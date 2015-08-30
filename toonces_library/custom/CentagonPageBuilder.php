@@ -32,7 +32,7 @@ class CentagonPageBuilder extends PageBuilder {
 		
 		$soundCloudEmbed = new DivElement('');
 		$soundCloudEmbed->setHTML('<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/51488040&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>');
-		$view->addElement($soundCloudEmbed);
+		//$view->addElement($soundCloudEmbed);
 		
 		$topDivider = new DivElement('section_divider');
 		$topDivider->setHTML('News and Announcements');
@@ -52,7 +52,7 @@ class CentagonPageBuilder extends PageBuilder {
 		$video = new DivElement('');
 		
 		$video->setHTML('<iframe width="420" height="315" src="https://www.youtube.com/embed/NjVugzSR7HA" frameborder="0" allowfullscreen></iframe>');
-		$view->addElement($video);
+		//$view->addElement($video);
 		
 		
 		$footer = new TagElement('footer');

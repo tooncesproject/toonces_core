@@ -9,7 +9,4 @@ SELECT
 FROM
 	toonces.pages
 WHERE
-	pathname = '%s'
-AND
-	hierarchy_level = %d
-LIMIT 1;
+	page_id = %d;

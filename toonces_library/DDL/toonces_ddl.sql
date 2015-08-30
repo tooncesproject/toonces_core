@@ -38,7 +38,8 @@ CREATE TABLE toonces.pages (
 	css_stylesheet VARCHAR(100) NOT NULL,
 	created_by VARCHAR(50),
 	created_dt DATETIME NOT NULL,
-	modified_dt DATETIME NOT NULL,
+	modified_dt DATETIME,
+	redirect_on_error BOOL,
 
 	PRIMARY KEY (page_id)
 );
@@ -49,3 +50,18 @@ ALTER TABlE toonces.pages
 ALTER TABlE toonces.pages
 	MODIFY modified_dt datetime ON UPDATE CURRENT_TIMESTAMP;
 
+DROP TABLE IF EXISTS toonces.page_hierarchy_bridge;
+
+CREATE TABLE toonces.page_hierarchy_bridge (
+	bridge_id BIGINT NOT NULL auto_increment,
+	page_id BIGINT NOT NULL,
+	ancestor_page_id BIGINT NOT NULL,
+	descendant_page_id BIGINT,
+		PRIMARY KEY (bridge_id),
+		FOREIGN KEY (page_id)
+			REFERENCES toonces.pages(page_id)/*,
+		FOREIGN KEY (ancestor_page_id)
+			REFERENCES toonces.pages(page_id),
+		FOREIGN KEY (descendant_page_id)
+			REFERENCES toonces.pages(page_id)*/
+);
