@@ -1,0 +1,7 @@
+# eclipse stuff
+.buildpath
+.metadata
+.project
+.settings
+test.html
+

@@ -1,0 +1,60 @@
+@charset "UTF-8";
+/* CSS Document */
+/*66635D (gray)  E54140 (red) F7EBD5 (cream) 6CC5C1 (aqua) 000000 (black)   */
+body
+{
+    background-color: #F7EBD5;
+    font-family: sans-serif;
+    color: #66635D;
+}
+a
+{
+    color: #E54140;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.warning
+{
+    color: #E54140;
+    font-weight: bold;
+}
+
+h1
+{
+    font-family: "Arial Black", Verdana, Helvetical,sans-serif;
+     background-color: #6CC5C1 ;
+     color: #E54140;
+     text-align: center;
+}
+header
+{
+    background-color: #E54140;
+     color: #E54140;
+     padding:1em;
+     color: #F7EBD5;
+     text-align: center;
+}
+
+.fl
+{
+    float: left;
+}
+
+div
+{
+    padding-left: 1em;
+}
+h2
+{
+    color: #000000;
+}
+
+li
+{
+    font-weight: bold;
+}
+iframe
+{
+    background-color:#6CC5C1;
+}
