@@ -1,6 +1,6 @@
 SELECT
 	phb.descendant_page_id,
-	pg.pathname,	
+	pg.pathname
 FROM
 	toonces.page_hierarchy_bridge phb
 LEFT JOIN
