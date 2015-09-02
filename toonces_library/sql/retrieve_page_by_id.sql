@@ -4,7 +4,6 @@ SELECT
 	page_title,
 	pagebuilder_class,
 	pageview_class,
-	hierarchy_level,
 	css_stylesheet
 FROM
 	toonces.pages

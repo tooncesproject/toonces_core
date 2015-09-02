@@ -16,6 +16,7 @@ include_once ROOTPATH.'/interfaces/iView.php';
 include_once ROOTPATH.'/custom/CentagonPageBuilder.php';
 include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
+include 'toonces_library/custom/FourOhFour.php';
 
 // function to get page from path
 
@@ -118,23 +119,30 @@ $conn = UniversalConnect::doConnect();
 if (trim($path))
 	$pageId = getPage($path, $conn);	
 
-// get sql query
+// if it's a 0, you got a 404
 
-$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$pageId);
+if ($pageId == 0) {
+	$pageBuilderClass = new FourOhFour();
+} else {
 
-$pageRecord = $conn->query($query);
+	// get sql query
+	$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$pageId);
+
+	$pageRecord = $conn->query($query);
 
 
-if ($pageRecord) {
-	foreach ($pageRecord as $result) {
-		$pathName = $result["pathname"];
-		$styleSheet = '/toonces_library/css/'.$result["css_stylesheet"];
-		$pageViewClass = $result["pageview_class"];
-		$pageBuilderClass = $result["pagebuilder_class"];
-		$pageTitle = $result["page_title"];
-	};
+	if ($pageRecord) {
+		foreach ($pageRecord as $result) {
+			$pathName = $result["pathname"];
+			$styleSheet = '/toonces_library/css/'.$result["css_stylesheet"];
+			$pageViewClass = $result["pageview_class"];
+			$pageBuilderClass = $result["pagebuilder_class"];
+			$pageTitle = $result["page_title"];
+		};
+	}
+
 }
-
+	
 // instantiate the page renderer
 $pageView = new $pageViewClass;
 

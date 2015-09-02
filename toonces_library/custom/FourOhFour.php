@@ -7,7 +7,7 @@ include_once ROOTPATH.'/BlogReader.php';
 include_once ROOTPATH.'/DivElement.php';
 include_once ROOTPATH.'/TagElement.php';
 
-class CentagonPageBuilder extends PageBuilder {
+class FourOhFour extends PageBuilder {
 	/*
 	var $elementArray = array();
 	private $containerHTML;
@@ -30,19 +30,18 @@ class CentagonPageBuilder extends PageBuilder {
 		
 		$view->addElement($contentElement);
 		
-		$soundCloudEmbed = new DivElement('');
-		$soundCloudEmbed->setHTML('<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/51488040&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>');
-		$view->addElement($soundCloudEmbed);
 		
 		$topDivider = new DivElement('section_divider');
-		$topDivider->setHTML('News and Announcements');
+		$topDivider->setHTML('404 MOTHERFUCKER');
 		$view->addElement($topDivider);
 		
 		array_push($this->elementArray,$view);
 		
-		$blogReader = new BlogReader();
+		$FourOhFourMessage = new Element();
 		
-		$view->addElement($blogReader);
+		$FourOhFourMessage->setHTML('SORRY DUDE WRONG PAGE');
+		
+		$view->addElement($FourOhFourMessage);
 		
 		$vidDivider = new DivElement('section_divider');
 		$vidDivider->setHTML('Get WEIRD!!!');

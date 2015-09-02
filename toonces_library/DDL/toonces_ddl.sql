@@ -33,13 +33,12 @@ CREATE TABLE toonces.pages (
 	page_title VARCHAR(50),
 	pagebuilder_class VARCHAR(50) NOT NULL,
 	pageview_class VARCHAR(50) NOT NULL,
-	hierarchy_level INT NOT NULL,
-	parent_page_id BIGINT,
 	css_stylesheet VARCHAR(100) NOT NULL,
 	created_by VARCHAR(50),
 	created_dt DATETIME NOT NULL,
 	modified_dt DATETIME,
 	redirect_on_error BOOL,
+	page_active BOOL,
 
 	PRIMARY KEY (page_id)
 );
