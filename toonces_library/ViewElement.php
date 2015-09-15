@@ -5,7 +5,7 @@ include_once ROOTPATH.'/test/fungussss.php';
 include_once ROOTPATH.'/test/herro.php';
 include_once ROOTPATH.'/Element.php';
 
-class ViewElement extends Element implements iView
+class ViewElement extends Element implements iElement
 {
 	// instance variables
 	// inherited class variables commented out
@@ -13,6 +13,11 @@ class ViewElement extends Element implements iView
 	//var $htmlFooter;
 	var $pageElements = array();
 	var $elementsCount = 0;
+	
+	//override element constructor method
+	public function __construct() {
+		// do nothing
+	}
 	
 	
 	// setter methods

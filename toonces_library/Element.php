@@ -2,11 +2,17 @@
 
 include_once ROOTPATH.'/interfaces/iElement.php';
 
-class Element implements iView {
+class Element implements iElement {
 
 	var $html;
 	var $htmlHeader;
 	var $htmlFooter;
+	var $pageViewReference;
+	
+	public function __construct($pageView) {
+		$this->pageViewReference = $pageView;
+	}
+	
 	
 	public function setHtmlHeader($headerString){
 		$htmlHeader = $headerString;

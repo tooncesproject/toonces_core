@@ -31,6 +31,7 @@ CREATE TABLE toonces.pages (
 	page_id BIGINT NOT NULL auto_increment,
 	pathname VARCHAR(50),
 	page_title VARCHAR(50),
+	page_link_text VARCHAR(50),
 	pagebuilder_class VARCHAR(50) NOT NULL,
 	pageview_class VARCHAR(50) NOT NULL,
 	css_stylesheet VARCHAR(100) NOT NULL,

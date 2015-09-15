@@ -17,6 +17,7 @@ include_once ROOTPATH.'/custom/CentagonPageBuilder.php';
 include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
 include 'toonces_library/custom/FourOhFour.php';
+include_once ROOTPATH.'/custom/CentagonPageBuilder1.php';
 
 // function to get page from path
 
@@ -134,10 +135,11 @@ if ($pageId == 0) {
 	if ($pageRecord) {
 		foreach ($pageRecord as $result) {
 			$pathName = $result["pathname"];
-			$styleSheet = '/toonces_library/css/'.$result["css_stylesheet"];
+			$styleSheet = $result["css_stylesheet"];
 			$pageViewClass = $result["pageview_class"];
 			$pageBuilderClass = $result["pagebuilder_class"];
 			$pageTitle = $result["page_title"];
+			$pageLinkText = $result["page_link_text"];
 		};
 	}
 
@@ -146,17 +148,27 @@ if ($pageId == 0) {
 // instantiate the page renderer
 $pageView = new $pageViewClass;
 
+
+/*
 // iView interface setter methods
 $pageView->setHtmlHeader($htmlHeader);
 $pageView->setHtmlFooter($htmlFooter);
+*/
+
 
 // set PageView class variables
-$pageView->pageTitle = $pageTitle;
-$pageView->styleSheet = $styleSheet;
-$pageView->metaTag = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
+
+$pageView->setStyleSheet($styleSheet);
+//$pageView->styleSheet = $styleSheet;
+
+$pageView->setPageTitle($pageTitle);
+
+$pageView->setPageLinkText($pageLinkText);
 
 $pageBuilder = new $pageBuilderClass;
-$pageElements = $pageBuilder->buildPage();
+
+
+$pageElements = $pageBuilder->buildPage($pageView);
 
 foreach($pageElements as $element) {	
 	$pageView->addElement($element);

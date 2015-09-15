@@ -2,8 +2,10 @@
 interface iView
 {
 	
-	public function setHtmlHeader ($headerString);
-	public function setHtmlFooter ($footerString);
+	
+	public function getPageTitle();
+	public function getStyleSheet();
+	public function getPageLinkText();
 	
 	public function getHTML();
 }

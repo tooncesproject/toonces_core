@@ -10,7 +10,7 @@
 include_once ROOTPATH.'/interfaces/iElement.php';
 include_once ROOTPATH.'/Element.php';
 
-class DivElement extends Element implements iView {
+class DivElement extends Element implements iElement {
 
 	// inherited class variables commented out
 	//var $html;

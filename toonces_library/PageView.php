@@ -7,14 +7,11 @@ class PageView extends ViewElement implements iView
 {
 	// instance variables
 
-	// inherited variables commented out
-	//private $htmlHeader;
-	//private $htmlFooter;
-	var $styleSheet;
-	var $metaTag;
+	var $htmlHeader;
+	var $pageElements = array();
 	var $pageTitle;
-	//var $pageElements = array();
-	
+	var $styleSheet;
+	var $pageLinkText;
 		
 	
 	public function addElement ($element) {
@@ -24,16 +21,45 @@ class PageView extends ViewElement implements iView
 		
 	}
 	
+	//setter methods
+	
+	public function setPageTitle($pageTitleString) {
+		$this->pageTitle = $pageTitleString;
+	}
+	
+	public function setStyleSheet($styleSheetFile) {
+		$this->styleSheet = $styleSheetFile;
+	}
+	
+	public function setPageLinkText($pageLinkString) {
+		$this->pageLinkText = $pageLinkString;
+	}
+	
+	// getter methods
+	public function getPageTitle() {
+		return $this->pageTitle;
+	}
+	
+	public function getStyleSheet() {
+		return  $this->styleSheet;
+	}
+	
+	public function getPageLinkText() {
+		return $this->pageLinkText;
+	}
+	
 	// execution methods
 	
 	public function getHTML() {
 		
-		$htmlString = "";
+		$htmlString = $this->htmlHeader;
 		
 		foreach($this->pageElements as $object) {
 			$htmlString = $htmlString.$object->getHTML();
 		}
 		
+		
+		/*
 		$htmlArray = [
 			"header" => $this->htmlHeader,
 			"headOpenTag" => '<head>'.PHP_EOL,
@@ -44,11 +70,15 @@ class PageView extends ViewElement implements iView
 			"headCloseTag" => '</head>'.PHP_EOL,
 			"bodyOpenTag" => '<body>'.PHP_EOL,
 			"elementsContent" => $htmlString.PHP_EOL,
-			"bodyCoseTag" => '</body>'.PHP_EOL,
+			"bodyCloseTag" => '</body>'.PHP_EOL,
 			"htmlFooter" => $this->htmlFooter.PHP_EOL
 		];
 		
 		return implode($htmlArray); 
+		*/
+		
+		return $htmlString;
+		
 		
 	}
 	

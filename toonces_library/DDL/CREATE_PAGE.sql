@@ -18,6 +18,7 @@ CREATE FUNCTION toonces.CREATE_PAGE  (
 	parent_page_id BIGINT,
 	pathname VARCHAR(50),
 	page_title VARCHAR(50),
+	page_link_text VARCHAR(50),
 	pagebuilder_class VARCHAR(50),
 	pageview_class VARCHAR(50),
 	css_stylesheet VARCHAR(100),
@@ -78,6 +79,7 @@ BEGIN
 		INSERT INTO toonces.pages (
 			pathname,
 			page_title,
+			page_link_text,
 			pagebuilder_class,
 			pageview_class,
 			css_stylesheet,
@@ -86,6 +88,7 @@ BEGIN
 		) VALUES (
 			pathname,
 			page_title,
+			page_link_text,
 			pagebuilder_class,
 			pageview_class,
 			css_stylesheet,
