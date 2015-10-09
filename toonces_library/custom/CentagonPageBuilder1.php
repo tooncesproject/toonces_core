@@ -29,7 +29,7 @@ class CentagonPageBuilder1 extends PageBuilder {
 		$htmlHeaderElement = new Element($this->pageViewReference);
 		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
 		
-		array_push($this->ElementArray, $htmlHeaderElement);
+		array_push($this->elementArray, $htmlHeaderElement);
 		
 		$headElement = new HeadElement($this->pageViewReference);
 		
@@ -39,13 +39,13 @@ class CentagonPageBuilder1 extends PageBuilder {
 		
 		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
 		
-		array_push($this->ElementArray, $headElement);
+		array_push($this->elementArray, $headElement);
 		
 		$bodyElement = new Element($this->pageViewReference);
 		
 		$bodyElement->setHTML(file_get_contents(ROOTPATH.'/static_data/footer_test.html'));
 		
-		array_push($this->ElementArray, $bodyElement);
+		array_push($this->elementArray, $bodyElement);
 		
 		/*
 		$view = new ViewElement();
@@ -89,7 +89,7 @@ class CentagonPageBuilder1 extends PageBuilder {
 		
 		$view->addElement($footer);
 		*/
-		return $this->ElementArray;
+		return $this->elementArray;
 		
 	}
 	

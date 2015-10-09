@@ -7,7 +7,7 @@ abstract class PageBuilder {
 	
 	var $styleSheet;
 	var $pageTitle;
-	var $ElementArray = array();
+	var $elementArray = array();
 	
 	// hold a reference to the PageView object, so I can pass it to the sub elements:
 	

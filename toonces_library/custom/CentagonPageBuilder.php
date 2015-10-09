@@ -38,7 +38,7 @@ class CentagonPageBuilder extends PageBuilder {
 		$topDivider->setHTML('News and Announcements');
 		$view->addElement($topDivider);
 		
-		array_push($this->ElementArray,$view);
+		array_push($this->elementArray,$view);
 		
 		$blogReader = new BlogReader();
 		
@@ -61,7 +61,7 @@ class CentagonPageBuilder extends PageBuilder {
 		
 		$view->addElement($footer);
 		
-		return $this->ElementArray;
+		return $this->elementArray;
 		
 	}
 	

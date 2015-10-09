@@ -10,16 +10,16 @@ class BlogReader implements iElement
 	var $query;
 	
 	//construct method
-	public function __construct() {
+	public function __construct($blogId) {
 		//$this->conn = UniversalConnect::doConnect;
 		
 		$this->conn = UniversalConnect::doConnect();
-		
+
 	}
-	
+
 	function queryBlog() {
 		
-		$query = file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql');
+		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$blogId);
 		
 		//$result = $this->conn->query($query);
 		

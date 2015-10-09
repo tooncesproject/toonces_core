@@ -18,6 +18,8 @@ include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
 include 'toonces_library/custom/FourOhFour.php';
 include_once ROOTPATH.'/custom/CentagonPageBuilder1.php';
+include_once ROOTPATH.'/custom/CentagonBlogPageBuilder2.php';
+include_once ROOTPATH.'/custom/CentagonBlogPostTest.php';
 
 // function to get page from path
 

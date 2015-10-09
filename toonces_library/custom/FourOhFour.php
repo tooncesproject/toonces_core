@@ -35,7 +35,7 @@ class FourOhFour extends PageBuilder {
 		$topDivider->setHTML('404 MOTHERFUCKER');
 		$view->addElement($topDivider);
 		
-		array_push($this->ElementArray,$view);
+		array_push($this->elementArray,$view);
 		
 		$FourOhFourMessage = new Element();
 		
@@ -60,7 +60,7 @@ class FourOhFour extends PageBuilder {
 		
 		$view->addElement($footer);
 		
-		return $this->ElementArray;
+		return $this->elementArray;
 		
 	}
 	

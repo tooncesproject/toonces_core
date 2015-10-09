@@ -60,7 +60,7 @@ BEGIN
 		INTO new_blog_page_id;
 
 		INSERT INTO toonces.blogs (
-			blog_page_id
+			page_id
 		)
 		VALUES (
 			new_blog_page_id

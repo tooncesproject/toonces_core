@@ -113,5 +113,6 @@ BEGIN
 
 	RETURN new_page_id;
 
-END ;
+END //
+DELIMITER ;
 
