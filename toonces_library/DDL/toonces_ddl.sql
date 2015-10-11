@@ -15,6 +15,7 @@ CREATE TABLE toonces.blog_posts (
 	title VARCHAR(200),
 	body TEXT,
 	thumbnail_image_vector VARCHAR(50),
+	published BOOL,
 
 	PRIMARY KEY (blog_post_id)
 	

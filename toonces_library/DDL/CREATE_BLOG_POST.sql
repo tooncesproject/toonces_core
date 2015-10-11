@@ -20,7 +20,6 @@ CREATE FUNCTION toonces.CREATE_BLOG_POST (
 	,body TEXT
 	,pagebuilder_class VARCHAR(50)
 	,thumbnail_image_vector VARCHAR(50)
-	
 )
 
 RETURNS BIGINT
@@ -44,57 +43,63 @@ BEGIN
 	WHERE
 		blog_id = parent_blog_id;
 	
-	
-	-- get page data
+	-- if blog page doesn't exist, return NULL. Otherwise, proceed.
+	IF blog_page_id IS NOT NULL THEN
 
-	SELECT
-		pageview_class
-		,css_stylesheet
-	INTO 
-		post_pageview_class
-		,post_css_stylesheet
-	FROM
-		toonces.pages
-	WHERE
-		page_id = blog_page_id
-	
-	;
+		-- get page data
+		SELECT
+			pageview_class
+			,css_stylesheet
+		INTO 
+			post_pageview_class
+			,post_css_stylesheet
+		FROM
+			toonces.pages
+		WHERE
+			page_id = blog_page_id	
+		;
 
-	-- generate pathname
-	-- strip all non-alphanumeric characters, lowercase and truncate
-	SET pathname = toonces.GENERATE_PATHNAME(title);
-	-- generate page
+		-- generate pathname
+		-- strip all non-alphanumeric characters, lowercase and truncate
+		SET pathname = toonces.GENERATE_PATHNAME(title);
 
-
-	SELECT toonces.CREATE_PAGE (
-		blog_page_id			-- parent_page_id BIGINT,
-		,pathname				-- pathname VARCHAR(50)
-		,title					-- page_title VARCHAR(50)
-		,title					-- page_link_text VARCHAR(50)
-		,pagebuilder_class		-- pagebuilder_class VARCHAR(50)
-		,post_pageview_class	-- pageview_class VARCHAR(50)
-		,post_css_stylesheet	-- css_stylesheet VARCHAR(100)
-		,1						-- redirect_on_error BOOL
-		,1						-- page_active BOOL
-	) INTO blog_post_page_id;
+		-- generate page
+		SELECT toonces.CREATE_PAGE (
+			blog_page_id			-- parent_page_id BIGINT,
+			,pathname				-- pathname VARCHAR(50)
+			,title					-- page_title VARCHAR(50)
+			,title					-- page_link_text VARCHAR(50)
+			,pagebuilder_class		-- pagebuilder_class VARCHAR(50)
+			,post_pageview_class	-- pageview_class VARCHAR(50)
+			,post_css_stylesheet	-- css_stylesheet VARCHAR(100)
+			,1						-- redirect_on_error BOOL
+			,1						-- page_active BOOL
+		) INTO blog_post_page_id;
 		
-	-- insert record into blog_posts table
+		-- if page creation was sucessful, proceed.
+		
+		IF blog_post_page_id IS NOT NULL THEN
+			-- insert record into blog_posts table
+			INSERT INTO toonces.blog_posts (
+				blog_id
+				,page_id
+				,author
+				,title
+				,body
+				,thumbnail_image_vector
+				,published
+			) VALUES (
+				parent_blog_id
+				,blog_post_page_id
+				,author
+				,title
+				,body
+				,thumbnail_image_vector
+				,1
+			);
+		END IF;
 
-	INSERT INTO toonces.blog_posts (
-		blog_id
-		,page_id
-		,author
-		,title
-		,body
-		,thumbnail_image_vector
-	) VALUES (
-		parent_blog_id
-		,blog_post_page_id
-		,author
-		,title
-		,body
-		,thumbnail_image_vector
-	);
+	END IF;
 
 	RETURN blog_post_page_id;
 

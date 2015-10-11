@@ -4,25 +4,25 @@ include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
 include_once ROOTPATH.'/static_classes/GrabPageURL.php';
 
-class BlogReader implements iElement
+class BlogReaderSingle implements iElement
 
 {
 	private $conn;
 	var $query;
-	var $theBlogId;
+	var $thePageId;
 	
 	//construct method
-	public function __construct($blogId) {
+	public function __construct($pageId) {
 		//$this->conn = UniversalConnect::doConnect;
 		
 		$this->conn = UniversalConnect::doConnect();
-		$this->theBlogId = $blogId;
+		$this->thePageId = $pageId;
 
 	}
 
 	function queryBlog() {
 		
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->theBlogId);
+		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_single_blog_post.sql'),$this->thePageId);
 		
 		//$result = $this->conn->query($query);
 		
@@ -47,8 +47,7 @@ class BlogReader implements iElement
 		foreach($queryRows as $row) {
 			
 			$postPageId = $row['page_id'];
-			$postPageURL = GrabPageURL::getURL($postPageId);
-			$html = $html.'<p><h1><a href="'.$postPageURL.'">'.$row['title'].'</a></h1></p>'.PHP_EOL;
+			$html = $html.'<p><h1>'.$row['title'].'</h1></p>'.PHP_EOL;
 			$html = $html.'<p><h2>'.$row['author'].'</h2></p>'.PHP_EOL;
 			$html = $html.'<p>'.$row['created_dt'].'</p>'.PHP_EOL;
 			$html = $html.'<p><body>'.$row['body'].'</body></p>'.PHP_EOL;

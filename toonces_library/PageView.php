@@ -12,6 +12,11 @@ class PageView extends ViewElement implements iView
 	var $pageTitle;
 	var $styleSheet;
 	var $pageLinkText;
+	var $pageId;
+	
+	public function __construct($pageViewPageId) {
+		$this->pageId = $pageViewPageId;	
+	}
 		
 	
 	public function addElement ($element) {
@@ -57,28 +62,8 @@ class PageView extends ViewElement implements iView
 		foreach($this->pageElements as $object) {
 			$htmlString = $htmlString.$object->getHTML();
 		}
-		
-		
-		/*
-		$htmlArray = [
-			"header" => $this->htmlHeader,
-			"headOpenTag" => '<head>'.PHP_EOL,
-			"metaTag" => $this->metaTag.PHP_EOL,
-			"titleTag" => '<title>'.$this->pageTitle.'</title>'.PHP_EOL,
-			"stylesheetTag" => '<link href="'.$this->styleSheet.'" rel="stylesheet" type="text/css" />'.PHP_EOL,
-			"faviconTag" => '<link rel="icon" type="image/ico" href="/favicon.ico">'.PHP_EOL,
-			"headCloseTag" => '</head>'.PHP_EOL,
-			"bodyOpenTag" => '<body>'.PHP_EOL,
-			"elementsContent" => $htmlString.PHP_EOL,
-			"bodyCloseTag" => '</body>'.PHP_EOL,
-			"htmlFooter" => $this->htmlFooter.PHP_EOL
-		];
-		
-		return implode($htmlArray); 
-		*/
-		
+				
 		return $htmlString;
-		
 		
 	}
 	

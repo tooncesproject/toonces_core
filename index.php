@@ -19,6 +19,7 @@ include_once ROOTPATH.'/utility/UniversalConnect.php';
 include 'toonces_library/custom/FourOhFour.php';
 include_once ROOTPATH.'/custom/CentagonPageBuilder1.php';
 include_once ROOTPATH.'/custom/CentagonBlogPageBuilder2.php';
+include_once ROOTPATH.'/custom/CentagonBlogPageBuilder1.php';
 include_once ROOTPATH.'/custom/CentagonBlogPostTest.php';
 
 // function to get page from path
@@ -148,7 +149,7 @@ if ($pageId == 0) {
 }
 	
 // instantiate the page renderer
-$pageView = new $pageViewClass;
+$pageView = new $pageViewClass($pageId);
 
 
 /*

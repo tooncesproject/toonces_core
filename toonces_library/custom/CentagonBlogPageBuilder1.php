@@ -3,13 +3,13 @@
 include_once ROOTPATH.'/ViewElement.php';
 include_once ROOTPATH.'/Element.php';
 include_once ROOTPATH.'/abstract/PageBuilder.php';
-include_once ROOTPATH.'/BlogReader.php';
+include_once ROOTPATH.'/BlogPageReader.php';
 include_once ROOTPATH.'/DivElement.php';
 include_once ROOTPATH.'/TagElement.php';
 include_once ROOTPATH.'/HeadElement.php';
 include_once ROOTPATH.'/PageView.php';
 
-class CentagonPageBuilder1 extends PageBuilder {
+class CentagonBlogPageBuilder1 extends PageBuilder {
 	/*
 	var $elementArray = array();
 	private $containerHTML;
@@ -21,10 +21,9 @@ class CentagonPageBuilder1 extends PageBuilder {
 	}
 	
 	*/
-	var $blogReader;
+	var $blogPageReader;
 	
 	function buildPage($pageView) {
-		
 		
 		$this->pageViewReference = $pageView;
 		
@@ -50,7 +49,9 @@ class CentagonPageBuilder1 extends PageBuilder {
 		
 		array_push($this->elementArray, $bodyElement);
 		
-		$blogReader = new BlogReader(1);
+		$pageId = $this->pageViewReference->pageId;
+		
+		$blogReader = new BlogPageReader($pageId);
 		
 		array_push($this->elementArray, $blogReader);
 		

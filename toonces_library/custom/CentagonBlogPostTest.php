@@ -8,6 +8,7 @@ include_once ROOTPATH.'/DivElement.php';
 include_once ROOTPATH.'/TagElement.php';
 include_once ROOTPATH.'/HeadElement.php';
 include_once ROOTPATH.'/PageView.php';
+include_once ROOTPATH.'/BlogReaderSingle.php';
 
 class CentagonBlogPostTest extends PageBuilder {
 	/*
@@ -43,9 +44,21 @@ class CentagonBlogPostTest extends PageBuilder {
 		
 		$bodyElement = new Element($this->pageViewReference);
 		
-		$bodyElement->setHTML(file_get_contents(ROOTPATH.'/static_data/buttchild2.html'));
+		$bodyElement->setHTML(file_get_contents(ROOTPATH.'/static_data/body_test.html'));
 		
 		array_push($this->elementArray, $bodyElement);
+		
+		$pageId = $this->pageViewReference->pageId;
+		
+		$blogReaderSingle = new BlogReaderSingle($pageId);
+		
+		array_push($this->elementArray, $blogReaderSingle);
+		
+		$footerElement = new Element($this->pageViewReference);
+		
+		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/real_footer_ish.html'));
+		
+		array_push($this->elementArray, $footerElement);
 		
 		return $this->elementArray;
 		
