@@ -1,23 +1,19 @@
 	@charset "UTF-8";
 
 a:link { 
-	font-family: Georgia, "Times New Roman", Times, serif;
 	color: #999;
 	text-decoration:none
 }
 a:active { 
-	font-family: Georgia, "Times New Roman", Times, serif;
 	color: #999;
 	text-decoration:none
 }
 
 a:visited { 
-	font-family: Georgia, "Times New Roman", Times, serif;
 	color: #999;
 	text-decoration:none
 }
 a:hover { 
-	font-family: Georgia, "Times New Roman", Times, serif;
 	color: #FFF;
 	text-decoration:none
 }
