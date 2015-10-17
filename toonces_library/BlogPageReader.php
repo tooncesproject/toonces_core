@@ -4,33 +4,40 @@ include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
 include_once ROOTPATH.'/static_classes/GrabPageURL.php';
 
-class BlogReader implements iElement
+class BlogPageReader extends BlogReader implements iElement
+
+/*
+ * 	Paul Anderson 10/10/2015
+ * 	This extension of the Blog Reader class acquires the blog content
+ * 	by the blog's home page ID, where BlogReader gets it from the BlogId.
+ * 	
+ *	Because BlogPageReader queries for content based on the page ID, it's
+ *	specifically designed to be instantiated in a blog home page, where
+ *	BlogReaader is designed to be used outside the blog's home page.
+ * 
+ */
+
 
 {
 	private $conn;
 	var $query;
-	var $theBlogId;
+	var $theBlogPageId;
 	
 	//construct method
-	public function __construct($blogId) {
-		//$this->conn = UniversalConnect::doConnect;
+	public function __construct($blogPageId) {
 		
 		$this->conn = UniversalConnect::doConnect();
-		$this->theBlogId = $blogId;
+		$this->theBlogPageId = $blogPageId;
 
 	}
 
 	function queryBlog() {
 		
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->theBlogId);
-		
-		//$result = $this->conn->query($query);
+		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts_by_blog_page_id.sql'),$this->theBlogPageId);
 		
 		$result = $this->conn->query($query);
 		
 		return $result;
-		
-		//return $this->runQuery($this->conn, $query);
 		
 		
 	}
