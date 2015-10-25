@@ -1,7 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/interfaces/iElement.php';
-include_once ROOTPATH.'/Element.php';
+include_once ROOTPATH.'/toonces.php';
 
 class HeadElement extends Element implements iElement {
 

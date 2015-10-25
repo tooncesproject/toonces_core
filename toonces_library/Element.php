@@ -1,6 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/interfaces/iElement.php';
+include_once ROOTPATH.'/toonces.php';
 
 class Element implements iElement {
 

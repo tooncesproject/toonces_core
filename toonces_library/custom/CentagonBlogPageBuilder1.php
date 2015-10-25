@@ -1,13 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/ViewElement.php';
-include_once ROOTPATH.'/Element.php';
-include_once ROOTPATH.'/abstract/PageBuilder.php';
-include_once ROOTPATH.'/BlogPageReader.php';
-include_once ROOTPATH.'/DivElement.php';
-include_once ROOTPATH.'/TagElement.php';
-include_once ROOTPATH.'/HeadElement.php';
-include_once ROOTPATH.'/PageView.php';
+
 
 class CentagonBlogPageBuilder1 extends PageBuilder {
 	/*
