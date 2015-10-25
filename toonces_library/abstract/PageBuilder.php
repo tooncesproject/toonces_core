@@ -1,7 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/ViewElement.php';
-include_once ROOTPATH.'/Element.php';
+include_once ROOTPATH.'/toonces.php';
 
 abstract class PageBuilder {
 	

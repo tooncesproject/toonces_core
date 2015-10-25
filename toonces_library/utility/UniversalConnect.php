@@ -1,6 +1,6 @@
 <?php
 
-INCLUDE_ONCE ROOTPATH.'/interfaces/iConnectInfo.php';
+include_once ROOTPATH.'/toonces.php';
 
 class UniversalConnect implements iConnectInfo
 {

@@ -7,8 +7,7 @@
  */
 
 
-include_once ROOTPATH.'/interfaces/iElement.php';
-include_once ROOTPATH.'/Element.php';
+include_once ROOTPATH.'/toonces.php';
 
 class DivElement extends Element implements iElement {
 

@@ -1,9 +1,6 @@
 <?php
-include_once ROOTPATH.'/interfaces/iView.php';
-//include_once ROOTPATH.'/interfaces/iElement.php';
-include_once ROOTPATH.'/test/fungussss.php';
-include_once ROOTPATH.'/test/herro.php';
-include_once ROOTPATH.'/Element.php';
+
+include_once ROOTPATH.'/toonces.php';
 
 class ViewElement extends Element implements iElement
 {

@@ -1,7 +1,6 @@
 <?php
-include_once ROOTPATH.'/interfaces/iView.php';
-include_once ROOTPATH.'/interfaces/iElement.php';
-include_once ROOTPATH.'/ViewElement.php';
+
+require_once ROOTPATH.'/toonces.php';
 
 class PageView extends ViewElement implements iView
 {

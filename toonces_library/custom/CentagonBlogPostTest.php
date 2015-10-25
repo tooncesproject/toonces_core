@@ -1,14 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/ViewElement.php';
-include_once ROOTPATH.'/Element.php';
-include_once ROOTPATH.'/abstract/PageBuilder.php';
-include_once ROOTPATH.'/BlogReader.php';
-include_once ROOTPATH.'/DivElement.php';
-include_once ROOTPATH.'/TagElement.php';
-include_once ROOTPATH.'/HeadElement.php';
-include_once ROOTPATH.'/PageView.php';
-include_once ROOTPATH.'/BlogReaderSingle.php';
+require_once ROOTPATH.'/toonces.php';
 
 class CentagonBlogPostTest extends PageBuilder {
 	/*

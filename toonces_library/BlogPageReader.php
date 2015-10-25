@@ -1,8 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/static_classes/SQLConn.php';
-include_once ROOTPATH.'/utility/UniversalConnect.php';
-include_once ROOTPATH.'/static_classes/GrabPageURL.php';
+require_once ROOTPATH.'/toonces.php';
 
 class BlogPageReader extends BlogReader implements iElement
 
