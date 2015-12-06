@@ -105,13 +105,23 @@ $pageId = 1;
 // Acquire path query from request
 $path = $_SERVER['REQUEST_URI']; 
 
-$path = substr($path,1,strlen($path)-1);
+
 
 
 // establish SQL connection and query for page
 $conn = UniversalConnect::doConnect();
 
-// Check for a URL query string. If none, defaults to home page.
+// Check URL for a query string, and parse it.
+$queryString = $_SERVER['QUERY_STRING']; 
+// If the url has a query string, remove it from the path.
+if (!empty($queryString)) {
+	$path = str_replace($queryString,'',$path);
+}
+
+// trim last slash from path
+$path = substr($path,1,strlen($path)-1);
+
+// Check for a URL page path string. If none, defaults to home page.
 
 if (trim($path))
 	$pageId = getPage($path, $conn);	

@@ -12,6 +12,7 @@ class PageView extends ViewElement implements iView
 	var $styleSheet;
 	var $pageLinkText;
 	var $pageId;
+	var $pageParams = array();
 	
 	public function __construct($pageViewPageId) {
 		$this->pageId = $pageViewPageId;	
