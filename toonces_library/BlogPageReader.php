@@ -20,18 +20,45 @@ class BlogPageReader extends BlogReader implements iElement
 	private $conn;
 	var $query;
 	var $theBlogPageId;
+	var $pageNumber;
+	var $itemsPerPage;
+	var $postIdString;
 	
 	//construct method
-	public function __construct($blogPageId) {
+	public function __construct($pageView) {
+		//$this->conn = UniversalConnect::doConnect;
 		
 		$this->conn = UniversalConnect::doConnect();
-		$this->theBlogPageId = $blogPageId;
-
+		// $this->theBlogId = $blogId;
+		$this->pageViewReference = $pageView;
+		$this->theBlogPageId = $this->pageViewReference->pageId;	
 	}
 
 	function queryBlog() {
 		
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts_by_blog_page_id.sql'),$this->theBlogPageId);
+		// get parameters from pageview query string, if they exist
+		if (array_key_exists('itemsperpage', $this->pageViewReference->queryArray)) {	
+			$this->itemsPerPage = intval($this->pageViewReference->queryArray['itemsperpage']);
+		}
+		if (array_key_exists('page',$this->pageViewReference->queryArray))
+			$this->pageNumber = intval($this->pageViewReference->queryArray['page']);
+		
+		// Check to see if they are set; if not, use defaults.
+		if (!is_int($this->itemsPerPage)) {
+			$this->itemsPerPage = 10;
+		}
+		
+		if (!is_int($this->pageNumber)) {
+			$this->pageNumber = 1;
+		}
+		
+		// query the SQL function to get desired blog post ids
+		
+		
+		
+		//$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->postIdString);
+		$query = sprintf('CALL toonces.sp_get_blog_posts(%d,%d,%d)',$this->theBlogId,$this->itemsPerPage,$this->pageNumber);
+		
 		
 		$result = $this->conn->query($query);
 		

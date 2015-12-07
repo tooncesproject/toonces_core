@@ -12,10 +12,11 @@ class PageView extends ViewElement implements iView
 	var $styleSheet;
 	var $pageLinkText;
 	var $pageId;
-	var $pageParams = array();
-	
+	var $queryArray = array();
+
 	public function __construct($pageViewPageId) {
-		$this->pageId = $pageViewPageId;	
+		$this->pageId = $pageViewPageId;
+		parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
 	}
 		
 	
@@ -67,10 +68,7 @@ class PageView extends ViewElement implements iView
 		
 	}
 	
-	
-	
 	public function renderPage() {
-
 		echo $this->getHTML();
 	}
 	

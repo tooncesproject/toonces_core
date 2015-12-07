@@ -8,19 +8,39 @@ class BlogReader implements iElement
 	private $conn;
 	var $query;
 	var $theBlogId;
+	var $pageViewReference;
+	//var $paramArray = array();
+	
+	// specific to this class, with defaults:
+	var $pageNumber;
+	var $itemsPerPage;
 	
 	//construct method
-	public function __construct($blogId) {
+	public function __construct($pageView, $blogId) {
 		//$this->conn = UniversalConnect::doConnect;
 		
 		$this->conn = UniversalConnect::doConnect();
 		$this->theBlogId = $blogId;
-
+		$this->pageViewReference = $pageView;
 	}
 
 	function queryBlog() {
 		
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->theBlogId);
+		// get parameters from pageview query string
+		$itemsPerPage = intval($this->pageViewReference->queryArray['itemsperpage']);
+		$pageNumber = intval($this->pageViewReference->queryArray['page']);
+		
+		// Check to see if they are set; if not, use defaults.
+		if (!is_int($itemsPerPage)) {
+			$itemsPerPage = 10;
+		}
+		
+		if (!is_int($pageNumber)) {
+			$pageNumber = 1;
+		}
+		
+		//$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->theBlogId);
+		$query = sprintf('call toonces.sp_get_blog_posts(%d,%d,%d)',$this->theBlogId,$this->itemsPerPage,$this->pageNumber);
 		
 		//$result = $this->conn->query($query);
 		

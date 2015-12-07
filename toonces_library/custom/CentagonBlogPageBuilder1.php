@@ -44,7 +44,7 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 		
 		$pageId = $this->pageViewReference->pageId;
 		
-		$blogReader = new BlogPageReader($pageId);
+		$blogReader = new BlogPageReader($this->pageViewReference);
 		
 		array_push($this->elementArray, $blogReader);
 		
