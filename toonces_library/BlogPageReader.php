@@ -53,9 +53,7 @@ class BlogPageReader extends BlogReader implements iElement
 		}
 		
 		// query the SQL function to get desired blog post ids
-		
-		
-		
+		// it doesn't work.
 		//$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->postIdString);
 		$query = sprintf('CALL toonces.sp_get_blog_posts(%d,%d,%d)',$this->theBlogId,$this->itemsPerPage,$this->pageNumber);
 		
