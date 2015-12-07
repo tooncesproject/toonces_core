@@ -390,7 +390,8 @@ CREATE FUNCTION toonces.GET_BLOG_POST_IDS (
     ,param_items_per_page   INT UNSIGNED
     ,param_page             INT UNSIGNED
 )
-RETURNS TABLE
+
+RETURNS VARCHAR(1000)
 
 NOT DETERMINISTIC
 
@@ -440,7 +441,7 @@ BEGIN
 
     DROP TEMPORARY TABLE temp_all_posts_for_blog;
 
-    RETURN SELECT var_id_string;
+    RETURN var_id_string;
 
 END //
 
