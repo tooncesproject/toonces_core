@@ -1,5 +1,5 @@
 SELECT
-    bp.created_dt
+     bp.created_dt
     ,bp.author
     ,bp.title
     ,bp.body

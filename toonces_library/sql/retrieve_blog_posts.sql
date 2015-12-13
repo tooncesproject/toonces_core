@@ -7,6 +7,6 @@ SELECT
 FROM
     toonces.blog_posts bp
 WHERE
-	bp.blog_id IN (%s)
--- ORDER BY created_dt DESC
--- LIMIT 10;
+	bp.blog_post_id IN (%s)
+ORDER BY
+	created_dt DESC;

@@ -19,7 +19,7 @@ class BlogPageReader extends BlogReader implements iElement
 {
 	private $conn;
 	var $query;
-	var $theBlogPageId;
+	var $blogPageId;
 	var $pageNumber;
 	var $itemsPerPage;
 	var $postIdString;
@@ -31,7 +31,7 @@ class BlogPageReader extends BlogReader implements iElement
 		$this->conn = UniversalConnect::doConnect();
 		// $this->theBlogId = $blogId;
 		$this->pageViewReference = $pageView;
-		$this->theBlogPageId = $this->pageViewReference->pageId;	
+		$this->blogPageId = $this->pageViewReference->pageId;	
 	}
 
 	function queryBlog() {
@@ -52,15 +52,53 @@ class BlogPageReader extends BlogReader implements iElement
 			$this->pageNumber = 1;
 		}
 		
-		// query the SQL function to get desired blog post ids
-		// it doesn't work.
-		//$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$this->postIdString);
-		$query = sprintf('CALL toonces.sp_get_blog_posts(%d,%d,%d)',$this->theBlogId,$this->itemsPerPage,$this->pageNumber);
+		$pageIdQuery = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_post_ids_by_page_id.sql'),$this->blogPageId);
 		
+		// run query to get a list of all the blog post ids
+		$postIdResults = $this->conn->query($pageIdQuery);
 		
-		$result = $this->conn->query($query);
+		// populate an array of the results.
+		$allPostIds = array();
+		foreach ($postIdResults as $resultRow) {
+			array_push($allPostIds,$resultRow['blog_post_id']);
+		}
+		$postCount = count($allPostIds);
 		
-		return $result;
+		// build a concatenated list of blog post ids per the input parameters
+		$postOrdinal= 1;
+		$postIdSet = array();
+		$minPost = $this->itemsPerPage * $this->pageNumber - $this->itemsPerPage + 1;
+		$maxPost = $this->itemsPerPage * $this->pageNumber;
+		
+		// if the query string specifies a set of blog posts that doesn't exist, default to
+		// the most recent set.
+		
+		if ($minPost > $postCount) {
+			
+			$maxPost = min($this->itemsPerPage,$postCount);
+			$minPost = 1;
+
+		}
+		
+
+		foreach ($allPostIds as $postIdRow) {
+			
+			if ($postOrdinal >= $minPost and $postOrdinal <= $maxPost) {
+				array_push($postIdSet, strval($postIdRow));
+			}
+			$postOrdinal++;
+			if ($postOrdinal > $maxPost) {
+				break;
+			}
+		}
+		
+		$postIdString = implode(',',$postIdSet);
+		
+		$blogPostQuery = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$postIdString);
+		
+		$blogPostResult = $this->conn->query($blogPostQuery);
+		
+		return $blogPostResult;
 		
 		
 	}
