@@ -18,11 +18,11 @@ class BlogPageReader extends BlogReader implements iElement
 
 {
 	private $conn;
-	var $query;
 	var $blogPageId;
 	var $pageNumber;
 	var $itemsPerPage;
 	var $postIdString;
+	var $postCount;
 	
 	//construct method
 	public function __construct($pageView) {
@@ -62,7 +62,7 @@ class BlogPageReader extends BlogReader implements iElement
 		foreach ($postIdResults as $resultRow) {
 			array_push($allPostIds,$resultRow['blog_post_id']);
 		}
-		$postCount = count($allPostIds);
+		$this->postCount = count($allPostIds);
 		
 		// build a concatenated list of blog post ids per the input parameters
 		$postOrdinal= 1;
@@ -73,9 +73,9 @@ class BlogPageReader extends BlogReader implements iElement
 		// if the query string specifies a set of blog posts that doesn't exist, default to
 		// the most recent set.
 		
-		if ($minPost > $postCount) {
+		if ($minPost > $this->postCount) {
 			
-			$maxPost = min($this->itemsPerPage,$postCount);
+			$maxPost = min($this->itemsPerPage,$this->postCount);
 			$minPost = 1;
 
 		}
@@ -102,6 +102,26 @@ class BlogPageReader extends BlogReader implements iElement
 		
 		
 	}
+	
+	
+	function makeSimpleNavigator($postCount) {
+		
+		$navHTML = '';
+		
+		// If there are any newer posts, generate a link to the next page
+		if ($postCount > $this->pageNumber * $this->itemsPerPage) {
+			$nextPageUrl = $_SERVER['HTTP_HOST'].$_SERVER['PATH'].'?page='.strval($this->pageNumber + 1).'&itemsperpage='.strval($this->itemsPerPage);
+			$navHTML = $navHTML.'<div class="nextpage"><a href="'.$nextPageUrl.'">Newer</a></div>'.PHP_EOL; 
+		}
+			
+			// If the page is greater than 1, generate a link to the previous page
+		if ($this->pageNumber > 1) {
+			$previousPageUrl = $_SERVER['HTTP_HOST'].$_SERVER['PATH'].'?page='.strval($this->pageNumber - 1).'&itemsperpage='.strval($this->itemsPerPage);
+			$navHTML = $navHTML.'<div class="prevpage"><a href="'.$previousPageUrlPageUrl.'">Older</a></div>'.PHP_EOL;
+		}
+		
+		return $navHTML;
+	}
 
 	
 	public function getHTML() {
@@ -123,6 +143,8 @@ class BlogPageReader extends BlogReader implements iElement
 		}
 		
 		$html = $html.'</div>'.PHP_EOL;
+		
+		$html = $html.$this->makeSimpleNavigator($this->postCount);
 		
 		$this->conn = null;
 		return $html;
