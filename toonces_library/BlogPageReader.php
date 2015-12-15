@@ -106,19 +106,21 @@ class BlogPageReader extends BlogReader implements iElement
 	
 	function makeSimpleNavigator($postCount) {
 		
-		$navHTML = '';
+		$navHTML = '<div class="bottom_nav_container">'.PHP_EOL;
+		
+		// If the page is greater than 1, generate a link to the previous page
+		if ($this->pageNumber > 1) {
+			$previousPageUrl = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?page='.strval($this->pageNumber - 1).'&itemsperpage='.strval($this->itemsPerPage);
+			$navHTML = $navHTML.'<div class="prev_page_link"><a href="'.$previousPageUrl.'">Newer Posts</a></div>'.PHP_EOL;
+		}
 		
 		// If there are any newer posts, generate a link to the next page
 		if ($postCount > $this->pageNumber * $this->itemsPerPage) {
-			$nextPageUrl = $_SERVER['HTTP_HOST'].$_SERVER['PATH'].'?page='.strval($this->pageNumber + 1).'&itemsperpage='.strval($this->itemsPerPage);
-			$navHTML = $navHTML.'<div class="nextpage"><a href="'.$nextPageUrl.'">Newer</a></div>'.PHP_EOL; 
+			$nextPageUrl = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?page='.strval($this->pageNumber + 1).'&itemsperpage='.strval($this->itemsPerPage);
+			$navHTML = $navHTML.'<div class="next_page_link"><a href="'.$nextPageUrl.'">Older Posts</a></div>'.PHP_EOL; 
 		}
 			
-			// If the page is greater than 1, generate a link to the previous page
-		if ($this->pageNumber > 1) {
-			$previousPageUrl = $_SERVER['HTTP_HOST'].$_SERVER['PATH'].'?page='.strval($this->pageNumber - 1).'&itemsperpage='.strval($this->itemsPerPage);
-			$navHTML = $navHTML.'<div class="prevpage"><a href="'.$previousPageUrlPageUrl.'">Older</a></div>'.PHP_EOL;
-		}
+		$navHTML = $navHTML.'</div>';
 		
 		return $navHTML;
 	}
@@ -142,9 +144,10 @@ class BlogPageReader extends BlogReader implements iElement
 			$html = $html.'<p><body>'.$row['body'].'</body></p>'.PHP_EOL;
 		}
 		
+		$html = $html.$this->makeSimpleNavigator($this->postCount);
 		$html = $html.'</div>'.PHP_EOL;
 		
-		$html = $html.$this->makeSimpleNavigator($this->postCount);
+		
 		
 		$this->conn = null;
 		return $html;
