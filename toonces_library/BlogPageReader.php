@@ -147,8 +147,6 @@ class BlogPageReader extends BlogReader implements iElement
 		$html = $html.$this->makeSimpleNavigator($this->postCount);
 		$html = $html.'</div>'.PHP_EOL;
 		
-		
-		
 		$this->conn = null;
 		return $html;
 		
