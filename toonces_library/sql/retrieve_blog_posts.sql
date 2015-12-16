@@ -1,5 +1,5 @@
 SELECT
-    created_dt
+     created_dt
     ,author
     ,title
     ,body
@@ -7,6 +7,6 @@ SELECT
 FROM
     toonces.blog_posts bp
 WHERE
-	bp.blog_id = %d
-ORDER BY created_dt DESC;
-LIMIT 10;
+	bp.blog_post_id IN (%s)
+ORDER BY
+	created_dt DESC;

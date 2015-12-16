@@ -14,7 +14,6 @@ include 'toonces_library/config.php';
 require_once ROOTPATH.'/toonces.php';
 
 
-
 // function to get page from path
 
 function getPage($pathString, $conn) {
@@ -103,15 +102,20 @@ $pageBuilderClass = 'CentagonPageBuilder';
 $pageId = 1;
 
 // Acquire path query from request
-$path = $_SERVER['REQUEST_URI']; 
-
-$path = substr($path,1,strlen($path)-1);
-
+//$path = $_SERVER['REQUEST_URI']; 
+$url = $_SERVER['REQUEST_URI'];
 
 // establish SQL connection and query for page
 $conn = UniversalConnect::doConnect();
 
-// Check for a URL query string. If none, defaults to home page.
+// Acquire query string if exists
+$queryString = $_SERVER['QUERY_STRING'];
+
+$path = parse_url($url,PHP_URL_PATH);
+// Check for a URL page path string. If none, defaults to home page.
+
+// trim last slash from path
+$path = substr($path,1,strlen($path)-1);
 
 if (trim($path))
 	$pageId = getPage($path, $conn);	

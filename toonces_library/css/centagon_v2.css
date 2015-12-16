@@ -209,3 +209,33 @@ h3 {
 	padding-top: 40px;
 	padding-bottom: 10px;
 }
+.bottom_nav_container {
+	height: 60px;
+	width: 100%;
+	position: relative;
+	bottom: 0px;
+}
+.prev_page_link {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	font-style: italic;
+	position: relative;
+	left: 20px;
+	width: 100px;
+	text-align: left;
+	float: left;
+	vertical-align: middle;
+	padding-top: 26px;
+}
+.next_page_link {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	font-style: italic;
+	position: relative;
+	right: 20px;
+	width: 100px;
+	text-align: right;
+	float: right;
+	vertical-align: middle;
+	padding-top: 26px;
+}

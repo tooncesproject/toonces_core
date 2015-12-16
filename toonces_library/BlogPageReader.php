@@ -12,57 +12,44 @@ class BlogPageReader extends BlogReader implements iElement
  *	Because BlogPageReader queries for content based on the page ID, it's
  *	specifically designed to be instantiated in a blog home page, where
  *	BlogReaader is designed to be used outside the blog's home page.
+ *
+ * This class overrides buildPageIdQuery(). All other functions are inherited.
  * 
  */
 
 
 {
+/* inherited instance variables commented out
 	private $conn;
-	var $query;
-	var $theBlogPageId;
-	
-	//construct method
-	public function __construct($blogPageId) {
-		
-		$this->conn = UniversalConnect::doConnect();
-		$this->theBlogPageId = $blogPageId;
+	var $blogPageId;
+	var $pageNumber;
+	var $itemsPerPage;
+	var $postIdString;
+	var $postCount;
+*/
 
-	}
+	function buildPageIdQuery() {
 
-	function queryBlog() {
+			// get parameters from pageview query string, if they exist
+		if (array_key_exists('itemsperpage', $this->pageViewReference->queryArray)) {
+			$this->itemsPerPage = intval($this->pageViewReference->queryArray['itemsperpage']);
+		}
+		if (array_key_exists('page',$this->pageViewReference->queryArray))
+			$this->pageNumber = intval($this->pageViewReference->queryArray['page']);
 		
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts_by_blog_page_id.sql'),$this->theBlogPageId);
-		
-		$result = $this->conn->query($query);
-		
-		return $result;
-		
-		
-	}
-
-	
-	public function getHTML() {
-		
-		$html = '<div class="blogreader">'.PHP_EOL;
-				
-		$queryRows = $this->queryBlog();
-		
-		// row contains: created_dt, author, title, body
-		
-		foreach($queryRows as $row) {
-			
-			$postPageId = $row['page_id'];
-			$postPageURL = GrabPageURL::getURL($postPageId);
-			$html = $html.'<p><h1><a href="'.$postPageURL.'">'.$row['title'].'</a></h1></p>'.PHP_EOL;
-			$html = $html.'<p><h2>'.$row['author'].'</h2></p>'.PHP_EOL;
-			$html = $html.'<p>'.$row['created_dt'].'</p>'.PHP_EOL;
-			$html = $html.'<p><body>'.$row['body'].'</body></p>'.PHP_EOL;
+		// Check to see if they are set; if not, use defaults.
+		if (!is_int($this->itemsPerPage)) {
+			$this->itemsPerPage = 10;
 		}
 		
-		$html = $html.'</div>'.PHP_EOL;
+		if (!is_int($this->pageNumber)) {
+			$this->pageNumber = 1;
+		}
 		
-		$this->conn = null;
-		return $html;
+		$pageIdQuery = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_post_ids_by_page_id.sql'),$this->blogPageId);
+		
+		return $pageIdQuery;
 		
 	}
+
 }
