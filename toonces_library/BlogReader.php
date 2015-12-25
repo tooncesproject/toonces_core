@@ -107,7 +107,12 @@ class BlogReader implements iElement
 				break;
 			}
 		}
-	
+		
+		// No blog posts yet? Make it return an empty set.
+		if (empty($postIdSet)) {
+			array_push($postIdSet,0);
+		}
+		
 		$postIdString = implode(',',$postIdSet);
 	
 		$blogPostQuery = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_blog_posts.sql'),$postIdString);
