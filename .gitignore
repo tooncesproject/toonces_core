@@ -15,6 +15,7 @@ test2.html
 *.png
 *.gif
 *.psd
+images/img\ edit/*
 
 # other centagon stuffs
 custom_js
