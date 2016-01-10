@@ -13,6 +13,9 @@ class PageView extends ViewElement implements iView
 	var $pageLinkText;
 	var $pageId;
 	var $queryArray = array();
+	var $sessionManager;
+	var $loginSuccess;
+	var $logoutSignal;
 
 	public function __construct($pageViewPageId) {
 		$this->pageId = $pageViewPageId;
@@ -69,7 +72,9 @@ class PageView extends ViewElement implements iView
 	}
 	
 	public function renderPage() {
+
 		echo $this->getHTML();
+		
 	}
 	
 }

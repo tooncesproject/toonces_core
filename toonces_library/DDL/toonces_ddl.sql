@@ -454,6 +454,8 @@ DELIMITER ;
 /*************************** TABLES TABLES TABLES ********************************/
 /*************************** TABLES TABLES TABLES ********************************/
 
+/*************** Content Stuff ******************/
+
 DROP TABLE IF EXISTS toonces.blog_posts;
 
 CREATE TABLE toonces.blog_posts (
@@ -505,7 +507,7 @@ ALTER TABlE toonces.pages
 DROP TABLE IF EXISTS toonces.page_hierarchy_bridge;
 
 CREATE TABLE toonces.page_hierarchy_bridge (
-    bridge_id BIGINT NOT NULL auto_increment
+     bridge_id BIGINT NOT NULL auto_increment
     ,page_id BIGINT NOT NULL
     ,ancestor_page_id BIGINT NOT NULL
     ,descendant_page_id BIGINT
@@ -529,4 +531,49 @@ CREATE TABLE toonces.blogs (
         -- FOREIGN KEY (page_id)
         -- REFERENCES toonces.pages(page_id)
 );
+
+/**************** User, Access & Security Stuff ********************/
+
+DROP TABLE IF EXISTS toonces.users;
+
+CREATE TABLE toonces.users (
+     user_id    BIGINT      NOT NULL    AUTO_INCREMENT
+    ,email      VARCHAR(40) NOT NULL
+    ,nickname   VARCHAR(32) NOT NULL
+    ,firstname  VARCHAR(32) NOT NULL
+    ,lastname   VARCHAR(32) NOT NULL
+    ,password   CHAR(128)   NOT NULL
+    ,salt       CHAR(128)   NOT NULL
+    ,created    TIMESTAMP   NOT NULL
+    ,is_admin   BOOL        NOT NULL  DEFAULT 0
+        ,PRIMARY KEY (user_id)
+        ,UNIQUE INDEX idx_email (email);
+);
+
+DROP TABLE IF EXISTS toonces.sessions;
+
+CREATE TABLE toonces.sessions (
+     session_id     BIGINT  NOT NULL    AUTO_INCREMENT
+    ,user_id        BIGINT  NOT NULL
+    ,ip_address     BIGINT  NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
+    ,started        TIMESTAMP   NOT NULL
+    ,user_agent     VARCHAR(192)
+        ,PRIMARY KEY (session_id)
+);
+
+DROP TABLE IF EXISTS toonces.page_user_access;
+
+CREATE TABLE toonces.page_user_access (
+     page_user_access_id     BIGINT  NOT NULL    AUTO_INCREMENT
+    ,page_id                 BIGINT  NOT NULL
+    ,user_id                 BIGINT  NOT NULL
+    ,can_edit                BOOL    NOT NULL    DEFAULT 0
+        ,PRIMARY KEY (page_user_access_id)
+        ,CONSTRAINT idx_pageid_userid UNIQUE INDEX 
+        (
+             page_id
+            ,user_id
+        )
+);
+
 

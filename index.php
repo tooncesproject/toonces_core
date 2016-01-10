@@ -13,6 +13,49 @@
 include 'toonces_library/config.php';
 require_once ROOTPATH.'/toonces.php';
 
+$sessionManager = new SessionManager();
+$sessionManager->beginSession();
+
+// Detect logout.
+$logoutSignal = isset($_POST['logout']) ? intval($_POST['logout']) : 0;
+if ($logoutSignal == 1) {
+	$sessionManager->logout();
+}
+
+
+// POST receivers
+// receive blog form submission
+$blogid = isset($_POST['blogid']) ? $_POST['blogid'] : '';
+$author = isset($_POST['author']) ? $_POST['author'] : '';
+$title = isset($_POST['title']) ? $_POST['title'] : '';
+$body = isset($_POST['body']) ? $_POST['body'] : '';
+$pageBuilderClass = isset($_POST['pageBuilderClass']) ? $_POST['pageBuilderClass'] : '';
+$thumbnailImageVector = isset($_POST['thumbnailImageVector']) ? $_POST['thumbnailImageVector'] : '';
+
+// Detect blog post data; if exists, create new blog post
+if (isset($_POST['blogid'])) {
+	$blogPoster = new BlogPoster($blogid, $author, $title, $body, $pageBuilderClass, $thumbnailImageVector);
+}
+
+// session stuff
+
+
+$loginSuccess = 0;
+$sessionActive = 0;
+$username = isset($_POST['username']) ? $_POST['username'] : '';
+$password = isset($_POST['psw']) ? $_POST['psw'] : '';
+
+if ($username != '') {
+	$loginSuccess = $sessionManager->login($username, $password);
+}
+
+if ($loginSuccess == 1) {
+	$sessionActive = 1;
+}
+
+if (isset($_SESSION['userId'])) {
+	$sessionActive = 1;
+}
 
 // function to get page from path
 
@@ -148,13 +191,17 @@ if ($pageId == 0) {
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
 
+// If login attempted, pass signal to PageView object
+if (isset($_POST['psw'])) {
+	$pageView->loginSuccess = $loginSuccess;
+}
 
-/*
-// iView interface setter methods
-$pageView->setHtmlHeader($htmlHeader);
-$pageView->setHtmlFooter($htmlFooter);
-*/
+// pass session manager if logged in
 
+if ($sessionActive == 1) {
+	$pageView->sessionManager = $sessionManager;
+//	$pageView->loginSuccess = 1;
+}
 
 // set PageView class variables
 
@@ -174,9 +221,6 @@ foreach($pageElements as $element) {
 	$pageView->addElement($element);
 }
 
-
-
-//$pageView->addElement($herro);
 
 $pageView->renderPage();
 

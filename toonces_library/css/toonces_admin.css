@@ -25,8 +25,11 @@ a:hover {
 	width: 100%;
 	visibility: visible;
 	z-index: auto;
-	padding: 0px;
 	margin: 0px;
+	padding-top: 30px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
 	}
 	.type_title {
 		font-family: Tahoma, Geneva, sans-serif;
@@ -37,8 +40,8 @@ a:hover {
 	}
 	.banner_img {
 		background-image: url(/images/main_logo.png);
-		height: 200px;
-		width: 800px;
+		height: 125px;
+		width: 666px;
 		position: relative;
 		left: 0px;
 		top: 0px;
@@ -176,7 +179,7 @@ h3 {
 	background-position: center top;
 	position: relative;
 	height: 125px;
-	width: 666px;
+	width: 800px;
 	top: 0px;
 	background-repeat: no-repeat;
 	padding: 0px;
@@ -226,6 +229,7 @@ h3 {
 	vertical-align: middle;
 	padding-top: 26px;
 }
+
 .next_page_link {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
