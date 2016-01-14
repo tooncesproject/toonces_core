@@ -1,6 +1,11 @@
 <?php
 require_once ROOTPATH.'/toonces.php';
 
+// Admin tools includes
+include_once ROOTPATH.'/admin/AdminHomeBuilder.php';
+include_once ROOTPATH.'/admin/UserManager.php';
+include_once ROOTPATH.'/admin/AdminViewElement.php';
+
 class AdminPageBuilder extends PageBuilder
 {
 	
@@ -10,14 +15,13 @@ class AdminPageBuilder extends PageBuilder
 	//var $pageTitle;
 	//var $elementArray = array();
 	//var $pageViewReference;
-	var $nickname;
 	
 	function buildPage($pageView) {
 		// build page...
 		$this->pageViewReference = $pageView; 
 		
 		// If logged in, go to dashboard, otherwise go to login page
-		if ($this->pageViewReference->loginSuccess == 1) {
+		if (isset($this->pageViewReference->sessionManager)) {
 			$this->buildDashboardPage();
 		} else {
 			$this->buildLoginPage();
@@ -56,6 +60,7 @@ class AdminPageBuilder extends PageBuilder
 		$bodyElement->addElement($bodyTopElement);
 		$bodyElement->addElement($loginFormElement);
 		$bodyElement->addElement($bodyBottomElement);
+
 		array_push($this->elementArray, $bodyElement);
 		
 		$footerElement = new Element($this->pageViewReference);
@@ -66,33 +71,21 @@ class AdminPageBuilder extends PageBuilder
 	}
 	
 	function buildDashboardPage() {
-		// get static/generic html header, create as element
-		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
 	
-		array_push($this->elementArray, $htmlHeaderElement);
+		// To do: nuke this stuff, make it page based.
+		
+		// Default is admin home.
+		$adminPageBuilder = 'AdminHomeBuilder';
 	
-		$headElement = new HeadElement($this->pageViewReference);
-	
-		// get head attributes
-		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
-		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-	
-		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
-	
-		array_push($this->elementArray, $headElement);
-	
-		$bodyElement = new Element($this->pageViewReference);
-	
-		$bodyElement->setHTML(sprintf($this->adminPageHTML(),$this->nickname));
-	
-		array_push($this->elementArray, $bodyElement);
-	
-		$footerElement = new Element($this->pageViewReference);
-	
-		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_footer.html'));
-	
-		array_push($this->elementArray, $footerElement);
+		// But... If an admin tool is specified in the query string, go to that page.
+		if (array_key_exists('admintool', $this->pageViewReference->queryArray)) {
+			$adminPageBuilder = $this->pageViewReference->queryArray['admintool'];
+			}
+
+		$adminHomeBuilder = new $adminPageBuilder($this->pageViewReference);
+		
+		$this->elementArray = $adminHomeBuilder->buildPage($this->pageViewReference);
+		
 	}
 	
 	function loginPageHTMLTop() {
@@ -133,48 +126,5 @@ HTML;
 		return $bottomHTML;
 	}
 	
-	function adminPageHTML() {
-		
-		$adminPageHTML = <<<HTML
-
-<script type="text/javascript">
-function submitform()
-{
-  document.logoutForm.submit();
-}
-</script>
-
-<body>
-
-	<div class="main_container">
-    	<div class="content_container">
-        	<div class="pageheader">
-            </div>
-            <div class="content_container">
-            	<div class="copy_block">
-					<p>
-					Hello, %s
-					</p>
-                	<h1>
-                    	Toonces Admin Dashboard</h1>
-                	<p>Manage Pages</p>
-                	<p>Manage Blogs</p>
-                	<p>Get Weerd</p>
-					<p>
-					<form name="logoutForm" method="post">
-						<input type="hidden" name="logout" value="1" />
-						<a href="javascript: submitform()">Log Out</a>
-					</form>
-					</p>
-                    </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-		
-HTML;
-		
-		return $adminPageHTML;
-	}
+	
 }

@@ -494,7 +494,7 @@ CREATE TABLE toonces.pages (
     ,created_dt TIMESTAMP NOT NULL
     ,modified_dt DATETIME
     ,redirect_on_error BOOL
-    ,page_active BOOL,
+    ,published BOOL,
 
     PRIMARY KEY (page_id)
 );
@@ -547,7 +547,7 @@ CREATE TABLE toonces.users (
     ,created    TIMESTAMP   NOT NULL
     ,is_admin   BOOL        NOT NULL  DEFAULT 0
         ,PRIMARY KEY (user_id)
-        ,UNIQUE INDEX idx_email (email);
+        ,UNIQUE INDEX idx_email (email)
 );
 
 DROP TABLE IF EXISTS toonces.sessions;

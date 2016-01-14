@@ -29,7 +29,7 @@ class LoginFormElement extends FormElement implements iElement
 		
 		$html = <<<HTML
             <form id="login" method="post">
-                Username:<br>
+                Email:<br>
                 <input type="text" name="username" size="50">
                 <br>
                 <br>

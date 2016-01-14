@@ -166,7 +166,9 @@ if (trim($path))
 // if it's a 0, you got a 404
 
 if ($pageId == 0) {
-	$pageBuilderClass = new FourOhFour();
+	$pageViewClass = 'PageView';
+	$pageBuilderClass = 'FourOhFour';
+	$pageLinkText = '';
 } else {
 
 	// get sql query
@@ -200,7 +202,6 @@ if (isset($_POST['psw'])) {
 
 if ($sessionActive == 1) {
 	$pageView->sessionManager = $sessionManager;
-//	$pageView->loginSuccess = 1;
 }
 
 // set PageView class variables

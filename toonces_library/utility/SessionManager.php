@@ -8,6 +8,9 @@ class SessionManager
 	var $conn;
 	var $userId;
 	var $nickname;
+	var $userIsAdmin;
+	var $userFirstName;
+	var $userLastName;
 
 // Session functions
 // Start session
@@ -63,6 +66,10 @@ class SessionManager
              user_id
             ,password
             ,nickname
+			,firstname
+			,lastname
+			,salt
+			,is_admin
         FROM
             toonces.users
         WHERE
@@ -78,14 +85,21 @@ SQL;
 			$userPassword = $row['password'];
 			$this->userId = $row['user_id'];
 			$this->nickname = $row['nickname'];
+			$this->userFirstName = $row['firstname'];
+			$this->userLastName = $row['lastname'];
+			$this->salt = $row['salt'];
+			$this->userIsAdmin = $row['is_admin'];
 		}
 		
 		// if successful, begin session
 		if ($password != '' and $userPassword == $password) {
 			$loginSuccess = 1;
 			// set sesh vars
-			$_SESSION['userId'] = $userId;
-			$_SESSION['nickname'] = $nickname;
+			$_SESSION['userId'] = $this->userId;
+			$_SESSION['nickname'] = $this->nickname;
+			$_SESSION['userFirstName'] = $this->userFirstName;
+			$_SESSION['userLastName'] = $this->userLastName;
+			$_SESSION['userIsAdmin'] = $this->userIsAdmin;
 			
 		} else {
 			$loginSuccess = 0;
