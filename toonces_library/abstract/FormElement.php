@@ -9,6 +9,7 @@ abstract class FormElement extends Element
 	// var $htmlHeader;
 	// var $htmlFooter;
 	// var $pageViewReference;
+	private $success;
 	
 	public function __construct($pageView) {
 		$this->pageViewReference = $pageView;

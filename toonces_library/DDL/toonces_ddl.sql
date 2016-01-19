@@ -73,7 +73,7 @@ CREATE FUNCTION toonces.CREATE_PAGE  (
     ,pageview_class VARCHAR(50)
     ,css_stylesheet VARCHAR(100)
     ,redirect_on_error BOOL
-    ,page_active BOOL
+    ,published BOOL
 
 )
 
@@ -137,7 +137,7 @@ BEGIN
             ,pageview_class
             ,css_stylesheet
             ,redirect_on_error
-            ,page_active
+            ,published
         ) VALUES (
             pathname
             ,page_title
@@ -146,7 +146,7 @@ BEGIN
             ,pageview_class
             ,css_stylesheet
             ,redirect_on_error
-            ,page_active
+            ,published
         );
     
         SET new_page_id = last_insert_id(); 
@@ -229,7 +229,7 @@ BEGIN
             ,blog_pageview_class        -- pageview_class
             ,css_stylesheet             -- css_stylesheet
             ,1                          -- redirect on error
-            ,1                          -- page active
+            ,1                          -- published
             )
         INTO new_blog_page_id;
 
@@ -327,7 +327,7 @@ BEGIN
             ,post_pageview_class    -- pageview_class VARCHAR(50)
             ,post_css_stylesheet    -- css_stylesheet VARCHAR(100)
             ,1                      -- redirect_on_error BOOL
-            ,1                      -- page_active BOOL
+            ,1                      -- published BOOL
         ) INTO blog_post_page_id;
         
         -- if page creation was sucessful, proceed.
@@ -464,6 +464,7 @@ CREATE TABLE toonces.blog_posts (
     ,page_id BIGINT NOT NULL
     ,created_dt TIMESTAMP NOT NULL
     ,modified_dt DATETIME
+    ,deleted TIMESTAMP NULL
     ,created_by VARCHAR(50)
     ,author VARCHAR(50)
     ,title VARCHAR(200)
@@ -494,7 +495,8 @@ CREATE TABLE toonces.pages (
     ,created_dt TIMESTAMP NOT NULL
     ,modified_dt DATETIME
     ,redirect_on_error BOOL
-    ,published BOOL,
+    ,published BOOL
+    ,is_admin_page BOOL
 
     PRIMARY KEY (page_id)
 );
@@ -527,6 +529,7 @@ CREATE TABLE toonces.blogs (
      blog_id BIGINT NOT NULL auto_increment
     ,page_id VARCHAR(50) NOT NULL
     ,created TIMESTAMP NOT NULL
+    ,deleted TIMESTAMP NULL
         ,PRIMARY KEY (blog_id)
         -- FOREIGN KEY (page_id)
         -- REFERENCES toonces.pages(page_id)
@@ -545,6 +548,7 @@ CREATE TABLE toonces.users (
     ,password   CHAR(128)   NOT NULL
     ,salt       CHAR(128)   NOT NULL
     ,created    TIMESTAMP   NOT NULL
+    ,revoked    TIMESTAMP   NULL
     ,is_admin   BOOL        NOT NULL  DEFAULT 0
         ,PRIMARY KEY (user_id)
         ,UNIQUE INDEX idx_email (email)
@@ -553,9 +557,9 @@ CREATE TABLE toonces.users (
 DROP TABLE IF EXISTS toonces.sessions;
 
 CREATE TABLE toonces.sessions (
-     session_id     BIGINT  NOT NULL    AUTO_INCREMENT
-    ,user_id        BIGINT  NOT NULL
-    ,ip_address     BIGINT  NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
+     session_id     BIGINT      NOT NULL    AUTO_INCREMENT
+    ,user_id        BIGINT      NOT NULL
+    ,ip_address     BIGINT      NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
     ,started        TIMESTAMP   NOT NULL
     ,user_agent     VARCHAR(192)
         ,PRIMARY KEY (session_id)
@@ -574,6 +578,27 @@ CREATE TABLE toonces.page_user_access (
              page_id
             ,user_id
         )
+    );
+/**************** Site Administration Tools ********************/
+
+DROP TABLE IF EXISTS toonces.adminpages;
+
+CREATE TABLE toonces.adminpages (
+     adminpage_id           BIGINT          NOT NULL
+    ,admin_parent_page_id   BIGINT          NOT NULL
+    ,pathname               VARCHAR(50)
+    ,page_title             VARCHAR(100)
+    ,page_link_text         VARCHAR(100)
+    ,pagebuilder_class      VARCHAR(50)     NOT NULL
+    ,pageview_class         VARCHAR(50)     NOT NULL
+    ,css_stylesheet         VARCHAR(100)    NOT NULL
+    ,created_by             VARCHAR(50)
+    ,created_dt             TIMESTAMP       NOT NULL
+    ,modified_dt            DATETIME
+    ,redirect_on_error      BOOL
+    ,published              BOOL
+
+        ,PRIMARY KEY (adminpage_id)
 );
 
 

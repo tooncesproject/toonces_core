@@ -134,23 +134,4 @@ SQL;
 		
 	}
 	
-	function createUser
-		(
-		$email
-		,$password
-		,$firstName
-		,$lastName
-		,$nickname
-		,$isAdmin
-		) 
-	{
-		
-		// $createUserStatus = 
-		// validate email
-		$email = filter_var($email,FILTER_VALIDATE_EMAIL);
-		
-		// If email valid, then check to see if it already exists.
-		// If not, place email in error state 
-		
-	}
 }

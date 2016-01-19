@@ -3,7 +3,7 @@
 //include_once ROOTPATH.'/admin/AdminViewElement.php';
 include_once ROOTPATH.'/admin/AdminToolBuilder.php';
 
-class AdminHomeBuilder extends AdminToolBuilder
+class AdminHomeBuilder extends AdminPageBuilder
 {
 	// Instance variables
 	// Inherited variables are commented out
@@ -11,7 +11,8 @@ class AdminHomeBuilder extends AdminToolBuilder
 	//var $pageTitle;
 	//var $elementArray = array();
 	//var $pageViewReference;
-	
+
+	/*
 	function buildPage($pageView) {
 		// build page...
 		$this->pageViewReference = $pageView;
@@ -24,12 +25,12 @@ class AdminHomeBuilder extends AdminToolBuilder
 		return $this->elementArray;
 	
 	}
-
+*/
 	function adminPageHTML() {
 	
 		$adminPageHTML = <<<HTML
             	<div class="copy_block">
-                	<p><a href="/admin?admintool=UserManager">Manage Users</a></p>
+                	<p><a href="/admin/useradmin">Manage Users</a></p>
 					<p>Manage Pages</p>
                 	<p>Manage Blogs</p>
                 	<p>Get Weerd</p>
@@ -43,7 +44,8 @@ class AdminHomeBuilder extends AdminToolBuilder
 				
 	
 HTML;
-		$adminPageHTML = sprintf($adminPageHTML, $_SESSION['nickname']);
+		$nickname = isset($_SESSION['nickname']) ? $_SESSION['nickname'] : '';
+		$adminPageHTML = sprintf($adminPageHTML, $nickname);
 	
 		return $adminPageHTML;
 	}

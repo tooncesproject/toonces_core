@@ -11,6 +11,8 @@ include_once ROOTPATH.'/utility/SessionManager.php';
 include_once ROOTPATH.'/abstract/FormElement.php';
 
 include_once ROOTPATH.'/pagebuilders/AdminPageBuilder.php';
+include_once ROOTPATH.'/admin/UserAdminPageBuilder.php';
+include_once ROOTPATH.'/admin/CreateUserAdminPageBuilder.php';
 
 include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
@@ -24,4 +26,6 @@ include_once ROOTPATH.'/TagElement.php';
 include_once ROOTPATH.'/HeadElement.php';
 include_once ROOTPATH.'/BlogReaderSingle.php';
 include_once ROOTPATH.'/utility/LoginFormElement.php';
+include_once ROOTPATH.'/utility/CreateUserFormElement.php';
+include_once ROOTPATH.'/utility/UserManager.php';
 
