@@ -6,7 +6,7 @@ include_once ROOTPATH.'/admin/AdminHomeBuilder.php';
 // include_once ROOTPATH.'/admin/UserManager.php';
 	include_once ROOTPATH.'/admin/AdminViewElement.php';
 
-class AdminPageBuilder extends PageBuilder
+abstract class AdminPageBuilder extends PageBuilder
 {
 	
 	// Instance variables

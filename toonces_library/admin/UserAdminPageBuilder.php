@@ -21,7 +21,7 @@ class UserAdminPageBuilder extends AdminPageBuilder
 		$html = <<<HTML
 		<div class="copy_block">
 		<h2>Toonces User Administration Tools</h2>
-		<p><a href="createuser">Create New User</a>
+		<p><a href="/admin/useradmin/createuser">Create New User</a>
 		</div>
 HTML;
 
@@ -51,7 +51,7 @@ SQL;
 		$result = $this->conn->query($SQL);
 		
 		// html template for users
-		$userRowTemplate = '<tr><td><a href="useradmin/manageuser?userid=%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>'.PHP_EOL;
+		$userRowTemplate = '<tr><td><a href="/admin/useradmin/manageuser?userid=%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>'.PHP_EOL;
 		$table = '<div class="copy_block"><table border = 1	><tr><td>User Id</td><td>email</td><td>nickname</td><td>first name</td><td>last name</td><td>User is admin</td>'.PHP_EOL;
 		foreach($result as $row) {
 			if ($row['is_admin'] == 1) {

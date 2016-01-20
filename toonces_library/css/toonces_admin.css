@@ -1,20 +1,20 @@
 	@charset "UTF-8";
 
 a:link { 
-	color: #999;
+	color: #ff884d;
 	text-decoration:none
 }
 a:active { 
-	color: #999;
+	color: #ff884d;
 	text-decoration:none
 }
 
 a:visited { 
-	color: #999;
+	color: #ff884d;
 	text-decoration:none
 }
 a:hover { 
-	color: #FFF;
+	color: #5cd65c;
 	text-decoration:none
 }
 

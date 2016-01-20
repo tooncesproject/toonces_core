@@ -11,21 +11,13 @@ class AdminHomeBuilder extends AdminPageBuilder
 	//var $pageTitle;
 	//var $elementArray = array();
 	//var $pageViewReference;
-
-	/*
-	function buildPage($pageView) {
-		// build page...
-		$this->pageViewReference = $pageView;
 	
+	// Override empty abstract function buildAdminTool()
+	function buildAdminTool() {
 		$this->toolElement = new Element($this->pageViewReference);
 		$this->toolElement->setHTML($this->adminPageHTML());
-		
-		$this->buildDashboardPage();
-	
-		return $this->elementArray;
-	
 	}
-*/
+
 	function adminPageHTML() {
 	
 		$adminPageHTML = <<<HTML

@@ -48,13 +48,13 @@ class SessionManager
 	}
 	
 	// login
-	function login($email,$password) {
+	function login($email,$formPassword) {
 		
 		//vars
 		$userId = 0;
 		$nickname = '';
 		
-		$userPassword = '';
+		$dbPassword = '';
 		
 		$this->conn = UniversalConnect::doConnect();
 		
@@ -82,7 +82,7 @@ SQL;
 		$result = $this->conn->query($query);
 		
 		foreach ($result as $row) {
-			$userPassword = $row['password'];
+			$dbPassword = $row['password'];
 			$this->userId = $row['user_id'];
 			$this->nickname = $row['nickname'];
 			$this->userFirstName = $row['firstname'];
@@ -92,7 +92,9 @@ SQL;
 		}
 		
 		// if successful, begin session
-		if ($password != '' and $userPassword == $password) {
+
+		$formPassword = hash('sha512', $formPassword.$this->salt);
+		if ($formPassword != '' and $dbPassword == $formPassword) {
 			$loginSuccess = 1;
 			// set sesh vars
 			$_SESSION['userId'] = $this->userId;
@@ -131,6 +133,10 @@ SQL;
 			,$sessionParams["httponly"]);
 		
 		session_destroy();
+		
+	}
+	
+	function checkBruteForce() {
 		
 	}
 	

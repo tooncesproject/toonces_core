@@ -56,6 +56,7 @@ class CreateUserFormElement extends FormElement implements iElement
 				if ($response['responseState'] != 1) {
 					$this->success = 0;
 				}
+
 			}
 		}
 		
@@ -106,6 +107,8 @@ class CreateUserFormElement extends FormElement implements iElement
                 <br>
                 <input type="submit" value="Woo!"/>
             </form>
+			<br>
+			<p><a href="/admin/useradmin/">Back to User Administration</a></p>
 		</div>
 HTML;
 	
