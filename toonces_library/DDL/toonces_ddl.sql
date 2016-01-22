@@ -578,7 +578,21 @@ CREATE TABLE toonces.page_user_access (
              page_id
             ,user_id
         )
-    );
+DROP TABLE IF EXISTS toonces.login_attempts;
+
+CREATE TABLE toonces.login_attempts (
+
+     login_attempt_id       BIGINT          NOT NULL    AUTO_INCREMENT
+    ,attempt_user_id        BIGINT          NULL
+    ,attempt_time           TIMESTAMP       NOT NULL
+    ,http_client_ip         INT UNSIGNED
+    ,http_x_forwarded_for   INT UNSIGNED
+    ,remote_addr            INT UNSIGNED
+    ,user_agent             VARCHAR(255)
+
+        ,PRIMARY KEY (login_attempt_id)
+);
+
 /**************** Site Administration Tools ********************/
 
 DROP TABLE IF EXISTS toonces.adminpages;
