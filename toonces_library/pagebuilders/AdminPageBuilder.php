@@ -3,8 +3,7 @@ require_once ROOTPATH.'/toonces.php';
 
 // Admin tools includes
 include_once ROOTPATH.'/admin/AdminHomeBuilder.php';
-// include_once ROOTPATH.'/admin/UserManager.php';
-	include_once ROOTPATH.'/admin/AdminViewElement.php';
+include_once ROOTPATH.'/admin/AdminViewElement.php';
 
 abstract class AdminPageBuilder extends PageBuilder
 {
