@@ -578,6 +578,11 @@ CREATE TABLE toonces.page_user_access (
              page_id
             ,user_id
         )
+        ,CONSTRAINT fk_page_id FOREIGN KEY (page_id) REFERENCES toonces.pages(page_id)
+        ,CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES toonces.users(user_id)
+);
+
+
 DROP TABLE IF EXISTS toonces.login_attempts;
 
 CREATE TABLE toonces.login_attempts (
