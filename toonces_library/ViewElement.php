@@ -12,9 +12,9 @@ class ViewElement extends Element implements iElement
 	var $elementsCount = 0;
 	
 	//override element constructor method
-	public function __construct() {
+//	public function __construct() {
 		// do nothing
-	}
+//	}
 	
 	
 	// setter methods

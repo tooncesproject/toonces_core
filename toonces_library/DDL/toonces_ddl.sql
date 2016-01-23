@@ -73,7 +73,7 @@ CREATE FUNCTION toonces.CREATE_PAGE  (
     ,pageview_class VARCHAR(50)
     ,css_stylesheet VARCHAR(100)
     ,redirect_on_error BOOL
-    ,page_active BOOL
+    ,published BOOL
 
 )
 
@@ -137,7 +137,7 @@ BEGIN
             ,pageview_class
             ,css_stylesheet
             ,redirect_on_error
-            ,page_active
+            ,published
         ) VALUES (
             pathname
             ,page_title
@@ -146,7 +146,7 @@ BEGIN
             ,pageview_class
             ,css_stylesheet
             ,redirect_on_error
-            ,page_active
+            ,published
         );
     
         SET new_page_id = last_insert_id(); 
@@ -229,7 +229,7 @@ BEGIN
             ,blog_pageview_class        -- pageview_class
             ,css_stylesheet             -- css_stylesheet
             ,1                          -- redirect on error
-            ,1                          -- page active
+            ,1                          -- published
             )
         INTO new_blog_page_id;
 
@@ -327,7 +327,7 @@ BEGIN
             ,post_pageview_class    -- pageview_class VARCHAR(50)
             ,post_css_stylesheet    -- css_stylesheet VARCHAR(100)
             ,1                      -- redirect_on_error BOOL
-            ,1                      -- page_active BOOL
+            ,1                      -- published BOOL
         ) INTO blog_post_page_id;
         
         -- if page creation was sucessful, proceed.
@@ -454,6 +454,8 @@ DELIMITER ;
 /*************************** TABLES TABLES TABLES ********************************/
 /*************************** TABLES TABLES TABLES ********************************/
 
+/*************** Content Stuff ******************/
+
 DROP TABLE IF EXISTS toonces.blog_posts;
 
 CREATE TABLE toonces.blog_posts (
@@ -462,6 +464,7 @@ CREATE TABLE toonces.blog_posts (
     ,page_id BIGINT NOT NULL
     ,created_dt TIMESTAMP NOT NULL
     ,modified_dt DATETIME
+    ,deleted TIMESTAMP NULL
     ,created_by VARCHAR(50)
     ,author VARCHAR(50)
     ,title VARCHAR(200)
@@ -492,7 +495,8 @@ CREATE TABLE toonces.pages (
     ,created_dt TIMESTAMP NOT NULL
     ,modified_dt DATETIME
     ,redirect_on_error BOOL
-    ,page_active BOOL,
+    ,published BOOL
+    ,is_admin_page BOOL
 
     PRIMARY KEY (page_id)
 );
@@ -505,7 +509,7 @@ ALTER TABlE toonces.pages
 DROP TABLE IF EXISTS toonces.page_hierarchy_bridge;
 
 CREATE TABLE toonces.page_hierarchy_bridge (
-    bridge_id BIGINT NOT NULL auto_increment
+     bridge_id BIGINT NOT NULL auto_increment
     ,page_id BIGINT NOT NULL
     ,ancestor_page_id BIGINT NOT NULL
     ,descendant_page_id BIGINT
@@ -525,8 +529,95 @@ CREATE TABLE toonces.blogs (
      blog_id BIGINT NOT NULL auto_increment
     ,page_id VARCHAR(50) NOT NULL
     ,created TIMESTAMP NOT NULL
+    ,deleted TIMESTAMP NULL
         ,PRIMARY KEY (blog_id)
         -- FOREIGN KEY (page_id)
         -- REFERENCES toonces.pages(page_id)
 );
+
+/**************** User, Access & Security Stuff ********************/
+
+DROP TABLE IF EXISTS toonces.users;
+
+CREATE TABLE toonces.users (
+     user_id    BIGINT      NOT NULL    AUTO_INCREMENT
+    ,email      VARCHAR(40) NOT NULL
+    ,nickname   VARCHAR(32) NOT NULL
+    ,firstname  VARCHAR(32) NOT NULL
+    ,lastname   VARCHAR(32) NOT NULL
+    ,password   CHAR(128)   NOT NULL
+    ,salt       CHAR(128)   NOT NULL
+    ,created    TIMESTAMP   NOT NULL
+    ,revoked    TIMESTAMP   NULL
+    ,is_admin   BOOL        NOT NULL  DEFAULT 0
+        ,PRIMARY KEY (user_id)
+        ,UNIQUE INDEX idx_email (email)
+);
+
+DROP TABLE IF EXISTS toonces.sessions;
+
+CREATE TABLE toonces.sessions (
+     session_id     BIGINT      NOT NULL    AUTO_INCREMENT
+    ,user_id        BIGINT      NOT NULL
+    ,ip_address     BIGINT      NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
+    ,started        TIMESTAMP   NOT NULL
+    ,user_agent     VARCHAR(192)
+        ,PRIMARY KEY (session_id)
+);
+
+DROP TABLE IF EXISTS toonces.page_user_access;
+
+CREATE TABLE toonces.page_user_access (
+     page_user_access_id     BIGINT  NOT NULL    AUTO_INCREMENT
+    ,page_id                 BIGINT  NOT NULL
+    ,user_id                 BIGINT  NOT NULL
+    ,can_edit                BOOL    NOT NULL    DEFAULT 0
+        ,PRIMARY KEY (page_user_access_id)
+        ,CONSTRAINT idx_pageid_userid UNIQUE INDEX 
+        (
+             page_id
+            ,user_id
+        )
+        ,CONSTRAINT fk_page_id FOREIGN KEY (page_id) REFERENCES toonces.pages(page_id)
+        ,CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES toonces.users(user_id)
+);
+
+
+DROP TABLE IF EXISTS toonces.login_attempts;
+
+CREATE TABLE toonces.login_attempts (
+
+     login_attempt_id       BIGINT          NOT NULL    AUTO_INCREMENT
+    ,attempt_user_id        BIGINT          NULL
+    ,attempt_time           TIMESTAMP       NOT NULL
+    ,http_client_ip         INT UNSIGNED
+    ,http_x_forwarded_for   INT UNSIGNED
+    ,remote_addr            INT UNSIGNED
+    ,user_agent             VARCHAR(255)
+
+        ,PRIMARY KEY (login_attempt_id)
+);
+
+/**************** Site Administration Tools ********************/
+
+DROP TABLE IF EXISTS toonces.adminpages;
+
+CREATE TABLE toonces.adminpages (
+     adminpage_id           BIGINT          NOT NULL
+    ,admin_parent_page_id   BIGINT          NOT NULL
+    ,pathname               VARCHAR(50)
+    ,page_title             VARCHAR(100)
+    ,page_link_text         VARCHAR(100)
+    ,pagebuilder_class      VARCHAR(50)     NOT NULL
+    ,pageview_class         VARCHAR(50)     NOT NULL
+    ,css_stylesheet         VARCHAR(100)    NOT NULL
+    ,created_by             VARCHAR(50)
+    ,created_dt             TIMESTAMP       NOT NULL
+    ,modified_dt            DATETIME
+    ,redirect_on_error      BOOL
+    ,published              BOOL
+
+        ,PRIMARY KEY (adminpage_id)
+);
+
 

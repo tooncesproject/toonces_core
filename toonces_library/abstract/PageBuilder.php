@@ -21,7 +21,7 @@ abstract class PageBuilder {
 	//page view reference setter method
 	
 	
-	function buildPage() {
+	function buildPage($pageView) {
 		// when making a child of PageBuilder, customize your class here
 	
 	}

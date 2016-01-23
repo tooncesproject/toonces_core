@@ -1,0 +1,251 @@
+	@charset "UTF-8";
+
+a:link { 
+	color: #ff884d;
+	text-decoration:none
+}
+a:active { 
+	color: #ff884d;
+	text-decoration:none
+}
+
+a:visited { 
+	color: #ff884d;
+	text-decoration:none
+}
+a:hover { 
+	color: #99003d;
+	text-decoration:none
+}
+
+	.main_container {
+	text-align: center;
+	position: relative;
+	height: auto;
+	width: 100%;
+	visibility: visible;
+	z-index: auto;
+	margin: 0px;
+	padding-top: 30px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	}
+	.type_title {
+		font-family: Tahoma, Geneva, sans-serif;
+		font-size: 18px;
+		color: #FFF;
+		text-transform: uppercase;
+		line-height: 4px;
+	}
+	.banner_img {
+		background-image: url(/images/main_logo.png);
+		height: 125px;
+		width: 666px;
+		position: relative;
+		left: 0px;
+		top: 0px;
+	}
+.copy_block {
+	padding-top: 20px;
+	padding-right: 80px;
+	padding-bottom: 20px;
+	padding-left: 80px;
+}
+
+.utility_block {
+	padding-top: 0px;
+	padding-right: 80px;
+	padding-bottom: 0px;
+	padding-left: 80px;
+}
+	body {
+	background-color: #FFF;
+	color: #000000;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	background-repeat: no-repeat;
+	padding: 0px;
+	}
+	.fungusss {
+		background-color: #906;
+		position: absolute;
+		visibility: visible;
+		height: 60px;
+		width: 60px;
+		left: 200px;
+		top: 200px;
+		right: 200px;
+		bottom: 200px;
+	}
+	.blogreader {
+		position: relative;
+		height: auto;
+		width: auto;
+		left: auto;
+		top: auto;
+		right: auto;
+		bottom: auto;
+		clip: rect(auto,auto,auto,auto);
+		text-align: left;
+		padding: 20px;
+		z-index: auto;
+	}
+	footer {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 10px;
+	color: #999;
+	vertical-align: middle;
+	position: relative;
+	left: auto;
+	top: 0px;
+	right: auto;
+	bottom: auto;
+	background-color: #002;
+	text-align: center;
+	padding: 5px;
+	height: 20px;
+	white-space: normal;
+	display: inherit;
+	}
+	
+	.section_divider {
+		font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+		font-size: 18px;
+		color: #999;
+		vertical-align: middle;
+		position: relative;
+		left: auto;
+		top: auto;
+		right: auto;
+		bottom: auto;
+		background-color: #036;
+		text-align: center;
+		padding: 5px;
+		height: 30px;
+		white-space: normal;
+		display: inherit;
+	}
+.top_nav {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	text-align: center;
+	height: 60px;
+	top: 130px;
+	overflow: hidden;
+	position: relative;
+	width: auto;
+	vertical-align: middle;
+	padding-right: 30px;
+	padding-left: 30px;
+}
+	
+	h1 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 30px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	color: #000;
+	}
+	h2 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 24px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	color: #000;
+	}
+h3 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 18px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	color: #000;
+}
+.image_block {
+	text-align: center;
+	vertical-align: middle;
+	padding: 0px;
+	width: 800px;
+	position: static;
+}
+	.content_container {
+	background-color: #CFF;
+	position: relative;
+	height: auto;
+	width: 800px;
+	top: 0px;
+	margin-right: auto;
+	margin-left: auto;
+	text-align: left;
+	padding: 0px;
+	}
+.pageheader {
+	background-image: url(../../images/toonces_banner.png);
+	background-position: center top;
+	position: relative;
+	height: 125px;
+	width: 800px;
+	top: 0px;
+	background-repeat: no-repeat;
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+}
+.nav_link_active {
+	float: right;
+	width: 80px;
+	text-transform: uppercase;
+	vertical-align: middle;
+}
+.nav_links_holder {
+	vertical-align: middle;
+	margin-top: 15px;
+}
+.social_icon {
+	padding: 0px;
+	height: 40px;
+	width: 60px;
+	position: static;
+	float: left;
+	text-align: center;
+}
+.soundcloud_embed {
+	height: 100px;
+	width: 100%;
+	text-align: center;
+	padding-top: 40px;
+	padding-bottom: 10px;
+}
+.bottom_nav_container {
+	height: 60px;
+	width: 100%;
+	position: relative;
+	bottom: 0px;
+}
+.prev_page_link {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	font-style: italic;
+	position: relative;
+	left: 20px;
+	width: 100px;
+	text-align: left;
+	float: left;
+	vertical-align: middle;
+	padding-top: 26px;
+}
+
+.next_page_link {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	font-style: italic;
+	position: relative;
+	right: 20px;
+	width: 100px;
+	text-align: right;
+	float: right;
+	vertical-align: middle;
+	padding-top: 26px;
+}

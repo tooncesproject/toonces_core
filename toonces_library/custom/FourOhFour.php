@@ -20,11 +20,11 @@ class FourOhFour extends PageBuilder {
 	*/
 	function buildPage() {
 		
-		$view = new ViewElement();
+		$view = new ViewElement($this->pageViewReference);
 		$view->setHtmlHeader('<div class="main_container">');
 		$view->setHtmlFooter('</div>');
 		
-		$contentElement = new Element();
+		$contentElement = new Element($this->pageViewReference);
 		
 		$contentElement->setHTML(file_get_contents(ROOTPATH.'/static_data/mainpage_content.html'));
 		
@@ -37,7 +37,7 @@ class FourOhFour extends PageBuilder {
 		
 		array_push($this->elementArray,$view);
 		
-		$FourOhFourMessage = new Element();
+		$FourOhFourMessage = new Element($this->pageViewReference);
 		
 		$FourOhFourMessage->setHTML('SORRY DUDE WRONG PAGE');
 		
