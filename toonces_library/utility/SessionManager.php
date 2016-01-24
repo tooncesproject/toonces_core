@@ -64,6 +64,7 @@ SQL;
 			if ($activeLoginString == $seshLoginString) {
 				$this->sessionActive = 1;
 				$this->userIsAdmin = $dbUserIsAdmin;
+				$this->userId = $seshUserId;
 			}
 		}
 	}

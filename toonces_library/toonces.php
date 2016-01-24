@@ -9,6 +9,7 @@ require_once ROOTPATH.'/PageView.php';
 include_once ROOTPATH.'/toonces_custom.php';
 include_once ROOTPATH.'/utility/SessionManager.php';
 include_once ROOTPATH.'/abstract/FormElement.php';
+include_once ROOTPATH.'/utility/DynamicNavigationLink.php';
 
 include_once ROOTPATH.'/pagebuilders/AdminPageBuilder.php';
 include_once ROOTPATH.'/admin/UserAdminPageBuilder.php';
@@ -28,4 +29,5 @@ include_once ROOTPATH.'/BlogReaderSingle.php';
 include_once ROOTPATH.'/utility/LoginFormElement.php';
 include_once ROOTPATH.'/utility/CreateUserFormElement.php';
 include_once ROOTPATH.'/utility/UserManager.php';
-
+include_once ROOTPATH.'/abstract/NavElement.php';
+include_once ROOTPATH.'/admin/AdminNavElement.php';

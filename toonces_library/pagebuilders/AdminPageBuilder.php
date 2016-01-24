@@ -108,7 +108,10 @@ abstract class AdminPageBuilder extends PageBuilder
 		array_push($this->elementArray, $headElement);
 	
 		$bodyElement = new AdminViewElement($this->pageViewReference);
-	
+		
+		// Add admin nav element to body element
+		$adminNavElement = new AdminNavElement($this->pageViewReference);
+		$bodyElement->addElement($adminNavElement);
 	
 		if (!isset($this->toolElement)) {
 			throw new Exception('Error: element $adminToolElement must be set before page is rendered.');
