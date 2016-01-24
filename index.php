@@ -14,13 +14,15 @@ include 'toonces_library/config.php';
 require_once ROOTPATH.'/toonces.php';
 
 $sessionManager = new SessionManager();
-$sessionManager->beginSession();
+
 
 // Detect logout.
 $logoutSignal = isset($_POST['logout']) ? intval($_POST['logout']) : 0;
 if ($logoutSignal == 1) {
 	$sessionManager->logout();
 }
+
+$sessionManager->checkSession();
 
 
 // POST receivers
@@ -39,9 +41,10 @@ if (isset($_POST['blogid'])) {
 
 // session stuff
 
-
 $loginSuccess = 0;
 $sessionActive = 0;
+$userId = 0;
+$userIsAdmin = 0;
 $username = isset($_POST['username']) ? $_POST['username'] : '';
 $password = isset($_POST['psw']) ? $_POST['psw'] : '';
 
@@ -49,12 +52,11 @@ if ($username != '') {
 	$loginSuccess = $sessionManager->login($username, $password);
 }
 
-if ($loginSuccess == 1) {
-	$sessionActive = 1;
-}
+$sessionActive = $sessionManager->sessionActive;
 
-if (isset($_SESSION['userId'])) {
-	$sessionActive = 1;
+if ($sessionActive == 1) {
+	$userId = $sessionManager->userId;
+	$userIsAdmin = $sessionManager->userIsAdmin;
 }
 
 // function to get page from path
@@ -163,35 +165,83 @@ $path = substr($path,1,strlen($path)-1);
 if (trim($path))
 	$pageId = getPage($path, $conn);	
 
-// if it's a 0, you got a 404
+// Default content state for page access is 404.
+$pathName = '';
+$styleSheet = ''; // Have a default stylesheet?
+$pageViewClass = 'PageView';
+$pageBuilderClass = 'FourOhFour';
+$pageTitle = '';
+$pageLinkText = '';
 
-if ($pageId == 0) {
-	$pageViewClass = 'PageView';
-	$pageBuilderClass = 'FourOhFour';
-	$pageLinkText = '';
-} else {
+// Page state
+$published = 0;
+$isAdminPage = 0;
 
-	// get sql query
-	$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$pageId);
+// user state
+$allowAccess = 0;
+$userCanEdit = 0;
+$userHasPageAccess = 0;
 
-	$pageRecord = $conn->query($query);
+// get sql query
+$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$userId,$pageId);
 
+$pageRecord = $conn->query($query);
 
-	if ($pageRecord) {
-		foreach ($pageRecord as $result) {
-			$pathName = $result["pathname"];
-			$styleSheet = $result["css_stylesheet"];
-			$pageViewClass = $result["pageview_class"];
-			$pageBuilderClass = $result["pagebuilder_class"];
-			$pageTitle = $result["page_title"];
-			$pageLinkText = $result["page_link_text"];
-		};
+if ($pageRecord) {
+	foreach ($pageRecord as $result) {
+		$pagePathName = $result['pathname'];
+		$pageStyleSheet = $result['css_stylesheet'];
+		$pagePageViewClass = $result['pageview_class'];
+		$pagePageBuilderClass = $result['pagebuilder_class'];
+		$pagePageTitle = $result['page_title'];
+		$pagePageLinkText = $result['page_link_text'];
+		$published = $result['published'];
+		$isAdminPage = $result['is_admin_page'];
+		$userHasPageAccess = $result['user_has_access'];
+		$userCanEdit = $result['can_edit'];
+	};
+
+	// Manage access.
+	// Is the page unpublished?
+	if ($published == 0) {
+		// Allow access to page if:
+		// user is logged in and page is admin page (defer access to page)
+		if ($sessionActive == 1 and  $pageIsAdminPage = 1) {
+			$allowAccess = 1;
+		}
+		// user is admin
+		if ($sessionManager->userIsAdmin == 1) {
+			$allowAccess = 1;
+		}
+		// page isn't necessarily admin page but user is logged in and has access
+		if ($userHasPageAccess == 1) {
+			$allowAccess = 1;
+		}
+			
+	} else {
+		// If published, page is public.
+		$allowAccess = 1;
 	}
-
 }
-	
+
+// If access state is true, build the page.
+if ($allowAccess == 1) {
+	$pathName = $pagePathName;
+	$styleSheet = $pageStyleSheet;
+	$pageViewClass = $pagePageViewClass;
+	$pageBuilderClass = $pagePageBuilderClass;
+	$pageTitle = $pagePageTitle;
+	$pageLinkText = $pagePageLinkText;
+}
+
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
+$pageView->userCanEdit = $userCanEdit;
+
+// If it's an admin page, pass the user's page access state to the pageView
+if ($sessionActive == 1 and $isAdminPage == 1) {
+	$pageView->userCanAccessAdminPage = $userHasPageAccess;
+}
 
 // If login attempted, pass signal to PageView object
 if (isset($_POST['psw'])) {

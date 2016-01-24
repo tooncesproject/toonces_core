@@ -1,12 +1,23 @@
 SELECT
-	page_id,
-	pathname,
-	page_title,
-	page_link_text,
-	pagebuilder_class,
-	pageview_class,
-	css_stylesheet
+     p.page_id
+    ,p.pathname
+    ,p.page_title
+    ,p.page_link_text
+    ,p.pagebuilder_class
+    ,p.pageview_class
+    ,p.css_stylesheet
+    ,p.published
+    ,p.is_admin_page
+    ,CASE 
+        WHEN pua.page_id IS NOT NULL THEN 1
+        ELSE 0
+    END AS user_has_access
+    ,COALESCE(pua.can_edit,0) AS can_edit
 FROM
-	toonces.pages
+    toonces.pages p
+LEFT OUTER JOIN
+    toonces.page_user_access pua
+        ON p.page_id = pua.page_id
+        AND pua.user_id = %d
 WHERE
-	page_id = %d;
+    p.page_id = %d;

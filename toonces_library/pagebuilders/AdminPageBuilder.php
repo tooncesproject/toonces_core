@@ -16,13 +16,29 @@ abstract class AdminPageBuilder extends PageBuilder
 	//var $pageViewReference;
 	var $toolElement;
 	var $adminAccessOnly;
+	var $accessGranted;
 	
 	function buildPage($pageView) {
+		
+		//Set up customizations.
+		$this->setupPageBuilder();
+		
 		// build page...
 		$this->pageViewReference = $pageView;
-		
 		$this->toolElement = new ViewElement($this->pageViewReference);
 		$this->buildAdminTool();
+		
+		// Does user have access?
+		$this->accessGranted = 0;
+		if ($this->adminAccessOnly == 1) {
+			if ($this->pageViewReference->sessionManager->userIsAdmin == 1) {
+				$this->accessGranted = 1;
+			} else {
+				$this->accessGranted = $this->pageViewReference->userCanAccessAdminPage;
+			}
+		} else {
+			$this->accessGranted = 1;
+		}
 		
 		// If logged in, go to dashboard, otherwise go to login page
 		if (isset($this->pageViewReference->sessionManager)) {
@@ -93,20 +109,10 @@ abstract class AdminPageBuilder extends PageBuilder
 	
 		$bodyElement = new AdminViewElement($this->pageViewReference);
 	
-		// manage access
-		//default to restricted
-		$accessGranted = false;
-		$accessIsRestricted = isset($this->adminAccessOnly) ? $this->adminAccessOnly : false;
-	
-		if ($accessIsRestricted == false) {
-			$accessGranted = true;
-		} else if ($_SESSION['userIsAdmin'] == 1) {
-			$accessGranted = true;
-		}
 	
 		if (!isset($this->toolElement)) {
 			throw new Exception('Error: element $adminToolElement must be set before page is rendered.');
-		} else if ($accessGranted == true) {
+		} else if ($this->accessGranted == true) {
 			$bodyElement->addElement($this->toolElement);
 		} else {
 			$bodyElement->addElement($this->notifyPageRestricted());
@@ -180,6 +186,10 @@ HTML;
 
 	function buildAdminTool() {
 		// Add elements to admin tool.
+	}
+	
+	function setupPageBuilder() {
+		// Custom variable settings for inheriting classes go here.
 	}
 	
 	
