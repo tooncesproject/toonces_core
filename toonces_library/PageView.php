@@ -16,6 +16,8 @@ class PageView extends ViewElement implements iView
 	var $sessionManager;
 	var $loginSuccess;
 	var $logoutSignal;
+	var $userCanEdit;
+	var $userCanAccessAdminPage;
 
 	public function __construct($pageViewPageId) {
 		$this->pageId = $pageViewPageId;

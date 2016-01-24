@@ -30,6 +30,8 @@ HTML;
 	$this->toolElement->addElement($topCopyBlock);
 	
 	}
-	
+	function setupPageBuilder() {
+		$this->adminAccessOnly = 1;
+	}
 
 }

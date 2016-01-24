@@ -20,6 +20,9 @@ class FourOhFour extends PageBuilder {
 	*/
 	function buildPage() {
 		
+		// send 404 HTTP header
+		header("HTTP/1.0 404 Not Found", true, 404);
+		
 		$view = new ViewElement($this->pageViewReference);
 		$view->setHtmlHeader('<div class="main_container">');
 		$view->setHtmlFooter('</div>');

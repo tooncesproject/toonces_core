@@ -41,4 +41,8 @@ HTML;
 	
 		return $adminPageHTML;
 	}
+	
+	function setupPageBuilder() {
+		$this->adminAccessOnly = false;
+	}
 }

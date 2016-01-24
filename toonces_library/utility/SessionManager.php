@@ -11,10 +11,64 @@ class SessionManager
 	var $userIsAdmin;
 	var $userFirstName;
 	var $userLastName;
+	var $sessionActive;
 
 // Session functions
-// Start session
 
+	// Check session
+	function checkSession() {
+		
+		$this->beginSession();
+		$this->sessionActive = 0;
+		$dbPassword = '';
+		$dbUserIsAdmin = 0;
+		$userAgentString = $_SERVER['HTTP_USER_AGENT'];
+		// Are session variables set?
+		if (
+			isset($_SESSION['userId'])
+			and 
+			isset($_SESSION['userFirstName'])
+			and
+			isset($_SESSION['userLastName'])
+			and
+			isset($_SESSION['loginString'])
+		) {
+			$seshUserId = $_SESSION['userId'];
+			$seshLoginString = $_SESSION['loginString'];
+			
+			// Query database for user's hashed password
+			$SQL = <<<SQL
+			SELECT
+				 password
+				,is_admin
+			FROM 
+				toonces.users 
+			WHERE 
+				user_id = :userid;
+SQL;
+			if (!isset($this->conn)) {
+				$this->conn = UniversalConnect::doConnect();
+			}
+			$stmt = $this->conn->prepare($SQL);
+			$stmt->execute(array(':userid' => $seshUserId));
+			foreach ($stmt as $row) {
+				$dbPassword = $row['password'];
+				$dbUserIsAdmin = $row['is_admin'];
+				$this->nickname = $_SESSION['nickname'];
+				$this->userFirstName = $_SESSION['userFirstName'];
+				$this->userLastName = $_SESSION['userLastName'];
+			}
+
+			//Check for matching login string.
+			$activeLoginString = hash('sha512',$dbPassword,$userAgentString);
+			if ($activeLoginString == $seshLoginString) {
+				$this->sessionActive = 1;
+				$this->userIsAdmin = $dbUserIsAdmin;
+			}
+		}
+	}
+
+	// Start session
 	function beginSession() {
 		$sessionName = 'secure_session';
 		$secure = 'SECURE';
@@ -49,19 +103,15 @@ class SessionManager
 	
 	// login
 	function login($email,$formPassword) {
-		
+
 		//vars
 		$userId = 0;
 		$nickname = '';
-		
 		$dbPassword = '';
-		
+
 		$this->conn = UniversalConnect::doConnect();
-		
-		
-		
+
 		$sql = <<<SQL
-        
         SELECT
              user_id
             ,password
@@ -77,10 +127,10 @@ class SessionManager
 SQL;
 		
 		$query = sprintf($sql,$email);
-		
+
 		// query and check for match
 		$result = $this->conn->query($query);
-		
+
 		foreach ($result as $row) {
 			$dbPassword = $row['password'];
 			$this->userId = $row['user_id'];
@@ -90,10 +140,10 @@ SQL;
 			$this->salt = $row['salt'];
 			$this->userIsAdmin = $row['is_admin'];
 		}
-		
+
 		// Check for brute-force attack and record login attempt
 		$bruteForce = $this->checkBruteForce();
-		
+
 		// if successful, begin session
 		$this->salt = isset($this->salt) ? $this->salt : '';
 		$formPassword = hash('sha512', $formPassword.$this->salt);
@@ -104,21 +154,21 @@ SQL;
 			$_SESSION['nickname'] = $this->nickname;
 			$_SESSION['userFirstName'] = $this->userFirstName;
 			$_SESSION['userLastName'] = $this->userLastName;
-			$_SESSION['userIsAdmin'] = $this->userIsAdmin;
-			
+			$_SESSION['loginString'] = hash('sha512',$dbPassword, $_SERVER['HTTP_USER_AGENT']);
+
+			$this->sessionActive = 1;
+
 		} else {
-			$loginSuccess = 0;
-			
-			
+			$loginSuccess = 0;	
 		}
-		
+
 		return $loginSuccess;
 	}
-	
+
 	function logout() {
-		
+
 		//run session start function
-		//$this->beginSession();
+		$this->beginSession();
 		
 		// Unset session variables
 		$_SESSION = array();
@@ -181,15 +231,7 @@ SQL;
 		} else {
 			$checkUserID = 0;
 		}
-		/*
-		$checkAttemptVars = array();
-		
-		$checkAttemptVars[':ten_mintues_ago'] = date('Y-m-d h:i:s',$tenMinutesAgo);
-		$checkAttemptVars[':http_client_ip'] = $loginAttemptVars[':http_client_ip'];
-		$checkAttemptVars[':http_x_forwarded_for'] = $loginAttemptVars[':http_x_forwarded_for'];
-		$checkAttemptVars[':remote_addr'] = $loginAttemptVars [':remote_addr'];
-		$checkAttemptVars[':user_id'] = $loginAttemptVars[':attempt_user_id'];
-	*/
+
 		$SQL = <<<SQL
 		SELECT
 			COUNT(*) AS attemptcount
