@@ -51,15 +51,7 @@ $password = isset($_POST['psw']) ? $_POST['psw'] : '';
 if ($username != '') {
 	$loginSuccess = $sessionManager->login($username, $password);
 }
-/*
-if ($loginSuccess == 1) {
-	$sessionActive = 1;
-}
 
-if (isset($_SESSION['userId'])) {
-	$sessionActive = 1;
-}
-*/
 $sessionActive = $sessionManager->sessionActive;
 
 if ($sessionActive == 1) {
@@ -172,16 +164,6 @@ $path = substr($path,1,strlen($path)-1);
 
 if (trim($path))
 	$pageId = getPage($path, $conn);	
-/*
-// if it's a 0, you got a 404
-
-if ($pageId == 0) {
-	$pageViewClass = 'PageView';
-	$pageBuilderClass = 'FourOhFour';
-	$pageLinkText = '';
-	
-} else {
-*/
 
 // Default content state for page access is 404.
 $pathName = '';
