@@ -249,3 +249,13 @@ h3 {
 	vertical-align: middle;
 	padding-top: 26px;
 }
+.dynamic_nav {
+	visibility: visible;
+	padding-top: 0px;
+	padding-right: 20px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+}
+.nav_link_child {
+	text-indent: 20px;
+}
