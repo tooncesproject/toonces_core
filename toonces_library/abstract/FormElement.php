@@ -19,22 +19,25 @@ abstract class FormElement extends Element
 	
 	// Abstract variables:
 	
-	// Binary success/fail state (doesn't have to be binary)
-	private $success;
+	// $responseState:
+	// Holds an integer indicating the response state.
+	// Standard states: 0 is failure, 1 is success, higher integers if
+	// multiple possible non-fail or partial-success states.
+	// should be NULL if a post hasn't been received.
+	var $responseState;
 	
+	// $postState:
+	// Holds a boolean indicating whether the form is in
+	//  false - Display state, no post received yet - default value
+	//  true - Response state - a post has been submitted
+	public $postState = false;	
+
 	// Array of FormElementInput objects
-	private $formArray = array();
-	
-	// Settings
-	private $responseType;
-	private $htmlTag;
-	private $cssClass;
-	
-	// Default settings
-	private $responseTypeDefault;
-	private $htmlTagDefault;
-	private $cssClassDefault;
-	
+	var $inputArray = array();
+
+	// uh i guess i'm supposed to be able to set the title of the submit button
+	var $submitName = 'submit';
+
 	public function __construct($pageView) {
 		// __construct handles the basic responsibilities of the element:
 			// interface compliance
@@ -46,20 +49,25 @@ abstract class FormElement extends Element
 		//	$this->htmlFooter = '</div>';
 	}
 
-	function buildFormArray() {
+	public function generateFormHTML() {
+		// Utility function, not likely you'll need to override.
+		// Iterate through input objects to generate HTML.
+		$this->html = '<form method="post">';
+		//var_dump($this->inputArray);
+		foreach ($this->inputArray as $inputObject) {
+			$this->html = $this->html.$inputObject->html.'<br>';
+		}
+		$this->html = $this->html.'<br><input type="submit" value="'.$this->submitName.'">';
+		$this->html = $this->html.'</form>';
+	}
+	function buildInputArray() {
 		// This function holds customizations for building the form array.
 		// Its responsibility is to add members to the formArray[] instance variable.
 		// FormElementInput objects will be rendered in the order they are added here.
 		// Also, this function handles 
 	}
 	
-	function responseStateHandler($responseState) {
-		
+	private function responseStateHandler($responseState) {
+		// Responsible for directing the form-level response to the input.
 	}
-	
-	function objectSettings() {
-		// Customizable method to override default settings if desired.
-		
-	}
-	
 }

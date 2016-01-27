@@ -41,7 +41,7 @@ abstract class AdminPageBuilder extends PageBuilder
 		}
 		
 		// If logged in, go to dashboard, otherwise go to login page
-		if (isset($this->pageViewReference->sessionManager)) {
+		if ($this->pageViewReference->sessionManager->sessionActive == 1) {
 			$this->buildDashboardPage();
 		} else {
 			$this->buildLoginPage();

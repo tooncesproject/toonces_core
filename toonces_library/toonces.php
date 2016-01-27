@@ -31,3 +31,4 @@ include_once ROOTPATH.'/utility/CreateUserFormElement.php';
 include_once ROOTPATH.'/utility/UserManager.php';
 include_once ROOTPATH.'/abstract/NavElement.php';
 include_once ROOTPATH.'/admin/AdminNavElement.php';
+include_once ROOTPATH.'/userinterface/FormElementInput.php';
