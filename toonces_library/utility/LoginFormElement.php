@@ -48,7 +48,6 @@ HTML;
 		//$submitInput = new FormElementInput('submit','submit');
 		$submitInput = new FormElementInput('submit','submit',null,null,null,$this->submitName);
 
-		
 		$this->inputArray['submit'] = $submitInput;
 
 	}

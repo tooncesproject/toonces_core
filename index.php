@@ -15,13 +15,6 @@ require_once ROOTPATH.'/toonces.php';
 
 $sessionManager = new SessionManager();
 
-
-// Detect logout.
-$logoutSignal = isset($_POST['logout']) ? intval($_POST['logout']) : 0;
-if ($logoutSignal == 1) {
-	$sessionManager->logout();
-}
-
 $sessionManager->checkSession();
 
 
