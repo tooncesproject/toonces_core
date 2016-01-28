@@ -27,8 +27,10 @@ class AdminHomeBuilder extends AdminPageBuilder
                 	<p>Manage Blogs</p>
                 	<p>Get Weerd</p>
 					<p>
+					<!--
 					<form name="logoutForm" method="post">
-						<input type="hidden" name="logout" value="1" />
+						<input type="hidden" name="logout" value="1" /> 
+				-->
 						<a href="javascript: submitform()">Log Out</a>
 					</form>
 					</p>

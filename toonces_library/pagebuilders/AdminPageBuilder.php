@@ -69,11 +69,10 @@ abstract class AdminPageBuilder extends PageBuilder
 		array_push($this->elementArray, $headElement);
 
 		$bodyElement = new ViewElement($this->pageViewReference);
-		
+
 		$bodyTopElement = new Element($this->pageViewReference);
 		$bodyTopElement->setHTML($this->loginPageHTMLTop());
 		$loginFormElement = new LoginFormElement($this->pageViewReference);
-		//array_push($this->elementArray,$loginFormElement);
 		$bodyBottomElement = new Element($this->pageViewReference);
 		$bodyBottomElement->setHTML($this->loginPageHTMLBottom());
 		
@@ -108,7 +107,11 @@ abstract class AdminPageBuilder extends PageBuilder
 		array_push($this->elementArray, $headElement);
 	
 		$bodyElement = new AdminViewElement($this->pageViewReference);
-		
+
+		// Add logout form to body element
+		$logoutFormElement = new LogoutFormElement($this->pageViewReference);
+		$bodyElement->addElement($logoutFormElement);
+
 		// Add admin nav element to body element
 		$adminNavElement = new AdminNavElement($this->pageViewReference);
 		$bodyElement->addElement($adminNavElement);

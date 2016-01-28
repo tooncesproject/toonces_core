@@ -39,14 +39,18 @@ HTML;
 
 	function buildInputArray() {
 		// Custom instantiation of input objects here.
-		$usernameInput = new FormElementInput('email', 'text','email',50);;
+		$usernameInput = new FormElementInput('email', 'text','Email',50);;
 		$this->inputArray['email'] = $usernameInput;
 
-		$pswInput = new FormElementInput('psw', 'password','password',50);
+		$pswInput = new FormElementInput('psw', 'password','Password',50);
 		$this->inputArray['psw'] = $pswInput;
+		
+		//$submitInput = new FormElementInput('submit','submit');
+		$submitInput = new FormElementInput('submit','submit',null,null,null,$this->submitName);
 
-		//$submit = new FormElementInput('submit', 'submit',NULL,NULL,'Shit Yeah!');
-		//$this->inputArray['submit'] = $submit;
+		
+		$this->inputArray['submit'] = $submitInput;
+
 	}
 	
 	function responseStateHandler($paramResponseState) {
@@ -56,13 +60,10 @@ HTML;
 		 	$message = '<div class="form_message_notifiacation"><p>ACCESS DENIED. GO AWAY. Or try again.</p></div>';
 		 	$this->html = $message.PHP_EOL.$this->html;
 		}
-		
-		// If login success, send a header so the page refreshes.
-		if ($paramResponseState == 1) {
-			$link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-			header('Location: '.$link.'?dank=true');
+
 			
-		}
+		$this->send303();
+
 
 	}
 
@@ -71,15 +72,7 @@ HTML;
 
 		$loginSuccess = false;
 
-		// Instantiate input objects
-		$this->buildInputArray();
-		//var_dump($this->inputArray);
-		
-		// Iterate through input objects to see if any received a POST
-		foreach ($this->inputArray as $input) {
-			if ($input->postState == true)
-				$this->postState = true;
-		}
+		// Set the submit value as "Shit Yeah!"
 
 		// if no post, render the form.
 		// Otherwise, process the input.
@@ -93,11 +86,9 @@ HTML;
 			// Gather POST data
 			$emailInput = $this->inputArray['email'];
 			$email = $emailInput->postData;
-			//$email = $this->inputArray['email']->formValue;
 			
 			$passwordInput = $this->inputArray['psw'];
 			$password = $passwordInput->postData;
-			//$password = $this->inputArray['psw']->formValue;
 			
 			// If email or password input is blank, response state is 0.
 			// Display warning message.
@@ -125,17 +116,25 @@ HTML;
 			}
 
 			$this->responseStateHandler($this->responseState);
-		//
+
 		}
-			
+
 	}
 
-
-	function objectSetup() {
+	public function objectSetup() {
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
-		// $this->html = $this->formHTML(); // deprecate
 	
+		$this->submitName = 'Shit Yeah!';
+		// Instantiate input objects
+		$this->buildInputArray();
+		// Iterate through input objects to see if any received a POST
+		foreach ($this->inputArray as $input) {
+			if ($input->postState == true)
+				$this->postState = true;
+	
+		}
+	
+
 	}
-	
 }

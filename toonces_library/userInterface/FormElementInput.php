@@ -71,13 +71,13 @@ class FormElementInput
 		$formHTML = '';
 		$displayNameHTML = '';
 		$sizeHTML = '';
-
+		$formValueHTML = '';
 			
 		if (isset($message))
 			$messageHTML = '<div class="'.$this->messageClass.'">'.$message.'</div>';
 		
 		if(isset($this->displayName))
-			$displayNameHTML = '<div class="input_display_name">'.$displayNameHTML.'</div>';
+			$displayNameHTML = '<div class="input_display_name">'.$this->displayName.'</div>';
 
 		if (isset($this->cssClass)) 
 			$classHTML = ' class="'.$this->cssClass.'"';
@@ -85,11 +85,14 @@ class FormElementInput
 		if (isset($this->size))
 			$sizeHTML = ' size="'.$this->size.'"';
 		
+		if (isset($this->formValue))
+			$formValueHTML = ' value="'.$this->formValue.'"';
+		
 		$this->html = $this->html.$messageHTML.PHP_EOL;
 		$this->html = $this->html.$displayNameHTML.PHP_EOL;
  
 		//if ($this->renderInput)
-			$this->html = $this->html.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.'>'.PHP_EOL;
+			$this->html = $this->html.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
 		
 	}
 
