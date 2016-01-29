@@ -20,6 +20,7 @@ $sessionManager->checkSession();
 
 // POST receivers
 // receive blog form submission
+// to be deprecated
 $blogid = isset($_POST['blogid']) ? $_POST['blogid'] : '';
 $author = isset($_POST['author']) ? $_POST['author'] : '';
 $title = isset($_POST['title']) ? $_POST['title'] : '';
@@ -41,11 +42,6 @@ $userIsAdmin = 0;
 $loginEmail = isset($_POST['email']) ? $_POST['email'] : '';
 $password = isset($_POST['psw']) ? $_POST['psw'] : '';
 
-/*
-if ($username != '') {
-	$loginSuccess = $sessionManager->login($loginEmail, $password);
-}
-*/
 $sessionActive = $sessionManager->sessionActive;
 
 if ($sessionActive == 1) {
@@ -237,16 +233,8 @@ if ($sessionActive == 1 and $isAdminPage == 1) {
 	$pageView->userCanAccessAdminPage = $userHasPageAccess;
 }
 
-// If login attempted, pass signal to PageView object
-//if (isset($_POST['psw'])) {
-//	$pageView->loginSuccess = $loginSuccess;
-//}
-
-// pass session manager if logged in
-
-// if ($sessionActive == 1) {
-	$pageView->sessionManager = $sessionManager;
-// }
+// pass session manager to pageView
+$pageView->sessionManager = $sessionManager;
 
 // set PageView class variables
 
@@ -258,7 +246,6 @@ $pageView->setPageTitle($pageTitle);
 $pageView->setPageLinkText($pageLinkText);
 
 $pageBuilder = new $pageBuilderClass;
-
 
 $pageElements = $pageBuilder->buildPage($pageView);
 
