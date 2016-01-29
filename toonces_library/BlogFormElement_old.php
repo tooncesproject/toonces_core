@@ -6,11 +6,14 @@
  * 
  * 	Basic, non-fancy blog post submission form
  * 
+ * To be deprecated. Not fancy enough.
+ * Need to replace it with something compliant to the
+ * FormElement class.
  * 
  */
 include_once ROOTPATH.'/toonces.php';
 
-class BlogFormElement extends Element
+class BlogFormElement_old extends Element
 {
 	
 	// inherited class variables commented out

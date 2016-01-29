@@ -15,13 +15,6 @@ require_once ROOTPATH.'/toonces.php';
 
 $sessionManager = new SessionManager();
 
-
-// Detect logout.
-$logoutSignal = isset($_POST['logout']) ? intval($_POST['logout']) : 0;
-if ($logoutSignal == 1) {
-	$sessionManager->logout();
-}
-
 $sessionManager->checkSession();
 
 
@@ -41,17 +34,18 @@ if (isset($_POST['blogid'])) {
 
 // session stuff
 
-$loginSuccess = 0;
+// $loginSuccess = 0;
 $sessionActive = 0;
 $userId = 0;
 $userIsAdmin = 0;
-$username = isset($_POST['username']) ? $_POST['username'] : '';
+$loginEmail = isset($_POST['email']) ? $_POST['email'] : '';
 $password = isset($_POST['psw']) ? $_POST['psw'] : '';
 
+/*
 if ($username != '') {
-	$loginSuccess = $sessionManager->login($username, $password);
+	$loginSuccess = $sessionManager->login($loginEmail, $password);
 }
-
+*/
 $sessionActive = $sessionManager->sessionActive;
 
 if ($sessionActive == 1) {
@@ -244,15 +238,15 @@ if ($sessionActive == 1 and $isAdminPage == 1) {
 }
 
 // If login attempted, pass signal to PageView object
-if (isset($_POST['psw'])) {
-	$pageView->loginSuccess = $loginSuccess;
-}
+//if (isset($_POST['psw'])) {
+//	$pageView->loginSuccess = $loginSuccess;
+//}
 
 // pass session manager if logged in
 
-if ($sessionActive == 1) {
+// if ($sessionActive == 1) {
 	$pageView->sessionManager = $sessionManager;
-}
+// }
 
 // set PageView class variables
 
