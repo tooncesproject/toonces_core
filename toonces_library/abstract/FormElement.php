@@ -59,10 +59,7 @@ abstract class FormElement extends Element
 		// Iterate through input objects to generate HTML.
 		$formNameHTML = '';
 		$messageHTML = '';
-		/*
-		if (isset($this->formName))
 
-		*/
 		if (isset($this->formName) == false)
 			throw new Exception('Form name must be set.');
 

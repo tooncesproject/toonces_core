@@ -10,7 +10,7 @@ class LogoutFormElement extends FormElement
 
 	function buildInputArray() {
 		$logoutInputElement = new FormElementInput('logout', 'hidden',$this->formName);
-		$logoutInputElement->setupForm($this->formName);
+		$logoutInputElement->setupForm();
 		$this->inputArray['logout'] = $logoutInputElement;
 
 	}

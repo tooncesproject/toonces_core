@@ -24,21 +24,21 @@ class LoginFormElement extends FormElement implements iElement
 		$this->inputArray['email'] = $usernameInput;
 		$usernameInput->displayName = 'Email';
 		$usernameInput->size = 50;
-		$usernameInput->setupForm($this->formName);
+		$usernameInput->setupForm();
 
 
 		$pswInput = new FormElementInput('psw', 'password',$this->formName);
 
 		$pswInput->displayName = 'Password';
 		$pswInput->size = 50;
-		$pswInput->setupForm($this->formName);
+		$pswInput->setupForm();
 
 		$this->inputArray['psw'] = $pswInput;
 
 		//$submitInput = new FormElementInput('submit','submit');
 		$submitInput = new FormElementInput('submit','submit',$this->formName);
 		$submitInput->formValue = $this->submitName;
-		$submitInput->setupForm($this->formName);
+		$submitInput->setupForm();
 
 		$this->inputArray['submit'] = $submitInput;
 
