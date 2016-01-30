@@ -28,13 +28,13 @@ class FormElementInput
 	public $messageClass = 'input_message_notification';
 	public $parentFormName;
 	public $messageVarName;
-	
+
 	function __construct($paramName,$paramInputType,$paramParentFormName) {
 
 		$this->name = $paramName;
 		$this->inputType = $paramInputType;
 		$this->parentFormName = $paramParentFormName;
-		
+
 		$this->messageVarName = $this->parentFormName.$this->name.'_inmsg';
 
 		if (isset($_SESSION[$this->messageVarName])) {
@@ -52,7 +52,7 @@ class FormElementInput
 		$this->message = $paramMessage;
 		$_SESSION[$this->messageVarName] = $this->message;
 	}
-	
+
 	public function setupForm() {
 
 		// Generate form.
@@ -72,13 +72,13 @@ class FormElementInput
 		$sizeHTML = '';
 		$formValueHTML = '';
 
-			
+
 		if (isset($this->message)) {
 			$messageHTML = '<div class="'.$this->messageClass.'">'.$this->message.'</div>';
 			// Destroy the message
 			unset($_SESSION[$this->messageVarName]);
 		}
-		
+
 		if(isset($this->displayName))
 			$displayNameHTML = '<div class="input_display_name">'.$this->displayName.'</div>';
 
@@ -87,16 +87,16 @@ class FormElementInput
 
 		if (isset($this->size))
 			$sizeHTML = ' size="'.$this->size.'"';
-		
+
 		if (isset($this->formValue))
 			$formValueHTML = ' value="'.$this->formValue.'"';
-		
+
 		$this->html = $this->html.$messageHTML.PHP_EOL;
 		$this->html = $this->html.$displayNameHTML.PHP_EOL;
  
 		//if ($this->renderInput)
 			$this->html = $this->html.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
-		
+
 	}
 
 }

@@ -2,7 +2,7 @@
 /*
 *	index.php
 *	Copyright (c) 2015 by Paul Anderson, All Rigths Reserved
-*	
+*
 *	This script is the root script for any given application in the site.
 *	It instantiates a PageView object which provides the base rendering for a page
 *
@@ -50,40 +50,40 @@ if ($adminSessionActive == 1) {
 // function to get page from path
 
 function getPage($pathString, $conn) {
-	
+
 	$defaultPage = 1;
 	$depthCount = 0;
 	$pathArray = array();
-	
+
 	// return home page if no path string
 	if (trim($pathString) == '') {
 		return $defaultPage;
 	} else {
 		$pathArray = explode('/', $pathString);
-		
+
 		// recursively query pages tables until end is reached
 		$pageSearchResult = pageSearch($pathArray, $defaultPage, $depthCount, $conn);
-		
+
 		return $pageSearchResult;
 	}
 }
 
 function pageSearch($pathArray, $pageid, $depthCount, $conn) {
-	
+
 	$pageFound = false;
 	$descendantPageId;
-		
+
 	$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_child_page_ids.sql'),$pageid);
-	
-	
+
+
 	$descenantPages = $conn->query($query);
-	
+
 	if (!$descenantPages) {
 		return $pageid;
 	}
-	
+
 	foreach ($descenantPages as $row) {
-		
+
 		if ($row['pathname'] == $pathArray[$depthCount]) {
 			$descendantPageId = $row['descendant_page_id'];
 			$pageFound = true;
@@ -93,25 +93,25 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 	// if a page was found and the end of the array has been reached, return the descendant ID
 	// otherwise continue recursion
 	$nextDepthCount = ++$depthCount;
-	
-	
+
+
 	if ($pageFound && (!array_key_exists($nextDepthCount, $pathArray) OR trim($pathArray[$nextDepthCount]) == '')) {
 		return $descendantPageId;
-		
+
 	} else if ($pageFound) {
 		//iterate recursion if page found
 		return pageSearch($pathArray, $descendantPageId, $nextDepthCount, $conn);
-		
+
 	} else {
-	
+
 		//if not found, query deepest page for whether it allows a redirect
 		$query = 'SELECT redirect_on_error FROM toonces.pages WHERE page_id = '.$pageid;
 		$result = $conn->query($query);
-	
+
 		foreach($result as $row) {
 			$redirectOnError = $row['redirect_on_error'];
 		}
-	
+
 		if ($redirectOnError) {
 			return $pageid;
 		}
@@ -119,7 +119,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 			return 0;
 		}
 	}
-	
+
 }
 
 
@@ -151,7 +151,7 @@ $path = parse_url($url,PHP_URL_PATH);
 $path = substr($path,1,strlen($path)-1);
 
 if (trim($path))
-	$pageId = getPage($path, $conn);	
+	$pageId = getPage($path, $conn);
 
 // Default content state for page access is 404.
 $pathName = '';
@@ -205,7 +205,7 @@ if ($pageRecord) {
 		if ($userHasPageAccess == 1) {
 			$allowAccess = 1;
 		}
-			
+
 	} else {
 		// If published, page is public.
 		$allowAccess = 1;
@@ -247,7 +247,7 @@ $pageBuilder = new $pageBuilderClass;
 
 $pageElements = $pageBuilder->buildPage($pageView);
 
-foreach($pageElements as $element) {	
+foreach($pageElements as $element) {
 	$pageView->addElement($element);
 }
 

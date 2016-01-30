@@ -4,7 +4,7 @@ require_once ROOTPATH.'/toonces.php';
 
 class SessionManager
 {
-	
+
 	var $conn;
 	var $userId;
 	var $nickname;
@@ -17,7 +17,7 @@ class SessionManager
 
 	// Check session
 	function checkSession() {
-		
+
 		$this->beginSession();
 		$this->adminSessionActive = 0;
 		$dbPassword = '';
@@ -35,7 +35,7 @@ class SessionManager
 		) {
 			$seshUserId = $_SESSION['userId'];
 			$seshLoginString = $_SESSION['loginString'];
-			
+
 			// Query database for user's hashed password
 			$SQL = <<<SQL
 			SELECT
@@ -74,7 +74,7 @@ SQL;
 		$sessionName = 'secure_session';
 		$secure = 'SECURE';
 		$httponly = true;
-		
+
 		// force session to use only cookies
 		if (ini_set('session.use_only_cookies', 1) === FALSE) {
 			header("Location:../error.php?err=Could Not initiate a safe session(ini_set)");
@@ -101,7 +101,7 @@ SQL;
 		// regenerate session
 		session_regenerate_id(true);
 	}
-	
+
 	// login
 	function login($email,$formPassword) {
 
@@ -126,7 +126,7 @@ SQL;
         WHERE
             email = '%s';
 SQL;
-		
+
 		$query = sprintf($sql,$email);
 
 		// query and check for match
@@ -160,7 +160,7 @@ SQL;
 			$this->adminSessionActive = 1;
 
 		} else {
-			$loginSuccess = 0;	
+			$loginSuccess = 0;
 		}
 
 		return $loginSuccess;
@@ -170,13 +170,13 @@ SQL;
 
 		//run session start function
 		$this->beginSession();
-		
+
 		// Unset session variables
 		$_SESSION = array();
-		
+
 		// acquire session parameters
 		$sessionParams = session_get_cookie_params();
-		
+
 		setcookie(
 			session_name()
 			,''
@@ -185,23 +185,23 @@ SQL;
 			,$sessionParams["domain"]
 			,$sessionParams["secure"]
 			,$sessionParams["httponly"]);
-		
+
 		session_destroy();
-		
+
 	}
-	
+
 	function checkBruteForce() {
-		
+
 		// build query array
 		$loginAttemptVars = array();
-		
+
 		$loginAttemptVars[':attempt_user_id'] = isset($this->userId) ? strval($this->userId) : null;
 		$loginAttemptVars[':attempt_time'] = date('Y-m-d h:i:s', time());
 		$loginAttemptVars[':http_client_ip'] = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : null;
 		$loginAttemptVars[':http_x_forwarded_for'] = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
 		$loginAttemptVars[':remote_addr'] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
 		$loginAttemptVars[':user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-		
+
 		// Insert login attempt record
 		$stmt = <<<SQL
 		INSERT INTO toonces.login_attempts
@@ -219,7 +219,7 @@ SQL;
 			,INET_ATON(:http_x_forwarded_for)
 			,INET_ATON(:remote_addr)
 			,:user_agent
-		)	
+		)
 SQL;
 
 		$stmt = $this->conn->prepare($stmt,$loginAttemptVars);
@@ -265,7 +265,7 @@ SQL;
 
 		foreach ($checkAttemptResponse as $row)
 			$attemptCount = $row['attemptcount'];
-	
+
 		// If more than 30 attempts in the past 10 minutes, reject login attempt.
 		if ($attemptCount > 30) {
 			return 1;
@@ -274,5 +274,5 @@ SQL;
 		}
 
 	}
-	
+
 }

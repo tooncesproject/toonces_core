@@ -2,7 +2,7 @@
 
 class LoginFormElement extends FormElement implements iElement
 {
-	
+
 	// Inherited variables commented out
 	// var $html;
 	// var $htmlHeader;
@@ -25,7 +25,7 @@ class LoginFormElement extends FormElement implements iElement
 		$usernameInput->displayName = 'Email';
 		$usernameInput->size = 50;
 		$usernameInput->setupForm($this->formName);
-		
+
 
 		$pswInput = new FormElementInput('psw', 'password',$this->formName);
 
@@ -43,16 +43,16 @@ class LoginFormElement extends FormElement implements iElement
 		$this->inputArray['submit'] = $submitInput;
 
 	}
-	
+
 	function responseStateHandler($paramResponseState) {
-		
+
 		if ($paramResponseState == 0) {
 			$this->generateFormHTML();
 		 	$_SESSION[$this->messageVarName] = 'ACCESS DENIED. GO AWAY. Or try again.';
 
 		}
 
-			
+
 		$this->send303();
 
 
@@ -73,14 +73,14 @@ class LoginFormElement extends FormElement implements iElement
 
 			// By default, attempt login
 			$doAttemptLogin = true;
-			
+
 			// Gather POST data
 			$emailInput = $this->inputArray['email'];
 			$email = $emailInput->postData;
-			
+
 			$passwordInput = $this->inputArray['psw'];
 			$password = $passwordInput->postData;
-			
+
 			// If email or password input is blank, response state is 0.
 			// Display warning message.
 			if (empty($email)) {
@@ -93,11 +93,11 @@ class LoginFormElement extends FormElement implements iElement
 				$this->inputArray['psw']->storeMessage('Please enter a password.');
 				$doAttemptLogin = false;
 			}
-			
+
 			if ($doAttemptLogin == true) {
 				$loginSuccess = $this->pageViewReference->sessionManager->login($email,$password);
 			}
-			
+
 			// If login was not successful, display the login fail message.
 			//if (isset($this->pageViewReference->loginSuccess) and $this->pageViewReference->loginSuccess == 0) {
 			if ($loginSuccess == false) {
@@ -116,7 +116,7 @@ class LoginFormElement extends FormElement implements iElement
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
 		$this->formName = 'loginForm';
-	
+
 		$this->submitName = 'Shit Yeah!';
 		// Instantiate input objects
 		$this->buildInputArray();
@@ -124,9 +124,9 @@ class LoginFormElement extends FormElement implements iElement
 		foreach ($this->inputArray as $input) {
 			if ($input->postState == true)
 				$this->postState = true;
-	
+
 		}
-	
+
 
 	}
 }
