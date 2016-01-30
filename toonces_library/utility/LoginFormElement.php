@@ -2,7 +2,7 @@
 
 class LoginFormElement extends FormElement implements iElement
 {
-	
+
 	// Inherited variables commented out
 	// var $html;
 	// var $htmlHeader;
@@ -18,49 +18,41 @@ class LoginFormElement extends FormElement implements iElement
 		}
 
 
-	function formHTML() {
-		
-		$html = <<<HTML
-            <form id="login" method="post">
-                Email:<br>
-                <input type="text" name="username" size="50">
-                <br>
-                <br>
-                Password:<br>
-                <input type="password" name="psw" size="50">
-                <br>
-                <br>
-                <input type="submit" value="Shit yeah!"/>
-            </form>
-HTML;
-	
-		return $html;
-	}
-
 	function buildInputArray() {
 		// Custom instantiation of input objects here.
-		$usernameInput = new FormElementInput('email', 'text','Email',50);;
+		$usernameInput = new FormElementInput('email', 'text',$this->formName);
 		$this->inputArray['email'] = $usernameInput;
+		$usernameInput->displayName = 'Email';
+		$usernameInput->size = 50;
+		$usernameInput->setupForm();
 
-		$pswInput = new FormElementInput('psw', 'password','Password',50);
+
+		$pswInput = new FormElementInput('psw', 'password',$this->formName);
+
+		$pswInput->displayName = 'Password';
+		$pswInput->size = 50;
+		$pswInput->setupForm();
+
 		$this->inputArray['psw'] = $pswInput;
-		
+
 		//$submitInput = new FormElementInput('submit','submit');
-		$submitInput = new FormElementInput('submit','submit',null,null,null,$this->submitName);
+		$submitInput = new FormElementInput('submit','submit',$this->formName);
+		$submitInput->formValue = $this->submitName;
+		$submitInput->setupForm();
 
 		$this->inputArray['submit'] = $submitInput;
 
 	}
-	
+
 	function responseStateHandler($paramResponseState) {
-		
+
 		if ($paramResponseState == 0) {
 			$this->generateFormHTML();
-		 	$message = '<div class="form_message_notifiacation"><p>ACCESS DENIED. GO AWAY. Or try again.</p></div>';
-		 	$this->html = $message.PHP_EOL.$this->html;
+		 	$_SESSION[$this->messageVarName] = 'ACCESS DENIED. GO AWAY. Or try again.';
+
 		}
 
-			
+
 		$this->send303();
 
 
@@ -81,31 +73,31 @@ HTML;
 
 			// By default, attempt login
 			$doAttemptLogin = true;
-			
+
 			// Gather POST data
 			$emailInput = $this->inputArray['email'];
 			$email = $emailInput->postData;
-			
+
 			$passwordInput = $this->inputArray['psw'];
 			$password = $passwordInput->postData;
-			
+
 			// If email or password input is blank, response state is 0.
 			// Display warning message.
 			if (empty($email)) {
 				$this->responseState = 0;
-				$this->inputArray['email']->message = 'Please enter an email address.';
+				$this->inputArray['email']->storeMessage('Please enter an email address.');
 				$doAttemptLogin = false;
 			}
 			if (empty($password)) {
 				$this->responseState = 0;
-				$this->inputArray['psw']->message = 'Please enter a password.';
+				$this->inputArray['psw']->storeMessage('Please enter a password.');
 				$doAttemptLogin = false;
 			}
-			
+
 			if ($doAttemptLogin == true) {
 				$loginSuccess = $this->pageViewReference->sessionManager->login($email,$password);
 			}
-			
+
 			// If login was not successful, display the login fail message.
 			//if (isset($this->pageViewReference->loginSuccess) and $this->pageViewReference->loginSuccess == 0) {
 			if ($loginSuccess == false) {
@@ -123,7 +115,8 @@ HTML;
 	public function objectSetup() {
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
-	
+		$this->formName = 'loginForm';
+
 		$this->submitName = 'Shit Yeah!';
 		// Instantiate input objects
 		$this->buildInputArray();
@@ -131,9 +124,9 @@ HTML;
 		foreach ($this->inputArray as $input) {
 			if ($input->postState == true)
 				$this->postState = true;
-	
+
 		}
-	
+
 
 	}
 }

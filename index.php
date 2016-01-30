@@ -2,7 +2,7 @@
 /*
 *	index.php
 *	Copyright (c) 2015 by Paul Anderson, All Rigths Reserved
-*	
+*
 *	This script is the root script for any given application in the site.
 *	It instantiates a PageView object which provides the base rendering for a page
 *
@@ -20,6 +20,7 @@ $sessionManager->checkSession();
 
 // POST receivers
 // receive blog form submission
+// to be deprecated
 $blogid = isset($_POST['blogid']) ? $_POST['blogid'] : '';
 $author = isset($_POST['author']) ? $_POST['author'] : '';
 $title = isset($_POST['title']) ? $_POST['title'] : '';
@@ -35,20 +36,13 @@ if (isset($_POST['blogid'])) {
 // session stuff
 
 // $loginSuccess = 0;
-$sessionActive = 0;
+$adminSessionActive = 0;
 $userId = 0;
 $userIsAdmin = 0;
-$loginEmail = isset($_POST['email']) ? $_POST['email'] : '';
-$password = isset($_POST['psw']) ? $_POST['psw'] : '';
 
-/*
-if ($username != '') {
-	$loginSuccess = $sessionManager->login($loginEmail, $password);
-}
-*/
-$sessionActive = $sessionManager->sessionActive;
+$adminSessionActive = $sessionManager->adminSessionActive;
 
-if ($sessionActive == 1) {
+if ($adminSessionActive == 1) {
 	$userId = $sessionManager->userId;
 	$userIsAdmin = $sessionManager->userIsAdmin;
 }
@@ -56,40 +50,40 @@ if ($sessionActive == 1) {
 // function to get page from path
 
 function getPage($pathString, $conn) {
-	
+
 	$defaultPage = 1;
 	$depthCount = 0;
 	$pathArray = array();
-	
+
 	// return home page if no path string
 	if (trim($pathString) == '') {
 		return $defaultPage;
 	} else {
 		$pathArray = explode('/', $pathString);
-		
+
 		// recursively query pages tables until end is reached
 		$pageSearchResult = pageSearch($pathArray, $defaultPage, $depthCount, $conn);
-		
+
 		return $pageSearchResult;
 	}
 }
 
 function pageSearch($pathArray, $pageid, $depthCount, $conn) {
-	
+
 	$pageFound = false;
 	$descendantPageId;
-		
+
 	$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_child_page_ids.sql'),$pageid);
-	
-	
+
+
 	$descenantPages = $conn->query($query);
-	
+
 	if (!$descenantPages) {
 		return $pageid;
 	}
-	
+
 	foreach ($descenantPages as $row) {
-		
+
 		if ($row['pathname'] == $pathArray[$depthCount]) {
 			$descendantPageId = $row['descendant_page_id'];
 			$pageFound = true;
@@ -99,25 +93,25 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 	// if a page was found and the end of the array has been reached, return the descendant ID
 	// otherwise continue recursion
 	$nextDepthCount = ++$depthCount;
-	
-	
+
+
 	if ($pageFound && (!array_key_exists($nextDepthCount, $pathArray) OR trim($pathArray[$nextDepthCount]) == '')) {
 		return $descendantPageId;
-		
+
 	} else if ($pageFound) {
 		//iterate recursion if page found
 		return pageSearch($pathArray, $descendantPageId, $nextDepthCount, $conn);
-		
+
 	} else {
-	
+
 		//if not found, query deepest page for whether it allows a redirect
 		$query = 'SELECT redirect_on_error FROM toonces.pages WHERE page_id = '.$pageid;
 		$result = $conn->query($query);
-	
+
 		foreach($result as $row) {
 			$redirectOnError = $row['redirect_on_error'];
 		}
-	
+
 		if ($redirectOnError) {
 			return $pageid;
 		}
@@ -125,7 +119,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 			return 0;
 		}
 	}
-	
+
 }
 
 
@@ -157,7 +151,7 @@ $path = parse_url($url,PHP_URL_PATH);
 $path = substr($path,1,strlen($path)-1);
 
 if (trim($path))
-	$pageId = getPage($path, $conn);	
+	$pageId = getPage($path, $conn);
 
 // Default content state for page access is 404.
 $pathName = '';
@@ -200,7 +194,7 @@ if ($pageRecord) {
 	if ($published == 0) {
 		// Allow access to page if:
 		// user is logged in and page is admin page (defer access to page)
-		if ($sessionActive == 1 and  $pageIsAdminPage = 1) {
+		if ($adminSessionActive == 1 and  $pageIsAdminPage = 1) {
 			$allowAccess = 1;
 		}
 		// user is admin
@@ -211,7 +205,7 @@ if ($pageRecord) {
 		if ($userHasPageAccess == 1) {
 			$allowAccess = 1;
 		}
-			
+
 	} else {
 		// If published, page is public.
 		$allowAccess = 1;
@@ -233,20 +227,12 @@ $pageView = new $pageViewClass($pageId);
 $pageView->userCanEdit = $userCanEdit;
 
 // If it's an admin page, pass the user's page access state to the pageView
-if ($sessionActive == 1 and $isAdminPage == 1) {
+if ($adminSessionActive == 1 and $isAdminPage == 1) {
 	$pageView->userCanAccessAdminPage = $userHasPageAccess;
 }
 
-// If login attempted, pass signal to PageView object
-//if (isset($_POST['psw'])) {
-//	$pageView->loginSuccess = $loginSuccess;
-//}
-
-// pass session manager if logged in
-
-// if ($sessionActive == 1) {
-	$pageView->sessionManager = $sessionManager;
-// }
+// pass session manager to pageView
+$pageView->sessionManager = $sessionManager;
 
 // set PageView class variables
 
@@ -259,10 +245,9 @@ $pageView->setPageLinkText($pageLinkText);
 
 $pageBuilder = new $pageBuilderClass;
 
-
 $pageElements = $pageBuilder->buildPage($pageView);
 
-foreach($pageElements as $element) {	
+foreach($pageElements as $element) {
 	$pageView->addElement($element);
 }
 

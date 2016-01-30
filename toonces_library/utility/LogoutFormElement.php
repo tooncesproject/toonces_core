@@ -9,7 +9,8 @@ class LogoutFormElement extends FormElement
 
 
 	function buildInputArray() {
-		$logoutInputElement = new FormElementInput('logout', 'hidden');
+		$logoutInputElement = new FormElementInput('logout', 'hidden',$this->formName);
+		$logoutInputElement->setupForm();
 		$this->inputArray['logout'] = $logoutInputElement;
 
 	}
@@ -17,6 +18,7 @@ class LogoutFormElement extends FormElement
 	function elementAction() {
 		$this->formName = 'logoutForm';
 		$this->generateFormHTML();
+		echo $this->postState;
 		if ($this->postState == 1) {
 			$this->pageViewReference->sessionManager->logout();
 			$this->responseStateHandler(0);

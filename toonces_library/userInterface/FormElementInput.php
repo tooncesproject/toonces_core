@@ -25,37 +25,36 @@ class FormElementInput
 	public $formValue;
 	public $displayName;
 	public $renderInput = true;
-	public $messageClass = 'form_message_notification';
-	
-	function __construct
-	(
-		 $paramName
-		,$paramInputType
-		,$paramDisplayName = NULL
-		,$paramSize = NULL
-		,$paramCssClass = NULL
-		,$paramFormValue = NULL
-	) 
-	{
+	public $messageClass = 'input_message_notification';
+	public $parentFormName;
+	public $messageVarName;
+
+	function __construct($paramName,$paramInputType,$paramParentFormName) {
+
 		$this->name = $paramName;
 		$this->inputType = $paramInputType;
+		$this->parentFormName = $paramParentFormName;
 
-		if (isset($paramDisplayName)) {
-			$this->displayName = $paramDisplayName;
+		$this->messageVarName = $this->parentFormName.$this->name.'_inmsg';
+
+		if (isset($_SESSION[$this->messageVarName])) {
+			$this->message = $_SESSION[$this->messageVarName];
 		}
-
-		if (isset($paramSize))
-			$this->size = $paramSize;
-
-		if (isset($paramFormValue))
-			$this->formValue = $paramFormValue;
-		
 		// Check for post data.
 		if (isset($_POST[$this->name])) {
 			$this->postState = true;
 			$this->postData = isset($_POST[$this->name]) ? $_POST[$this->name] : NULL;
 		}
-		
+
+	}
+
+	public function storeMessage($paramMessage) {
+		$this->message = $paramMessage;
+		$_SESSION[$this->messageVarName] = $this->message;
+	}
+
+	public function setupForm() {
+
 		// Generate form.
 		$this->generateForm($this->renderInput,$this->message,$this->messageClass);
 	}
@@ -72,10 +71,14 @@ class FormElementInput
 		$displayNameHTML = '';
 		$sizeHTML = '';
 		$formValueHTML = '';
-			
-		if (isset($message))
-			$messageHTML = '<div class="'.$this->messageClass.'">'.$message.'</div>';
-		
+
+
+		if (isset($this->message)) {
+			$messageHTML = '<div class="'.$this->messageClass.'">'.$this->message.'</div>';
+			// Destroy the message
+			unset($_SESSION[$this->messageVarName]);
+		}
+
 		if(isset($this->displayName))
 			$displayNameHTML = '<div class="input_display_name">'.$this->displayName.'</div>';
 
@@ -84,16 +87,16 @@ class FormElementInput
 
 		if (isset($this->size))
 			$sizeHTML = ' size="'.$this->size.'"';
-		
+
 		if (isset($this->formValue))
 			$formValueHTML = ' value="'.$this->formValue.'"';
-		
+
 		$this->html = $this->html.$messageHTML.PHP_EOL;
 		$this->html = $this->html.$displayNameHTML.PHP_EOL;
  
 		//if ($this->renderInput)
 			$this->html = $this->html.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
-		
+
 	}
 
 }
