@@ -18,35 +18,27 @@ class LoginFormElement extends FormElement implements iElement
 		}
 
 
-	function formHTML() {
-		
-		$html = <<<HTML
-            <form id="login" method="post">
-                Email:<br>
-                <input type="text" name="username" size="50">
-                <br>
-                <br>
-                Password:<br>
-                <input type="password" name="psw" size="50">
-                <br>
-                <br>
-                <input type="submit" value="Shit yeah!"/>
-            </form>
-HTML;
-	
-		return $html;
-	}
-
 	function buildInputArray() {
 		// Custom instantiation of input objects here.
-		$usernameInput = new FormElementInput('email', 'text','Email',50);;
+		$usernameInput = new FormElementInput('email', 'text',$this->formName);
 		$this->inputArray['email'] = $usernameInput;
-
-		$pswInput = new FormElementInput('psw', 'password','Password',50);
-		$this->inputArray['psw'] = $pswInput;
+		$usernameInput->displayName = 'Email';
+		$usernameInput->size = 50;
+		$usernameInput->setupForm($this->formName);
 		
+
+		$pswInput = new FormElementInput('psw', 'password',$this->formName);
+
+		$pswInput->displayName = 'Password';
+		$pswInput->size = 50;
+		$pswInput->setupForm($this->formName);
+
+		$this->inputArray['psw'] = $pswInput;
+
 		//$submitInput = new FormElementInput('submit','submit');
-		$submitInput = new FormElementInput('submit','submit',null,null,null,$this->submitName);
+		$submitInput = new FormElementInput('submit','submit',$this->formName);
+		$submitInput->formValue = $this->submitName;
+		$submitInput->setupForm($this->formName);
 
 		$this->inputArray['submit'] = $submitInput;
 
@@ -56,8 +48,8 @@ HTML;
 		
 		if ($paramResponseState == 0) {
 			$this->generateFormHTML();
-		 	$message = '<div class="form_message_notifiacation"><p>ACCESS DENIED. GO AWAY. Or try again.</p></div>';
-		 	$this->html = $message.PHP_EOL.$this->html;
+		 	$_SESSION[$this->messageVarName] = 'ACCESS DENIED. GO AWAY. Or try again.';
+
 		}
 
 			
@@ -93,12 +85,12 @@ HTML;
 			// Display warning message.
 			if (empty($email)) {
 				$this->responseState = 0;
-				$this->inputArray['email']->message = 'Please enter an email address.';
+				$this->inputArray['email']->storeMessage('Please enter an email address.');
 				$doAttemptLogin = false;
 			}
 			if (empty($password)) {
 				$this->responseState = 0;
-				$this->inputArray['psw']->message = 'Please enter a password.';
+				$this->inputArray['psw']->storeMessage('Please enter a password.');
 				$doAttemptLogin = false;
 			}
 			
@@ -123,6 +115,7 @@ HTML;
 	public function objectSetup() {
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
+		$this->formName = 'loginForm';
 	
 		$this->submitName = 'Shit Yeah!';
 		// Instantiate input objects

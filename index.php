@@ -36,15 +36,13 @@ if (isset($_POST['blogid'])) {
 // session stuff
 
 // $loginSuccess = 0;
-$sessionActive = 0;
+$adminSessionActive = 0;
 $userId = 0;
 $userIsAdmin = 0;
-$loginEmail = isset($_POST['email']) ? $_POST['email'] : '';
-$password = isset($_POST['psw']) ? $_POST['psw'] : '';
 
-$sessionActive = $sessionManager->sessionActive;
+$adminSessionActive = $sessionManager->adminSessionActive;
 
-if ($sessionActive == 1) {
+if ($adminSessionActive == 1) {
 	$userId = $sessionManager->userId;
 	$userIsAdmin = $sessionManager->userIsAdmin;
 }
@@ -196,7 +194,7 @@ if ($pageRecord) {
 	if ($published == 0) {
 		// Allow access to page if:
 		// user is logged in and page is admin page (defer access to page)
-		if ($sessionActive == 1 and  $pageIsAdminPage = 1) {
+		if ($adminSessionActive == 1 and  $pageIsAdminPage = 1) {
 			$allowAccess = 1;
 		}
 		// user is admin
@@ -229,7 +227,7 @@ $pageView = new $pageViewClass($pageId);
 $pageView->userCanEdit = $userCanEdit;
 
 // If it's an admin page, pass the user's page access state to the pageView
-if ($sessionActive == 1 and $isAdminPage == 1) {
+if ($adminSessionActive == 1 and $isAdminPage == 1) {
 	$pageView->userCanAccessAdminPage = $userHasPageAccess;
 }
 

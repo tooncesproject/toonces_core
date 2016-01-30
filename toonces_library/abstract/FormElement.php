@@ -39,6 +39,8 @@ abstract class FormElement extends Element
 	public $submitName;
 	
 	public $formName;
+	
+	public $messageVarName;
 
 	public function __construct($pageView) {
 		// __construct handles the basic responsibilities of the element:
@@ -56,14 +58,29 @@ abstract class FormElement extends Element
 		// Utility function, not likely you'll need to override.
 		// Iterate through input objects to generate HTML.
 		$formNameHTML = '';
+		$messageHTML = '';
+		/*
 		if (isset($this->formName))
-			$formNameHTML = 'name="'.$this->formName.'"';
+			
+		*/
+		if (isset($this->formName) == false)
+			throw new Exception('Form name must be set.');
+
+		$this->messageVarName = $this->formName.'_msg';
+		if (isset($_SESSION[$this->messageVarName]))
+			$messageHTML = '<div class="form_message_notification"><p>'.$_SESSION[$this->messageVarName].'</p></div>';
 		
-		$this->html = '<form method="post" '.$formNameHTML.'>';
+		$formNameHTML = 'name="'.$this->formName.'"';
+		
+		$this->html = $messageHTML.PHP_EOL;
+
+		$this->html = $this->html.'<form method="post" '.$formNameHTML.'>';
 		foreach ($this->inputArray as $inputObject) {
 			$this->html = $this->html.$inputObject->html.'<br>';
 		}
 
+		// Destroy the message session variable so it doesn't show when it's not supposed to.
+		unset($_SESSION[$this->messageVarName]);
 	}
 	public function buildInputArray() {
 		// This function holds customizations for building the form array.

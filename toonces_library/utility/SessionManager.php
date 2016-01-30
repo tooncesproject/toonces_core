@@ -11,7 +11,7 @@ class SessionManager
 	var $userIsAdmin;
 	var $userFirstName;
 	var $userLastName;
-	var $sessionActive;
+	var $adminSessionActive;
 
 // Session functions
 
@@ -19,7 +19,7 @@ class SessionManager
 	function checkSession() {
 		
 		$this->beginSession();
-		$this->sessionActive = 0;
+		$this->adminSessionActive = 0;
 		$dbPassword = '';
 		$dbUserIsAdmin = 0;
 		$userAgentString = $_SERVER['HTTP_USER_AGENT'];
@@ -62,7 +62,7 @@ SQL;
 			//Check for matching login string.
 			$activeLoginString = hash('sha512',$dbPassword,$userAgentString);
 			if ($activeLoginString == $seshLoginString) {
-				$this->sessionActive = 1;
+				$this->adminSessionActive = 1;
 				$this->userIsAdmin = $dbUserIsAdmin;
 				$this->userId = $seshUserId;
 			}
@@ -157,7 +157,7 @@ SQL;
 			$_SESSION['userLastName'] = $this->userLastName;
 			$_SESSION['loginString'] = hash('sha512',$dbPassword, $_SERVER['HTTP_USER_AGENT']);
 
-			$this->sessionActive = 1;
+			$this->adminSessionActive = 1;
 
 		} else {
 			$loginSuccess = 0;	
