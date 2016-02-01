@@ -73,7 +73,8 @@ abstract class FormElement extends Element
 
 		$this->html = $this->html.'<form method="post" '.$formNameHTML.'>';
 		foreach ($this->inputArray as $inputObject) {
-			$this->html = $this->html.$inputObject->html.'<br>';
+			if ($inputObject->hideInput == false)
+				$this->html = $this->html.$inputObject->html.'<br>';
 		}
 
 		$this->html = $this->html.'</form>';

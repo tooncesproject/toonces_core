@@ -2,7 +2,7 @@
 
 class CreateUserFormElement extends FormElement implements iElement
 {
-	
+
 	// Inherited variables commented out
 	// var $html;
 	// var $htmlHeader;
@@ -15,9 +15,6 @@ class CreateUserFormElement extends FormElement implements iElement
 	private $nickname;
 	private $password;
 	private $adminCreated;
-
-		return $html;
-	}
 
 	function buildInputArray() {
 	// Custom instantiation of input objects here.
@@ -75,7 +72,7 @@ class CreateUserFormElement extends FormElement implements iElement
 		$submitInput->formValue = $this->submitName;
 		$submitInput->setupForm();
 		$this->inputArray['submit'] = $submitInput;
-		
+
 	}
 
 	function responseStateHandler($responseState) {
@@ -92,7 +89,7 @@ class CreateUserFormElement extends FormElement implements iElement
 				$inputName = $input->displayName.': ';
 				$inputValue = $input->postData;
 				$input->storeRenderSignal(false);
-				
+
 				// Display input data except password, confirm password and submit
 				if ($input->name != 'password' and $input->name != 'confirmPassword' and $input->name != 'submit') {
 					$input->storeMessage($inputName.$inputValue);
@@ -116,17 +113,17 @@ class CreateUserFormElement extends FormElement implements iElement
 HTML;
 			$parentPageUrl = GrabParentPageURL::getURL($this->pageViewReference->pageId);
 			$successMessage = sprintf($successMessage, $_SERVER['REQUEST_URI'],$parentPageUrl);
-			
+
 			$this->storeMessage($successMessage);
 
 			$this->send303();
-			
+
 		}
 	}
 
 
 	function elementAction() {
-		
+
 		$success = 0;
 
 		// if no post, render the form.
@@ -169,7 +166,7 @@ HTML;
 
 			// input validation is handled by the UserManager object.
 			$userManager = new UserManager;
-			
+
 			$responseArray = $userManager->createUser
 			(
 					 $email
@@ -185,7 +182,7 @@ HTML;
 			$success = 1;
 			reset($responseArray);
 			foreach($responseArray as $inputName => $response) {
-				
+
 				//$inputName = key($response);
 				if ($response['responseState'] == 0) {
 					$responseMesssage = isset($response['responseMessage']) ? $response['responseMessage'] : '';
@@ -199,7 +196,7 @@ HTML;
 				$this->adminCreated = $grantAdmin;
 
 			$this->responseStateHandler($success);
-		}	
+		}
 	}
 
 
@@ -208,7 +205,7 @@ HTML;
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
 		$this->formName = 'createUserForm';
-	
+
 		$this->submitName = 'Create User';
 		// Instantiate input objects
 		$this->buildInputArray();
@@ -216,8 +213,8 @@ HTML;
 		foreach ($this->inputArray as $input) {
 			if ($input->postState == true)
 				$this->postState = true;
-	
+
 		}
 	}
-	
+
 }

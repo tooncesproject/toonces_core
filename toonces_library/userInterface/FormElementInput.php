@@ -63,8 +63,8 @@ class FormElementInput
 			// Destroy the signal
 			unset($_SESSION[$this->hideSignalVarName]);
 		}
-			
-		
+
+
 		// Check for post data.
 		if (isset($_POST[$this->name])) {
 			$this->postState = true;
