@@ -73,8 +73,11 @@ abstract class FormElement extends Element
 
 		$this->html = $this->html.'<form method="post" '.$formNameHTML.'>';
 		foreach ($this->inputArray as $inputObject) {
-			$this->html = $this->html.$inputObject->html.'<br>';
+			if ($inputObject->hideInput == false)
+				$this->html = $this->html.$inputObject->html.'<br>';
 		}
+
+		$this->html = $this->html.'</form>';
 
 		// Destroy the message session variable so it doesn't show when it's not supposed to.
 		unset($_SESSION[$this->messageVarName]);
@@ -102,6 +105,11 @@ abstract class FormElement extends Element
 		header("HTTP/1.1 303 See Other");
 		header('Location: '.$link);
 	}
+
+	public function storeMessage($message) {
+		$_SESSION[$this->messageVarName] = $message;
+	}
+
 
 	public function objectSetup() {
 		$this->htmlHeader = '<div class="form_element>';

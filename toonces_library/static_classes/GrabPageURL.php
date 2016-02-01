@@ -14,7 +14,7 @@ include_once ROOTPATH.'/toonces.php';
 
 class GrabPageURL {
 	
-	private static $conn;
+	public static $conn;
 	
 	public static function getURL($pageId) {
 		
@@ -28,7 +28,7 @@ class GrabPageURL {
 	}
 	
 	
-	private static function getPathnames($pageId,$urlPath) {
+	public static function getPathnames($pageId,$urlPath) {
 		// This function recursively iterates through a page and all its ancestors,
 		// Concatenating together their pathnames until it has generated the full URL.
 		

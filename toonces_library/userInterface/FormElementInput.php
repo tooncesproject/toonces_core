@@ -25,9 +25,12 @@ class FormElementInput
 	public $formValue;
 	public $displayName;
 	public $renderInput = true;
+	public $hideInput = false;
 	public $messageClass = 'input_message_notification';
 	public $parentFormName;
 	public $messageVarName;
+	public $renderSignalVarName;
+	public $hideSignalVarName;
 
 	function __construct($paramName,$paramInputType,$paramParentFormName) {
 
@@ -35,11 +38,33 @@ class FormElementInput
 		$this->inputType = $paramInputType;
 		$this->parentFormName = $paramParentFormName;
 
+		// Make receptive to utility session variables
 		$this->messageVarName = $this->parentFormName.$this->name.'_inmsg';
+		$this->renderSignalVarName = $this->parentFormName.$this->name.'_rsig';
+		$this->hideSignalVarName = $this->parentFormName.$this->name.'_hsig';
 
+		// receive message if exists.
 		if (isset($_SESSION[$this->messageVarName])) {
 			$this->message = $_SESSION[$this->messageVarName];
+			// Destroy the message
+			unset($_SESSION[$this->messageVarName]);
 		}
+
+		// Receive render signal if exists
+		if (isset($_SESSION[$this->renderSignalVarName])) {
+			$this->renderInput = $_SESSION[$this->renderSignalVarName];
+			// Destroy the signal
+			unset($_SESSION[$this->renderSignalVarName]);
+		}
+
+		//receive hide signal if exists
+		if (isset($_SESSION[$this->hideSignalVarName])) {
+			$this->hideInput = $_SESSION[$this->hideSignalVarName];
+			// Destroy the signal
+			unset($_SESSION[$this->hideSignalVarName]);
+		}
+
+
 		// Check for post data.
 		if (isset($_POST[$this->name])) {
 			$this->postState = true;
@@ -49,8 +74,19 @@ class FormElementInput
 	}
 
 	public function storeMessage($paramMessage) {
+		echo 'message var name:'.$this->messageVarName.'<br>';
 		$this->message = $paramMessage;
 		$_SESSION[$this->messageVarName] = $this->message;
+	}
+
+	public function storeRenderSignal($paramRenderSignal) {
+		$this->renderInput = $paramRenderSignal;
+		$_SESSION[$this->renderSignalVarName] = $this->renderInput;
+	}
+
+	public function storeHideSignal($paramHideSignal) {
+		$this->hideInput = $paramHideSignal;
+		$_SESSION[$this->hideSignalVarName] = $this->hideInput;
 	}
 
 	public function setupForm() {
@@ -72,30 +108,30 @@ class FormElementInput
 		$sizeHTML = '';
 		$formValueHTML = '';
 
+		// If no hide input signal, generate the HTML.
+		if ($this->hideInput == false) {
+			if (isset($this->message)) {
+				$messageHTML = '<div class="'.$this->messageClass.'">'.$this->message.'</div>';
+			}
 
-		if (isset($this->message)) {
-			$messageHTML = '<div class="'.$this->messageClass.'">'.$this->message.'</div>';
-			// Destroy the message
-			unset($_SESSION[$this->messageVarName]);
-		}
+			if(isset($this->displayName))
+				$displayNameHTML = '<div class="input_display_name">'.$this->displayName.'</div>';
 
-		if(isset($this->displayName))
-			$displayNameHTML = '<div class="input_display_name">'.$this->displayName.'</div>';
+			if (isset($this->cssClass)) 
+				$classHTML = ' class="'.$this->cssClass.'"';
 
-		if (isset($this->cssClass)) 
-			$classHTML = ' class="'.$this->cssClass.'"';
+			if (isset($this->size))
+				$sizeHTML = ' size="'.$this->size.'"';
 
-		if (isset($this->size))
-			$sizeHTML = ' size="'.$this->size.'"';
+			if (isset($this->formValue))
+				$formValueHTML = ' value="'.$this->formValue.'"';
 
-		if (isset($this->formValue))
-			$formValueHTML = ' value="'.$this->formValue.'"';
-
-		$this->html = $this->html.$messageHTML.PHP_EOL;
-		$this->html = $this->html.$displayNameHTML.PHP_EOL;
+			$this->html = $this->html.$messageHTML.PHP_EOL;
+//			$this->html = $this->html.$displayNameHTML.PHP_EOL;
  
-		//if ($this->renderInput)
-			$this->html = $this->html.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
+			if ($this->renderInput == true)
+				$this->html = $this->html.$displayNameHTML.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
+		}
 
 	}
 

@@ -607,6 +607,7 @@ CREATE TABLE toonces.users (
     ,is_admin   BOOL        NOT NULL  DEFAULT 0
         ,PRIMARY KEY (user_id)
         ,UNIQUE INDEX idx_email (email)
+        ,UNIQUE INDEX idx_nickname (nickname)
 );
 
 DROP TABLE IF EXISTS toonces.sessions;
