@@ -18,6 +18,7 @@ include_once ROOTPATH.'/admin/CreateUserAdminPageBuilder.php';
 include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
 include_once ROOTPATH.'/static_classes/GrabPageURL.php';
+include_once ROOTPATH.'/static_classes/GrabParentPageURL.php';
 
 include_once ROOTPATH.'/abstract/PageBuilder.php';
 include_once ROOTPATH.'/BlogPageReader.php';

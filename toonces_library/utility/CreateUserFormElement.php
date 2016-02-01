@@ -14,155 +14,210 @@ class CreateUserFormElement extends FormElement implements iElement
 	private $lastName;
 	private $nickname;
 	private $password;
-	private $isAdmin;
+	private $adminCreated;
 
-	public function __construct($pageView) {
+		return $html;
+	}
+
+	function buildInputArray() {
+	// Custom instantiation of input objects here.
+
+		// email
+		$emailInput = new FormElementInput('email', 'text', $this->formName);
+		$this->inputArray['email'] = $emailInput;
+		$emailInput->displayName = 'Email';
+		$emailInput->size = 50;
+		$emailInput->setupForm();
+
+		// first name
+		$firstNameInput = new FormElementInput('firstName', 'text', $this->formName);
+		$this->inputArray['firstName'] = $firstNameInput;
+		$firstNameInput->displayName = 'First Name';
+		$firstNameInput->size = 50;
+		$firstNameInput->setupForm();
+
+		// last name
+		$lastNameInput = new FormElementInput('lastName', 'text', $this->formName);
+		$this->inputArray['lastName'] = $lastNameInput;
+		$lastNameInput->displayName = 'Last Name';
+		$lastNameInput->size = 50;
+		$lastNameInput->setupForm();
+
+		// nickname
+		$nicknameInput = new FormElementInput('nickname', 'text', $this->formName);
+		$this->inputArray['nickname'] = $nicknameInput;
+		$nicknameInput->displayName = 'Nickname';
+		$nicknameInput->size = 50;
+		$nicknameInput->setupForm();
+
+		// password
+		$passwordInput = new FormElementInput('password', 'password', $this->formName);
+		$this->inputArray['password'] = $passwordInput;
+		$passwordInput->displayName = 'Password';
+		$passwordInput->size = 50;
+		$passwordInput->setupForm();
+
+		// confirm password
+		$confirmPasswordInput = new FormElementInput('confirmPassword', 'password', $this->formName);
+		$this->inputArray['confirmPassword'] = $confirmPasswordInput;
+		$confirmPasswordInput->displayName = 'Confirm Password';
+		$confirmPasswordInput->size = 50;
+		$confirmPasswordInput->setupForm();
+
+		// Is admin checkbox
+		$grantAdminInput = new FormElementInput('grantAdmin', 'checkbox', $this->formName);
+		$this->inputArray['grantAdmin'] = $grantAdminInput;
+		$grantAdminInput->displayName = 'Grant Admin Privileges';
+		$grantAdminInput->setupForm();
+
+		//form submit
+		$submitInput = new FormElementInput('submit','submit',$this->formName);
+		$submitInput->formValue = $this->submitName;
+		$submitInput->setupForm();
+		$this->inputArray['submit'] = $submitInput;
 		
-		$this->pageViewReference = $pageView;
-		$this->success = 0;
-		$this->htmlHeader = '<div class="form_element">';
-		$this->htmlFooter = '</div>';
-		
-		//Empty strings to hold post response
-		$emailResponseMsg = '';
-		$passwordResponseMsg = '';
-		$firstNameResponseMsg = '';
-		$lastNameResponseMsg = '';
-		$nicknameResponseMsg = '';
-		
-		// Was there a post?
-		if ($this->checkPost() == 1) {
-		$userManager = new UserManager;
-		
-			$responseArray = $userManager->createUser
-			(
-				 $this->email
-				,$this->password
-				,$this->firstName
-				,$this->lastName
-				,$this->nickname
-				,$this->isAdmin
-			);
-			
-			$emailResponseMsg = $responseArray['email']['responseMessage'].'<br>';
-			$passwordResponseMsg = $responseArray['password']['responseMessage'].'<br>';
-			$firstNameResponseMsg = $responseArray['firstName']['responseMessage'].'<br>';
-			$lastNameResponseMsg = $responseArray['lastName']['responseMessage'].'<br>';
-			$nickResponseMsg = $responseArray['nickname']['responseMessage'].'<br>';
-			
-			// Check for success
-			$this->success = 1;
-			foreach($responseArray as $response) {
-				if ($response['responseState'] != 1) {
-					$this->success = 0;
+	}
+
+	function responseStateHandler($responseState) {
+
+		// fail state
+		if ($responseState == 0) {
+			$this->generateFormHTML();
+			$this->storeMessage('<p>Oops! That didn\'t work.</p>');
+			$this->send303();
+
+		// success
+		} else if ($responseState == 1) {
+			foreach ($this->inputArray as $input) {
+				$inputName = $input->displayName.': ';
+				$inputValue = $input->postData;
+				$input->storeRenderSignal(false);
+				
+				// Display input data except password, confirm password and submit
+				if ($input->name != 'password' and $input->name != 'confirmPassword' and $input->name != 'submit') {
+					$input->storeMessage($inputName.$inputValue);
+				} else {
+					$input->storeHideSignal(true);
 				}
 
+				// In the case of the admin switch, change the input value to something readable.
+				if ($input->name == 'grantAdmin') {
+					$inputValue = ($inputValue === 'on') ? 'Yes' : 'No';
+					$input->storeMessage($inputName.$inputValue);
+				}
+
+				$input->setupForm();
 			}
-		}
-		
-		// If successful, build response page.
-		// Otherwise, build form HTML (with messages, if applicable).
-		if ($this->success == 1) {
-			if ($this->isAdmin == 1) {
-				$adminMsg = 'Yes';
-			} else {
-				$adminMsg = 'No';
-			}
+			$this->generateFormHTML();
+			$successMessage = <<<HTML
+			<p>Hooray! You successfully created a user.</p>
+			<p><a href="%s">Create Another User</a></p>
+			<p><a href="%s">Back to User Administration</a></p>
+HTML;
+			$parentPageUrl = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+			$successMessage = sprintf($successMessage, $_SERVER['REQUEST_URI'],$parentPageUrl);
 			
-			$this->html = sprintf($this->successHTML(),$this->email,$this->firstName,$this->lastName,$this->nickname, $adminMsg);
+			$this->storeMessage($successMessage);
+
+			$this->send303();
+			
+		}
+	}
+
+
+	function elementAction() {
+		
+		$success = 0;
+
+		// if no post, render the form.
+		// Otherwise, process the input.
+		if ($this->postState == false) {
+			$this->generateFormHTML();
 		} else {
-			$this->html = sprintf($this->formHTML(),$emailResponseMsg,$firstNameResponseMsg,$lastNameResponseMsg,$nicknameResponseMsg,$passwordResponseMsg);
-		}
-		
+
+			// By default, attempt to create user.
+			$doAttemptCreate = true;
+
+			// Gather POST data
+			// email
+			$emailInput = $this->inputArray['email'];
+			$email = filter_var($emailInput->postData,FILTER_SANITIZE_EMAIL);
+
+			// First name
+			$firstNameInput = $this->inputArray['firstName'];
+			$firstName = filter_var($firstNameInput->postData, FILTER_SANITIZE_STRING);
+
+			// Last name
+			$lastNameInput = $this->inputArray['lastName'];
+			$lastName = filter_var($lastNameInput->postData,FILTER_SANITIZE_STRING);
+
+			// nickname
+			$nicknameInput = $this->inputArray['nickname'];
+			$nickname = filter_var($nicknameInput->postData,FILTER_SANITIZE_STRING);
+
+			// password
+			$passwordInput = $this->inputArray['password'];
+			$password = $passwordInput->postData;
+
+			// confirm password
+			$confirmPasswordInput = $this->inputArray['confirmPassword'];
+			$confirmPassword = $confirmPasswordInput->postData;
+
+			// grant admin
+			$grantAdminInput = $this->inputArray['grantAdmin'];
+			$grantAdmin = isset($grantAdminInput->postData) ? 1 : 0;
+
+			// input validation is handled by the UserManager object.
+			$userManager = new UserManager;
+			
+			$responseArray = $userManager->createUser
+			(
+					 $email
+					,$password
+					,$confirmPassword
+					,$firstName
+					,$lastName
+					,$nickname
+					,$grantAdmin
+			);
+
+			// Check each response and update the FormInputElement objects accordingly.
+			$success = 1;
+			reset($responseArray);
+			foreach($responseArray as $inputName => $response) {
+				
+				//$inputName = key($response);
+				if ($response['responseState'] == 0) {
+					$responseMesssage = isset($response['responseMessage']) ? $response['responseMessage'] : '';
+					//$inputName = key($responseArray);
+					$this->inputArray[$inputName]->storeMessage($responseMesssage);
+					$success = 0;
+				}
+			}
+
+			if ($success == 1)
+				$this->adminCreated = $grantAdmin;
+
+			$this->responseStateHandler($success);
+		}	
 	}
 
-	function formHTML() {
-		
-		$html = <<<HTML
-		<div class="utility_block">
-		<h2>Create New User </h2>
-           <form id="login" method="post">
-                Email:<br>
-				%s
-                <input type="text" name="uc_email" size="50">
-                <br>
-				First Name:<br>
-				%s
-				<input type="text" name="uc_firstname" size="50">
-                <br>
-				Last Name:<br>
-				%s
-				<input type="text" name="uc_lastname" size="50">
-                <br>
-				Nickname:<br>
-				%s
-				<input type="text" name="uc_nickname" size="50">
-                <br>
-                Password:<br>
-				%s
-                <input type="password" name="uc_password" size="50">
-				<br>
-				<input type="checkbox" name="uc_isadmin" value="1"> Grant Admin Privileges
-                <br>
-                <br>
-                <input type="submit" value="Woo!"/>
-            </form>
-			<br>
-			<p><a href="/admin/useradmin/">Back to User Administration</a></p>
-		</div>
-HTML;
-	
-		return $html;
-	}
-	
-	function successHTML() {
-		$html = <<<HTML
-		<div class="utility_block">
-			<h2>Success!</h3>
-			<p>Email: %s</p>
-			<p>First Name: %s</p>
-			<p>Last Name: %s</p>
-			<p>Nickname: %s</p>
-			<p>Has Admin Privileges: %s</p>
-		</div>
-HTML;
 
-		return $html;
-	}
-	
-	function checkPost() {
-		
-		$postStatus = 0;
-		//Default isAdmin to false
-		$this->isAdmin = 0;
+	public function objectSetup() {
 
-		// Receive postdata
-		if (isset($_POST['uc_email'])) {
-			$this->email = filter_input(INPUT_POST, 'uc_email', FILTER_SANITIZE_EMAIL);
-			$postStatus = 1;
+		$this->htmlHeader = '<div class="form_element>';
+		$this->htmlFooter = '</div>';
+		$this->formName = 'createUserForm';
+	
+		$this->submitName = 'Create User';
+		// Instantiate input objects
+		$this->buildInputArray();
+		// Iterate through input objects to see if any received a POST
+		foreach ($this->inputArray as $input) {
+			if ($input->postState == true)
+				$this->postState = true;
+	
 		}
-		if (isset($_POST['uc_firstname'])) {
-			$this->firstName = filter_input(INPUT_POST, 'uc_firstname', FILTER_SANITIZE_STRING);
-			$postStatus = 1;
-		}
-		if (isset($_POST['uc_lastname'])) {
-			$this->lastName = filter_input(INPUT_POST, 'uc_lastname', FILTER_SANITIZE_STRING);
-			$postStatus = 1;
-		}
-		if (isset($_POST['uc_nickname'])) {
-			$this->nickname = filter_input(INPUT_POST, 'uc_nickname', FILTER_SANITIZE_STRING);
-			$postStatus = 1;
-		}
-		if (isset($_POST['uc_password'])) {
-			$this->password = filter_input(INPUT_POST, 'uc_password', FILTER_SANITIZE_STRING);
-			$postStatus = 1;
-		}
-		if (isset($_POST['uc_isadmin'])) {
-			$this->isAdmin = $_POST['uc_isadmin'];
-			$postStatus = 1;
-		}
-		
-		return $postStatus;	 
 	}
 	
 }

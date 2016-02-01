@@ -9,14 +9,6 @@ class LoginFormElement extends FormElement implements iElement
 	// var $htmlFooter;
 	// var $pageViewReference;
 
-	public function __construct($pageView) {
-
-			$this->pageViewReference = $pageView;
-			$this->objectSetup();
-			$this->elementAction();
-
-		}
-
 
 	function buildInputArray() {
 		// Custom instantiation of input objects here.
@@ -35,7 +27,6 @@ class LoginFormElement extends FormElement implements iElement
 
 		$this->inputArray['psw'] = $pswInput;
 
-		//$submitInput = new FormElementInput('submit','submit');
 		$submitInput = new FormElementInput('submit','submit',$this->formName);
 		$submitInput->formValue = $this->submitName;
 		$submitInput->setupForm();
@@ -48,7 +39,7 @@ class LoginFormElement extends FormElement implements iElement
 
 		if ($paramResponseState == 0) {
 			$this->generateFormHTML();
-		 	$_SESSION[$this->messageVarName] = 'ACCESS DENIED. GO AWAY. Or try again.';
+			$this->storeMessage('ACCESS DENIED. GO AWAY. Or try again.');
 
 		}
 
@@ -62,8 +53,6 @@ class LoginFormElement extends FormElement implements iElement
 	function elementAction() {
 
 		$loginSuccess = false;
-
-		// Set the submit value as "Shit Yeah!"
 
 		// if no post, render the form.
 		// Otherwise, process the input.
