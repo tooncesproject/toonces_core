@@ -14,6 +14,9 @@ include_once ROOTPATH.'/utility/DynamicNavigationLink.php';
 include_once ROOTPATH.'/pagebuilders/AdminPageBuilder.php';
 include_once ROOTPATH.'/admin/UserAdminPageBuilder.php';
 include_once ROOTPATH.'/admin/CreateUserAdminPageBuilder.php';
+include_once ROOTPATH.'/admin/ManageUserAdminPageBuilder.php';
+include_once ROOTPATH.'/admin/PageAdminPageBuilder.php';
+include_once ROOTPATH.'/admin/EditPageAdminPageBuilder.php';
 
 include_once ROOTPATH.'/static_classes/SQLConn.php';
 include_once ROOTPATH.'/utility/UniversalConnect.php';
