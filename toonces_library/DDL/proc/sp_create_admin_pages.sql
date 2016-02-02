@@ -114,7 +114,7 @@ BEGIN
             FROM
                 toonces.pages
             WHERE
-                is_admin_page = TRUE
+                pagetype_id = 1
             AND
                 pathname = var_pathname;
         END;
@@ -139,17 +139,8 @@ BEGIN
                 ,var_css_stylesheet     -- css_stylesheet VARCHAR(100)
                 ,var_redirect_on_error  -- redirect_on_error BOOL
                 ,var_published          -- published BOOL
+                ,1                      -- pagetype_id BIGINT - type for admin page (1)
             ) INTO var_new_admin_page_id;
-        
-
-            -- Update the new page record to indicate that it's an admin page
-            UPDATE
-                toonces.pages
-            SET
-                is_admin_page = TRUE
-            WHERE
-                page_id = var_new_admin_page_id
-            ;
 
         END IF;
 

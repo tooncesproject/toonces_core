@@ -74,6 +74,7 @@ CREATE FUNCTION toonces.CREATE_PAGE  (
     ,css_stylesheet VARCHAR(100)
     ,redirect_on_error BOOL
     ,published BOOL
+    ,pagetype_id BIGINT
 
 )
 
@@ -138,6 +139,7 @@ BEGIN
             ,css_stylesheet
             ,redirect_on_error
             ,published
+            ,pagetype_id
         ) VALUES (
             pathname
             ,page_title
@@ -147,6 +149,7 @@ BEGIN
             ,css_stylesheet
             ,redirect_on_error
             ,published
+            ,pagetype_id
         );
     
         SET new_page_id = last_insert_id(); 
@@ -230,6 +233,7 @@ BEGIN
             ,css_stylesheet             -- css_stylesheet
             ,1                          -- redirect on error
             ,1                          -- published
+            ,2                          -- pagetype_id - Blog root page type
             )
         INTO new_blog_page_id;
 
@@ -327,7 +331,8 @@ BEGIN
             ,post_pageview_class    -- pageview_class VARCHAR(50)
             ,post_css_stylesheet    -- css_stylesheet VARCHAR(100)
             ,1                      -- redirect_on_error BOOL
-            ,1                      -- published BOOL
+            ,0                      -- published BOOL - Blog posts are unpublished by default
+            ,3                      -- pagetype_id - Type for blog post page
         ) INTO blog_post_page_id;
         
         -- if page creation was sucessful, proceed.
@@ -551,9 +556,10 @@ CREATE TABLE toonces.pages (
     ,modified_dt DATETIME
     ,redirect_on_error BOOL
     ,published BOOL
-    ,is_admin_page BOOL
+    ,pagetype_id BIGINT    NOT NULL DEFAULT 0
 
-    PRIMARY KEY (page_id)
+        ,PRIMARY KEY (page_id)
+        ,CONSTRAINT fk_pagetype FOREIGN KEY (pagetype_id) REFERENCES toonces.pagetypes (pagetype_id)
 );
 
 /* commented out, not compatble with MySQL 5.5 or older
@@ -581,7 +587,7 @@ CREATE TABLE toonces.page_hierarchy_bridge (
 DROP TABLE IF EXISTS toonces.blogs;
 
 CREATE TABLE toonces.blogs (
-     blog_id BIGINT NOT NULL auto_increment
+     blog_id BIGINT NOT NULL AUTO_INCREMENT
     ,page_id VARCHAR(50) NOT NULL
     ,created TIMESTAMP NOT NULL
     ,deleted TIMESTAMP NULL
@@ -589,6 +595,17 @@ CREATE TABLE toonces.blogs (
         -- FOREIGN KEY (page_id)
         -- REFERENCES toonces.pages(page_id)
 );
+
+DROP TABLE IF EXISTS toonces.pagetypes;
+
+CREATE TABLE toonces.pagetypes (
+     pagetype_id        BIGINT      NOT NULL
+    ,name               VARCHAR(50) NOT NULL
+    ,description        VARCHAR(512) NOT NULL
+    ,restricted_access  BOOL        NOT NULL
+        ,PRIMARY KEY (pagetype_id)
+);
+
 
 /**************** User, Access & Security Stuff ********************/
 

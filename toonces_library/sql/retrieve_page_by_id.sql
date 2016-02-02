@@ -7,7 +7,7 @@ SELECT
     ,p.pageview_class
     ,p.css_stylesheet
     ,p.published
-    ,p.is_admin_page
+    ,p.pagetype_id
     ,CASE 
         WHEN pua.page_id IS NOT NULL THEN 1
         ELSE 0

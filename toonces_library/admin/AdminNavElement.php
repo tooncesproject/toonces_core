@@ -37,7 +37,7 @@ class AdminNavElement extends NavElement implements iElement
 			toonces.page_hierarchy_bridge phb2
 				ON p.page_id = phb2.page_id
 		WHERE
-			p.is_admin_page = 1
+			p.pagetype_id = 1
 		ORDER BY
 			p.page_id
 SQL;
