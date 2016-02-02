@@ -71,6 +71,13 @@ BEGIN
         descendant_page_id = param_page_id
     ;
 
+    -- Hard-delete page_user_access record
+    DELETE FROM
+        page_user_access
+    WHERE
+        page_id = param_page_id
+    ;
+
     -- Soft-delete blog_posts record: Set page_id to zero (we won't delete the content).
     UPDATE
         toonces.blog_posts

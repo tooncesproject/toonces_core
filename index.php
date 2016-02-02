@@ -164,6 +164,7 @@ $pageLinkText = '';
 // Page state
 $published = 0;
 $isAdminPage = 0;
+$pageTypeId = 0;
 
 // user state
 $allowAccess = 0;
@@ -184,7 +185,8 @@ if ($pageRecord) {
 		$pagePageTitle = $result['page_title'];
 		$pagePageLinkText = $result['page_link_text'];
 		$published = $result['published'];
-		$isAdminPage = $result['is_admin_page'];
+		$isAdminPage = ($result['pagetype_id'] == 1) ? 1 : 0;
+		$pageTypeId = $result['pagetype_id'];
 		$userHasPageAccess = $result['user_has_access'];
 		$userCanEdit = $result['can_edit'];
 	};
@@ -242,6 +244,8 @@ $pageView->setStyleSheet($styleSheet);
 $pageView->setPageTitle($pageTitle);
 
 $pageView->setPageLinkText($pageLinkText);
+
+$pageView->pageTypeId = $pageTypeId;
 
 $pageBuilder = new $pageBuilderClass;
 
