@@ -14,10 +14,14 @@ abstract class ToolbarElement extends Element
 	public $userNickname;
 	public $userCanEdit;
 	public $userIsAdmin;
+	public $toolHTML;
 
 	public function __construct($pageView) {
 		// Required stuff
 		$this->pageViewReference = $pageView;
+		
+		// Default utilityCssClass
+		$this->utilityCssClass = 'TE_toolbarelement';
 		
 		// populate user variables
 		$this->userId = $this->pageViewReference->sessionManager->userId;
@@ -33,6 +37,7 @@ abstract class ToolbarElement extends Element
 		}
 
 	}
+
 	// Builds the basic funtionality common to all toolbar elements.
 	public function buildUtilityHTML() {
 		// Include the logout form element
@@ -41,13 +46,42 @@ abstract class ToolbarElement extends Element
 
 		// HTML Template
 		$htmlTemplate = <<<HTML
-		<div class="%s">
-			
-		</div>
+		<div class="TE_usergreeting">
+    		<p>Greetings, %s.</p>
+        	<p><a href="/admin"><telink>Go to Toonces Admin</telink></a></p>
+        	<p><a href="javascript: submitform()"><telink>Sign Out</telink>	</a></p>
+     	</div>
+				
 HTML;
 
 		// populate the template
-		$htmlTemplate = sprintf($htmlTemplate,$this->utilityCssClass);
+		$htmlOut = sprintf($htmlTemplate,$this->userNickname);
 		
+		return $htmlOut;
+	}
+
+	public function buildToolHTML() {
+		// abstract. Chilren should overrride this.
+		$htmlOut = '';
+		return $htmlOut;
+	}
+	
+	// override the getHTML function
+	public function getHTML() {
+		
+		$this->buildUtilityHTML();
+		
+		$headerTemplate = '<div class = "%s">';
+		$this->htmlHeader = sprintf($headerTemplate,$this->utilityCssClass).PHP_EOL;
+		$this->htmlFooter = '</div>'.PHP_EOL;
+		
+		$utilityHTML = $this->buildUtilityHTML().PHP_EOL;
+		$toolHTML = $this->buildToolHTML().PHP_EOL;
+		
+		$this->html = $utilityHTML.$toolHTML;
+		
+		$htmlOut = $this->htmlHeader.$this->html.$this->htmlFooter;
+		
+		return $htmlOut;
 	}
 }
