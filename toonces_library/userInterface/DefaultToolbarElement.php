@@ -2,7 +2,7 @@
 /*
  * DefaultToolbarElement
  * Initial Commit Paul Anderson 2.7.2016
- * 	
+ * 
  * 
  */
 class DefaultToolbarElement extends ToolbarElement

@@ -19,15 +19,15 @@ abstract class ToolbarElement extends ViewElement
 	public function __construct($pageView) {
 		// Required stuff
 		$this->pageViewReference = $pageView;
-		
+
 		// Default utilityCssClass
 		$this->utilityCssClass = 'TE_toolbarelement';
-		
+
 		// populate user variables
 		$this->userId = $this->pageViewReference->sessionManager->userId;
 		$this->userNickname = $this->pageViewReference->sessionManager->nickname;
 		$this->userIsAdmin = $this->pageViewReference->sessionManager->userIsAdmin; 
-		
+
 		// If the user is admin, can edit defaults to true
 		// Otherwise, refer to the PageView object
 		if ($this->userIsAdmin == true) {
@@ -35,24 +35,24 @@ abstract class ToolbarElement extends ViewElement
 		} else {
 			$this->userCanEdit = $this->pageViewReference->userCanEdit;
 		}
-		
+
 		// set header and footer
 		$headerTemplate = '<div class = "%s">';
 		$this->htmlHeader = sprintf($headerTemplate,$this->utilityCssClass).PHP_EOL;
 		$this->htmlFooter = '</div>'.PHP_EOL;
 
-		// Add elements to the array	
+		// Add elements to the array
 		$logoutFormElement = new LogoutFormElement($this->pageViewReference);
 		$this->addElement($logoutFormElement);
 
 		$utilityElement = new Element($this->pageViewReference);
 		$utilityElement->setHTML($this->buildUtilityHTML());
 		$this->addElement($utilityElement);
-		
+
 		$toolElement = new Element($this->pageViewReference);
 		$toolElement->setHTML($this->buildToolHTML());
 		$this->addElement($toolElement);
-		
+
 	}
 
 	// Builds the basic funtionality common to all toolbar elements.
@@ -68,12 +68,12 @@ abstract class ToolbarElement extends ViewElement
         	<p><a href="/admin"><telink>Go to Toonces Admin</telink></a></p>
         	<p><a href="javascript: submitform()"><telink>Sign Out</telink>	</a></p>
      	</div>
-				
+
 HTML;
 
 		// populate the template
 		$htmlOut = sprintf($htmlTemplate,$this->userNickname);
-		
+
 		return $htmlOut;
 	}
 
@@ -82,24 +82,5 @@ HTML;
 		$htmlOut = '';
 		return $htmlOut;
 	}
-	
-	// override the getHTML function
-	//or don't
-/*	public function getHTML() {
-		
-		$this->buildUtilityHTML();
-		
-		$headerTemplate = '<div class = "%s">';
-		$this->htmlHeader = sprintf($headerTemplate,$this->utilityCssClass).PHP_EOL;
-		$this->htmlFooter = '</div>'.PHP_EOL;
-		
-		$utilityHTML = $this->buildUtilityHTML().PHP_EOL;
-		$toolHTML = $this->buildToolHTML().PHP_EOL;
-		
-		$this->html = $utilityHTML.$toolHTML;
-		
-		$htmlOut = $this->htmlHeader.$this->html.$this->htmlFooter;
-		
-		return $htmlOut;
-	} */
+
 }

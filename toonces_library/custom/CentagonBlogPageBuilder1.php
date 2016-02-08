@@ -8,16 +8,16 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 	private $containerHTML;
 	private $bodyHTML;
 	var $view;
-	
+
 	function getElementArray() {
 		return $elementArray;
 	}
-	
+
 	*/
 	var $displayElement;
-	
+
 	function buildPage($pageView) {
-		
+
 		$this->pageViewReference = $pageView;
 
 		// Check for edit mode signal from GET, and if applicable, check for user access.
@@ -36,57 +36,57 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 		$this->buildElementArray();
 
 		return $this->elementArray;
-		
+
 	}
-	
+
 	function buildElementArray() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
 		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
-		
+
 		array_push($this->elementArray, $htmlHeaderElement);
-		
+
 		$headElement = new HeadElement($this->pageViewReference);
-		
+
 		// get head attributes
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-		
+
 		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
-		
+
 		array_push($this->elementArray, $headElement);
-		
+
 		$bodyStartElement = new Element($this->pageViewReference);
-		
+
 		$bodyStartElement->setHTML(file_get_contents(ROOTPATH.'/static_data/body_start.html'));
 		array_push($this->elementArray, $bodyStartElement);
-		
+
 		// If there's a toolbar, add it here.
 		if (isset($this->toolbarElement)) {
 			array_push($this->elementArray, $this->toolbarElement);
 		}
-		
+
 		// After the toolbar,add the header element
 		$pageHeader = new Element($this->pageViewReference);
 		$pageHeader->setHTML(file_get_contents(ROOTPATH.'/static_data/centagon_header.html'));
 		array_push($this->elementArray, $pageHeader);
-		
+
 		$pageId = $this->pageViewReference->pageId;
-		
+
 		//$blogReader = new BlogPageReader($this->pageViewReference);
 		// Insert the element you wanna use here...
 		//array_push($this->elementArray, $blogReader);
 		array_push($this->elementArray, $this->displayElement);
-		
+
 		$footerElement = new Element($this->pageViewReference);
-		
+
 		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/real_footer_ish.html'));
-		
+
 		array_push($this->elementArray, $footerElement);
 
 	}
-	
-	
+
+
 }
 
 ?>
