@@ -13,10 +13,9 @@ class AdminToolBuilder extends PageBuilder
 	var $adminAccessOnly;
 	
 	
-	function buildPage($pageView) {
+	function buildPage() {
 		// build page...
-		$this->pageViewReference = $pageView;
-	
+
 		$this->buildDashboardPage();
 	
 		return $this->elementArray;

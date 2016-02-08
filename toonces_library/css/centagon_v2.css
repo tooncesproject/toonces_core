@@ -121,13 +121,14 @@ a:hover {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	text-align: center;
 	height: 60px;
+	width: 100%;
 	top: 130px;
+	left: 0px;
 	overflow: hidden;
-	position: relative;
-	width: auto;
+	position: absolute;
 	vertical-align: middle;
-	padding-right: 30px;
-	padding-left: 30px;
+	padding-right: 0px;
+	padding-left: 0px;
 }
 	
 	h1 {
@@ -189,10 +190,13 @@ h3 {
 	width: 80px;
 	text-transform: uppercase;
 	vertical-align: middle;
+	position: relative;
 }
 .nav_links_holder {
 	vertical-align: middle;
 	margin-top: 15px;
+	right: 0px;
+	
 }
 .social_icon {
 	padding: 0px;
@@ -215,6 +219,7 @@ h3 {
 	position: relative;
 	bottom: 0px;
 }
+
 .prev_page_link {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
@@ -227,6 +232,7 @@ h3 {
 	vertical-align: middle;
 	padding-top: 26px;
 }
+
 .next_page_link {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
@@ -238,4 +244,44 @@ h3 {
 	float: right;
 	vertical-align: middle;
 	padding-top: 26px;
+}
+
+.TE_toolbarelement {
+	color: #C36;
+	font-size: 12px;
+	background-color: #CFF;
+	height: 100px;
+	width: 100%;
+	top: 0px;
+	background-image: url(../../images/toonces_smaller_banner.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+
+.TE_usergreeting {
+
+	position: relative;
+	left: 200px;
+	width: 150px;
+	height: 100px;
+	display: block;
+	float: left;
+}
+
+.TE_pagetoolelement {
+	position: relative;
+	left: 200px;
+	top: 0px;
+	height: 100px;
+	width: auto;
+	z-index: 0;
+	float: left;
+	padding: 8px;
+}
+
+telink {
+	color: #ff884d
+}
+telink:hover {
+	color: #99003d;
 }

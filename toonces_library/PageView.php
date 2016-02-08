@@ -23,62 +23,62 @@ class PageView extends ViewElement implements iView
 		$this->pageId = $pageViewPageId;
 		parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
 	}
-		
-	
+
+
 	public function addElement ($element) {
-		
+
 		array_push($this->pageElements,$element);
 		$this->elementsCount++;
-		
+
 	}
-	
+
 	//setter methods
-	
+
 	public function setPageTitle($pageTitleString) {
 		$this->pageTitle = $pageTitleString;
 	}
-	
+
 	public function setStyleSheet($styleSheetFile) {
 		$this->styleSheet = $styleSheetFile;
 	}
-	
+
 	public function setPageLinkText($pageLinkString) {
 		$this->pageLinkText = $pageLinkString;
 	}
-	
+
 	// getter methods
 	public function getPageTitle() {
 		return $this->pageTitle;
 	}
-	
+
 	public function getStyleSheet() {
 		return  $this->styleSheet;
 	}
-	
+
 	public function getPageLinkText() {
 		return $this->pageLinkText;
 	}
-	
+
 	// execution methods
-	
+
 	public function getHTML() {
-		
+
 		$htmlString = $this->htmlHeader;
-		
+
 		foreach($this->pageElements as $object) {
 			$htmlString = $htmlString.$object->getHTML();
 		}
-				
+
 		return $htmlString;
-		
+
 	}
-	
+
 	public function renderPage() {
 
 		echo $this->getHTML();
-		
+
 	}
-	
+
 }
 
 ?>

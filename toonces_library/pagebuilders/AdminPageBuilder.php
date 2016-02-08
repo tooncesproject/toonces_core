@@ -18,13 +18,12 @@ abstract class AdminPageBuilder extends PageBuilder
 	var $adminAccessOnly;
 	var $accessGranted;
 
-	function buildPage($pageView) {
+	function buildPage() {
 
 		//Set up customizations.
 		$this->setupPageBuilder();
 
 		// build page...
-		$this->pageViewReference = $pageView;
 		$this->toolElement = new ViewElement($this->pageViewReference);
 		$this->buildAdminTool();
 

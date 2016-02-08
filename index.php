@@ -247,9 +247,9 @@ $pageView->setPageLinkText($pageLinkText);
 
 $pageView->pageTypeId = $pageTypeId;
 
-$pageBuilder = new $pageBuilderClass;
+$pageBuilder = new $pageBuilderClass($pageView);
 
-$pageElements = $pageBuilder->buildPage($pageView);
+$pageElements = $pageBuilder->buildPage();
 
 foreach($pageElements as $element) {
 	$pageView->addElement($element);
