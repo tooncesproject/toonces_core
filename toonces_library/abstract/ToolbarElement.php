@@ -6,7 +6,7 @@
  * Abstraction for toolbar UI objects.
  * 
  */
-abstract class ToolbarElement extends Element
+abstract class ToolbarElement extends ViewElement
 {
 
 	public $utilityCssClass;
@@ -35,14 +35,31 @@ abstract class ToolbarElement extends Element
 		} else {
 			$this->userCanEdit = $this->pageViewReference->userCanEdit;
 		}
+		
+		// set header and footer
+		$headerTemplate = '<div class = "%s">';
+		$this->htmlHeader = sprintf($headerTemplate,$this->utilityCssClass).PHP_EOL;
+		$this->htmlFooter = '</div>'.PHP_EOL;
 
+		// Add elements to the array	
+		$logoutFormElement = new LogoutFormElement($this->pageViewReference);
+		$this->addElement($logoutFormElement);
+
+		$utilityElement = new Element($this->pageViewReference);
+		$utilityElement->setHTML($this->buildUtilityHTML());
+		$this->addElement($utilityElement);
+		
+		$toolElement = new Element($this->pageViewReference);
+		$toolElement->setHTML($this->buildToolHTML());
+		$this->addElement($toolElement);
+		
 	}
 
 	// Builds the basic funtionality common to all toolbar elements.
 	public function buildUtilityHTML() {
 		// Include the logout form element
-		$logoutFormElement = new LogoutFormElement();
-		$this->html = $this->html.$logoutFormElement->getHTML();
+		//$logoutFormElement = new LogoutFormElement($this->pageViewReference);
+		//$this->html = $this->html.$logoutFormElement->getHTML();
 
 		// HTML Template
 		$htmlTemplate = <<<HTML
@@ -67,7 +84,8 @@ HTML;
 	}
 	
 	// override the getHTML function
-	public function getHTML() {
+	//or don't
+/*	public function getHTML() {
 		
 		$this->buildUtilityHTML();
 		
@@ -83,5 +101,5 @@ HTML;
 		$htmlOut = $this->htmlHeader.$this->html.$this->htmlFooter;
 		
 		return $htmlOut;
-	}
+	} */
 }

@@ -68,7 +68,7 @@ class PageView extends ViewElement implements iView
 		foreach($this->pageElements as $object) {
 			$htmlString = $htmlString.$object->getHTML();
 		}
-				
+		
 		return $htmlString;
 		
 	}
