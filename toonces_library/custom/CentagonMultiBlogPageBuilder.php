@@ -16,9 +16,7 @@ class CentagonMultiBlogPageBuilder extends PageBuilder {
 	*/
 	var $blogPageReader;
 	
-	function buildPage($pageView) {
-		
-		$this->pageViewReference = $pageView;
+	function buildPage() {
 		
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);

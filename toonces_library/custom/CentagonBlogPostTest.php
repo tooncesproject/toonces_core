@@ -13,15 +13,12 @@ class CentagonBlogPostTest extends PageBuilder {
 		return $elementArray;
 	}
 	*/
-	function buildPage($pageView) {
-		
-		
-		$this->pageViewReference = $pageView;
-		
+	function buildPage() {
+
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
 		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
-		
+
 		array_push($this->elementArray, $htmlHeaderElement);
 		
 		$headElement = new HeadElement($this->pageViewReference);

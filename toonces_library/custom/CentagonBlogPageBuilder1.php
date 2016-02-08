@@ -16,9 +16,7 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 	*/
 	var $displayElement;
 
-	function buildPage($pageView) {
-
-		$this->pageViewReference = $pageView;
+	function buildPage() {
 
 		// Check for edit mode signal from GET, and if applicable, check for user access.
 		if (isset($_GET['mode'])) {

@@ -33,7 +33,7 @@ abstract class PageBuilder {
 		}
 	}
 
-	function buildPage($pageView) {
+	function buildPage() {
 		// when making a child of PageBuilder, customize your class here
 
 	}
