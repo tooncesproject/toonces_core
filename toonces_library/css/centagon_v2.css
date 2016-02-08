@@ -121,13 +121,14 @@ a:hover {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	text-align: center;
 	height: 60px;
+	width: 100%;
 	top: 130px;
+	left: 0px;
 	overflow: hidden;
-	position: relative;
-	width: auto;
+	position: absolute;
 	vertical-align: middle;
-	padding-right: 30px;
-	padding-left: 30px;
+	padding-right: 0px;
+	padding-left: 0px;
 }
 	
 	h1 {
@@ -189,10 +190,13 @@ h3 {
 	width: 80px;
 	text-transform: uppercase;
 	vertical-align: middle;
+	position: relative;
 }
 .nav_links_holder {
 	vertical-align: middle;
 	margin-top: 15px;
+	right: 0px;
+	
 }
 .social_icon {
 	padding: 0px;

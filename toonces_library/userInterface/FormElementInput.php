@@ -127,7 +127,7 @@ class FormElementInput
 				$formValueHTML = ' value="'.$this->formValue.'"';
 
 			$this->html = $this->html.$messageHTML.PHP_EOL;
-//			$this->html = $this->html.$displayNameHTML.PHP_EOL;
+
  
 			if ($this->renderInput == true)
 				$this->html = $this->html.$displayNameHTML.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
