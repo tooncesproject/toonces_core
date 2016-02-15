@@ -270,12 +270,12 @@ DROP FUNCTION IF EXISTS toonces.CREATE_BLOG_POST;
 DELIMITER //
 
 CREATE FUNCTION toonces.CREATE_BLOG_POST (
-     parent_blog_id BIGINT
-    ,author VARCHAR(50)
-    ,title VARCHAR(200)
-    ,body TEXT
-    ,pagebuilder_class VARCHAR(50)
-    ,thumbnail_image_vector VARCHAR(50)
+     param_page_id BIGINT
+    ,param_user_id BIGINT
+    ,param_title VARCHAR(200)
+    ,param_body TEXT
+    ,param_pagebuilder_class VARCHAR(50)
+    ,param_thumbnail_image_vector VARCHAR(50)
 )
 
 RETURNS BIGINT
@@ -284,83 +284,95 @@ NOT DETERMINISTIC
 
 BEGIN
 
-    DECLARE blog_page_id BIGINT;
-    DECLARE blog_post_page_id BIGINT;
-    DECLARE pathname VARCHAR(50);
-    -- DECLARE page_link_text VARCHAR(100);
-    DECLARE post_pageview_class VARCHAR(50);
-    DECLARE post_css_stylesheet VARCHAR(50);
+    DECLARE var_parent_blog_id BIGINT;
+    DECLARE var_blog_post_page_id BIGINT;
+    DECLARE var_pathname VARCHAR(50);
+    DECLARE var_post_pageview_class VARCHAR(50);
+    DECLARE var_post_css_stylesheet VARCHAR(50);
+    DECLARE var_user_can_edit BOOL;
 
-    -- Get blog page ID
+    -- Get blog ID
     SELECT
-        page_id
+        blog_id
     INTO 
-        blog_page_id
+        var_parent_blog_id
     FROM 
         toonces.blogs
     WHERE
-        blog_id = parent_blog_id;
+        page_id = param_page_id;
+
+    -- Check for user existence
+    SELECT
+        1
+    INTO
+        var_user_can_edit
+    FROM
+        toonces.users tu
+    WHERE
+        tu.user_id = param_user_id
+    LIMIT 1;
+
     
-    -- if blog page doesn't exist, return NULL. Otherwise, proceed.
-    IF blog_page_id IS NOT NULL THEN
+    -- if blog page doesn't exist or user doesn't exist and have editing privileges, return NULL. Otherwise, proceed.
+    IF var_parent_blog_id IS NOT NULL AND var_user_can_edit = 1 THEN
 
         -- get page data
         SELECT
              pageview_class
             ,css_stylesheet
         INTO 
-             post_pageview_class
-            ,post_css_stylesheet
+             var_post_pageview_class
+            ,var_post_css_stylesheet
         FROM
             toonces.pages
         WHERE
-            page_id = blog_page_id  
+            page_id = param_page_id  
         ;
 
         -- generate pathname
         -- strip all non-alphanumeric characters, lowercase and truncate
-        SET pathname = toonces.GENERATE_PATHNAME(title);
+        SET var_pathname = toonces.GENERATE_PATHNAME(param_title);
 
         -- generate page
         SELECT toonces.CREATE_PAGE (
-             blog_page_id           -- parent_page_id BIGINT,
-            ,pathname               -- pathname VARCHAR(50)
-            ,title                  -- page_title VARCHAR(50)
-            ,title                  -- page_link_text VARCHAR(50)
-            ,pagebuilder_class      -- pagebuilder_class VARCHAR(50)
-            ,post_pageview_class    -- pageview_class VARCHAR(50)
-            ,post_css_stylesheet    -- css_stylesheet VARCHAR(100)
+             param_page_id           -- parent_page_id BIGINT,
+            ,var_pathname               -- pathname VARCHAR(50)
+            ,param_title                  -- page_title VARCHAR(50)
+            ,param_title                  -- page_link_text VARCHAR(50)
+            ,param_pagebuilder_class      -- pagebuilder_class VARCHAR(50)
+            ,var_post_pageview_class    -- pageview_class VARCHAR(50)
+            ,var_post_css_stylesheet    -- css_stylesheet VARCHAR(100)
             ,1                      -- redirect_on_error BOOL
             ,0                      -- published BOOL - Blog posts are unpublished by default
             ,3                      -- pagetype_id - Type for blog post page
-        ) INTO blog_post_page_id;
+        ) INTO var_blog_post_page_id;
         
         -- if page creation was sucessful, proceed.
         
-        IF blog_post_page_id IS NOT NULL THEN
+        IF var_blog_post_page_id IS NOT NULL THEN
             -- insert record into blog_posts table
             INSERT INTO toonces.blog_posts (
                  blog_id
                 ,page_id
-                ,author
+                ,user_id
                 ,title
                 ,body
                 ,thumbnail_image_vector
                 ,published
             ) VALUES (
-                 parent_blog_id
-                ,blog_post_page_id
-                ,author
-                ,title
-                ,body
-                ,thumbnail_image_vector
+                 var_parent_blog_id
+                ,var_blog_post_page_id
+                ,param_user_id
+                ,param_title
+                ,param_body
+                ,param_thumbnail_image_vector
                 ,1
             );
         END IF;
 
     END IF;
 
-    RETURN blog_post_page_id;
+    RETURN var_blog_post_page_id;
 
 END //
 
@@ -527,12 +539,14 @@ CREATE TABLE toonces.blog_posts (
     ,deleted TIMESTAMP NULL
     ,created_by VARCHAR(50)
     ,author VARCHAR(50)
+    ,user_id BIGINT  NOT NULL
     ,title VARCHAR(200)
     ,body TEXT
     ,thumbnail_image_vector VARCHAR(50)
-    ,published BOOL,
+    ,published BOOL
 
-    PRIMARY KEY (blog_post_id)
+    ,PRIMARY KEY (blog_post_id)
+    ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
     
 );
 

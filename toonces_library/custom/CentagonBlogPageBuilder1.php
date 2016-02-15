@@ -19,13 +19,11 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 	function buildPage() {
 
 		// Check for edit mode signal from GET, and if applicable, check for user access.
-		if (isset($_GET['mode'])) {
-			if ($_GET['mode'] == 'newpost' and $this->pageViewReference->userCanEdit == true) {
-				//placeholder...
-				$blogPostFormElement = new Element($this->pageViewReference);
-				$blogPostFormElement->setHTML('Hello, i\'m a placeholder for blog form element.');
-				$this->displayElement = $blogPostFormElement;
-			}
+		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
+
+		if ($mode == 'newpost' and $this->pageViewReference->userCanEdit == true) {
+			$blogFormElement = new BlogFormElement($this->pageViewReference);
+			$this->displayElement = $blogFormElement;
 		} else {
 			$blogReader = new BlogPageReader($this->pageViewReference);
 			$this->displayElement = $blogReader;
