@@ -368,6 +368,18 @@ BEGIN
                 ,param_thumbnail_image_vector
                 ,1
             );
+
+            -- Add a page_user_access record
+            INSERT INTO toonces.page_user_access (
+                 page_id
+                ,user_id
+                ,can_edit
+            ) VALUES (
+                 var_blog_post_page_id
+                ,param_user_id
+                ,1
+            );
+
         END IF;
 
     END IF;

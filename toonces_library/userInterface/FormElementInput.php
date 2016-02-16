@@ -31,6 +31,7 @@ class FormElementInput
 	public $messageVarName;
 	public $renderSignalVarName;
 	public $hideSignalVarName;
+	public $valueVarName;
 
 	function __construct($paramName,$paramInputType,$paramParentFormName) {
 
@@ -42,6 +43,7 @@ class FormElementInput
 		$this->messageVarName = $this->parentFormName.$this->name.'_inmsg';
 		$this->renderSignalVarName = $this->parentFormName.$this->name.'_rsig';
 		$this->hideSignalVarName = $this->parentFormName.$this->name.'_hsig';
+		$this->valueVarName = $this->parentFormName.$this->name.'_vsig';
 
 		// receive message if exists.
 		if (isset($_SESSION[$this->messageVarName])) {
@@ -64,6 +66,12 @@ class FormElementInput
 			unset($_SESSION[$this->hideSignalVarName]);
 		}
 
+		//receive value signal if exists
+		if (isset($_SESSION[$this->valueVarName])) {
+			$this->formValue = $_SESSION[$this->valueVarName];
+			// Destroy the signal
+			unset($_SESSION[$this->valueVarName]);
+		}
 
 		// Check for post data.
 		if (isset($_POST[$this->name])) {
@@ -74,7 +82,7 @@ class FormElementInput
 	}
 
 	public function storeMessage($paramMessage) {
-		echo 'message var name:'.$this->messageVarName.'<br>';
+		//echo 'message var name:'.$this->messageVarName.'<br>';
 		$this->message = $paramMessage;
 		$_SESSION[$this->messageVarName] = $this->message;
 	}
@@ -89,6 +97,11 @@ class FormElementInput
 		$_SESSION[$this->hideSignalVarName] = $this->hideInput;
 	}
 
+	public function storeValue($paramFormValue) {
+		$this->formValue = $paramFormValue;
+		$_SESSION[$this->valueVarName = $paramFormValue];
+	}
+	
 	public function setupForm() {
 
 		// Generate form.

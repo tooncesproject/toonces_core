@@ -11,12 +11,15 @@ class BlogFormElement extends FormElement implements iElement
 	var $conn;
 	var $newPageURI = '';
 	var $newPageId;
+	public $textareaValue;
+	public $textareaValueVarName;
 
 	public function generateFormHTML() {
 		// Overridden in this case so we can add our textarea
 		// Iterate through input objects to generate HTML.
 		$formNameHTML = '';
 		$messageHTML = '';
+		$valueHTML = '';
 
 		if (isset($this->formName) == false)
 			throw new Exception('Form name must be set.');
@@ -24,6 +27,11 @@ class BlogFormElement extends FormElement implements iElement
 		$this->messageVarName = $this->formName.'_msg';
 		if (isset($_SESSION[$this->messageVarName]))
 			$messageHTML = '<div class="form_message_notification"><p>'.$_SESSION[$this->messageVarName].'</p></div>';
+
+
+		$this->textareaValueVarName = $this->formName.'_tav';
+		if (isset($_SESSION[$this->textareaValueVarName]))
+			$valueHTML = $_SESSION[$this->textareaValueVarName].PHP_EOL;
 
 		$formNameHTML = 'name="'.$this->formName.'"';
 		$formIdHTML = 'id="'.$this->formName.'"';
@@ -34,18 +42,20 @@ class BlogFormElement extends FormElement implements iElement
 		foreach ($this->inputArray as $inputObject) {
 			if ($inputObject->hideInput == false)
 				$this->html = $this->html.$inputObject->html;
+
 		}
 
 		$this->html = $this->html.'</form>'.PHP_EOL;
 
 		//Add the textarea
-		$textAreaHTML = '<textarea name="body" rows="20" cols="80" form="blogPostForm"></textarea>'.PHP_EOL;
+		$textAreaHTML = '<textarea name="body" rows="20" cols="80" form="blogPostForm">'.PHP_EOL.$valueHTML.'</textarea>'.PHP_EOL;
 		$this->html = $this->html.'<br>'.PHP_EOL.'<br>'.PHP_EOL.$textAreaHTML;
-
-
 
 		// Destroy the message session variable so it doesn't show when it's not supposed to.
 		unset($_SESSION[$this->messageVarName]);
+
+		// Destroy the text area value session variable.
+		unset($_SESSION[$this->textareaValueVarName]);
 	}
 
 	public function buildInputArray() {
@@ -75,7 +85,7 @@ class BlogFormElement extends FormElement implements iElement
 		if ($responseState == 1) {
 			$this->send303($this->newPageURI);
 		} else {
-			//$this->send303();
+			$this->send303();
 		}
 	}
 
@@ -95,10 +105,15 @@ class BlogFormElement extends FormElement implements iElement
 
 		$doAttemptPost = true;
 		$newPageId = 0;
+		$this->textareaValueVarName = $this->formName.'_tav';
 
 		if ($this->postState == false) {
 			$this->generateFormHTML();
 		} else {
+
+			if (!isset($this->conn))
+				$this->conn = UniversalConnect::doConnect();
+
 			// Get the input data
 			$titleInput = $this->inputArray['title'];
 			$title = filter_var($titleInput->postData,FILTER_SANITIZE_STRING);
@@ -106,15 +121,50 @@ class BlogFormElement extends FormElement implements iElement
 			$bodyInput = $this->inputArray['body'];
 			$body = filter_var($bodyInput->postData,FILTER_SANITIZE_STRING);
 
-			// Validate input data: Pass if neither is empty.
+			// Validate input data: Pass if neither is empty and if the name doesn't exist.
 			if (empty($title) == true) {
 				$titleInput->storeMessage('Please enter a title.');
 				$doAttemptPost = false;
+
+				$_SESSION[$this->textareaValueVarName] = $body;
+
+			} else {
+
+				// check name existence
+				$queryParams = array (
+					 ':parentPageId' => strval($this->pageViewReference->pageId)
+					,':title' => $title
+				);
+
+				$sql = <<<SQL
+					SELECT
+						CASE
+							WHEN count(*) = 0 THEN 0
+							WHEN count(*) > 0 THEN 1
+						END
+					FROM toonces.page_hierarchy_bridge phb
+					JOIN toonces.pages tp on tp.page_id = phb.descendant_page_id
+					WHERE
+						phb.page_id = :parentPageId
+					AND 
+						tp.pathname = GENERATE_PATHNAME(:title);
+SQL;
+				$stmt = $this->conn->prepare($sql);
+				$stmt->execute($queryParams);
+				$result = $stmt->fetch(PDO::FETCH_NUM);
+				$pageNameExists = intval($result[0]);
+				if ($pageNameExists == 1) {
+					$titleInput->storeMessage('Sorry, that title is already taken. Please try another.');
+					$doAttemptPost = false;
+					$_SESSION[$this->textareaValueVarName] = $body;
+				}
+
 			}
 
 			if (empty($body) == true) {
 				$bodyInput->storeMessage('Please enter some text in your blog post.');
 				$doAttemptPost = false;
+				$bodyInput->storeValue($body);
 			}
 
 			// If there's some text in both fields, go ahead and generate a blog post.
@@ -139,8 +189,6 @@ class BlogFormElement extends FormElement implements iElement
 						,''						--  ,param_thumbnail_image_vector VARCHAR(50)
 					)
 SQL;
-				if (!isset($this->conn))
-					$this->conn = UniversalConnect::doConnect();
 
 				$stmt = $this->conn->prepare($sql);
 
