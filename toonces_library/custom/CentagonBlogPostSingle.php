@@ -2,7 +2,7 @@
 
 require_once ROOTPATH.'/toonces.php';
 
-class CentagonBlogPostTest extends PageBuilder {
+class CentagonBlogPostSingle extends PageBuilder {
 	/*
 	var $elementArray = array();
 	private $containerHTML;
@@ -39,7 +39,7 @@ class CentagonBlogPostTest extends PageBuilder {
 		
 		$pageId = $this->pageViewReference->pageId;
 		
-		$blogReaderSingle = new BlogReaderSingle($pageId);
+		$blogReaderSingle = new BlogReaderSingle($this->pageViewReference);
 		
 		array_push($this->elementArray, $blogReaderSingle);
 		

@@ -14,7 +14,7 @@ include 'toonces_library/config.php';
 require_once ROOTPATH.'/toonces.php';
 
 // global variables
-$gBlogDefaultPagebuilder = 'CentagonPageBuilder1';
+$gBlogDefaultPagebuilder = 'CentagonBlogPostSingle';
 
 $sessionManager = new SessionManager();
 
