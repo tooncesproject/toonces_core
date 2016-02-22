@@ -13,10 +13,11 @@ class BlogReaderSingle extends Element implements iElement
 
 	function queryBlog() {
 
+		if (!isset($this->conn))
+			$this->conn = UniversalConnect::doConnect();
+
 		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_single_blog_post.sql'),$this->pageId);
-
 		$result = $this->conn->query($query);
-
 		return $result;
 
 	}

@@ -13,6 +13,37 @@ class BlogFormElement extends FormElement implements iElement
 	var $newPageId;
 	public $textareaValue;
 	public $textareaValueVarName;
+	
+	public function checkNameExistence($paramName) {
+
+		$queryParams = array (
+				':parentPageId' => strval($this->pageViewReference->pageId)
+				,':title' => $paramName
+		);
+		
+		$sql = <<<SQL
+					SELECT
+						CASE
+							WHEN count(*) = 0 THEN 0
+							WHEN count(*) > 0 THEN 1
+						END
+					FROM toonces.page_hierarchy_bridge phb
+					JOIN toonces.pages tp on tp.page_id = phb.descendant_page_id
+					WHERE
+						phb.page_id = :parentPageId
+					AND
+						tp.pathname = GENERATE_PATHNAME(:title);
+					AND
+						tp.page_id != :parentPageId
+SQL;
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute($queryParams);
+		$result = $stmt->fetch(PDO::FETCH_NUM);
+		$pageNameExists = intval($result[0]);
+		
+		return $pageNameExists;
+		
+	}
 
 	public function generateFormHTML() {
 		// Overridden in this case so we can add our textarea
@@ -28,10 +59,15 @@ class BlogFormElement extends FormElement implements iElement
 		if (isset($_SESSION[$this->messageVarName]))
 			$messageHTML = '<div class="form_message_notification"><p>'.$_SESSION[$this->messageVarName].'</p></div>';
 
-
+		// Text area value. Priority goes to session data (i.e., user has failed blog post attempt but
+		// we don't want to be mean and delete all they've written).
+		// Next priority goes to $textAreaValue variable (i.e., user editing existing blog post).
 		$this->textareaValueVarName = $this->formName.'_tav';
-		if (isset($_SESSION[$this->textareaValueVarName]))
+		if (isset($_SESSION[$this->textareaValueVarName])) {
 			$valueHTML = $_SESSION[$this->textareaValueVarName].PHP_EOL;
+		} else if (isset($this->textareaValue)) {
+			$valueHTML = $this->textareaValue;
+		}
 
 		$formNameHTML = 'name="'.$this->formName.'"';
 		$formIdHTML = 'id="'.$this->formName.'"';
@@ -131,28 +167,8 @@ class BlogFormElement extends FormElement implements iElement
 			} else {
 
 				// check name existence
-				$queryParams = array (
-					 ':parentPageId' => strval($this->pageViewReference->pageId)
-					,':title' => $title
-				);
-
-				$sql = <<<SQL
-					SELECT
-						CASE
-							WHEN count(*) = 0 THEN 0
-							WHEN count(*) > 0 THEN 1
-						END
-					FROM toonces.page_hierarchy_bridge phb
-					JOIN toonces.pages tp on tp.page_id = phb.descendant_page_id
-					WHERE
-						phb.page_id = :parentPageId
-					AND 
-						tp.pathname = GENERATE_PATHNAME(:title);
-SQL;
-				$stmt = $this->conn->prepare($sql);
-				$stmt->execute($queryParams);
-				$result = $stmt->fetch(PDO::FETCH_NUM);
-				$pageNameExists = intval($result[0]);
+				$pageNameExists = $this->checkNameExistence($title);
+				
 				if ($pageNameExists == 1) {
 					$titleInput->storeMessage('Sorry, that title is already taken. Please try another.');
 					$doAttemptPost = false;

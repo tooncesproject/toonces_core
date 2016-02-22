@@ -224,6 +224,7 @@ if ($allowAccess == 1) {
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
 $pageView->userCanEdit = $userCanEdit;
+$pageView->urlPath = $path;
 
 // If it's an admin page, pass the user's page access state to the pageView
 if ($adminSessionActive == 1 and $isAdminPage == 1) {

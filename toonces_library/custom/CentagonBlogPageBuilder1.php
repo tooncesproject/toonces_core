@@ -3,17 +3,7 @@
 
 
 class CentagonBlogPageBuilder1 extends PageBuilder {
-	/*
-	var $elementArray = array();
-	private $containerHTML;
-	private $bodyHTML;
-	var $view;
 
-	function getElementArray() {
-		return $elementArray;
-	}
-
-	*/
 	var $displayElement;
 
 	function buildPage() {
@@ -69,9 +59,6 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 
 		$pageId = $this->pageViewReference->pageId;
 
-		//$blogReader = new BlogPageReader($this->pageViewReference);
-		// Insert the element you wanna use here...
-		//array_push($this->elementArray, $blogReader);
 		array_push($this->elementArray, $this->displayElement);
 
 		$footerElement = new Element($this->pageViewReference);
