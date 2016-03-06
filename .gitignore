@@ -9,6 +9,7 @@ test.html
 test_sql
 toonces_library/MySqlOOPBasics
 test2.html
+test3.html
 
 # images - for now
 *.jpg
@@ -22,3 +23,5 @@ custom_js
 toonces_library/static_data/footer_test.html
 toonces_library/static_data/head_tags.html
 .gitignore
+toonces_dash_mockup.html
+

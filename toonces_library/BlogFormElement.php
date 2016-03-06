@@ -13,14 +13,15 @@ class BlogFormElement extends FormElement implements iElement
 	var $newPageId;
 	public $textareaValue;
 	public $textareaValueVarName;
-	
+	public $blogPostTitle;
+
 	public function checkNameExistence($paramName) {
 
 		$queryParams = array (
 				':parentPageId' => strval($this->pageViewReference->pageId)
 				,':title' => $paramName
 		);
-		
+
 		$sql = <<<SQL
 					SELECT
 						CASE
@@ -40,14 +41,15 @@ SQL;
 		$stmt->execute($queryParams);
 		$result = $stmt->fetch(PDO::FETCH_NUM);
 		$pageNameExists = intval($result[0]);
-		
+
 		return $pageNameExists;
-		
+
 	}
 
 	public function generateFormHTML() {
 		// Overridden in this case so we can add our textarea
 		// Iterate through input objects to generate HTML.
+
 		$formNameHTML = '';
 		$messageHTML = '';
 		$valueHTML = '';
@@ -69,6 +71,12 @@ SQL;
 			$valueHTML = $this->textareaValue;
 		}
 
+		// Title value:
+		if (isset($this->blogPostTitle)) {
+			$this->inputArray['title']->formValue = $this->blogPostTitle;
+			$this->inputArray['title']->setupForm();
+		}
+
 		$formNameHTML = 'name="'.$this->formName.'"';
 		$formIdHTML = 'id="'.$this->formName.'"';
 
@@ -82,6 +90,8 @@ SQL;
 		}
 
 		$this->html = $this->html.'</form>'.PHP_EOL;
+
+
 
 		//Add the textarea
 		$textAreaHTML = '<textarea name="body" rows="20" cols="80" form="blogPostForm">'.PHP_EOL.$valueHTML.'</textarea>'.PHP_EOL;
@@ -168,7 +178,7 @@ SQL;
 
 				// check name existence
 				$pageNameExists = $this->checkNameExistence($title);
-				
+
 				if ($pageNameExists == 1) {
 					$titleInput->storeMessage('Sorry, that title is already taken. Please try another.');
 					$doAttemptPost = false;

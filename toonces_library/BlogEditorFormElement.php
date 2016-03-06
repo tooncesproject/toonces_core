@@ -10,9 +10,20 @@
 class BlogEditorFormElement extends BlogFormElement implements iElement
 {
 
-	public $blogPostTitle;
 	public $updatedBlogPostTitle;
 	public $blogPostId;
+
+
+	function queryBlog() {
+
+		if (!isset($this->conn))
+			$this->conn = UniversalConnect::doConnect();
+
+		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_single_blog_post.sql'),$this->pageViewReference->pageId);
+		$result = $this->conn->query($query);
+		return $result;
+
+	}
 
 	public function responseStateHandler($responseState) {
 
@@ -32,7 +43,7 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 				// If user has been directed to URL check screen,
 				// Redirect to the PageBuilder's URL Check mode
 				$path = $this->pageViewReference->urlPath;
-				$path = $path.'?mode=urlcheck';
+				$path = '/'.$path.'?mode=urlcheck';
 				$this->send303($path);
 				break;
 		}
@@ -49,6 +60,16 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 			// generate the form.
 			// Otherwise, go to the URL management screen.
 			if (isset($_SESSION['checkNewPageTitle']) == false) {
+
+				// Query the existing data.
+				$result = $this->queryBlog();
+				foreach($result as $row) {
+
+					$this->blogPostTitle = $row['title'];
+					$this->textareaValue = $row['body'];
+
+				}
+
 				$this->generateFormHTML();
 			} else {
 				$this->responseStateHandler(2);

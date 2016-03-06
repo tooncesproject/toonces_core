@@ -101,7 +101,7 @@ class FormElementInput
 		$this->formValue = $paramFormValue;
 		$_SESSION[$this->valueVarName = $paramFormValue];
 	}
-	
+
 	public function setupForm() {
 
 		// Generate form.
