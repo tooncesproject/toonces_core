@@ -12,9 +12,6 @@ class CentagonBlogPostSingle extends PageBuilder {
 		$title = '';
 		$body = '';
 
-		// Instantiate the BlogReaderSingle object and get its contents.
-		//$blogReaderSingle = new BlogReaderSingle($this->pageViewReference);
-
 		// Check for edit mode signal from GET, and if applicable, check for user access.
 		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
 
