@@ -16,13 +16,13 @@
 
 class URLCheckFormElement extends FormElement implements iElement
 {
-	
+
 	var $conn;
 	var $proposedPathname;
 
 
 	public function getParentPath($pageId) {
-		
+
 		if (isset($this->conn) == false)
 			$this->conn = UniversalConnect::doConnect();
 
@@ -36,26 +36,26 @@ class URLCheckFormElement extends FormElement implements iElement
 SQL;
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(array($pageId));
-		
+
 		$result = $stmt->fetchAll();
 		$parentPath = $result[0][0];
-		
+
 		return $parentPath;
 	}
 	public function buildInputArray() {
-	
+
 		$changeTitleAndURLButton = new FormElementInput('change', 'radio', $this->formName);
 		$this->inputArray['changeBoth'] = $changeTitleAndURLButton;
 		$changeTitleAndURLButton->formValue = 0;
 		$changeTitleAndURLButton->displayName = 'Change both page title and URL.';
 		$changeTitleAndURLButton->setupForm();
-		
+
 		$changeOnlyTitleButton = new FormElementInput('change', 'radio', $this->formName);
 		$this->inputArray['changeTitle'] = $changeOnlyTitleButton;
 		$changeOnlyTitleButton->formValue = 1;
 		$changeOnlyTitleButton->displayName = 'Change the title and do not change the URL.';
 		$changeOnlyTitleButton->setupForm();
-		
+
 		$changeNeitherButton = new FormElementInput('change', 'radio', $this->formName);
 		$this->inputArray['changeNeither'] = $changeNeitherButton;
 		$changeNeitherButton->formValue = 2;
@@ -67,7 +67,7 @@ SQL;
 		$submitInput->setupForm();
 		$this->inputArray['submit'] = $submitInput;
 	}
-	
+
 	public function responseStateHandler($responseState) {
 		switch ($responseState) {
 			case 0:
@@ -82,39 +82,39 @@ SQL;
 				$this->send303($path);
 		}
 	}
-	
+
 	public function elementAction() {
-		
-		// Acquire exiting and proposed titles and URLs.		
+
+		// Acquire exiting and proposed titles and URLs.
 		$proposedTitle = urldecode($_GET['newtitle']);
 		$currentPath = '/'.$this->pageViewReference->urlPath;
 		$currentTitle = $this->pageViewReference->pageTitle;
-		
+
 		if (isset($this->conn) == false) {
 			$this->conn = UniversalConnect::doConnect();
 		}
 		$sql = "SELECT GENERATE_PATHNAME(?)";
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute(array($proposedTitle));
-		
+
 		$result = $stmt->fetchAll();
 		$this->proposedPathname = $result[0][0];
 
 		if ($this->postState == false) {
-			
+
 			$parentPath = '';
-			
+
 			// If no proposed title, the page must have been reached in error.
 			// Also, ability to change the page depends on user's access level.
 			// In these cases, redirect to the blog page.
 			if (empty($proposedTitle) or $this->pageViewReference->userCanEdit == false) {
 				$this->send303($currentPath);
 			} else {
-				// Otherwise...				
+				// Otherwise...
 				// Query the database for the path of the page's parent.
 				$parentPath = $this->getParentPath($this->pageViewReference->pageId);
 				$proposedFullPath = $parentPath.$this->proposedPathname;
-				
+
 				// Build HTML.
 				$infoHTML = <<<HTML
 				<div class="content_container">
@@ -131,24 +131,24 @@ SQL;
 				</div>
 HTML;
 				$infoHTML = sprintf($infoHTML, $currentTitle, $proposedTitle, $currentPath, $proposedFullPath).PHP_EOL;
-				
+
 				$this->generateFormHTML();
 				$this->html = $infoHTML.$this->html;
 			}
-			
+
 		} else {
-			
-			
+
+
 			switch ($_POST['change']) {
 				case 0:
 				// 0: Change both
-					
+
 					$queryParams = array (
 							 ':pathname' => $this->proposedPathname
 							,':newTitle' => $proposedTitle
 							,':pageId' => $this->pageViewReference->pageId
 					);
-					
+
 					$sql = <<<SQL
 					UPDATE toonces.pages
 					SET
@@ -160,7 +160,7 @@ SQL;
 					$stmt = $this->conn->prepare($sql);
 					$stmt->execute($queryParams);
 					// Response state 0: Successfully updated both title and pathname
-					$this->responseStateHandler(0);					
+					$this->responseStateHandler(0);
 					break;
 				case 1:
 					// Change title only
@@ -168,7 +168,7 @@ SQL;
 							 ':newTitle' => $proposedTitle
 							,':pageId' => $this->pageViewReference->pageId
 					);
-					
+
 					$sql = <<<SQL
 					UPDATE toonces.pages
 					SET page_title = :newTitle
@@ -184,16 +184,16 @@ SQL;
 					$this->responseStateHandler(1);
 					break;
 			}
-			
-			
+
+
 		}
 	}
 	public function objectSetup() {
-	
+
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
 		$this->formName = 'URLCheckForm';
-	
+
 		$this->submitName = 'OK!';
 		// Instantiate input objects
 		$this->buildInputArray();
@@ -201,7 +201,7 @@ SQL;
 		foreach ($this->inputArray as $input) {
 			if ($input->postState == true)
 				$this->postState = true;
-	
+
 		}
 	}
 }

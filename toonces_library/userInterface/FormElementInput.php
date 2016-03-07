@@ -99,7 +99,7 @@ class FormElementInput
 
 	public function storeValue($paramFormValue) {
 		$this->formValue = $paramFormValue;
-		$_SESSION[$this->valueVarName = $paramFormValue];
+		$_SESSION[$this->valueVarName] = $paramFormValue;
 	}
 
 	public function setupForm() {
