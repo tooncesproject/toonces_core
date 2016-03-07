@@ -42,3 +42,4 @@ include_once ROOTPATH.'/userinterface/FormElementInput.php';
 include_once ROOTPATH.'/utility/LogoutFormElement.php';
 include_once ROOTPATH.'/BlogFormElement.php';
 include_once ROOTPATH.'/BlogEditorFormElement.php';
+include_once ROOTPATH.'/URLCheckFormElement.php';

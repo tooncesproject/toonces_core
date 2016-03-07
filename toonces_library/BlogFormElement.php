@@ -135,18 +135,6 @@ SQL;
 		}
 	}
 
-	function send303($paramURI = '') {
-
-		// By default, URI is current page.
-		$uri = $_SERVER[REQUEST_URI];
-		if (empty($paramURI) == false)
-			$uri = $paramURI;
-
-		$link = "http://$_SERVER[HTTP_HOST]$uri";
-		header("HTTP/1.1 303 See Other");
-		header('Location: '.$link);
-	}
-
 	public function elementAction() {
 
 		$doAttemptPost = true;

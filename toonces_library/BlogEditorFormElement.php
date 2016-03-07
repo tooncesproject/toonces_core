@@ -36,14 +36,15 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 			case 1:
 				// If title change detected, set checkNewPageTitle session variable
 				// and send a 303 header, staying in edit mode.
-				$_SESSION['checkNewPageTitle'] = $this->updatedBlogPostTitle;
-				$this->send303();
-				break;
-			case 2:
+		//		$_SESSION['checkNewPageTitle'] = $this->updatedBlogPostTitle;
+		//		$this->send303();
+		//		break;
+		//	case 2:
 				// If user has been directed to URL check screen,
 				// Redirect to the PageBuilder's URL Check mode
+				$checkTitle = urlencode($this->updatedBlogPostTitle);
 				$path = $this->pageViewReference->urlPath;
-				$path = '/'.$path.'?mode=urlcheck';
+				$path = '/'.$path.'?mode=urlcheck&newtitle='.$checkTitle;
 				$this->send303($path);
 				break;
 		}
@@ -59,7 +60,7 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 			// If there's no POST but the checkNewPageTitle sesh var is not set,
 			// generate the form.
 			// Otherwise, go to the URL management screen.
-			if (isset($_SESSION['checkNewPageTitle']) == false) {
+			//if (isset($_SESSION['checkNewPageTitle']) == false) {
 
 				// Query the existing data.
 				$result = $this->queryBlog();
@@ -68,11 +69,14 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 					$this->blogPostTitle = $row['title'];
 					$this->textareaValue = $row['body'];
 
-				}
+				//}
 
 				$this->generateFormHTML();
-			} else {
-				$this->responseStateHandler(2);
+		/*	} else {
+				// Destroy the signal
+				unset($_SESSION['checkNewPageTitle']);
+				// Load the URL check screen
+				$this->responseStateHandler(2); */
 			}
 		} else {
 			// If there is POST data, validate and update.

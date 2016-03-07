@@ -14,17 +14,26 @@ class CentagonBlogPostSingle extends PageBuilder {
 
 		// Check for edit mode signal from GET, and if applicable, check for user access.
 		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
-
-		if ($mode == 'edit' and $this->pageViewReference->userCanEdit == true) {
-
-			$blogEditorFormElement = new BlogEditorFormElement($this->pageViewReference);
-
-			$this->displayElement = $blogEditorFormElement;
-		} else {
-			$blogReaderSingle = new BlogReaderSingle($this->pageViewReference);
-			$this->displayElement = $blogReaderSingle;
+		
+		// If user doesn't have editing capability, ignore the mode.
+		if ($this->pageViewReference->userCanEdit == false) {
+			$mode = '';
 		}
 
+		switch ($mode) {
+			case 'edit':
+				$blogEditorFormElement = new BlogEditorFormElement($this->pageViewReference);
+				$this->displayElement = $blogEditorFormElement;
+				break;
+			case 'urlcheck':
+				$urlCheckFormElement = new URLCheckFormElement($this->pageViewReference);
+				$this->displayElement = $urlCheckFormElement;
+				break;
+			default:
+				$blogReaderSingle = new BlogReaderSingle($this->pageViewReference);
+				$this->displayElement = $blogReaderSingle;
+		}
+		
 		$this->buildElementArray();
 
 		return $this->elementArray;
