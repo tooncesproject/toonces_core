@@ -18,7 +18,30 @@ class URLCheckFormElement extends FormElement implements iElement
 {
 	
 	var $conn;
+	var $proposedPathname;
 
+
+	public function getParentPath($pageId) {
+		
+		if (isset($this->conn) == false)
+			$this->conn = UniversalConnect::doConnect();
+
+		$sql = <<<SQL
+				SELECT
+					GET_PAGE_PATH(page_id) AS parent_page_path
+				FROM
+					toonces.page_hierarchy_bridge
+				WHERE
+					descendant_page_id = ?
+SQL;
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(array($pageId));
+		
+		$result = $stmt->fetchAll();
+		$parentPath = $result[0][0];
+		
+		return $parentPath;
+	}
 	public function buildInputArray() {
 	
 		$changeTitleAndURLButton = new FormElementInput('change', 'radio', $this->formName);
@@ -46,19 +69,40 @@ class URLCheckFormElement extends FormElement implements iElement
 	}
 	
 	public function responseStateHandler($responseState) {
-		// foo
+		switch ($responseState) {
+			case 0:
+				// 0: successfully updated both title and path; redirect to new URL.
+				$parentPath = $this->getParentPath($this->pageViewReference->pageId);
+				$newFullPath = $parentPath.$this->proposedPathname;
+				$this->send303($newFullPath);
+				break;
+			case 1:
+				// 1: No structural change to page; exit edit mode.
+				$path = '/'.$this->pageViewReference->urlPath;
+				$this->send303($path);
+		}
 	}
 	
 	public function elementAction() {
 		
+		// Acquire exiting and proposed titles and URLs.		
+		$proposedTitle = urldecode($_GET['newtitle']);
+		$currentPath = '/'.$this->pageViewReference->urlPath;
+		$currentTitle = $this->pageViewReference->pageTitle;
+		
+		if (isset($this->conn) == false) {
+			$this->conn = UniversalConnect::doConnect();
+		}
+		$sql = "SELECT GENERATE_PATHNAME(?)";
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute(array($proposedTitle));
+		
+		$result = $stmt->fetchAll();
+		$this->proposedPathname = $result[0][0];
+
 		if ($this->postState == false) {
 			
 			$parentPath = '';
-			
-			// Acquire exiting and proposed titles and URLs. 
-			$currentPath = '/'.$this->pageViewReference->urlPath;
-			$proposedTitle = urldecode($_GET['newtitle']);
-			$currentTitle = $this->pageViewReference->pageTitle;
 			
 			// If no proposed title, the page must have been reached in error.
 			// Also, ability to change the page depends on user's access level.
@@ -66,33 +110,10 @@ class URLCheckFormElement extends FormElement implements iElement
 			if (empty($proposedTitle) or $this->pageViewReference->userCanEdit == false) {
 				$this->send303($currentPath);
 			} else {
-				// Otherwise...
-				// Query the database for the URL path resulting from the proposed title.
-				if (isset($this->conn) == false) {
-					$this->conn = UniversalConnect::doConnect();
-				}
-				$sql = "SELECT GENERATE_PATHNAME(?)";
-				$stmt = $this->conn->prepare($sql);
-				$stmt->execute(array($proposedTitle));
-				
-				$result = $stmt->fetchAll();
-				$proposedURL = $result[0][0];
-				
+				// Otherwise...				
 				// Query the database for the path of the page's parent.
-				$sql = <<<SQL
-				SELECT
-					GET_PAGE_PATH(page_id) AS parent_page_path
-				FROM
-					toonces.page_hierarchy_bridge
-				WHERE
-					descendant_page_id = ?
-SQL;
-				$stmt = $this->conn->prepare($sql);
-				$stmt->execute(array($this->pageViewReference->pageId));
-				
-				$result = $stmt->fetchAll();
-				$parentPath = $result[0][0];
-				$proposedURL = $parentPath.$proposedURL;
+				$parentPath = $this->getParentPath($this->pageViewReference->pageId);
+				$proposedFullPath = $parentPath.$this->proposedPathname;
 				
 				// Build HTML.
 				$infoHTML = <<<HTML
@@ -102,20 +123,68 @@ SQL;
 				<p>You have changed the title of an existing blog post.</p>
 				<p>Do you want to change its URL also?</p>
 				<p>Note: If you change the URL, this page will no longer exist at its present location!</p>
-				<p>If this page has been live for some time, changing the URL is not recommended, as any links to the page or user bookmarks will no longer work.</p>
+				<p>If this page has been live for some time, changing the URL is not recommended, as any links to the page from other sites will no longer work.</p>
 				<p><strong>Current Title: </strong>%s</p>
 				<p><strong>Proposed Title: </strong>%s</p>
 				<p><strong>Current URL Path: </strong>%s</p>
 				<p><strong>Proposed URL Path: </strong>%s</p>
 				</div>
 HTML;
-				$infoHTML = sprintf($infoHTML, $currentTitle, $proposedTitle, $currentPath, $proposedURL).PHP_EOL;
+				$infoHTML = sprintf($infoHTML, $currentTitle, $proposedTitle, $currentPath, $proposedFullPath).PHP_EOL;
 				
 				$this->generateFormHTML();
 				$this->html = $infoHTML.$this->html;
 			}
 			
 		} else {
+			
+			
+			switch ($_POST['change']) {
+				case 0:
+				// 0: Change both
+					
+					$queryParams = array (
+							 ':pathname' => $this->proposedPathname
+							,':newTitle' => $proposedTitle
+							,':pageId' => $this->pageViewReference->pageId
+					);
+					
+					$sql = <<<SQL
+					UPDATE toonces.pages
+					SET
+						 pathname = :pathname
+						,page_title = :newTitle
+					WHERE
+						page_id = :pageId;
+SQL;
+					$stmt = $this->conn->prepare($sql);
+					$stmt->execute($queryParams);
+					// Response state 0: Successfully updated both title and pathname
+					$this->responseStateHandler(0);					
+					break;
+				case 1:
+					// Change title only
+					$queryParams = array (
+							 ':newTitle' => $proposedTitle
+							,':pageId' => $this->pageViewReference->pageId
+					);
+					
+					$sql = <<<SQL
+					UPDATE toonces.pages
+					SET page_title = :newTitle
+					WHERE
+						page_id = :pageId;
+SQL;
+					$stmt = $this->conn->prepare($sql);
+					$stmt->execute($queryParams);
+					$this->responseStateHandler(1);
+					break;
+				case 2:
+					// Do nothing, exit edit mode.
+					$this->responseStateHandler(1);
+					break;
+			}
+			
 			
 		}
 	}
