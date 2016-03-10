@@ -20,7 +20,6 @@ class URLCheckFormElement extends FormElement implements iElement
 	var $conn;
 	var $proposedPathname;
 
-
 	public function getParentPath($pageId) {
 
 		if (isset($this->conn) == false)
@@ -150,12 +149,16 @@ HTML;
 					);
 
 					$sql = <<<SQL
-					UPDATE toonces.pages
+					UPDATE toonces.pages tp
+					JOIN
+						toonces.blog_posts bp USING (page_id)
 					SET
-						 pathname = :pathname
-						,page_title = :newTitle
+						 tp.pathname = :pathname
+						,tp.page_title = :newTitle
+						,bp.title = :newTitle
+
 					WHERE
-						page_id = :pageId;
+						tp.page_id = :pageId;
 SQL;
 					$stmt = $this->conn->prepare($sql);
 					$stmt->execute($queryParams);
@@ -170,10 +173,14 @@ SQL;
 					);
 
 					$sql = <<<SQL
-					UPDATE toonces.pages
-					SET page_title = :newTitle
+					UPDATE toonces.pages tp
+					JOIN
+						toonces.blog_posts bp USING (page_id)	
+					SET
+						tp.page_title = :newTitle
+						bp.title = :newTitle
 					WHERE
-						page_id = :pageId;
+						tp.page_id = :pageId;
 SQL;
 					$stmt = $this->conn->prepare($sql);
 					$stmt->execute($queryParams);
