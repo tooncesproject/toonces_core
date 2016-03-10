@@ -23,21 +23,22 @@ class BlogPostToolbarElement extends ToolbarElement
 		//  Delete page
 		//  recover deleted page
 
-		$newPostLinkHTML = '';
+		$editPostLinkHTML = '';
 		$publishHTML = '';
 
-		$urlArray = parse_url($_SERVER['REQUEST_URI']);
-		// Build URL for new post link
-		$newpostUrlArray = $urlArray;
-		$urlPath = $newpostUrlArray['path'];
-		if (isset($urlArray['query']))
-			parse_str($urlArray['query'], $params);
-
+		$thisPageURI = $_SERVER['REQUEST_URI'];
+		$urlArray = parse_url($thisPageURI);
+		// Build URL for edit post link
+		$editPostUrlArray = $urlArray;
+		$urlPath = $editPostUrlArray['path'];
+		if (isset($urlArray['query'])) {
+			parse_str($urlArray['query'], $currentParams);
+			parse_str($urlArray['query'], $linkParams);
+		}
 		// Add parameter
-		$params['mode'] = 'newpost';
-		$newpostUrlArray['query'] = http_build_query($params);
-		$editPostURL = $newpostUrlArray['path'].'?'.$newpostUrlArray['query'];
-
+		$linkParams['mode'] = 'edit';
+		$editPostUrlArray['query'] = http_build_query($linkParams);
+		$editPostURL = $editPostUrlArray['path'].'?'.$editPostUrlArray['query'];
 
 		$htmlOut = <<<HTML
 		<div class="TE_pagetoolelement">
@@ -46,16 +47,28 @@ HTML;
 
 		$htmlOut = $htmlOut.PHP_EOL;
 
-		// If the user has editing privileges, add a link create new post
+		// If the user has editing privileges, add a blog editing link
 		if ($this->userCanEdit == true) {
-			// Create links to publish or unpublish the post.
-			
-			$newPostLinkHTML = '<p><a href="'.$editPostURL.'"><telink>Edit this post.</telink></a></p>'.PHP_EOL;
-
+			// If we're in edit mode, make it a 'cancel' link, otherwise an 'edit' link
+			$currentParamsMode = isset($currentParams['mode']) ? $currentParams['mode'] : '';
+			if ($currentParamsMode == 'edit') {
+				unset($linkParams['mode']);
+				$editPostUrlArray['query'] = http_build_query($linkParams);
+				if (empty($editPostUrlArray['query'])) {
+					$cancelPostURL = $editPostUrlArray['path'];
+				} else {
+					$cancelPostURL = $editPostUrlArray['path'].'?'.$editPostUrlArray['query'];
+				}
+				$editPostLinkHTML = '<p><a href="'.$cancelPostURL.'"><telink>Discard changes and cancel editing</telink></a></p>'.PHP_EOL;
+			} else {
+				$editPostLinkHTML = '<p><a href="'.$editPostURL.'"><telink>Edit this blog post</telink></a></p>'.PHP_EOL;
+			}
 		}
-		$htmlOut = $htmlOut.$newPostLinkHTML;
+		$htmlOut = $htmlOut.$editPostLinkHTML;
 
 		$htmlOut = $htmlOut.'</div>'.PHP_EOL;
+		
+		// If not in edit or urlcheck mode, display a link to publish or unpublish the page.
 
 		return $htmlOut;
 	}

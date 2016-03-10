@@ -12,6 +12,7 @@ include_once ROOTPATH.'/abstract/FormElement.php';
 include_once ROOTPATH.'/utility/DynamicNavigationLink.php';
 include_once ROOTPATH.'/abstract/ToolbarElement.php';
 include_once ROOTPATH.'/userinterface/BlogToolbarElement.php';
+include_once ROOTPATH.'/userinterface/BlogPostToolbarElement.php';
 include_once ROOTPATH.'/userinterface/DefaultToolbarElement.php';
 
 include_once ROOTPATH.'/pagebuilders/AdminPageBuilder.php';

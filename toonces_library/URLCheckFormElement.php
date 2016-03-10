@@ -175,7 +175,7 @@ SQL;
 					$sql = <<<SQL
 					UPDATE toonces.pages tp
 					JOIN
-						toonces.blog_posts bp USING (page_id)	
+						toonces.blog_posts bp USING (page_id)
 					SET
 						tp.page_title = :newTitle
 						bp.title = :newTitle
