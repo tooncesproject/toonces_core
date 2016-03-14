@@ -14,7 +14,7 @@ abstract class ToolbarElement extends ViewElement
 	public $userNickname;
 	public $userCanEdit;
 	public $userIsAdmin;
-	public $toolHTML;
+	public $toolElement;
 
 	public function __construct($pageView) {
 		// Required stuff
@@ -49,9 +49,10 @@ abstract class ToolbarElement extends ViewElement
 		$utilityElement->setHTML($this->buildUtilityHTML());
 		$this->addElement($utilityElement);
 
-		$toolElement = new Element($this->pageViewReference);
-		$toolElement->setHTML($this->buildToolHTML());
-		$this->addElement($toolElement);
+		$this->toolElement = new ViewElement($this->pageViewReference);
+		$this->buildToolElement();
+		
+		$this->addElement($this->toolElement);
 
 	}
 
@@ -77,10 +78,14 @@ HTML;
 		return $htmlOut;
 	}
 
-	public function buildToolHTML() {
+	public function buildToolElement() {
 		// abstract. Chilren should overrride this.
-		$htmlOut = '';
-		return $htmlOut;
+		
+		// This element's job is to add elements to the toolElement ViewElement object.
+	
+		// The toolElement ViewElement object should already exist once this is
+		// called.
+		
 	}
 
 }

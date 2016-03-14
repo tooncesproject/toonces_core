@@ -15,13 +15,16 @@ class BlogToolbarElement extends ToolbarElement
 	// user state
 	var $userCanEdit;
 
-	public function buildToolHTML() {
+	public function buildToolElement() {
 
 		// Tool's capabilities:
 		// 	publish page
 		//	unpublish page
 		//  Create new blog post
-
+		
+		$this->newPostElement = new Element($this->pageViewReference);
+		
+		
 		$newPostLinkHTML = '';
 
 		$urlArray = parse_url($_SERVER['REQUEST_URI']);
@@ -52,7 +55,8 @@ HTML;
 
 		$htmlOut = $htmlOut.'</div>'.PHP_EOL;
 
-		return $htmlOut;
+		$newPostElement->setHTML($htmlOut);
+		$this->toolElement->addElement($newPostElement);
 	}
 
 }

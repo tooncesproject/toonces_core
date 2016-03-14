@@ -1,6 +1,6 @@
 <?php
 /*
- * LinkActionController
+ * LinkActionControlElement
  * Initial commit: Paul Anderson, 2013-03-13
  * 
  * This abstract class provides a framework for HTTP GET-based input 
@@ -16,39 +16,27 @@
  * 
  */
 
-abstract class LinkActionController
+abstract class LinkActionControlElement extends Element implements iElement
 {
 	public $linkActionName;
 	public $redirectURI;
 	public $urlArray;
 	public $params;
-	
-	public function __construct($linkActionName, $performAction = true) {
-		// Object must be instantiated with the named action.
+
+	public function __construct($pageViewReference) {
+
+		$this->pageViewReference = $pageViewReference;
+		
 		// This method detects whether the linkActionName exists in the URI.
 		// By default, it calls the linkAction method if so. 
-		$this->linkActionName = $linkActionName;
 		
 		// Parse the URL.
 		$this->urlArray = parse_url($_SERVER['REQUEST_URI']);
 		// If there's a query string, parse it too.
 		if (isset($this->urlArray['query']))
 			parse_str($this->urlArray['query'], $this->params);
-		
-		//$actionDetected = array_key_exists($linkActionName, $this->params);
-		$actionDetected = false;
-		
-		if (isset($this->params['linkaction'])) {
-			if ($this->params['linkaction'] == $linkActionName) {
-				$actionDetected == true;
-			}
-		}
-		
-		// Default behavior is to perform LinkAction
-		if ($actionDetected && $performAction)
-			$this->linkAction();
-		
 	}
+	
 
 	
 	// This function redirects the user based on class settings or
@@ -56,35 +44,72 @@ abstract class LinkActionController
 	// the $redirectURI class variable.
 	function redirectUser() {
 	
-		$link = '';
+		$uri= '';
 		
 		// By default, URI is current page, sans the linkaction parameter.
 		
 		// If the URI has been set externally, use that. 
 		if (isset($this->redirectURI)) {
-			$link = $this->urlArray['path'].$this->redirectURI;
+			$uri = $this->urlArray['path'].$this->redirectURI;
 		} else {
 			$redirectParams = $this->params;
-			unset($redirectParams[$this->linkActionName]);
+			unset($redirectParams['linkaction']);
 		}
 
 		// If this makes the array empty, Build URL without parameters
 		if (empty($redirectParams)) {
-			$link = $this->urlArray['path'];
+			$uri = $this->urlArray['path'];
 		
 		// Otherwise, build the url with the parameters.
 		} else {
-			$link = $this->urlArray['path'].'?'.http_build_query($redirectParams);
+			$uri = $this->urlArray['path'].'?'.http_build_query($redirectParams);
 		}
 
 		$link = "http://$_SERVER[HTTP_HOST]$uri";
 		header("HTTP/1.1 303 See Other");
 		header('Location: '.$link);
+		
 	}
 	
 	
 	public function linkAction() {
+	// To be customized by children of LinkActionController.
+	// Responsibilities:
 		// Performs any under-the-hood actions specified by the named action.
-		// To be customized by children of LinkActionController.
+
+	
+	}
+	
+	public function objectSetup() {
+		// Post-instantiation actions here.
+	}
+	
+	public function getHTML() {
+		// linkActionName must be set by either the objectSetup method or the instantiating function.
+		// If linkActionName is not set, throw an exception.
+		// Otherwise, execute the action.
+		$this->objectSetup();
+		
+		if (isset($this->linkActionName) == false) {
+			throw new Exception('LinkActionController Exception - linkActionName (string) class variable MUST be set for children of LinkActionController abstract class at time of calling the getHTML() method.');
+		} else {
+
+			$actionDetected = false;
+			
+			if (isset($this->params['linkaction'])) {
+				if ($this->params['linkaction'] == $this->linkActionName) {
+					$actionDetected = true;
+				}
+			}
+			
+			// Default behavior is to perform LinkAction
+			if ($actionDetected == true)  {
+				echo 'debug: action detected by LinkActionController parent';
+				$this->linkAction();
+			}
+		}
+
+		// returns no HTML
+		return '';
 	}
 }

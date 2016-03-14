@@ -22,17 +22,13 @@ class BlogPostToolbarElement extends ToolbarElement
 	var $currentParams = array();
 	var $currentParamsMode;
 
-	public function buildToolHTML() {
+	public function buildToolElement() {
 
 		// Tool's capabilities:
 		// 	publish page
 		//	unpublish page
 		//  Delete page
 		//  recover deleted page
-
-		$editPostLinkHTML = '';
-		$publishHTML = '';
-		$htmlOut = '';
 
 		// Set URL variables common to all tools
 		$thisPageURI = $_SERVER['REQUEST_URI'];
@@ -45,18 +41,30 @@ class BlogPostToolbarElement extends ToolbarElement
 		$this->currentParamsMode = isset($this->currentParams['mode']) ? $this->currentParams['mode'] : '';
 		
 		// Build the edit/cancel edit post tool
-		$htmlOut = $htmlOut.$this->buildEditToolElement();
+		//$htmlOut = $htmlOut.$this->buildEditToolElement();
+		$editToolElement = new Element($this->pageViewReference);
+		$editToolElement->setHTML($this->buildEditToolElementHTML());
+		$this->toolElement->addElement($editToolElement);
 		
 		// If not in edit or urlcheck mode, display a link to publish or unpublish the page.
 		$doDisplayPublishTool = ($this->currentParamsMode != 'edit') && ($this->currentParamsMode != 'urlcheck') && ($this->userCanEdit == true);
 		if ($doDisplayPublishTool) {
-			$htmlOut = $htmlOut.$this->buildPublishToolElement();
+			
+			$publishLinkControlElement = new PublishLinkControlElement($this->pageViewReference);
+			$this->toolElement->addElement($publishLinkControlElement);
+			
+			$unPublishLinkConrolElement = new UnPublishLinkControlElement($this->pageViewReference);
+			$this->toolElement->addElement($unPublishLinkConrolElement);
+			
+			$publishToolElement = new Element($this->pageViewReference);
+			$publishToolElement->setHTML($this->buildPublishToolElementHTML());
+			$this->toolElement->addElement($publishToolElement);
+			
 		}
-
-		return $htmlOut;
+;
 	}
 
-	function buildEditToolElement() {
+	function buildEditToolElementHTML() {
 		
 		$editPostLinkHTML = '';
 		
@@ -103,20 +111,30 @@ HTML;
 		
 		return $editPageToolHTML;
 	}
-	
-	function buildPublishToolElement() {
+
+
+	function buildPublishToolElementHTML() {
 		
+		$linkHTML = '';
+		$linkParams = $this->currentParams;
 		$publishPageToolHTML = '<div class="TE_pagetoolelement">'.PHP_EOL;
-		
+
 		// If page is unpublished, add the option to publish the page.
 		if ($this->pageViewReference->pageIsPublished == false) {
 			$publishedMessage = '<p>This blog post is not yet published.<br>Only you and the site administrator can see it.</p>'.PHP_EOL;
+			$linkParams['linkaction'] = 'publishpage';
+			$link = $this->urlArray['path'].'?'.http_build_query($linkParams);
+			$linkHTML = '<p><a href="'.$link.'"><telink>Publish Page<telink></a></p>';
 		} else {
 		// If page is published, add the option to unpublish the page.
-			$publishedMessage = '<p>This blog post is published, for the whole world too see! How marvelous!</p>'.PHP_EOL;
+			$publishedMessage = '<p>This blog post is published, for the whole world too see!<br> How marvelous!</p>'.PHP_EOL;
+			$linkParams['linkaction'] = 'unpublishpage';
+			$link = $this->urlArray['path'].'?'.http_build_query($linkParams);
+			$linkHTML = '<p><a href="'.$link.'"><telink>Unpublish Page</telink></a></p>';
 		}
 
 		$publishPageToolHTML = $publishPageToolHTML.$publishedMessage.PHP_EOL;
+		$publishPageToolHTML = $publishPageToolHTML.$linkHTML.PHP_EOL;
 		$publishPageToolHTML = $publishPageToolHTML.'</div>'.PHP_EOL;
 		return $publishPageToolHTML;
 	}
