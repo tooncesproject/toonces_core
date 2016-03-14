@@ -9,6 +9,7 @@ class BlogReaderSingle extends Element implements iElement
 	var $query;
 	var $pageId;
 	var $blogPostId;
+	var $blogId;
 
 
 	function queryBlog() {
@@ -38,13 +39,13 @@ class BlogReaderSingle extends Element implements iElement
 		if ($adminSessionActive == true) {
 			// If so, is the user an admin user?
 			if ($this->pageViewReference->sessionManager->userIsAdmin == true) {
-				$sql = $this->adminUserNavQuery($this->blogPostId);
+				$sql = $this->adminUserNavQuery($this->blogPostId, $this->blogId);
 			} else {
 				$userId = $this->pageViewReference->sessionManager->userId;
-				$sql = $this->loggedInUserNavQuery($this->blogPostId, $userId);
+				$sql = $this->loggedInUserNavQuery($this->blogPostId, $userId,$this->blogId);
 			}
 		} else {
-			$sql = $this->guestUserNavQuery($this->blogPostId);
+			$sql = $this->guestUserNavQuery($this->blogPostId,$this->blogId);
 		}
 
 		// Execute the query
@@ -107,6 +108,7 @@ class BlogReaderSingle extends Element implements iElement
 			$createdDT = $row['created_dt'];
 			$body = $row['body'];
 			$this->blogPostId = $row['blog_post_id'];
+			$this->blogId = $row['blog_id'];
 
 		}
 
@@ -128,7 +130,7 @@ class BlogReaderSingle extends Element implements iElement
 
 	}
 
-	function guestUserNavQuery($blogPostID) {
+	function guestUserNavQuery($blogPostID, $blogID) {
 
 		// Query to get the page IDs of the previous and next posts in the blog.
 		$sql = <<<SQL
@@ -154,6 +156,8 @@ class BlogReaderSingle extends Element implements iElement
 					bp.deleted IS NULL
 				AND
 					bp.blog_post_id < %s
+				AND
+					bp.blog_id = %s
 			) prev_post
 		JOIN
 			(
@@ -172,6 +176,8 @@ class BlogReaderSingle extends Element implements iElement
 					bp.deleted IS NULL
 				AND
 					bp.blog_post_id > %s
+				AND
+					bp.blog_id = %s
 			) next_post USING (joiner)
 		LEFT OUTER JOIN
 			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id
@@ -179,13 +185,13 @@ class BlogReaderSingle extends Element implements iElement
 			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
 SQL;
 
-		$sql = sprintf($sql,strval($blogPostID),strval($blogPostID));
+		$sql = sprintf($sql,strval($blogPostID),strval($blogID),strval($blogPostID),strval($blogID));
 
 		return $sql;
 
 	}
 
-	function loggedInUserNavQuery($blogPostID, $userID) {
+	function loggedInUserNavQuery($blogPostID, $userID,$blogID) {
 
 		$sql = <<<SQL
 		SELECT
@@ -207,6 +213,8 @@ SQL;
 				WHERE
 					bp.blog_post_id < %s
 				AND
+					bp.blog_id = %s
+				AND
 				(
 					(bp.published = 1 AND p.published = 1)
 					OR
@@ -227,6 +235,8 @@ SQL;
 				WHERE
 					bp.blog_post_id > %s
 				AND
+					bp.blog_id = %s
+				AND
 				(
 					(bp.published = 1 AND p.published = 1)
 					OR
@@ -239,12 +249,12 @@ SQL;
 			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
 SQL;
 
-		$sql = sprintf($sql,strval($userID),strval($blogPostID),strval($userID),strval($blogPostID));
+		$sql = sprintf($sql,strval($userID),strval($blogPostID),strval($blogID),strval($userID),strval($blogPostID),strval($blogID));
 
 		return $sql;
 	}
 
-	function adminUserNavQuery($blogPostID) {
+	function adminUserNavQuery($blogPostID,$blogID) {
 
 		$sql = <<<SQL
 		SELECT
@@ -263,6 +273,8 @@ SQL;
 					toonces.pages p ON bp.page_id = p.page_id
 				WHERE
 					bp.blog_post_id < %s
+				AND
+					bp.blog_id = %s
 			) prev_post
 		JOIN
 			(
@@ -275,14 +287,16 @@ SQL;
 					toonces.pages p ON bp.page_id = p.page_id
 				WHERE
 					bp.blog_post_id > %s
+				AND
+					bp.blog_id = %s
 			) next_post USING (joiner)
 		LEFT OUTER JOIN
-			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id
+			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id 
 		LEFT OUTER JOIN
 			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
 SQL;
 
-		$sql = sprintf($sql,strval($blogPostID),strval($blogPostID));
+		$sql = sprintf($sql,strval($blogPostID),strval($blogID),strval($blogPostID),strval($blogID));
 
 		return $sql;
 
