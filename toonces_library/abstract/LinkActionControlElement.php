@@ -28,7 +28,7 @@ abstract class LinkActionControlElement extends Element implements iElement
 		$this->pageViewReference = $pageViewReference;
 
 		// This method detects whether the linkActionName exists in the URI.
-		// By default, it calls the linkAction method if so. 
+		// By default, it calls the linkAction method if so.
 
 		// Parse the URL.
 		$this->urlArray = parse_url($_SERVER['REQUEST_URI']);
@@ -48,7 +48,7 @@ abstract class LinkActionControlElement extends Element implements iElement
 
 		// By default, URI is current page, sans the linkaction parameter.
 
-		// If the URI has been set externally, use that. 
+		// If the URI has been set externally, use that.
 		if (isset($this->redirectURI)) {
 			$uri = $this->urlArray['path'].$this->redirectURI;
 		} else {
@@ -103,10 +103,8 @@ abstract class LinkActionControlElement extends Element implements iElement
 			}
 
 			// Default behavior is to perform LinkAction
-			if ($actionDetected == true)  {
-				echo 'debug: action detected by LinkActionController parent';
+			if ($actionDetected == true)
 				$this->linkAction();
-			}
 		}
 
 		// returns no HTML

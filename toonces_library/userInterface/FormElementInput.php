@@ -82,7 +82,6 @@ class FormElementInput
 	}
 
 	public function storeMessage($paramMessage) {
-		//echo 'message var name:'.$this->messageVarName.'<br>';
 		$this->message = $paramMessage;
 		$_SESSION[$this->messageVarName] = $this->message;
 	}
