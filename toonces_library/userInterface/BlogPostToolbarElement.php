@@ -14,7 +14,7 @@ class BlogPostToolbarElement extends ToolbarElement
 
 	// user state
 	var $userCanEdit;
-	
+
 	// utility stuff
 	// Array of this page's parsed URI
 	var $urlArray = array();
@@ -33,61 +33,61 @@ class BlogPostToolbarElement extends ToolbarElement
 		// Set URL variables common to all tools
 		$thisPageURI = $_SERVER['REQUEST_URI'];
 		$this->urlArray = parse_url($thisPageURI);
-		
+
 		if (isset($this->urlArray['query'])) {
 			parse_str($this->urlArray['query'], $this->currentParams);
 		}
-		
+
 		$this->currentParamsMode = isset($this->currentParams['mode']) ? $this->currentParams['mode'] : '';
-		
+
 		// Build the edit/cancel edit post tool
 		//$htmlOut = $htmlOut.$this->buildEditToolElement();
 		$editToolElement = new Element($this->pageViewReference);
 		$editToolElement->setHTML($this->buildEditToolElementHTML());
 		$this->toolElement->addElement($editToolElement);
-		
+
 		// If not in edit or urlcheck mode, display a link to publish or unpublish the page.
 		$doDisplayPublishTool = ($this->currentParamsMode != 'edit') && ($this->currentParamsMode != 'urlcheck') && ($this->userCanEdit == true);
 		if ($doDisplayPublishTool) {
-			
+
 			$publishLinkControlElement = new PublishLinkControlElement($this->pageViewReference);
 			$this->toolElement->addElement($publishLinkControlElement);
-			
+
 			$unPublishLinkConrolElement = new UnPublishLinkControlElement($this->pageViewReference);
 			$this->toolElement->addElement($unPublishLinkConrolElement);
-			
+
 			$publishToolElement = new Element($this->pageViewReference);
 			$publishToolElement->setHTML($this->buildPublishToolElementHTML());
 			$this->toolElement->addElement($publishToolElement);
-			
+
 		}
 ;
 	}
 
 	function buildEditToolElementHTML() {
-		
+
 		$editPostLinkHTML = '';
-		
+
 		if (isset($this->urlArray['query'])) {
 			parse_str($this->urlArray['query'], $linkParams);
 		}
-		
+
 		// Build URL for edit post link
 		$editPostUrlArray = $this->urlArray;
 		$urlPath = $editPostUrlArray['path'];
-		
+
 		// Add parameter
 		$linkParams['mode'] = 'edit';
 		$editPostUrlArray['query'] = http_build_query($linkParams);
 		$editPostURL = $editPostUrlArray['path'].'?'.$editPostUrlArray['query'];
-		
+
 		$editPageToolHTML= <<<HTML
 		<div class="TE_pagetoolelement">
 			<p>Hi. I'm a blog post.</p>
 HTML;
-		
+
 		$editPageToolHTML = $editPageToolHTML.PHP_EOL;
-		
+
 		// If the user has editing privileges, add a blog editing link
 		if ($this->userCanEdit == true) {
 			// If we're in edit mode, make it a 'cancel' link, otherwise an 'edit' link
@@ -106,15 +106,15 @@ HTML;
 			}
 		}
 		$editPageToolHTML = $editPageToolHTML.$editPostLinkHTML;
-		
+
 		$editPageToolHTML = $editPageToolHTML.'</div>'.PHP_EOL;
-		
+
 		return $editPageToolHTML;
 	}
 
 
 	function buildPublishToolElementHTML() {
-		
+
 		$linkHTML = '';
 		$linkParams = $this->currentParams;
 		$publishPageToolHTML = '<div class="TE_pagetoolelement">'.PHP_EOL;
