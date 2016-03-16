@@ -82,6 +82,7 @@ abstract class FormElement extends Element
 		// Destroy the message session variable so it doesn't show when it's not supposed to.
 		unset($_SESSION[$this->messageVarName]);
 	}
+
 	public function buildInputArray() {
 		// This function holds customizations for building the form array.
 		// Its responsibility is to add members to the formArray[] instance variable.

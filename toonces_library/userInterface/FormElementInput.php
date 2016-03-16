@@ -2,14 +2,14 @@
 /*
  * FormElementInput
  * Initial commit: Paul Anderson 1/25/16
- * 
+ *
  * This class holds inputs to be handled by the FormElement class
  * The responsibilities of the inputs are:
  * 		Generate html for the input within the form
  * 		Gather the postdata from the input
  * 		Set the type of the input
  * 		Display input-level responses
- * 
+ *
  */
 
 class FormElementInput
@@ -31,6 +31,7 @@ class FormElementInput
 	public $messageVarName;
 	public $renderSignalVarName;
 	public $hideSignalVarName;
+	public $valueVarName;
 
 	function __construct($paramName,$paramInputType,$paramParentFormName) {
 
@@ -42,6 +43,7 @@ class FormElementInput
 		$this->messageVarName = $this->parentFormName.$this->name.'_inmsg';
 		$this->renderSignalVarName = $this->parentFormName.$this->name.'_rsig';
 		$this->hideSignalVarName = $this->parentFormName.$this->name.'_hsig';
+		$this->valueVarName = $this->parentFormName.$this->name.'_vsig';
 
 		// receive message if exists.
 		if (isset($_SESSION[$this->messageVarName])) {
@@ -64,6 +66,12 @@ class FormElementInput
 			unset($_SESSION[$this->hideSignalVarName]);
 		}
 
+		//receive value signal if exists
+		if (isset($_SESSION[$this->valueVarName])) {
+			$this->formValue = $_SESSION[$this->valueVarName];
+			// Destroy the signal
+			unset($_SESSION[$this->valueVarName]);
+		}
 
 		// Check for post data.
 		if (isset($_POST[$this->name])) {
@@ -74,7 +82,6 @@ class FormElementInput
 	}
 
 	public function storeMessage($paramMessage) {
-		echo 'message var name:'.$this->messageVarName.'<br>';
 		$this->message = $paramMessage;
 		$_SESSION[$this->messageVarName] = $this->message;
 	}
@@ -89,6 +96,11 @@ class FormElementInput
 		$_SESSION[$this->hideSignalVarName] = $this->hideInput;
 	}
 
+	public function storeValue($paramFormValue) {
+		$this->formValue = $paramFormValue;
+		$_SESSION[$this->valueVarName] = $paramFormValue;
+	}
+
 	public function setupForm() {
 
 		// Generate form.
@@ -96,7 +108,7 @@ class FormElementInput
 	}
 
 	// $message is a string to be displayed, optionally
-	// $renderInput is a boolean determining whether to create an input  
+	// $renderInput is a boolean determining whether to create an input
 	// $messageClass is the CSS class of the message, defaults to form_message_notification
 	public function generateForm($renderInput, $message = NULL, $messageClass = NULL) {
 
@@ -117,7 +129,7 @@ class FormElementInput
 			if(isset($this->displayName))
 				$displayNameHTML = '<div class="input_display_name">'.$this->displayName.'</div>';
 
-			if (isset($this->cssClass)) 
+			if (isset($this->cssClass))
 				$classHTML = ' class="'.$this->cssClass.'"';
 
 			if (isset($this->size))
@@ -128,7 +140,7 @@ class FormElementInput
 
 			$this->html = $this->html.$messageHTML.PHP_EOL;
 
- 
+
 			if ($this->renderInput == true)
 				$this->html = $this->html.$displayNameHTML.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
 		}

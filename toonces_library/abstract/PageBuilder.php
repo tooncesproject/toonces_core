@@ -25,6 +25,11 @@ abstract class PageBuilder {
 					$blogToolbarElement = new BlogToolbarElement($this->pageViewReference);
 					$this->toolbarElement = $blogToolbarElement;
 					break;
+				// blog post
+				case 3:
+					$blogPostToolbarElement = new BlogPostToolbarElement($this->pageViewReference);
+					$this->toolbarElement = $blogPostToolbarElement;
+					break;
 				default:
 					$defaultToolbarElement = new DefaultToolbarElement($this->pageViewReference);
 					$this->toolbarElement = $defaultToolbarElement;

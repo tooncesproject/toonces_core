@@ -18,6 +18,8 @@ class PageView extends ViewElement implements iView
 	var $userCanEdit;
 	var $userCanAccessAdminPage;
 	var $pageTypeId;
+	var $urlPath;
+	var $pageIsPublished;
 
 	public function __construct($pageViewPageId) {
 		$this->pageId = $pageViewPageId;
@@ -81,4 +83,3 @@ class PageView extends ViewElement implements iView
 
 }
 
-?>

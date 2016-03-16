@@ -1,22 +1,37 @@
 <?php
 
+require_once ROOTPATH.'/toonces.php';
 
+class CentagonBlogPostSingle extends PageBuilder {
 
-class CentagonBlogPageBuilder1 extends PageBuilder {
-
-	var $displayElement;
+	var $blogPostId;
 
 	function buildPage() {
+
+		$postContent = '';
+		$title = '';
+		$body = '';
 
 		// Check for edit mode signal from GET, and if applicable, check for user access.
 		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
 
-		if ($mode == 'newpost' and $this->pageViewReference->userCanEdit == true) {
-			$blogFormElement = new BlogFormElement($this->pageViewReference);
-			$this->displayElement = $blogFormElement;
-		} else {
-			$blogReader = new BlogPageReader($this->pageViewReference);
-			$this->displayElement = $blogReader;
+		// If user doesn't have editing capability, ignore the mode.
+		if ($this->pageViewReference->userCanEdit == false) {
+			$mode = '';
+		}
+
+		switch ($mode) {
+			case 'edit':
+				$blogEditorFormElement = new BlogEditorFormElement($this->pageViewReference);
+				$this->displayElement = $blogEditorFormElement;
+				break;
+			case 'urlcheck':
+				$urlCheckFormElement = new URLCheckFormElement($this->pageViewReference);
+				$this->displayElement = $urlCheckFormElement;
+				break;
+			default:
+				$blogReaderSingle = new BlogReaderSingle($this->pageViewReference);
+				$this->displayElement = $blogReaderSingle;
 		}
 
 		$this->buildElementArray();
@@ -68,8 +83,4 @@ class CentagonBlogPageBuilder1 extends PageBuilder {
 		array_push($this->elementArray, $footerElement);
 
 	}
-
-
 }
-
-?>

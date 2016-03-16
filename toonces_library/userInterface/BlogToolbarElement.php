@@ -1,9 +1,9 @@
 <?php
 /*
  * BlogToolbarElement
- * 
+ *
  * Initial Commit: Paul Anderson 2/7/2015
- * 
+ *
  */
 
 class BlogToolbarElement extends ToolbarElement
@@ -15,12 +15,15 @@ class BlogToolbarElement extends ToolbarElement
 	// user state
 	var $userCanEdit;
 
-	public function buildToolHTML() {
+	public function buildToolElement() {
 
 		// Tool's capabilities:
 		// 	publish page
 		//	unpublish page
 		//  Create new blog post
+
+		$this->newPostElement = new Element($this->pageViewReference);
+
 
 		$newPostLinkHTML = '';
 
@@ -52,7 +55,8 @@ HTML;
 
 		$htmlOut = $htmlOut.'</div>'.PHP_EOL;
 
-		return $htmlOut;
+		$newPostElement->setHTML($htmlOut);
+		$this->toolElement->addElement($newPostElement);
 	}
 
 }

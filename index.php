@@ -13,20 +13,13 @@
 include 'toonces_library/config.php';
 require_once ROOTPATH.'/toonces.php';
 
+// global variables
+$gBlogDefaultPagebuilder = 'CentagonBlogPostSingle';
+
 $sessionManager = new SessionManager();
 
 $sessionManager->checkSession();
 
-
-// POST receivers
-// receive blog form submission
-// to be deprecated
-$blogid = isset($_POST['blogid']) ? $_POST['blogid'] : '';
-$author = isset($_POST['author']) ? $_POST['author'] : '';
-$title = isset($_POST['title']) ? $_POST['title'] : '';
-$body = isset($_POST['body']) ? $_POST['body'] : '';
-$pageBuilderClass = isset($_POST['pageBuilderClass']) ? $_POST['pageBuilderClass'] : '';
-$thumbnailImageVector = isset($_POST['thumbnailImageVector']) ? $_POST['thumbnailImageVector'] : '';
 
 // Detect blog post data; if exists, create new blog post
 if (isset($_POST['blogid'])) {
@@ -135,7 +128,7 @@ $pageBuilderClass = 'CentagonPageBuilder';
 $pageId = 1;
 
 // Acquire path query from request
-//$path = $_SERVER['REQUEST_URI']; 
+//$path = $_SERVER['REQUEST_URI'];
 $url = $_SERVER['REQUEST_URI'];
 
 // establish SQL connection and query for page
@@ -212,6 +205,10 @@ if ($pageRecord) {
 		// If published, page is public.
 		$allowAccess = 1;
 	}
+
+	// If the user is an admin/root user, set userCanEdit to true
+	if ($sessionManager->userIsAdmin == true)
+		$userCanEdit = true;
 }
 
 // If access state is true, build the page.
@@ -227,6 +224,8 @@ if ($allowAccess == 1) {
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
 $pageView->userCanEdit = $userCanEdit;
+$pageView->urlPath = $path;
+$pageView->pageIsPublished = $published;
 
 // If it's an admin page, pass the user's page access state to the pageView
 if ($adminSessionActive == 1 and $isAdminPage == 1) {
