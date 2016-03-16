@@ -208,16 +208,18 @@ SQL;
 
 			$postPageId = $row['page_id'];
 			$postPageURL = GrabPageURL::getURL($postPageId);
+			if ($row['published'] == '0')
+				$html = $html.'<p><div class="notify_inline">Unpublished</div></p>'.PHP_EOL;
 			$html = $html.'<p><h1><a href="'.$postPageURL.'">'.$row['title'].'</a></h1></p>'.PHP_EOL;
 			$html = $html.'<p><h2>'.$row['author'].'</h2></p>'.PHP_EOL;
 			$html = $html.'<p>'.$row['created_dt'].'</p>'.PHP_EOL;
 			$html = $html.'<p><body>'.$row['body'].'</body></p>'.PHP_EOL;
+			$html = $html.'<br>'.PHP_EOL.'<br>'.PHP_EOL;
 		}
 
 		$html = $html.$this->makeSimpleNavigator($this->postCount);
 		$html = $html.'</div>'.PHP_EOL;
 
-		$this->conn = null;
 		return $html;
 
 	}
