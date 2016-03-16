@@ -291,7 +291,7 @@ SQL;
 					bp.blog_id = %s
 			) next_post USING (joiner)
 		LEFT OUTER JOIN
-			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id 
+			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id
 		LEFT OUTER JOIN
 			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
 SQL;

@@ -1,17 +1,17 @@
 <?php
 /*
  * URLCheckFormElement class
- * 
+ *
  * Initial commit: Paul Anderson, 3/6/2016
- * 
+ *
  * This FormElement class displays when a user changes the title
  * of a blog page.
- * 
+ *
  * It asks the user whether they would like to choose from the following options:
  * 		* Change the title AND the URL
  * 		* Change the title but not the URL
  * 		* Post update without changing URL or nor title
- * 
+ *
  */
 
 class URLCheckFormElement extends FormElement implements iElement

@@ -1,9 +1,9 @@
 <?php
 /*
  * BlogToolbarElement
- * 
+ *
  * Initial Commit: Paul Anderson 2/7/2015
- * 
+ *
  */
 
 class BlogToolbarElement extends ToolbarElement
@@ -21,10 +21,10 @@ class BlogToolbarElement extends ToolbarElement
 		// 	publish page
 		//	unpublish page
 		//  Create new blog post
-		
+
 		$this->newPostElement = new Element($this->pageViewReference);
-		
-		
+
+
 		$newPostLinkHTML = '';
 
 		$urlArray = parse_url($_SERVER['REQUEST_URI']);

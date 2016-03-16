@@ -2,18 +2,18 @@
 /*
  * LinkActionControlElement
  * Initial commit: Paul Anderson, 2013-03-13
- * 
- * This abstract class provides a framework for HTTP GET-based input 
+ *
+ * This abstract class provides a framework for HTTP GET-based input
  * triggering state change in the stack.
- * 
+ *
  * It establishes a PRD-like design pattern for GET calls. It detects a "linkaction" variable
  * in the URL query string and calls any functions expected to be triggered by the named
  * action.
- * 
+ *
  * In order to work, a LinkActionController object must be instantiated in the scope of the
  * link's destination page build. LinkAction responses are not intended to apply in global scope.
  * It also must hold the linkActionName variable specified in the URI.
- * 
+ *
  */
 
 abstract class LinkActionControlElement extends Element implements iElement

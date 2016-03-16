@@ -2,9 +2,9 @@
 /*
  * ToolbarElement
  * Initial Commit Paul Anderson 2.4.2016
- * 
+ *
  * Abstraction for toolbar UI objects.
- * 
+ *
  */
 abstract class ToolbarElement extends ViewElement
 {
@@ -26,7 +26,7 @@ abstract class ToolbarElement extends ViewElement
 		// populate user variables
 		$this->userId = $this->pageViewReference->sessionManager->userId;
 		$this->userNickname = $this->pageViewReference->sessionManager->nickname;
-		$this->userIsAdmin = $this->pageViewReference->sessionManager->userIsAdmin; 
+		$this->userIsAdmin = $this->pageViewReference->sessionManager->userIsAdmin;
 
 		// If the user is admin, can edit defaults to true
 		// Otherwise, refer to the PageView object
@@ -51,7 +51,7 @@ abstract class ToolbarElement extends ViewElement
 
 		$this->toolElement = new ViewElement($this->pageViewReference);
 		$this->buildToolElement();
-		
+
 		$this->addElement($this->toolElement);
 
 	}
@@ -80,12 +80,12 @@ HTML;
 
 	public function buildToolElement() {
 		// abstract. Chilren should overrride this.
-		
+
 		// This element's job is to add elements to the toolElement ViewElement object.
-	
+
 		// The toolElement ViewElement object should already exist once this is
 		// called.
-		
+
 	}
 
 }

@@ -13,7 +13,7 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 	public $updatedBlogPostTitle;
 	public $blogPostId;
 
-	public function checkPathExistence($paramName) { 
+	public function checkPathExistence($paramName) {
 
 		if (isset($this->conn) == false)
 			$this->conn = UniversalConnect::doConnect();
@@ -66,7 +66,7 @@ SQL;
 	public function responseStateHandler($responseState) {
 
 		switch ($responseState) {
-			case 0: 
+			case 0:
 				// If no title change, exit edit mode.
 				$path = '/'.$this->pageViewReference->urlPath;
 				$this->send303($path);
@@ -126,7 +126,7 @@ SQL;
 			// If title is empty, default to the existing title.
 			if (empty($title) == true) {
 				$title = $this->blogPostTitle;
-			} 
+			}
 
 			// If body is empty, nag the user.
 			if (empty($body) == true) {
@@ -141,7 +141,7 @@ SQL;
 
 				$queryParams = array (
 						 ':body' => $body
-						,':blogPostId' => $this->blogPostId 
+						,':blogPostId' => $this->blogPostId
 				);
 
 				$sql = <<<SQL

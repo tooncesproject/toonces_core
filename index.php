@@ -128,7 +128,7 @@ $pageBuilderClass = 'CentagonPageBuilder';
 $pageId = 1;
 
 // Acquire path query from request
-//$path = $_SERVER['REQUEST_URI']; 
+//$path = $_SERVER['REQUEST_URI'];
 $url = $_SERVER['REQUEST_URI'];
 
 // establish SQL connection and query for page
@@ -205,7 +205,7 @@ if ($pageRecord) {
 		// If published, page is public.
 		$allowAccess = 1;
 	}
-	
+
 	// If the user is an admin/root user, set userCanEdit to true
 	if ($sessionManager->userIsAdmin == true)
 		$userCanEdit = true;

@@ -1,9 +1,9 @@
 <?php
 /*
  * BlogPostToolbarElement
- * 
+ *
  * Initial Commit: Paul Anderson 2/21/2015
- * 
+ *
  */
 
 class BlogPostToolbarElement extends ToolbarElement
@@ -27,8 +27,6 @@ class BlogPostToolbarElement extends ToolbarElement
 		// Tool's capabilities:
 		// 	publish page
 		//	unpublish page
-		//  Delete page
-		//  recover deleted page
 
 		// Set URL variables common to all tools
 		$thisPageURI = $_SERVER['REQUEST_URI'];
@@ -41,7 +39,6 @@ class BlogPostToolbarElement extends ToolbarElement
 		$this->currentParamsMode = isset($this->currentParams['mode']) ? $this->currentParams['mode'] : '';
 
 		// Build the edit/cancel edit post tool
-		//$htmlOut = $htmlOut.$this->buildEditToolElement();
 		$editToolElement = new Element($this->pageViewReference);
 		$editToolElement->setHTML($this->buildEditToolElementHTML());
 		$this->toolElement->addElement($editToolElement);
@@ -61,7 +58,7 @@ class BlogPostToolbarElement extends ToolbarElement
 			$this->toolElement->addElement($publishToolElement);
 
 		}
-;
+
 	}
 
 	function buildEditToolElementHTML() {

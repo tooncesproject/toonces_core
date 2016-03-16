@@ -83,4 +83,3 @@ class PageView extends ViewElement implements iView
 
 }
 
-?>

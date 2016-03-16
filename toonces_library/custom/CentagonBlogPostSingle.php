@@ -84,5 +84,3 @@ class CentagonBlogPostSingle extends PageBuilder {
 
 	}
 }
-
-?>
