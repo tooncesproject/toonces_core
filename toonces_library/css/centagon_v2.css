@@ -246,6 +246,11 @@ h3 {
 	padding-top: 26px;
 }
 
+.notify_inline {
+	color: #F00;
+	text-transform: uppercase;
+}
+
 .TE_toolbarelement {
 	color: #C36;
 	font-size: 12px;
