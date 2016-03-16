@@ -1,7 +1,5 @@
 <?php
 
-
-
 class CentagonBlogPageBuilder1 extends PageBuilder {
 
 	var $displayElement;

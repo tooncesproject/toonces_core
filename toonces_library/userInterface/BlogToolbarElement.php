@@ -55,8 +55,8 @@ HTML;
 
 		$htmlOut = $htmlOut.'</div>'.PHP_EOL;
 
-		$newPostElement->setHTML($htmlOut);
-		$this->toolElement->addElement($newPostElement);
+		$this->newPostElement->setHTML($htmlOut);
+		$this->toolElement->addElement($this->newPostElement);
 	}
 
 }
