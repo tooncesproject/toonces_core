@@ -10,6 +10,7 @@ class BlogReaderSingle extends Element implements iElement
 	var $pageId;
 	var $blogPostId;
 	var $blogId;
+	var $createdDT;
 
 
 	function queryBlog() {
@@ -17,7 +18,25 @@ class BlogReaderSingle extends Element implements iElement
 		if (!isset($this->conn))
 			$this->conn = UniversalConnect::doConnect();
 
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_single_blog_post.sql'),$this->pageId);
+		$query = <<<SQL
+		SELECT
+			 bp.created_dt
+			,u.nickname AS author
+			,bp.title
+			,bp.body
+			,bp.page_id
+			,bp.blog_post_id
+			,bp.blog_id
+		FROM
+			toonces.blog_posts bp
+		JOIN
+			toonces.users u USING (user_id)
+		WHERE
+			bp.page_id = %d
+			;
+SQL;
+		
+		$query = sprintf($query,$this->pageId);
 		$result = $this->conn->query($query);
 		return $result;
 
@@ -32,41 +51,168 @@ class BlogReaderSingle extends Element implements iElement
 		$navHTML = '';
 		$previousHTML = '';
 		$nextHTML = '';
+		$userId = 0;
+		$userIsAdmin = false;
 
-		// Is the user logged in?
-		$adminSessionActive = $this->pageViewReference->sessionManager->adminSessionActive;
-
-		if ($adminSessionActive == true) {
-			// If so, is the user an admin user?
-			if ($this->pageViewReference->sessionManager->userIsAdmin == true) {
-				$sql = $this->adminUserNavQuery($this->blogPostId, $this->blogId);
-			} else {
-				$userId = $this->pageViewReference->sessionManager->userId;
-				$sql = $this->loggedInUserNavQuery($this->blogPostId, $userId,$this->blogId);
-			}
-		} else {
-			$sql = $this->guestUserNavQuery($this->blogPostId,$this->blogId);
-		}
-
-		// Execute the query
-		if (!isset($this->conn))
+		if (isset($this->conn) == false)
 			$this->conn = UniversalConnect::doConnect();
 
-		$result = $this->conn->query($sql);
-
-		foreach ($result as $row) {
-			if (isset($row['previous_page_id'])) {
-				$previousPageId = $row['previous_page_id'];
-				$previousPagePath = $row['previous_page_path'];
+		// Is the user logged in? Are they an admin?
+		$adminSessionActive = $this->pageViewReference->sessionManager->adminSessionActive;
+		if ($adminSessionActive) {
+			$userId = $this->pageViewReference->sessionManager->userId;
+			$userIsAdmin = $this->pageViewReference->sessionManager->userIsAdmin;
+		}
+		
+		$queryParams = array(
+				 ':userId' => $userId
+				,':createdDT' => $this->createdDT
+				,':blogPostId' => $this->blogPostId
+		);
+		
+		// Query for previous pages 
+		$sql = <<<SQL
+				SELECT
+			 bp.blog_post_id
+			,p.page_id
+			,GET_PAGE_PATH(p.page_id) AS pagepath
+			,bp.created_dt
+			,CASE WHEN
+				p.published = 1
+				AND
+				bp.published = 1
+				AND
+				bp.deleted IS NULL
+			 THEN 1 ELSE 0 END AS guest_ok
+			,CASE WHEN
+				bp.deleted IS NULL
+				AND
+				(
+					(p.published = 1 AND bp.published = 1)
+					OR
+					pua.page_id IS NOT NULL
+				)
+			 THEN 1 ELSE 0 END AS user_ok
+		FROM
+			blog_posts bp
+		JOIN
+			pages p ON bp.page_id = p.page_id
+		LEFT OUTER JOIN
+			page_user_access pua ON bp.page_id = pua.page_id AND pua.user_id = :userId
+		WHERE
+			bp.created_dt <= :createdDT
+		AND
+			bp.blog_post_id != :blogPostId
+		ORDER BY
+			 bp.created_dt DESC
+			,bp.blog_post_id DESC
+SQL;
+			
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute($queryParams);
+		$prevPageResult = $stmt->fetchAll();
+		
+		
+		foreach ($prevPageResult as $row) {
+			$checkPage = true;
+			// Skip the page if it has the same created timestamp as the one we're on but a higher blog post ID.
+			if ($row['created_dt'] = $this->createdDT && $row['blog_post_id'] > $this->blogPostId)
+				$checkPage = false;
+			
+			if ($checkPage) {
+				// If user is admin, break and exit.
+				if ($userIsAdmin == true) {
+					$previousPagePath = $row['pagepath'];
+					$previousPageId = $row['page_id'];
+					break;
+				}
+				// If user is non-admin but logged in and link is viewable by this user break and exit.
+				if ($userId != 0 and $row['user_ok'] == 1) {
+					$previousPagePath = $row['pagepath'];
+					$previousPageId = $row['page_id'];
+					break;
+				}
+				// If user is guest and link is viewable to guest users, break and exit
+				if ($row['guest_ok'] == 1) {
+					$previousPagePath = $row['pagepath'];
+					$previousPageId = $row['page_id'];
+					break;
+				}
 			}
-
-			if (isset($row['next_page_id'])) {
-				$nextPageId = $row['next_page_id'];
-				$nextPagePath = $row['next_page_path'];
-			}
-
 		}
 
+		// Query for next pages
+		$sql = <<<SQL
+		SELECT
+			 bp.blog_post_id
+			,p.page_id
+			,GET_PAGE_PATH(p.page_id) AS pagepath
+			,bp.created_dt
+			,CASE WHEN
+				p.published = 1
+				AND
+				bp.published = 1
+				AND
+				bp.deleted IS NULL
+			 THEN 1 ELSE 0 END AS guest_ok
+			,CASE WHEN
+				bp.deleted IS NULL
+				AND
+				(
+					(p.published = 1 AND bp.published = 1)
+					OR
+					pua.page_id IS NOT NULL
+				)
+			 THEN 1 ELSE 0 END AS user_ok
+		FROM
+			blog_posts bp
+		JOIN
+			pages p ON bp.page_id = p.page_id
+		LEFT OUTER JOIN
+			page_user_access pua ON bp.page_id = pua.page_id AND pua.user_id = :userId
+		WHERE
+			bp.created_dt >= :createdDT
+		AND
+			bp.blog_post_id != :blogPostId
+		ORDER BY
+			 bp.created_dt ASC
+			,bp.blog_post_id ASC
+SQL;
+			
+		$stmt = $this->conn->prepare($sql);
+		$stmt->execute($queryParams);
+		$nextPageResult = $stmt->fetchAll();
+		
+		foreach ($nextPageResult as $row) {
+			$checkPage = true;
+			// Skip the page if it has the same created timestamp as the one we're on but a higher blog post ID.
+			if ($row['created_dt'] = $this->createdDT && $row['blog_post_id'] < $this->blogPostId)
+				$checkPage = false;
+				
+			if ($checkPage) {
+				// If user is admin, break and exit.
+				if ($userIsAdmin == true) {
+					$nextPagePath = $row['pagepath'];
+					$nextPageId = $row['page_id'];
+					break;
+				}
+				// If user is non-admin but logged in and link is viewable by this user break and exit.
+				if ($userId != 0 and $row['user_ok'] == 1) {
+					$nextPagePath = $row['pagepath'];
+					$nextPageId = $row['page_id'];
+					break;
+				}
+				// If user is guest and link is viewable to guest users, break and exit
+				if ($row['guest_ok'] == 1) {
+					$nextPagePath = $row['page	path'];
+					$nextPageId = $row['page_id'];
+					break;
+				}
+			}
+		}
+		
+
+		
 		// Build navigation html
 		$navHTML = '<div class="bottom_nav_container">'.PHP_EOL;
 
@@ -91,7 +237,6 @@ class BlogReaderSingle extends Element implements iElement
 		$this->pageId = $this->pageViewReference->pageId;
 		$title = '';
 		$author = '';
-		$createdDT = '';
 		$body = '';
 
 		$html = '<div class="blogreader">'.PHP_EOL;
@@ -105,7 +250,7 @@ class BlogReaderSingle extends Element implements iElement
 			$postPageId = $row['page_id'];
 			$title = $row['title'];
 			$author = $row['author'];
-			$createdDT = $row['created_dt'];
+			$this->createdDT = $row['created_dt'];
 			$body = $row['body'];
 			$this->blogPostId = $row['blog_post_id'];
 			$this->blogId = $row['blog_id'];
@@ -117,7 +262,7 @@ class BlogReaderSingle extends Element implements iElement
 
 		$html = $html.'<p><h1>'.$title.'</h1></p>'.PHP_EOL;
 		$html = $html.'<p><h2>'.$author.'</h2></p>'.PHP_EOL;
-		$html = $html.'<p>'.$createdDT.'</p>'.PHP_EOL;
+		$html = $html.'<p>'.$this->createdDT.'</p>'.PHP_EOL;
 		$html = $html.'<p><body>'.$body.'</body></p>'.PHP_EOL;
 
 		$html = $html.'</div>'.PHP_EOL;
@@ -132,6 +277,8 @@ class BlogReaderSingle extends Element implements iElement
 
 	function guestUserNavQuery($blogPostID, $blogID) {
 
+		$createdDtFormatted = date('Y-m-d h:i:s', $this->createdDT);
+		
 		// Query to get the page IDs of the previous and next posts in the blog.
 		$sql = <<<SQL
 		SELECT
@@ -143,7 +290,7 @@ class BlogReaderSingle extends Element implements iElement
 			(
 				SELECT
 					 1 AS joiner
-					,MAX(bp.blog_post_id) AS previous_post_id
+					,bp.blog_post_id AS previous_post_id
 				FROM
 					toonces.blog_posts bp
 				JOIN
@@ -155,9 +302,15 @@ class BlogReaderSingle extends Element implements iElement
 				AND
 					bp.deleted IS NULL
 				AND
-					bp.blog_post_id < %s
+					bp.created_dt <= :createdDT
 				AND
-					bp.blog_id = %s
+					bp.blog_post_id != :blogPostId
+				AND
+					bp.blog_id = :blogId
+				ORDER BY
+					 bp.created_dt DESC
+					,bp.blog_post_id DESC
+				LIMIT 1
 			) prev_post
 		JOIN
 			(
@@ -185,7 +338,7 @@ class BlogReaderSingle extends Element implements iElement
 			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
 SQL;
 
-		$sql = sprintf($sql,strval($blogPostID),strval($blogID),strval($blogPostID),strval($blogID));
+		//$sql = sprintf($sql,strval($blogPostID),strval($blogID),strval($blogPostID),strval($blogID));
 
 		return $sql;
 

@@ -142,7 +142,7 @@ SQL;
 		$blogPostQuery = <<<SQL
 		SELECT
 			 bp.created_dt
-			,bp.author
+			,u.nickname AS author
 			,bp.title
 			,bp.body
 			,pgs.page_id
@@ -151,10 +151,13 @@ SQL;
 			toonces.blog_posts bp
 		JOIN
 			toonces.pages pgs ON bp.page_id = pgs.page_id
+		JOIN
+			toonces.users u ON bp.user_id = u.user_id
 		WHERE
 			bp.blog_post_id IN (%s)
 		ORDER BY
-			created_dt DESC;
+			 created_dt DESC
+			,blog_post_id DESC;
 SQL;
 
 
