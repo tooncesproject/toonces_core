@@ -35,7 +35,7 @@ class BlogReaderSingle extends Element implements iElement
 			bp.page_id = %d
 			;
 SQL;
-		
+
 		$query = sprintf($query,$this->pageId);
 		$result = $this->conn->query($query);
 		return $result;
@@ -63,13 +63,13 @@ SQL;
 			$userId = $this->pageViewReference->sessionManager->userId;
 			$userIsAdmin = $this->pageViewReference->sessionManager->userIsAdmin;
 		}
-		
+
 		$queryParams = array(
 				 ':userId' => $userId
 				,':createdDT' => $this->createdDT
 				,':blogPostId' => $this->blogPostId
 		);
-		
+
 		// Query for previous pages 
 		$sql = <<<SQL
 				SELECT
@@ -107,18 +107,18 @@ SQL;
 			 bp.created_dt DESC
 			,bp.blog_post_id DESC
 SQL;
-			
+
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute($queryParams);
 		$prevPageResult = $stmt->fetchAll();
-		
-		
+
+
 		foreach ($prevPageResult as $row) {
 			$checkPage = true;
 			// Skip the page if it has the same created timestamp as the one we're on but a higher blog post ID.
 			if ($row['created_dt'] = $this->createdDT && $row['blog_post_id'] > $this->blogPostId)
 				$checkPage = false;
-			
+
 			if ($checkPage) {
 				// If user is admin, break and exit.
 				if ($userIsAdmin == true) {
@@ -178,17 +178,17 @@ SQL;
 			 bp.created_dt ASC
 			,bp.blog_post_id ASC
 SQL;
-			
+
 		$stmt = $this->conn->prepare($sql);
 		$stmt->execute($queryParams);
 		$nextPageResult = $stmt->fetchAll();
-		
+
 		foreach ($nextPageResult as $row) {
 			$checkPage = true;
 			// Skip the page if it has the same created timestamp as the one we're on but a higher blog post ID.
 			if ($row['created_dt'] = $this->createdDT && $row['blog_post_id'] < $this->blogPostId)
 				$checkPage = false;
-				
+
 			if ($checkPage) {
 				// If user is admin, break and exit.
 				if ($userIsAdmin == true) {
@@ -204,15 +204,13 @@ SQL;
 				}
 				// If user is guest and link is viewable to guest users, break and exit
 				if ($row['guest_ok'] == 1) {
-					$nextPagePath = $row['page	path'];
+					$nextPagePath = $row['pagepath'];
 					$nextPageId = $row['page_id'];
 					break;
 				}
 			}
 		}
-		
 
-		
 		// Build navigation html
 		$navHTML = '<div class="bottom_nav_container">'.PHP_EOL;
 
@@ -222,12 +220,19 @@ SQL;
 		if ($nextPageId != 0)
 			$nextHTML = '<div class="next_page_link"><a href="'.$nextPagePath.'">Next Post</a></div>'.PHP_EOL;
 
+		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+
+
 		$navHTML = $navHTML.$previousHTML.$nextHTML.'</div>'.PHP_EOL;
+
+		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+		$parentLink = '<div class="bottom_nav_container">'.PHP_EOL.'<div class="parent_page_link"><a href="'.$parentURL.'">Back to the Blog</a></div></div>'.PHP_EOL;
+		$navHTML = $navHTML.$parentLink;
 
 		return $navHTML;
 
-
 	}
+
 
 	public function getHTML() {
 
@@ -275,183 +280,4 @@ SQL;
 
 	}
 
-	function guestUserNavQuery($blogPostID, $blogID) {
-
-		$createdDtFormatted = date('Y-m-d h:i:s', $this->createdDT);
-		
-		// Query to get the page IDs of the previous and next posts in the blog.
-		$sql = <<<SQL
-		SELECT
-			 p1.page_id AS previous_page_id
-			,toonces.GET_PAGE_PATH(COALESCE(p1.page_id, 0)) AS previous_page_path
-			,p2.page_id AS next_page_id
-			,toonces.GET_PAGE_PATH(COALESCE(p2.page_id,0)) AS next_page_path
-		FROM
-			(
-				SELECT
-					 1 AS joiner
-					,bp.blog_post_id AS previous_post_id
-				FROM
-					toonces.blog_posts bp
-				JOIN
-					toonces.pages p USING (page_id)
-				WHERE
-					bp.published = 1
-				AND
-					p.published = 1
-				AND
-					bp.deleted IS NULL
-				AND
-					bp.created_dt <= :createdDT
-				AND
-					bp.blog_post_id != :blogPostId
-				AND
-					bp.blog_id = :blogId
-				ORDER BY
-					 bp.created_dt DESC
-					,bp.blog_post_id DESC
-				LIMIT 1
-			) prev_post
-		JOIN
-			(
-				SELECT
-					 1 AS joiner
-					,MIN(bp.blog_post_id) AS next_post_id
-				FROM
-					toonces.blog_posts bp
-				JOIN
-					toonces.pages p USING (page_id)
-				WHERE
-					bp.published = 1
-				AND
-					p.published = 1
-				AND
-					bp.deleted IS NULL
-				AND
-					bp.blog_post_id > %s
-				AND
-					bp.blog_id = %s
-			) next_post USING (joiner)
-		LEFT OUTER JOIN
-			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id
-		LEFT OUTER JOIN
-			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
-SQL;
-
-		//$sql = sprintf($sql,strval($blogPostID),strval($blogID),strval($blogPostID),strval($blogID));
-
-		return $sql;
-
-	}
-
-	function loggedInUserNavQuery($blogPostID, $userID,$blogID) {
-
-		$sql = <<<SQL
-		SELECT
-			 p1.page_id AS previous_page_id
-			,toonces.GET_PAGE_PATH(COALESCE(p1.page_id, 0)) AS previous_page_path
-			,p2.page_id AS next_page_id
-			,toonces.GET_PAGE_PATH(COALESCE(p2.page_id,0)) AS next_page_path
-		FROM
-			(
-				SELECT
-					 1 AS joiner
-					,MAX(bp.blog_post_id) AS previous_post_id
-				FROM
-					toonces.blog_posts bp
-				JOIN
-					toonces.pages p ON bp.page_id = p.page_id
-				LEFT OUTER JOIN
-					toonces.page_user_access pua ON p.page_id = pua.page_id AND pua.user_id = %s
-				WHERE
-					bp.blog_post_id < %s
-				AND
-					bp.blog_id = %s
-				AND
-				(
-					(bp.published = 1 AND p.published = 1)
-					OR
-					pua.page_id IS NOT NULL
-				)
-			) prev_post
-		JOIN
-			(
-				SELECT
-					 1 AS joiner
-					,MIN(bp.blog_post_id) AS next_post_id
-				FROM
-					toonces.blog_posts bp
-				JOIN
-					toonces.pages p ON bp.page_id = p.page_id
-				LEFT OUTER JOIN
-					toonces.page_user_access pua ON p.page_id = pua.page_id AND pua.user_id = %s
-				WHERE
-					bp.blog_post_id > %s
-				AND
-					bp.blog_id = %s
-				AND
-				(
-					(bp.published = 1 AND p.published = 1)
-					OR
-					pua.page_id IS NOT NULL
-				)
-			) next_post USING (joiner)
-		LEFT OUTER JOIN
-			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id
-		LEFT OUTER JOIN
-			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
-SQL;
-
-		$sql = sprintf($sql,strval($userID),strval($blogPostID),strval($blogID),strval($userID),strval($blogPostID),strval($blogID));
-
-		return $sql;
-	}
-
-	function adminUserNavQuery($blogPostID,$blogID) {
-
-		$sql = <<<SQL
-		SELECT
-			 p1.page_id AS previous_page_id
-			,toonces.GET_PAGE_PATH(COALESCE(p1.page_id, 0)) AS previous_page_path
-			,p2.page_id AS next_page_id
-			,toonces.GET_PAGE_PATH(COALESCE(p2.page_id,0)) AS next_page_path
-		FROM
-			(
-				SELECT
-					 1 AS joiner
-					,MAX(bp.blog_post_id) AS previous_post_id
-				FROM
-					toonces.blog_posts bp
-				JOIN
-					toonces.pages p ON bp.page_id = p.page_id
-				WHERE
-					bp.blog_post_id < %s
-				AND
-					bp.blog_id = %s
-			) prev_post
-		JOIN
-			(
-				SELECT
-					 1 AS joiner
-					,MIN(bp.blog_post_id) AS next_post_id
-				FROM
-					toonces.blog_posts bp
-				JOIN
-					toonces.pages p ON bp.page_id = p.page_id
-				WHERE
-					bp.blog_post_id > %s
-				AND
-					bp.blog_id = %s
-			) next_post USING (joiner)
-		LEFT OUTER JOIN
-			toonces.blog_posts p1 ON prev_post.previous_post_id = p1.blog_post_id
-		LEFT OUTER JOIN
-			toonces.blog_posts p2 ON next_post.next_post_id = p2.blog_post_id;
-SQL;
-
-		$sql = sprintf($sql,strval($blogPostID),strval($blogID),strval($blogPostID),strval($blogID));
-
-		return $sql;
-
-	}
 }
