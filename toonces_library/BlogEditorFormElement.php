@@ -57,7 +57,25 @@ SQL;
 		if (!isset($this->conn))
 			$this->conn = UniversalConnect::doConnect();
 
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_single_blog_post.sql'),$this->pageViewReference->pageId);
+		$query = <<<SQL
+		SELECT
+			 bp.created_dt
+			,u.nickname AS author
+			,bp.title
+			,bp.body
+			,bp.page_id
+			,bp.blog_post_id
+			,bp.blog_id
+		FROM
+			toonces.blog_posts bp
+		JOIN
+			toonces.users u USING (user_id)
+		WHERE
+			bp.page_id = %d
+			;
+SQL;
+
+		$query = sprintf($query,$this->pageViewReference->pageId);
 		$result = $this->conn->query($query);
 		return $result;
 
