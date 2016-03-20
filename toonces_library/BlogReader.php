@@ -38,7 +38,12 @@ class BlogReader implements iElement
 
 	function buildPageIdQuery() {
 
-		$publishedTrigger = '';
+		$pageAccessToken = '';
+		$userId = 0;
+
+		// User logged in?
+		if ($this->pageViewReference->sessionManager->adminSessionActive == true)
+			$userId = $this->pageViewReference->sessionManager->userId;
 
 		if (!isset($this->blogIdString)) {
 
@@ -69,23 +74,32 @@ class BlogReader implements iElement
 				toonces.blog_posts bp
 			JOIN
 				toonces.pages pgs ON bp.page_id = pgs.page_id
+			LEFT OUTER JOIN
+				toonces.page_user_access pua ON pgs.page_id = pua.page_id and pua.user_id = %d
 			WHERE
 				bp.blog_id IN (%s)
 			AND
-				(pgs.published = %s)
+			(
+				(pgs.published = TRUE)
+				OR
+				(%s)
+			)
 			ORDER BY
 				bp.created_dt DESC;
 SQL;
 
-			// If the user is logged in and has editing capabilities,
-			// display all posts. Otherwise, only display published posts.
-			if ($this->pageViewReference->userCanEdit == true) {
-				$publishedTrigger = 'TRUE OR 1 = 1';
+			// if page is published, display post.
+			// If page is not published:
+				// If user is admin, display post.
+				// If user has access, display post.
+
+			if ($this->pageViewReference->sessionManager->userIsAdmin == true) {
+				$pageAccessToken = '1 = 1';
 			} else {
-				$publishedTrigger = 'TRUE';
+				$pageAccessToken = 'pua.page_id IS NOT NULL';
 			}
 
-			$pageIdQuery = sprintf($pageIdQuery,$this->blogIdString,$publishedTrigger);
+			$pageIdQuery = sprintf($pageIdQuery,$userId,$this->blogIdString,$pageAccessToken);
 		}
 
 		return $pageIdQuery;

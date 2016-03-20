@@ -189,13 +189,14 @@ if ($pageRecord) {
 	if ($published == 0) {
 		// Allow access to page if:
 		// user is logged in and page is admin page (defer access to page)
-		if ($adminSessionActive == 1 and  $pageIsAdminPage = 1) {
+		if ($adminSessionActive == 1 and  $isAdminPage == 1) {
 			$allowAccess = 1;
 		}
 		// user is admin
 		if ($sessionManager->userIsAdmin == 1) {
 			$allowAccess = 1;
 		}
+
 		// page isn't necessarily admin page but user is logged in and has access
 		if ($userHasPageAccess == 1) {
 			$allowAccess = 1;
