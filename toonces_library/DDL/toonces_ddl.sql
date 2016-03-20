@@ -538,34 +538,6 @@ DELIMITER ;
 /*************************** TABLES TABLES TABLES ********************************/
 /*************************** TABLES TABLES TABLES ********************************/
 
-/*************** Content Stuff ******************/
-
-DROP TABLE IF EXISTS toonces.blog_posts;
-
-CREATE TABLE toonces.blog_posts (
-     blog_post_id BIGINT NOT NULL AUTO_INCREMENT
-    ,blog_id BIGINT NOT NULL
-    ,page_id BIGINT NOT NULL
-    ,created_dt TIMESTAMP NOT NULL
-    ,modified_dt DATETIME
-    ,deleted TIMESTAMP NULL
-    ,created_by VARCHAR(50)
-    ,author VARCHAR(50)
-    ,user_id BIGINT  NOT NULL
-    ,title VARCHAR(200)
-    ,body TEXT
-    ,thumbnail_image_vector VARCHAR(50)
-    ,published BOOL
-
-    ,PRIMARY KEY (blog_post_id)
-    ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
-    
-);
-
-/* commented out, not compatble with MySQL 5.5 or older
-ALTER TABLE toonces.blog_posts 
-    MODIFY modified_dt datetime DEFAULT CURRENT_TIMESTAMP;
-*/
 
 DROP TABLE IF EXISTS toonces.pages;
 
@@ -588,10 +560,6 @@ CREATE TABLE toonces.pages (
         ,CONSTRAINT fk_pagetype FOREIGN KEY (pagetype_id) REFERENCES toonces.pagetypes (pagetype_id)
 );
 
-/* commented out, not compatble with MySQL 5.5 or older
-ALTER TABlE toonces.pages
-    MODIFY modified_dt datetime ON UPDATE CURRENT_TIMESTAMP;
-*/
 
 DROP TABLE IF EXISTS toonces.page_hierarchy_bridge;
 
@@ -633,8 +601,6 @@ CREATE TABLE toonces.pagetypes (
 );
 
 
-/**************** User, Access & Security Stuff ********************/
-
 DROP TABLE IF EXISTS toonces.users;
 
 CREATE TABLE toonces.users (
@@ -651,6 +617,29 @@ CREATE TABLE toonces.users (
         ,PRIMARY KEY (user_id)
         ,UNIQUE INDEX idx_email (email)
         ,UNIQUE INDEX idx_nickname (nickname)
+);
+
+DROP TABLE IF EXISTS toonces.blog_posts;
+
+CREATE TABLE toonces.blog_posts (
+     blog_post_id BIGINT NOT NULL AUTO_INCREMENT
+    ,blog_id BIGINT NOT NULL
+    ,page_id BIGINT NOT NULL
+    ,created_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt TIMESTAMP NULL
+    ,deleted TIMESTAMP NULL
+    ,user_id BIGINT  NOT NULL
+    ,title VARCHAR(200)
+    ,body TEXT
+    ,thumbnail_image_vector VARCHAR(50)
+    ,published BOOL
+
+    ,PRIMARY KEY (blog_post_id)
+    ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
+    ,CONSTRAINT fk_blog_post_blog FOREIGN KEY (blog_id) REFERENCES blogs (blog_id)
+    ,CONSTRAINT fk_blog_post_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
+    ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
+    
 );
 
 DROP TABLE IF EXISTS toonces.sessions;
