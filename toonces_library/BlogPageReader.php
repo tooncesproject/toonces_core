@@ -63,7 +63,9 @@ class BlogPageReader extends BlogReader implements iElement
 				(%s)
 			)
 		ORDER BY
-			bp.created_dt DESC;
+			 bp.created_dt DESC
+			,bp.blog_post_id DESC
+		;
 SQL;
 
 

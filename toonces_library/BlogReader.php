@@ -85,7 +85,9 @@ class BlogReader implements iElement
 				(%s)
 			)
 			ORDER BY
-				bp.created_dt DESC;
+				 bp.created_dt DESC
+				,bp.blog_post_id DESC
+			;
 SQL;
 
 			// if page is published, display post.
