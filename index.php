@@ -195,8 +195,8 @@ if ($pageRecord) {
 		// user is admin
 		if ($sessionManager->userIsAdmin == 1) {
 			$allowAccess = 1;
-
 		}
+
 		// page isn't necessarily admin page but user is logged in and has access
 		if ($userHasPageAccess == 1) {
 			$allowAccess = 1;

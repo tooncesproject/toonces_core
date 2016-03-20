@@ -18,7 +18,6 @@ class BlogPageReader extends BlogReader implements iElement
 {
 	function buildPageIdQuery() {
 
-		//$publishedTrigger = '';
 		$pageAccessToken = '';
 		$userId = 0;
 
