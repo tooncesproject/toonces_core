@@ -19,7 +19,6 @@ class CentagonBlogPostSingle extends PageBuilder {
 		if ($this->pageViewReference->userCanEdit == false) {
 			$mode = '';
 		}
-
 		switch ($mode) {
 			case 'edit':
 				$blogEditorFormElement = new BlogEditorFormElement($this->pageViewReference);
@@ -28,6 +27,10 @@ class CentagonBlogPostSingle extends PageBuilder {
 			case 'urlcheck':
 				$urlCheckFormElement = new URLCheckFormElement($this->pageViewReference);
 				$this->displayElement = $urlCheckFormElement;
+				break;
+			case 'delete':
+				$deleteBlogPostFormElement = new DeleteBlogPostFormElement($this->pageViewReference);
+				$this->displayElement = $deleteBlogPostFormElement;
 				break;
 			default:
 				$blogReaderSingle = new BlogReaderSingle($this->pageViewReference);
