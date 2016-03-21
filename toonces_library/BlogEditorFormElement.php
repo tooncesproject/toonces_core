@@ -136,6 +136,7 @@ SQL;
 			// Get the input data
 			$titleInput = $this->inputArray['title'];
 			$title = filter_var($titleInput->postData,FILTER_SANITIZE_STRING);
+			$title = htmlspecialchars_decode($title, ENT_QUOTES);
 
 			$bodyInput = $this->inputArray['body'];
 			$body = filter_var($bodyInput->postData,FILTER_SANITIZE_STRING);
