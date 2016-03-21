@@ -231,7 +231,8 @@ SQL;
 				$html = $html.'<p><div class="notify_inline">Unpublished</div></p>'.PHP_EOL;
 			$html = $html.'<p><h1><a href="'.$postPageURL.'">'.$row['title'].'</a></h1></p>'.PHP_EOL;
 			$html = $html.'<p><h2>'.$row['author'].'</h2></p>'.PHP_EOL;
-			$html = $html.'<p>'.$row['created_dt'].'</p>'.PHP_EOL;
+			$created = date('l, F j, Y g:i:s', strtotime($row['created_dt']));
+			$html = $html.'<p>'.$created.'</p>'.PHP_EOL;
 
 			$body = trim(preg_replace('/\n+/', '<br>', $row['body']));
 			$html = $html.'<p><body>'.$body.'</body></p>'.PHP_EOL;
