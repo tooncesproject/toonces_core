@@ -79,6 +79,8 @@ class BlogReader implements iElement
 			WHERE
 				bp.blog_id IN (%s)
 			AND
+				bp.deleted IS NULL
+			AND
 			(
 				(pgs.published = TRUE)
 				OR

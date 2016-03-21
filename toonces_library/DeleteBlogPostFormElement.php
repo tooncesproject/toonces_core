@@ -40,7 +40,7 @@ class DeleteBlogPostFormElement extends FormElement implements iElement
 				// exit delete mode
 				$urlArray = parse_url($_SERVER['REQUEST_URI']);
 				// If there's a query string, parse it too.
-				parse_str($this->urlArray['query'], $params);
+				parse_str($urlArray['query'], $params);
 				unset($params['mode']);
 				if (empty($params) == false)
 					$queryString = '?'.http_build_query($params);
@@ -52,13 +52,36 @@ class DeleteBlogPostFormElement extends FormElement implements iElement
 	}
 	
 	function elementAction() {
-		
+
 		if (isset($this->conn) == false) 
 			$this->conn = UniversalConnect::doConnect();
 		
 		// stupid shit i should refactor
 		if ($this->postState == false) {
+		
+			$queryString = '';
+			// build query to exit delete mode
+			$urlArray = parse_url($_SERVER['REQUEST_URI']);
+			// If there's a query string, parse it too.
+			parse_str($urlArray['query'], $params);
+			unset($params['mode']);
+			if (empty($params) == false)
+				$queryString = '?'.http_build_query($params);
+			
+			$uri = $urlArray['path'].$queryString;
+
+			$html = <<<HTML
+			<div class="content_container">
+			<h2>Delete blog post?</h2>
+			<p>DO YOU REALLY WANT TO?</p>
+			<p><a href="%s">Nah, not really.</a></p>
+			</div>
+HTML;
+			
+			$html = sprintf($html,$uri);
+			
 			$this->generateFormHTML();
+			$this->html = $html.$this->html; 
 		} else {
 			// If there is POST data, validate and evaluate.
 			
