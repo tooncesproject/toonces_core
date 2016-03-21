@@ -255,6 +255,7 @@ SQL;
 			$postPageId = $row['page_id'];
 			$title = $row['title'];
 			$author = $row['author'];
+			$dateFormatted = date('l, F j, Y g:i:s', strtotime($row['created_dt']));
 			$this->createdDT = $row['created_dt'];
 			$body = $row['body'];
 			$this->blogPostId = $row['blog_post_id'];
@@ -267,7 +268,7 @@ SQL;
 
 		$html = $html.'<p><h1>'.$title.'</h1></p>'.PHP_EOL;
 		$html = $html.'<p><h2>'.$author.'</h2></p>'.PHP_EOL;
-		$html = $html.'<p>'.$this->createdDT.'</p>'.PHP_EOL;
+		$html = $html.'<p>'.$dateFormatted.'</p>'.PHP_EOL;
 		$html = $html.'<p><body>'.$body.'</body></p>'.PHP_EOL;
 
 		$html = $html.'</div>'.PHP_EOL;
