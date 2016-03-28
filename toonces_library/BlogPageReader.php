@@ -57,6 +57,8 @@ class BlogPageReader extends BlogReader implements iElement
 		WHERE
 			pgs.page_id = %d
 		AND
+			bp.deleted IS NULL
+		AND
 			(
 				(bpgs.published = TRUE)
 				OR

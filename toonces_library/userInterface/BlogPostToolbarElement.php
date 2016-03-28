@@ -43,7 +43,7 @@ class BlogPostToolbarElement extends ToolbarElement
 		$editToolElement->setHTML($this->buildEditToolElementHTML());
 		$this->toolElement->addElement($editToolElement);
 
-		// If not in edit or urlcheck mode, display a link to publish or unpublish the page.
+		// If not in edit or urlcheck mode, display a link to publish or unpublish the page and the delete tool.
 		$doDisplayPublishTool = ($this->currentParamsMode != 'edit') && ($this->currentParamsMode != 'urlcheck') && ($this->userCanEdit == true);
 		if ($doDisplayPublishTool) {
 
@@ -57,7 +57,12 @@ class BlogPostToolbarElement extends ToolbarElement
 			$publishToolElement->setHTML($this->buildPublishToolElementHTML());
 			$this->toolElement->addElement($publishToolElement);
 
+			$deleteToolElement = new Element($this->pageViewReference);
+			$deleteToolElement->setHTML($this->buildDeleteToolElementHTML());
+			$this->toolElement->addElement($deleteToolElement);
+
 		}
+
 
 	}
 
@@ -134,5 +139,22 @@ HTML;
 		$publishPageToolHTML = $publishPageToolHTML.$linkHTML.PHP_EOL;
 		$publishPageToolHTML = $publishPageToolHTML.'</div>'.PHP_EOL;
 		return $publishPageToolHTML;
+	}
+
+	function buildDeleteToolElementHTML() {
+
+		$linkParams = $this->currentParams;
+		$linkParams['mode'] = 'delete';
+		$link = $this->urlArray['path'].'?'.http_build_query($linkParams);
+		$DeleteToolHTML = <<<HTML
+		<div class="TE_pagetoolelement">
+			<p>Do you hate this blog post? You can delete it.</p> 
+			<p><a href="%s"><telink>Delete post.</telink></a></p>
+		</div>
+HTML;
+
+		$DeleteToolHTML = sprintf($DeleteToolHTML,$link);
+
+		return $DeleteToolHTML;
 	}
 }
