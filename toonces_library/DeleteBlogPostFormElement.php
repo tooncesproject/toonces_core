@@ -10,26 +10,26 @@
 
 class DeleteBlogPostFormElement extends FormElement implements iElement
 {
-	
+
 	function buildInputArray() {
-		
+
 		$confirmationInput = new FormElementInput('confirmation', 'text', $this->formName);
 		$this->inputArray['confirmation'] = $confirmationInput;
 		$confirmationInput->displayName = 'Type "YES" (case sensitive) if you\'re sure you want to delete this blog post.';
 		$confirmationInput->setupForm();
-		
+
 		$submitInput = new FormElementInput('Submit', 'submit', $this->formName);
 		$submitInput->formValue = $this->submitName;
 		$submitInput->setupForm();
 		$this->inputArray['submit'] = $submitInput;
-		
+
 	}
-	
+
 	function responseStateHandler($responseState) {
-		
+
 		$params = array();
 		$queryString = '';
-		
+
 		switch ($responseState) {
 			case 1:
 				// If the post was deleted, go to its parent page.
@@ -45,20 +45,20 @@ class DeleteBlogPostFormElement extends FormElement implements iElement
 				if (empty($params) == false)
 					$queryString = '?'.http_build_query($params);
 				$uri = $urlArray['path'].$queryString;
-				
+
 				$this->send303($uri);
-				
+
 		}
 	}
-	
+
 	function elementAction() {
 
 		if (isset($this->conn) == false) 
 			$this->conn = UniversalConnect::doConnect();
-		
+
 		// stupid shit i should refactor
 		if ($this->postState == false) {
-		
+
 			$queryString = '';
 			// build query to exit delete mode
 			$urlArray = parse_url($_SERVER['REQUEST_URI']);
@@ -67,24 +67,23 @@ class DeleteBlogPostFormElement extends FormElement implements iElement
 			unset($params['mode']);
 			if (empty($params) == false)
 				$queryString = '?'.http_build_query($params);
-			
+
 			$uri = $urlArray['path'].$queryString;
 
 			$html = <<<HTML
-			<div class="content_container">
+			<div class="copy_block">
 			<h2>Delete blog post?</h2>
 			<p>DO YOU REALLY WANT TO?</p>
 			<p><a href="%s">Nah, not really.</a></p>
-			</div>
 HTML;
-			
+
 			$html = sprintf($html,$uri);
-			
+
 			$this->generateFormHTML();
-			$this->html = $html.$this->html; 
+			$this->html = $html.$this->html.'</div>'.PHP_EOL; 
 		} else {
 			// If there is POST data, validate and evaluate.
-			
+
 			if ($this->inputArray['confirmation']->postData == 'YES') {
 				// Soft-delete the blog post.
 				$sql = <<<SQL
@@ -96,7 +95,7 @@ HTML;
 SQL;
 				$sql = sprintf($sql,$this->pageViewReference->pageId);
 				$this->conn->query($sql);
-				
+
 				// Unpublish the page.
 				$sql = <<<SQL
 				UPDATE pages
@@ -105,25 +104,22 @@ SQL;
 SQL;
 				$sql = sprintf($sql, $this->pageViewReference->pageId);
 				$this->conn->query($sql);
-				
+
 				$this->responseStateHandler(1);
 			} else {
 				//If YES not typed, this will exit edit mode.
 				$this->responseStateHandler(0);
 			}
-			
-			
 		}
-			
-		
+
 	}
-	
+
 	public function objectSetup() {
-	
+
 		$this->htmlHeader = '<div class="form_element>';
 		$this->htmlFooter = '</div>';
 		$this->formName = 'deleteBlogPostForm';
-	
+
 		$this->submitName = 'Submit';
 		// Instantiate input objects
 		$this->buildInputArray();
@@ -131,7 +127,7 @@ SQL;
 		foreach ($this->inputArray as $input) {
 			if ($input->postState == true)
 				$this->postState = true;
-	
+
 		}
 	}
 }
