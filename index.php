@@ -161,7 +161,7 @@ $userHasPageAccess = 0;
 
 // get sql query
 $query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$userId,$pageId);
-//die($query);
+
 $pageRecord = $conn->query($query);
 
 if ($pageRecord) {
