@@ -85,17 +85,23 @@ HTML;
 			// If there is POST data, validate and evaluate.
 
 			if ($this->inputArray['confirmation']->postData == 'YES') {
-				// Soft-delete the blog post.
+				// Soft-delete the blog post and its accompanying page
 				$sql = <<<SQL
-				UPDATE blog_posts
-				SET 
-					 deleted = CURRENT_TIMESTAMP()
-					,published = 0
-				WHERE page_id = %d
+				UPDATE
+					blog_posts bp
+				JOIN
+					pages p ON bp.page_id = p.page_id 
+				SET
+					 bp.deleted = CURRENT_TIMESTAMP()
+					,bp.published = 0
+					,p.published = 0
+					,p.deleted = CURRENT_TIMESTAMP()
+				WHERE bp.page_id = %d
 SQL;
 				$sql = sprintf($sql,$this->pageViewReference->pageId);
 				$this->conn->query($sql);
 
+				/*
 				// Unpublish the page.
 				$sql = <<<SQL
 				UPDATE pages
@@ -104,7 +110,7 @@ SQL;
 SQL;
 				$sql = sprintf($sql, $this->pageViewReference->pageId);
 				$this->conn->query($sql);
-
+				*/
 				$this->responseStateHandler(1);
 			} else {
 				//If YES not typed, this will exit edit mode.
