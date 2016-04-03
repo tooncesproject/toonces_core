@@ -94,6 +94,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 		//if not found, query deepest page for whether it allows a redirect
 		$query = 'SELECT redirect_on_error FROM toonces.pages WHERE page_id = '.$pageid;
 		$result = $conn->query($query);
+
 		foreach($result as $row) {
 			$redirectOnError = $row['redirect_on_error'];
 		}
@@ -160,6 +161,7 @@ $userHasPageAccess = 0;
 
 // get sql query
 $query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$userId,$pageId);
+
 $pageRecord = $conn->query($query);
 
 if ($pageRecord->rowCount() > 0) {
