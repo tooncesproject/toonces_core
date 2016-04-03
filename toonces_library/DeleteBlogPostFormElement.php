@@ -101,16 +101,6 @@ SQL;
 				$sql = sprintf($sql,$this->pageViewReference->pageId);
 				$this->conn->query($sql);
 
-				/*
-				// Unpublish the page.
-				$sql = <<<SQL
-				UPDATE pages
-				SET published = 0
-				WHERE page_id = %d
-SQL;
-				$sql = sprintf($sql, $this->pageViewReference->pageId);
-				$this->conn->query($sql);
-				*/
 				$this->responseStateHandler(1);
 			} else {
 				//If YES not typed, this will exit edit mode.

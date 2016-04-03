@@ -20,12 +20,6 @@ $sessionManager = new SessionManager();
 
 $sessionManager->checkSession();
 
-
-// Detect blog post data; if exists, create new blog post
-if (isset($_POST['blogid'])) {
-	$blogPoster = new BlogPoster($blogid, $author, $title, $body, $pageBuilderClass, $thumbnailImageVector);
-}
-
 // session stuff
 
 // $loginSuccess = 0;
