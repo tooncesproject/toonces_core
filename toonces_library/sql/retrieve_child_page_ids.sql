@@ -7,5 +7,3 @@ LEFT JOIN
 	toonces.pages pg on pg.page_id = phb.descendant_page_id
 WHERE
 	phb.page_id = %d
-AND
-	deleted IS NULL

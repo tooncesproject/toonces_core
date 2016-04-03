@@ -8,6 +8,7 @@ SELECT
     ,p.css_stylesheet
     ,p.published
     ,p.pagetype_id
+    ,p.deleted
     ,CASE 
         WHEN pua.page_id IS NOT NULL THEN 1
         ELSE 0

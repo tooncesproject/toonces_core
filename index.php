@@ -158,6 +158,7 @@ $pageLinkText = '';
 $published = 0;
 $isAdminPage = 0;
 $pageTypeId = 0;
+$pageIsDeleted = false;
 
 // user state
 $allowAccess = 0;
@@ -166,7 +167,7 @@ $userHasPageAccess = 0;
 
 // get sql query
 $query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$userId,$pageId);
-
+//die($query);
 $pageRecord = $conn->query($query);
 
 if ($pageRecord) {
@@ -182,31 +183,34 @@ if ($pageRecord) {
 		$pageTypeId = $result['pagetype_id'];
 		$userHasPageAccess = $result['user_has_access'];
 		$userCanEdit = $result['can_edit'];
+		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
 
 	// Manage access.
-	// Is the page unpublished?
-	if ($published == 0) {
-		// Allow access to page if:
-		// user is logged in and page is admin page (defer access to page)
-		if ($adminSessionActive == 1 and  $isAdminPage == 1) {
-			$allowAccess = 1;
-		}
-		// user is admin
-		if ($sessionManager->userIsAdmin == 1) {
-			$allowAccess = 1;
-		}
+	// Is the page deleted?
+	if ($pageIsDeleted == false) {
+		// Is the page unpublished?
+		if ($published == 0) {
+			// Allow access to page if:
+			// user is logged in and page is admin page (defer access to page)
+			if ($adminSessionActive == 1 and  $isAdminPage == 1) {
+				$allowAccess = 1;
+			}
+			// user is admin
+			if ($sessionManager->userIsAdmin == 1) {
+				$allowAccess = 1;
+			}
 
-		// page isn't necessarily admin page but user is logged in and has access
-		if ($userHasPageAccess == 1) {
+			// page isn't necessarily admin page but user is logged in and has access
+			if ($userHasPageAccess == 1) {
+				$allowAccess = 1;
+			}
+
+		} else {
+			// If published, page is public.
 			$allowAccess = 1;
 		}
-
-	} else {
-		// If published, page is public.
-		$allowAccess = 1;
 	}
-
 	// If the user is an admin/root user, set userCanEdit to true
 	if ($sessionManager->userIsAdmin == true)
 		$userCanEdit = true;
