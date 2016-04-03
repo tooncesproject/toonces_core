@@ -81,6 +81,8 @@ class BlogReader implements iElement
 			AND
 				bp.deleted IS NULL
 			AND
+				pgs.deleted IS NULL
+			AND
 			(
 				(pgs.published = TRUE)
 				OR

@@ -59,6 +59,8 @@ class BlogPageReader extends BlogReader implements iElement
 		AND
 			bp.deleted IS NULL
 		AND
+			bpgs.deleted IS NULL
+		AND
 			(
 				(bpgs.published = TRUE)
 				OR
