@@ -154,7 +154,8 @@ SQL;
 			$title = htmlspecialchars_decode($title, ENT_QUOTES);
 
 			$bodyInput = $this->inputArray['body'];
-			$body = filter_var($bodyInput->postData,FILTER_SANITIZE_STRING);
+			$body = $bodyInput->postData;
+			$body = htmlspecialchars_decode($body, ENT_QUOTES);
 
 			// Validate input data: Pass if neither is empty and if the name doesn't exist.
 			if (empty($title) == true) {

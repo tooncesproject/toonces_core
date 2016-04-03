@@ -260,12 +260,13 @@ SQL;
 		}
 
 		// process strings
+		$body = htmlspecialchars($body, ENT_QUOTES);
 		$body = trim(preg_replace('/\n+/', '<br>', $body));
 
-		$html = $html.'<p><h1>'.$title.'</h1></p>'.PHP_EOL;
-		$html = $html.'<p><h2>'.$author.'</h2></p>'.PHP_EOL;
+		$html = $html.'<p><h1>'.htmlspecialchars($title, ENT_QUOTES).'</h1></p>'.PHP_EOL;
+		$html = $html.'<p><h2>'.htmlspecialchars($author, ENT_QUOTES).'</h2></p>'.PHP_EOL;
 		$html = $html.'<p>'.$dateFormatted.'</p>'.PHP_EOL;
-		$html = $html.'<p><body>'.$body.'</body></p>'.PHP_EOL;
+		$html = $html.'<p>'.$body.'</p>'.PHP_EOL;
 
 		$html = $html.'</div>'.PHP_EOL;
 
