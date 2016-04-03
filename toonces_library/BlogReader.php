@@ -233,12 +233,14 @@ SQL;
 			$postPageURL = GrabPageURL::getURL($postPageId);
 			if ($row['published'] == '0')
 				$html = $html.'<p><div class="notify_inline">Unpublished</div></p>'.PHP_EOL;
-			$html = $html.'<p><h1><a href="'.$postPageURL.'">'.$row['title'].'</a></h1></p>'.PHP_EOL;
-			$html = $html.'<p><h2>'.$row['author'].'</h2></p>'.PHP_EOL;
+			$title = htmlspecialchars($row['title'], ENT_QUOTES);
+			$html = $html.'<p><h1><a href="'.$postPageURL.'">'.$title.'</a></h1></p>'.PHP_EOL;
+			$author = htmlspecialchars($row['author'], ENT_QUOTES);
+			$html = $html.'<p><h2>'.$author.'</h2></p>'.PHP_EOL;
 			$created = date('l, F j, Y g:i:s', strtotime($row['created_dt']));
 			$html = $html.'<p>'.$created.'</p>'.PHP_EOL;
-
-			$body = trim(preg_replace('/\n+/', '<br>', $row['body']));
+			$body = htmlspecialchars($row['body'], ENT_QUOTES);
+			$body = trim(preg_replace('/\n+/', '<br>', $body));
 			$html = $html.'<p><body>'.$body.'</body></p>'.PHP_EOL;
 
 			$html = $html.'<br>'.PHP_EOL.'<br>'.PHP_EOL;

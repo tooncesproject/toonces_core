@@ -12,6 +12,7 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 
 	public $updatedBlogPostTitle;
 	public $blogPostId;
+	public $checkBlogPostTitle;
 
 	public function checkPathExistence($paramName) {
 
@@ -119,7 +120,8 @@ SQL;
 		$result = $this->queryBlog();
 		foreach($result as $row) {
 
-			$this->blogPostTitle = $row['title'];
+			$this->checkBlogPostTitle = $row['title'];
+			$this->blogPostTitle = htmlspecialchars($this->checkBlogPostTitle, ENT_QUOTES);
 			$this->textareaValue = $row['body'];
 			$this->blogPostId = $row['blog_post_id'];
 
@@ -139,7 +141,8 @@ SQL;
 			$title = htmlspecialchars_decode($title, ENT_QUOTES);
 
 			$bodyInput = $this->inputArray['body'];
-			$body = filter_var($bodyInput->postData,FILTER_SANITIZE_STRING);
+			$body = $bodyInput->postData;
+			$body = htmlspecialchars_decode($body, ENT_QUOTES);
 
 			// Validate input data:
 			// If title is empty, default to the existing title.
@@ -176,7 +179,7 @@ SQL;
 				// Otherwise, check for pathname existence.
 					// If path doesn't exist: state 1 (Check for URL change)
 					// If it does: state 2 (error and retry)
-				if ($title == $this->blogPostTitle) {
+				if ($title == $this->checkBlogPostTitle) {
 					$this->responseStateHandler(0);
 				} else if ($this->checkPathExistence($title) == false) {
 					$this->updatedBlogPostTitle = $title;
