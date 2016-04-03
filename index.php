@@ -164,7 +164,7 @@ $query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$use
 
 $pageRecord = $conn->query($query);
 
-if ($pageRecord) {
+if ($pageRecord->rowCount() > 0) {
 	foreach ($pageRecord as $result) {
 		$pagePathName = $result['pathname'];
 		$pageStyleSheet = $result['css_stylesheet'];
