@@ -550,8 +550,9 @@ CREATE TABLE toonces.pages (
     ,pageview_class VARCHAR(50) NOT NULL
     ,css_stylesheet VARCHAR(100) NOT NULL
     ,created_by VARCHAR(50)
-    ,created_dt TIMESTAMP NOT NULL
-    ,modified_dt DATETIME
+    ,created_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
+    ,deleted TIMESTAMP NULL
     ,redirect_on_error BOOL
     ,published BOOL
     ,pagetype_id BIGINT    NOT NULL DEFAULT 0
@@ -626,7 +627,7 @@ CREATE TABLE toonces.blog_posts (
     ,blog_id BIGINT NOT NULL
     ,page_id BIGINT NOT NULL
     ,created_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt TIMESTAMP NULL
+    ,modified_dt TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
     ,deleted TIMESTAMP NULL
     ,user_id BIGINT  NOT NULL
     ,title VARCHAR(200)

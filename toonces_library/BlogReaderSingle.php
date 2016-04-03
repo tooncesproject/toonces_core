@@ -81,17 +81,11 @@ SQL;
 				p.published = 1
 				AND
 				bp.published = 1
-				AND
-				bp.deleted IS NULL
 			 THEN 1 ELSE 0 END AS guest_ok
 			,CASE WHEN
-				bp.deleted IS NULL
-				AND
-				(
-					(p.published = 1 AND bp.published = 1)
-					OR
-					pua.page_id IS NOT NULL
-				)
+				(p.published = 1 AND bp.published = 1)
+				OR
+				pua.page_id IS NOT NULL
 			 THEN 1 ELSE 0 END AS user_ok
 		FROM
 			blog_posts bp
@@ -103,6 +97,10 @@ SQL;
 			bp.created_dt <= :createdDT
 		AND
 			bp.blog_post_id != :blogPostId
+		AND
+			bp.deleted IS NULL
+		AND
+			p.deleted IS NULL
 		ORDER BY
 			 bp.created_dt DESC
 			,bp.blog_post_id DESC
@@ -152,17 +150,11 @@ SQL;
 				p.published = 1
 				AND
 				bp.published = 1
-				AND
-				bp.deleted IS NULL
 			 THEN 1 ELSE 0 END AS guest_ok
 			,CASE WHEN
-				bp.deleted IS NULL
-				AND
-				(
-					(p.published = 1 AND bp.published = 1)
-					OR
-					pua.page_id IS NOT NULL
-				)
+				(p.published = 1 AND bp.published = 1)
+				OR
+				pua.page_id IS NOT NULL
 			 THEN 1 ELSE 0 END AS user_ok
 		FROM
 			blog_posts bp
@@ -174,6 +166,10 @@ SQL;
 			bp.created_dt >= :createdDT
 		AND
 			bp.blog_post_id != :blogPostId
+		AND
+			bp.deleted IS NULL
+		AND
+			p.deleted IS NULL
 		ORDER BY
 			 bp.created_dt ASC
 			,bp.blog_post_id ASC
