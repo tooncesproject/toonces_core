@@ -113,11 +113,8 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 
 // set default properties for view renderer setter methods
 $pageTitle = 'eff';
-$styleSheet = '/toonces_library/css/centagon_v1.css';
-$htmlHeader = file_get_contents(ROOTPATH.'/static_data/generic_html_header.html');
-$htmlFooter = file_get_contents(ROOTPATH.'/static_data/generic_html_header.html');
+$styleSheet = 'centagon_v2.css';
 $pageViewClass = 'PageView';
-$pageBuilderClass = 'CentagonPageBuilder';
 
 $pageId = 1;
 
@@ -142,8 +139,6 @@ if (trim($path))
 
 // Default content state for page access is 404.
 $pathName = '';
-$styleSheet = ''; // Have a default stylesheet?
-$pageViewClass = 'PageView';
 $pageBuilderClass = 'FourOhFour';
 $pageTitle = '';
 $pageLinkText = '';
