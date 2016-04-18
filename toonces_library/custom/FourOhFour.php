@@ -15,7 +15,7 @@ class FourOhFour extends PageBuilder {
 	private $containerHTML;
 	private $bodyHTML;
 	var $view;
-	
+
 	function getElementArray() {
 		return $elementArray;
 	}
@@ -25,30 +25,30 @@ class FourOhFour extends PageBuilder {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
 		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
-		
+
 		array_push($this->elementArray, $htmlHeaderElement);
-		
+
 		$headElement = new HeadElement($this->pageViewReference);
-		
+
 		// get head attributes
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-		
+
 		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
-		
+
 		array_push($this->elementArray, $headElement);
-		
+
 
 		$footerElement = new Element($this->pageViewReference);
-		
+
 		$headerElement = new Element($this->pageViewReference);
-		
+
 		$headerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/body_test.html'));
-		
+
 		array_push($this->elementArray, $headerElement);
-		
+
 		$contentElement = new Element($this->pageViewReference);
-		
+
 		// Content element HTML
 		$HTML = <<<HTML
 		<div class="copy_block">
@@ -59,23 +59,18 @@ class FourOhFour extends PageBuilder {
 				<iframe width="420" height="315" src="https://www.youtube.com/embed/NjVugzSR7HA" frameborder="0" allowfullscreen></iframe>
 		</div>
 HTML;
-		
+
 		$contentElement->setHTML($HTML);
 		array_push($this->elementArray, $contentElement);
 
-		$videoElement = new Element($this->pageViewReference);
-		
-		$videoElement->setHTML('<div class="copy_block"><iframe width="420" height="315" src="https://www.youtube.com/embed/NjVugzSR7HA" frameborder="0" allowfullscreen></iframe></div>');
-		//array_push($this->elementArray, $videoElement);
-		
 		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/real_footer_ish.html'));
-		
+
 		array_push($this->elementArray, $footerElement);
 
 		return $this->elementArray;
-		
+
 	}
-	
+
 }
 
 ?>

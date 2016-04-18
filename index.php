@@ -114,10 +114,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 // set default properties for view renderer setter methods
 $pageTitle = 'eff';
 $styleSheet = 'centagon_v2.css';
-//$htmlHeader = file_get_contents(ROOTPATH.'/static_data/generic_html_header.html');
-//$htmlFooter = file_get_contents(ROOTPATH.'/static_data/generic_html_header.html');
 $pageViewClass = 'PageView';
-$pageBuilderClass = 'CentagonPageBuilder';
 
 $pageId = 1;
 
