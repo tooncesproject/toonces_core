@@ -3,12 +3,6 @@
 class CreateUserFormElement extends FormElement implements iElement
 {
 
-	// Inherited variables commented out
-	// var $html;
-	// var $htmlHeader;
-	// var $htmlFooter;
-	// var $pageViewReference;
-	// private $success;
 	private $email;
 	private $firstName;
 	private $lastName;
@@ -202,8 +196,6 @@ HTML;
 
 	public function objectSetup() {
 
-		$this->htmlHeader = '<div class="form_element>';
-		$this->htmlFooter = '</div>';
 		$this->formName = 'createUserForm';
 
 		$this->submitName = 'Create User';

@@ -1,8 +1,5 @@
 <?php
 
-//include_once ROOTPATH.'/admin/AdminViewElement.php';
-include_once ROOTPATH.'/admin/AdminToolBuilder.php';
-
 class UserAdminPageBuilder extends AdminPageBuilder
 {
 	// Instance variables

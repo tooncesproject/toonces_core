@@ -1,9 +1,6 @@
 <?php
 require_once ROOTPATH.'/toonces.php';
 
-// Admin tools includes
-include_once ROOTPATH.'/admin/AdminHomeBuilder.php';
-include_once ROOTPATH.'/admin/AdminViewElement.php';
 
 abstract class AdminPageBuilder extends PageBuilder
 {
@@ -113,6 +110,8 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		// Add admin nav element to body element
 		$adminNavElement = new AdminNavElement($this->pageViewReference);
+		$adminNavElement->htmlHeader = '<div class="copy_block">';
+		$adminNavElement->htmlFooter = '</div>';
 		$bodyElement->addElement($adminNavElement);
 
 		if (!isset($this->toolElement)) {

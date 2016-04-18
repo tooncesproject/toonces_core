@@ -10,16 +10,7 @@ include_once ROOTPATH.'/HeadElement.php';
 include_once ROOTPATH.'/PageView.php';
 
 class FourOhFour extends PageBuilder {
-	/*
-	var $elementArray = array();
-	private $containerHTML;
-	private $bodyHTML;
-	var $view;
 
-	function getElementArray() {
-		return $elementArray;
-	}
-	*/
 	function buildPage() {
 
 		// get static/generic html header, create as element
@@ -37,9 +28,6 @@ class FourOhFour extends PageBuilder {
 		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
 
 		array_push($this->elementArray, $headElement);
-
-
-		$footerElement = new Element($this->pageViewReference);
 
 		$headerElement = new Element($this->pageViewReference);
 
@@ -62,6 +50,8 @@ HTML;
 
 		$contentElement->setHTML($HTML);
 		array_push($this->elementArray, $contentElement);
+		
+		$footerElement = new Element($this->pageViewReference);
 
 		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/real_footer_ish.html'));
 

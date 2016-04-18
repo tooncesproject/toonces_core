@@ -37,6 +37,8 @@ class CentagonBlogPostBuilder extends PageBuilder {
 
 		$blogFormElement->blogId = '1';
 		$blogFormElement->pageBuilderClass = 'CentagonBlogPageBuilder1';
+		$blogFormElement->htmlHeader = '<div class="copy_block">';
+		$blogFormElement->htmlFooter = '</div>';
 
 		array_push($this->elementArray, $blogFormElement);
 

@@ -72,7 +72,7 @@ class CentagonBlogPostSingle extends PageBuilder {
 
 		// After the toolbar,add the header element
 		$pageHeader = new Element($this->pageViewReference);
-		$pageHeader->setHTML(file_get_contents(ROOTPATH.'/static_data/centagon_header.html'));
+		$pageHeader->setHTML(file_get_contents(ROOTPATH.'/static_data/body_test.html'));
 		array_push($this->elementArray, $pageHeader);
 
 		$pageId = $this->pageViewReference->pageId;

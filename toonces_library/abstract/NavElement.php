@@ -18,6 +18,9 @@ abstract class NavElement extends Element implements iElement
 		$html = $html.$this->buildLinkHierarchy(0);
 		
 		$html = $html.'</div>';
+
+		//add header and footer
+		$html = $this->htmlHeader.PHP_EOL.$html.PHP_EOL.$this->htmlFooter;
 		return $html;
 	}
 

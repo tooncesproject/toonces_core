@@ -193,7 +193,7 @@ SQL;
 
 	public function objectSetup() {
 
-		$this->htmlHeader = '<div class="form_element>';
+		$this->htmlHeader = '<div class="copy_block">';
 		$this->htmlFooter = '</div>';
 		$this->formName = 'blogPostForm';
 
