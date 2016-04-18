@@ -11,11 +11,6 @@ require_once ROOTPATH.'/toonces.php';
 
 abstract class FormElement extends Element
 {
-	// Inherited variables commented out
-	// var $html;
-	// var $htmlHeader;
-	// var $htmlFooter;
-	// var $pageViewReference;
 
 	// Abstract variables:
 
@@ -113,8 +108,6 @@ abstract class FormElement extends Element
 
 
 	public function objectSetup() {
-		$this->htmlHeader = '<div class="form_element>';
-		$this->htmlFooter = '</div>';
 
 		// Instantiate input objects
 		$this->buildInputArray();
