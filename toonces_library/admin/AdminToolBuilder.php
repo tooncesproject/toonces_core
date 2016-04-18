@@ -1,6 +1,5 @@
 <?php
 
-include_once ROOTPATH.'/admin/AdminViewElement.php';
 class AdminToolBuilder extends PageBuilder
 {
 	// Instance variables

@@ -1,6 +1,5 @@
 <?php
 
-include_once ROOTPATH.'/admin/AdminToolBuilder.php';
 
 class CreateUserAdminPageBuilder extends AdminPageBuilder
 {
