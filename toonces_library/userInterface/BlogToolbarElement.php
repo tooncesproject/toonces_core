@@ -67,7 +67,7 @@ class BlogToolbarElement extends ToolbarElement
 
 		$editPageToolHTML= <<<HTML
 		<div class="TE_pagetoolelement">
-			<p>Hey, that's a good lookin' blog you got there!.</p>
+			<p>Hey, that's a good lookin' blog you got there!</p>
 HTML;
 
 		$editPageToolHTML = $editPageToolHTML.PHP_EOL;
