@@ -102,7 +102,7 @@ class LoginFormElement extends FormElement implements iElement
 	}
 
 	public function objectSetup() {
-		$this->htmlHeader = '<div class="form_element>';
+		$this->htmlHeader = '<div class="form_element">';
 		$this->htmlFooter = '</div>';
 		$this->formName = 'loginForm';
 
