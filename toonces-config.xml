@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<toonces_settings>
+	<!-- Standard page settings: File locations from document root -->
+	<standard_page header_html_file="" body_tag_html_file="static_data/body_start.html" footer_html_file="static_data/standard_html_footer.html" />
+</toonces_settings>
