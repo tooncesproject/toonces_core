@@ -21,12 +21,12 @@ abstract class StandardPageBuilder extends PageBuilder {
 	var $bodyViewElement;
 
 	function createContentElement() {
-		
+
 		// Insert code here to create a content element
 		// $this->contentElement = new Element($this->pageViewReference);
-		
+
 	}
-	
+
 	function buildPage() {
 
 		// Instantiate the BodyViewElement
@@ -66,9 +66,9 @@ abstract class StandardPageBuilder extends PageBuilder {
 		}
 
 		// Call the createContentElement method to acquire the content element
-		
+
 		$this->createContentElement();
-		
+
 		$this->buildElementArray();
 
 		return $this->elementArray;
