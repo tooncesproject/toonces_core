@@ -7,7 +7,7 @@
  */
 
 
-include_once ROOTPATH.'/toonces.php';
+include_once LIBPATH.'toonces.php';
 
 class DivElement extends Element implements iElement {
 

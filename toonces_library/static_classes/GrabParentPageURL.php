@@ -10,7 +10,7 @@
  * 
  */
  
-include_once ROOTPATH.'/toonces.php';
+include_once LIBPATH.'toonces.php';
 
 class GrabParentPageURL extends GrabPageURL
 {
@@ -24,7 +24,7 @@ class GrabParentPageURL extends GrabPageURL
 		}
 
 		// Get page's ancestor ID.
-		$query = sprintf(file_get_contents(ROOTPATH.'/sql/get_page_pathname_and_ancestor.sql'),$pageId);
+		$query = sprintf(file_get_contents(LIBPATH.'sql/get_page_pathname_and_ancestor.sql'),$pageId);
 		
 		$result = GrabPageURL::$conn->query($query);
 		

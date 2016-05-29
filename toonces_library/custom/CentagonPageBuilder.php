@@ -1,11 +1,11 @@
 <?php
 
-include_once ROOTPATH.'/ViewElement.php';
-include_once ROOTPATH.'/Element.php';
-include_once ROOTPATH.'/abstract/PageBuilder.php';
-include_once ROOTPATH.'/BlogReader.php';
-include_once ROOTPATH.'/DivElement.php';
-include_once ROOTPATH.'/TagElement.php';
+include_once LIBPATH.'ViewElement.php';
+include_once LIBPATH.'Element.php';
+include_once LIBPATH.'abstract/PageBuilder.php';
+include_once LIBPATH.'BlogReader.php';
+include_once LIBPATH.'DivElement.php';
+include_once LIBPATH.'TagElement.php';
 
 class CentagonPageBuilder extends PageBuilder {
 	/*
@@ -26,7 +26,7 @@ class CentagonPageBuilder extends PageBuilder {
 		
 		$contentElement = new Element();
 		
-		$contentElement->setHTML(file_get_contents(ROOTPATH.'/static_data/mainpage_content.html'));
+		$contentElement->setHTML(file_get_contents(LIBPATH.'static_data/mainpage_content.html'));
 		
 		$view->addElement($contentElement);
 		
