@@ -6,6 +6,8 @@ include_once LIBPATH.'Element.php';
 include_once LIBPATH.'ViewElement.php';
 include_once LIBPATH.'interfaces/iView.php';
 require_once LIBPATH.'PageView.php';
+include_once LIBPATH.'abstract/PageBuilder.php';
+include_once LIBPATH.'abstract/StandardPageBuilder.php';
 include_once LIBPATH.'toonces_custom.php';
 include_once LIBPATH.'utility/SessionManager.php';
 include_once LIBPATH.'abstract/FormElement.php';
@@ -25,7 +27,7 @@ include_once LIBPATH.'admin/CreateUserAdminPageBuilder.php';
 include_once LIBPATH.'admin/ManageUserAdminPageBuilder.php';
 include_once LIBPATH.'admin/PageAdminPageBuilder.php';
 include_once LIBPATH.'admin/EditPageAdminPageBuilder.php';
-include_once LIBPATH.'pagebuilders/StandardPageBuilder.php';
+include_once LIBPATH.'abstract/StandardPageBuilder.php';
 
 include_once LIBPATH.'admin/AdminViewElement.php';
 include_once LIBPATH.'BodyViewElement.php';
@@ -35,7 +37,7 @@ include_once LIBPATH.'utility/UniversalConnect.php';
 include_once LIBPATH.'static_classes/GrabPageURL.php';
 include_once LIBPATH.'static_classes/GrabParentPageURL.php';
 
-include_once LIBPATH.'abstract/PageBuilder.php';
+
 include_once LIBPATH.'BlogPageReader.php';
 include_once LIBPATH.'BlogReader.php';
 include_once LIBPATH.'DivElement.php';

@@ -1,27 +1,33 @@
 <?php
+/*
+ * StandardPageBuilder
+ * Initial commit: Paul Anderson, 5/28/2016
+ * 
+ * An abstract PageBuilder class that automagically generates a page based on
+ * input from the toonces-config.xml file.
+ * Extend it by overriding the createContentElement method to insert
+ * custom content in the page.
+ * 
+ */
+
 
 require_once LIBPATH.'toonces.php';
 
-class StandardPageBuilder extends PageBuilder {
+abstract class StandardPageBuilder extends PageBuilder {
 
 	var $contentElement;
 	var $headerHTML;
 	var $footerHTML;
 	var $bodyViewElement;
 
+	function createContentElement() {
+		
+		// Insert code here to create a content element
+		// $this->contentElement = new Element($this->pageViewReference);
+		
+	}
+	
 	function buildPage() {
-
-		// Check for edit mode signal from GET, and if applicable, check for user access.
-		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
-
-		// If user doesn't have editing capability, ignore the mode.
-		if ($this->pageViewReference->userCanEdit == false) {
-			$mode = '';
-		}
-		switch ($mode) {
-			default:
-				$this->contentElement = new Element($this->pageViewReference);
-		}
 
 		// Instantiate the BodyViewElement
 		$this->bodyViewElement = new BodyViewElement($this->pageViewReference);
@@ -51,7 +57,6 @@ class StandardPageBuilder extends PageBuilder {
 								$nodeAttributes = $attributeNode->attributes;
 								$keyItem = $nodeAttributes->getNamedItem('key');
 								$valueItem = $nodeAttributes->getNamedItem('value');
-								//echo $keyItem->nodeValue;
 								$this->bodyViewElement->addBodyAttribute($keyItem->nodeValue, $valueItem->nodeValue);
 							}
 						}
@@ -60,6 +65,10 @@ class StandardPageBuilder extends PageBuilder {
 			}
 		}
 
+		// Call the createContentElement method to acquire the content element
+		
+		$this->createContentElement();
+		
 		$this->buildElementArray();
 
 		return $this->elementArray;
@@ -94,7 +103,6 @@ class StandardPageBuilder extends PageBuilder {
 		$pageId = $this->pageViewReference->pageId;
 
 		// Add the content element, which holds the page content.
-		array_push($this->elementArray, $this->contentElement);
 		$this->bodyViewElement->addElement($this->contentElement);
 
 		// Add the content footer element
