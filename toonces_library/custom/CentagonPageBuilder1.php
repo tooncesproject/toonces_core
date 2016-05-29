@@ -1,13 +1,13 @@
 <?php
 
-include_once ROOTPATH.'/ViewElement.php';
-include_once ROOTPATH.'/Element.php';
-include_once ROOTPATH.'/abstract/PageBuilder.php';
-include_once ROOTPATH.'/BlogReader.php';
-include_once ROOTPATH.'/DivElement.php';
-include_once ROOTPATH.'/TagElement.php';
-include_once ROOTPATH.'/HeadElement.php';
-include_once ROOTPATH.'/PageView.php';
+include_once LIBPATH.'ViewElement.php';
+include_once LIBPATH.'Element.php';
+include_once LIBPATH.'abstract/PageBuilder.php';
+include_once LIBPATH.'BlogReader.php';
+include_once LIBPATH.'DivElement.php';
+include_once LIBPATH.'TagElement.php';
+include_once LIBPATH.'HeadElement.php';
+include_once LIBPATH.'PageView.php';
 
 class CentagonPageBuilder1 extends PageBuilder {
 	/*
@@ -24,7 +24,7 @@ class CentagonPageBuilder1 extends PageBuilder {
 
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
+		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'static_data/generic_html_header.html'));
 		
 		array_push($this->elementArray, $htmlHeaderElement);
 		
@@ -34,13 +34,13 @@ class CentagonPageBuilder1 extends PageBuilder {
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
 		
-		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
+		$headElement->setHeadTags(file_get_contents(LIBPATH.'static_data/head_tags.html'));
 		
 		array_push($this->elementArray, $headElement);
 		
 		$bodyElement = new Element($this->pageViewReference);
 		
-		$bodyElement->setHTML(file_get_contents(ROOTPATH.'/static_data/footer_test.html'));
+		$bodyElement->setHTML(file_get_contents(LIBPATH.'static_data/footer_test.html'));
 		
 		array_push($this->elementArray, $bodyElement);
 		
@@ -51,7 +51,7 @@ class CentagonPageBuilder1 extends PageBuilder {
 		
 		$contentElement = new Element();
 		
-		$contentElement->setHTML(file_get_contents(ROOTPATH.'/static_data/mainpage_content.html'));
+		$contentElement->setHTML(file_get_contents(LIBPATH.'static_data/mainpage_content.html'));
 		
 		$view->addElement($contentElement);
 		
