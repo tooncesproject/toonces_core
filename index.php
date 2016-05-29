@@ -10,8 +10,8 @@
 *
 */
 
-include 'toonces_library/config.php';
-require_once ROOTPATH.'/toonces.php';
+include 'config.php';
+require_once LIBPATH.'/toonces.php';
 
 // global variables
 $gBlogDefaultPagebuilder = 'CentagonBlogPostSingle';
@@ -60,7 +60,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 	$pageFound = false;
 	$descendantPageId;
 
-	$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_child_page_ids.sql'),$pageid);
+	$query = sprintf(file_get_contents(LIBPATH.'/sql/retrieve_child_page_ids.sql'),$pageid);
 
 
 	$descenantPages = $conn->query($query);
@@ -155,7 +155,7 @@ $userCanEdit = 0;
 $userHasPageAccess = 0;
 
 // get sql query
-$query = sprintf(file_get_contents(ROOTPATH.'/sql/retrieve_page_by_id.sql'),$userId,$pageId);
+$query = sprintf(file_get_contents(LIBPATH.'/sql/retrieve_page_by_id.sql'),$userId,$pageId);
 
 $pageRecord = $conn->query($query);
 

@@ -1,5 +1,5 @@
 <?php
-require_once ROOTPATH.'/toonces.php';
+require_once LIBPATH.'toonces.php';
 
 
 abstract class AdminPageBuilder extends PageBuilder
@@ -50,7 +50,7 @@ abstract class AdminPageBuilder extends PageBuilder
 	function buildLoginPage() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
+		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'static_data/generic_html_header.html'));
 
 		array_push($this->elementArray, $htmlHeaderElement);
 
@@ -60,7 +60,7 @@ abstract class AdminPageBuilder extends PageBuilder
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
 
-		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
+		$headElement->setHeadTags(file_get_contents(LIBPATH.'static_data/head_tags.html'));
 
 		array_push($this->elementArray, $headElement);
 
@@ -80,7 +80,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		$footerElement = new Element($this->pageViewReference);
 
-		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_footer.html'));
+		$footerElement->setHTML(file_get_contents(LIBPATH.'static_data/generic_html_footer.html'));
 
 		array_push($this->elementArray, $footerElement);
 	}
@@ -88,7 +88,7 @@ abstract class AdminPageBuilder extends PageBuilder
 	function buildDashboardPage() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
+		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'static_data/generic_html_header.html'));
 
 		array_push($this->elementArray, $htmlHeaderElement);
 
@@ -98,7 +98,7 @@ abstract class AdminPageBuilder extends PageBuilder
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
 
-		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
+		$headElement->setHeadTags(file_get_contents(LIBPATH.'static_data/head_tags.html'));
 
 		array_push($this->elementArray, $headElement);
 
@@ -126,7 +126,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		$footerElement = new Element($this->pageViewReference);
 
-		$footerElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_footer.html'));
+		$footerElement->setHTML(file_get_contents(LIBPATH.'static_data/generic_html_footer.html'));
 
 		array_push($this->elementArray, $footerElement);
 	}

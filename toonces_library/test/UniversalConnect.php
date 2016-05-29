@@ -1,6 +1,6 @@
 <?php
 
-INCLUDE_ONCE ROOTPATH.'/interfaces/iConnectInfo.php';
+INCLUDE_ONCE LIBPATH.'interfaces/iConnectInfo.php';
 
 class UniversalConnect implements iConnectInfo
 {

@@ -1,6 +1,6 @@
 <?php
 
-include_once ROOTPATH.'/toonces.php';
+include_once LIBPATH.'toonces.php';
 
 class ViewElement extends Element implements iElement
 {
