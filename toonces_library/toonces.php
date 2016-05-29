@@ -19,6 +19,7 @@ include_once ROOTPATH.'/userinterface/BlogPostToolbarElement.php';
 include_once ROOTPATH.'/userinterface/DefaultToolbarElement.php';
 
 include_once ROOTPATH.'/pagebuilders/AdminPageBuilder.php';
+include_once ROOTPATH.'/pagebuilders/StandardPageBuilder.php';
 include_once ROOTPATH.'/admin/AdminHomeBuilder.php';
 include_once ROOTPATH.'/admin/UserAdminPageBuilder.php';
 include_once ROOTPATH.'/admin/CreateUserAdminPageBuilder.php';

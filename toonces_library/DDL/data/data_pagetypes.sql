@@ -10,6 +10,7 @@ INSERT INTO toonces.pagetypes
     ,(2,    'blog',         'Root page of a blog',                                  0)
     ,(3,    'blog post',    'Individual post entry for a blog',                     0)
     ,(4,    'content page', 'Non-blog dynamic content page',                        0)
+    ,(5,    'standard page','Uses XML configuration for page',                      0)
 ON DUPLICATE KEY UPDATE
      name = VALUES (name)
     ,description = VALUES (description)

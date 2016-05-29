@@ -23,7 +23,8 @@ class StandardPageBuilder extends PageBuilder {
 		// Acquire the toonces-configuration.xml file
 		$xmlReader = new XMLReader();
 		try {
-			$xmlReader->open('ROOTPATH.toonces-configuration.xml');
+			die(ROOTPATH.'/toonces-config.xml');
+			$xmlReader->open(ROOTPATH.'/toonces-configuration.xml');
 		} catch (Exception $e) {
 			die('Error reading the config file (toonces-configuration.xml). Consult documentation for help.');
 		}
