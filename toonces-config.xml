@@ -2,5 +2,12 @@
 
 <toonces_settings>
 	<!-- Standard page settings: File locations from document root -->
-	<standard_page header_html_file="" body_tag_html_file="static_data/body_start.html" footer_html_file="static_data/standard_html_footer.html" />
+	<standard_page
+		header_html_file="" 
+		footer_html_file="static_data/standard_html_footer.html"
+	>
+		<body_attributes>
+			<html_attribute key="onload" value="MM_preloadImages('/images/fb-40-ro.gif','/images/tw-40-ro.gif','/images/ig-40-ro.gif','/images/sc-40-ro.gif')"/>
+		</body_attributes>
+	</standard_page>
 </toonces_settings>

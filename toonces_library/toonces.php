@@ -28,6 +28,7 @@ include_once LIBPATH.'admin/EditPageAdminPageBuilder.php';
 include_once LIBPATH.'pagebuilders/StandardPageBuilder.php';
 
 include_once LIBPATH.'admin/AdminViewElement.php';
+include_once LIBPATH.'BodyViewElement.php';
 
 include_once LIBPATH.'static_classes/SQLConn.php';
 include_once LIBPATH.'utility/UniversalConnect.php';
