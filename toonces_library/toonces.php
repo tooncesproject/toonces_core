@@ -18,16 +18,6 @@ include_once LIBPATH.'userinterface/BlogToolbarElement.php';
 include_once LIBPATH.'userinterface/BlogPostToolbarElement.php';
 include_once LIBPATH.'userinterface/DefaultToolbarElement.php';
 
-<<<<<<< HEAD
-include_once ROOTPATH.'/pagebuilders/AdminPageBuilder.php';
-include_once ROOTPATH.'/pagebuilders/StandardPageBuilder.php';
-include_once ROOTPATH.'/admin/AdminHomeBuilder.php';
-include_once ROOTPATH.'/admin/UserAdminPageBuilder.php';
-include_once ROOTPATH.'/admin/CreateUserAdminPageBuilder.php';
-include_once ROOTPATH.'/admin/ManageUserAdminPageBuilder.php';
-include_once ROOTPATH.'/admin/PageAdminPageBuilder.php';
-include_once ROOTPATH.'/admin/EditPageAdminPageBuilder.php';
-=======
 include_once LIBPATH.'pagebuilders/AdminPageBuilder.php';
 include_once LIBPATH.'admin/AdminHomeBuilder.php';
 include_once LIBPATH.'admin/UserAdminPageBuilder.php';
@@ -35,7 +25,7 @@ include_once LIBPATH.'admin/CreateUserAdminPageBuilder.php';
 include_once LIBPATH.'admin/ManageUserAdminPageBuilder.php';
 include_once LIBPATH.'admin/PageAdminPageBuilder.php';
 include_once LIBPATH.'admin/EditPageAdminPageBuilder.php';
->>>>>>> 09da75beced7afa26fa9e8a26450fbeaef18a618
+include_once LIBPATH.'pagebuilders/StandardPageBuilder.php';
 
 include_once LIBPATH.'admin/AdminViewElement.php';
 

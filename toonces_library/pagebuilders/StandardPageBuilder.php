@@ -1,6 +1,6 @@
 <?php
 
-require_once ROOTPATH.'/toonces.php';
+require_once LIBPATH.'/toonces.php';
 
 class StandardPageBuilder extends PageBuilder {
 
@@ -22,20 +22,15 @@ class StandardPageBuilder extends PageBuilder {
 
 		// Acquire the toonces-configuration.xml file
 		$xmlReader = new XMLReader();
-		try {
-			die(ROOTPATH.'/toonces-config.xml');
-			$xmlReader->open(ROOTPATH.'/toonces-configuration.xml');
-		} catch (Exception $e) {
-			die('Error reading the config file (toonces-configuration.xml). Consult documentation for help.');
-		}
+		$xmlReader->open(ROOTPATH.'toonces-config.xml');
 
 		// does this work?
 		while ($xmlReader->read()) {
-			if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'standard_page') {
-				$headerHTMLFile = $reader->getAttribute('header_html_file');
+			if ($xmlReader->nodeType == XMLReader::ELEMENT && $xmlReader->name == 'standard_page') {
+				$headerHTMLFile = $xmlReader->getAttribute('header_html_file');
 				// no body tag? because it's fucking dumb.
 				//$bodyTagHTMLFile = $reader->getAttribute('body_tag_html_file');
-				$footerHTMLFile = $reader->getAttribute('footer_html_file');
+				$footerHTMLFile = $xmlReader->getAttribute('footer_html_file');
 			}
 		}
 		
@@ -48,7 +43,7 @@ class StandardPageBuilder extends PageBuilder {
 	function buildElementArray() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(ROOTPATH.'/static_data/generic_html_header.html'));
+		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'/static_data/generic_html_header.html'));
 
 		array_push($this->elementArray, $htmlHeaderElement);
 
@@ -58,13 +53,13 @@ class StandardPageBuilder extends PageBuilder {
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
 
-		$headElement->setHeadTags(file_get_contents(ROOTPATH.'/static_data/head_tags.html'));
+		$headElement->setHeadTags(file_get_contents(LIBPATH.'/static_data/head_tags.html'));
 
 		array_push($this->elementArray, $headElement);
 
 		$bodyStartElement = new Element($this->pageViewReference);
 
-		$bodyStartElement->setHTML(file_get_contents(ROOTPATH.'/static_data/body_start.html'));
+		$bodyStartElement->setHTML(file_get_contents(LIBPATH.'/static_data/body_start.html'));
 		array_push($this->elementArray, $bodyStartElement);
 
 		// If there's a toolbar, add it here.
