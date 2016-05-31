@@ -29,7 +29,6 @@ include_once LIBPATH.'admin/PageAdminPageBuilder.php';
 include_once LIBPATH.'admin/EditPageAdminPageBuilder.php';
 include_once LIBPATH.'abstract/StandardPageBuilder.php';
 include_once LIBPATH.'pagebuilders/BlogPageBuilder.php';
-include_once LIBPATH.'pagebuilders/BlogPostCreatorPageBuilder.php';
 include_once LIBPATH.'pagebuilders/BlogPostSinglePageBuilder.php';
 
 include_once LIBPATH.'admin/AdminViewElement.php';
