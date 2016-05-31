@@ -191,7 +191,7 @@ SQL;
 						,':userId' => strval($this->pageViewReference->sessionManager->userId)
 						,':title' => $title
 						,':body' => $body
-						,':pagebuilderClass' => $GLOBALS['gBlogDefaultPagebuilder']
+						,':pagebuilderClass' => 'BlogPostSinglePageBuilder'
 
 				);
 
