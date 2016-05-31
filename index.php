@@ -13,9 +13,6 @@
 include 'config.php';
 require_once LIBPATH.'/toonces.php';
 
-// global variables
-$gBlogDefaultPagebuilder = 'CentagonBlogPostSingle';
-
 $sessionManager = new SessionManager();
 
 $sessionManager->checkSession();
