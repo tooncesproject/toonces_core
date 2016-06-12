@@ -1,712 +1,183 @@
+CREATE DATABASE IF NOT EXISTS toonces;
 
-DROP DATABASE IF EXISTS toonces;
-CREATE DATABASE toonces;
+USE toonces;
 
-/*********** Functions!!! *************
+CREATE TABLE IF NOT EXISTS pagetypes (
+     pagetype_id        BIGINT          NOT NULL
+    ,name               VARCHAR(50)     NOT NULL
+    ,description        VARCHAR(512)    NOT NULL
+    ,restricted_access  BOOL            NOT NULL
+    ,created_dt         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt        TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
 
-    FUNC YEAH
+        ,CONSTRAINT pk_pagetypes PRIMARY KEY (pagetype_id)
 
-************ Functions!!! *************/
-
--- GENERATE_PATHNAME
--- creates a URL name based on a page name.
--- Makes it all lowercase and free of funky characters.
-DROP FUNCTION IF EXISTS toonces.GENERATE_PATHNAME; 
-
-DELIMITER // 
-
-CREATE FUNCTION toonces.GENERATE_PATHNAME ( str VARCHAR(100) ) RETURNS VARCHAR(50)
-
-DETERMINISTIC
-
-BEGIN
- 
-    DECLARE i, len SMALLINT DEFAULT 1;
-    DECLARE ret VARCHAR(50) DEFAULT '';
-    DECLARE c CHAR(1);
-    SET len = CHAR_LENGTH( str );
-
-    REPEAT 
-    BEGIN 
-        SET c = MID( str, i, 1 );
-        IF c = ' ' THEN
-            SET ret = CONCAT(ret,'_');
-        ELSE 
-            IF c REGEXP '[[:alnum:]]' THEN 
-                SET ret = CONCAT(ret,c); 
-            END IF; 
-        END IF;
-        SET i = i + 1;
-    END; 
-    UNTIL i > len END REPEAT;
-
-    -- truncate at 50 chars
-    SET ret = LEFT(ret, 50);
-
-    -- lowercase it
-    SET ret = lcase(ret);
-  RETURN ret; 
-END // 
-DELIMITER ; 
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-/*
+CREATE TABLE IF NOT EXISTS pages (
+     page_id            BIGINT          NOT NULL AUTO_INCREMENT
+    ,pathname           VARCHAR(50)     NULL
+    ,page_title         VARCHAR(100)    NULL
+    ,page_link_text     VARCHAR(100)    NULL
+    ,pagebuilder_class  VARCHAR(50)     NOT NULL
+    ,pageview_class     VARCHAR(50)     NOT NULL
+    ,css_stylesheet     VARCHAR(100)    NOT NULL
+    ,created_dt         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt        TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
+    ,deleted            TIMESTAMP       NULL
+    ,redirect_on_error  BOOL            NOT NULL
+    ,published          BOOL            NOT NULL DEFAULT 0
+    ,pagetype_id        BIGINT          NOT NULL DEFAULT 0
 
-    TOONCES ADD A PAGE FUNCTION
-    PAUL ANDERSON 9/1/2015
-    BOOYA GRANDMA!
+        ,CONSTRAINT pk_pages PRIMARY KEY (page_id)
+        ,CONSTRAINT fk_pagetype FOREIGN KEY (pagetype_id) REFERENCES pagetypes (pagetype_id)
+        ,INDEX idx_pathname (pathname)
 
-    returns the new page id if success
-    returns null if failure.
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
-*/
 
-DROP FUNCTION IF EXISTS toonces.CREATE_PAGE;
-DELIMITER //
+CREATE TABLE IF NOT EXISTS page_hierarchy_bridge (
+     bridge_id          BIGINT      NOT NULL AUTO_INCREMENT
+    ,page_id            BIGINT      NOT NULL
+    ,ancestor_page_id   BIGINT      NOT NULL
+    ,descendant_page_id BIGINT      NULL
+    ,created_dt         TIMESTAMP   NOT NULL
 
-CREATE FUNCTION toonces.CREATE_PAGE  (
-     parent_page_id BIGINT
-    ,pathname VARCHAR(50)
-    ,page_title VARCHAR(50)
-    ,page_link_text VARCHAR(50)
-    ,pagebuilder_class VARCHAR(50)
-    ,pageview_class VARCHAR(50)
-    ,css_stylesheet VARCHAR(100)
-    ,redirect_on_error BOOL
-    ,published BOOL
-    ,pagetype_id BIGINT
+        ,CONSTRAINT pk_page_hierarchy_bridge PRIMARY KEY (bridge_id)
+        ,CONSTRAINT fk_phb_page FOREIGN KEY (page_id) REFERENCES pages (page_id)
+        ,CONSTRAINT fk_phb_ancestor FOREIGN KEY (ancestor_page_id) REFERENCES pages (page_id)
+        ,CONSTRAINT fk_phb_descendant FOREIGN KEY (descendant_page_id) REFERENCES pages (page_id)
+        ,CONSTRAINT ak_page_ancestor UNIQUE KEY (page_id, ancestor_page_id)
 
-)
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
-RETURNS BIGINT
 
-NOT DETERMINISTIC
+CREATE TABLE IF NOT EXISTS blogs (
+     blog_id            BIGINT         NOT NULL AUTO_INCREMENT
+    ,name               VARCHAR(255)   NULL
+    ,description        VARCHAR(255)   NULL
+    ,page_id            BIGINT         NOT NULL
+    ,created            TIMESTAMP      NOT NULL
+    ,modified_dt        TIMESTAMP      NULL ON UPDATE CURRENT_TIMESTAMP
+    ,deleted            TIMESTAMP      NULL
 
-BEGIN
+        ,CONSTRAINT pk_blogs PRIMARY KEY (blog_id)
+        ,CONSTRAINT fk_blog_page FOREIGN KEY (page_id) REFERENCES pages(page_id)
 
-    DECLARE new_page_id BIGINT;
-    DECLARE ancestor_page_id BIGINT;
-    DECLARE existing_page_id BIGINT;
-    DECLARE pathname_exists BOOL;
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
+
+
+CREATE TABLE IF NOT EXISTS users (
+     user_id        BIGINT      NOT NULL    AUTO_INCREMENT
+    ,email          VARCHAR(40) NOT NULL
+    ,nickname       VARCHAR(32) NOT NULL
+    ,firstname      VARCHAR(32) NOT NULL
+    ,lastname       VARCHAR(32) NOT NULL
+    ,password       CHAR(128)   NOT NULL
+    ,salt           CHAR(128)   NOT NULL
+    ,created        TIMESTAMP   NOT NULL
+    ,modified_dt    TIMESTAMP   NULL ON UPDATE CURRENT_TIMESTAMP
+    ,revoked        TIMESTAMP   NULL
+    ,is_admin       BOOL        NOT NULL  DEFAULT 0
+
+        ,CONSTRAINT pk_users PRIMARY KEY (user_id)
+        ,CONSTRAINT ak_email UNIQUE KEY (email)
+        ,CONSTRAINT ak_nickname UNIQUE KEY (nickname)
+
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
+
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+     blog_post_id           BIGINT          NOT NULL AUTO_INCREMENT
+    ,blog_id                BIGINT          NOT NULL
+    ,page_id                BIGINT          NOT NULL
+    ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
+    ,deleted                TIMESTAMP       NULL
+    ,user_id                BIGINT          NOT NULL
+    ,title                  VARCHAR(200)    NULL
+    ,body                   TEXT            NULL
+    ,thumbnail_image_vector VARCHAR(50)     NULL
+    ,published              BOOL            NOT NULL DEFAULT 0
+
+        ,CONSTRAINT pk_blog_posts PRIMARY KEY (blog_post_id)
+        ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
+        ,CONSTRAINT fk_blog_post_blog FOREIGN KEY (blog_id) REFERENCES blogs (blog_id)
+        ,CONSTRAINT fk_blog_post_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
     
-    /* check for existing parent page id */
-    
-    SELECT page_id
-    INTO existing_page_id
-    FROM toonces.pages
-    WHERE page_id = parent_page_id;
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
-    /* check for existing page with same pathname with same parent page */
 
-    SELECT
-        CASE
-            WHEN count(*) = 0 THEN 0
-            WHEN count(*) > 0 THEN 1
-        END
-    INTO pathname_exists
-    FROM toonces.page_hierarchy_bridge phb
-    JOIN toonces.pages tp on tp.page_id = phb.descendant_page_id
-    WHERE
-        phb.page_id = parent_page_id
-    AND 
-        tp.pathname = pathname;
+CREATE TABLE IF NOT EXISTS sessions (
+     session_id     BIGINT          NOT NULL    AUTO_INCREMENT
+    ,user_id        BIGINT          NOT NULL
+    ,ip_address     BIGINT          NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
+    ,started        TIMESTAMP       NOT NULL
+    ,user_agent     VARCHAR(1000)   NULL
 
+        ,CONSTRAINT pk_sessions PRIMARY KEY (session_id)
+        ,CONSTRAINT fk_session_user FOREIGN KEY (user_id) REFERENCES users (user_id)
+        ,INDEX IDX_session_ip (ip_address)
+        ,INDEX idx_session_started (started)
+        ,INDEX idx_session_useragent (user_agent) 
 
-    /* if all is well, proceed. */  
-    IF 
-        existing_page_id IS NOT NULL
-    AND
-        pathname_exists = 0
-    THEN
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
-        /* if parent page id is not the homepage, query for parent's ancestor.
-            otherwise, set ancestor to O. */
-        IF parent_page_id > 1 THEN
-            SELECT page_id
-            INTO ancestor_page_id
-            FROM toonces.page_hierarchy_bridge
-            WHERE descendant_page_id = parent_page_id;
-        ELSE
-            set ancestor_page_id = 0;
-        END IF;
 
-        INSERT INTO toonces.pages (
-             pathname
-            ,page_title
-            ,page_link_text
-            ,pagebuilder_class
-            ,pageview_class
-            ,css_stylesheet
-            ,redirect_on_error
-            ,published
-            ,pagetype_id
-        ) VALUES (
-            pathname
-            ,page_title
-            ,page_link_text
-            ,pagebuilder_class
-            ,pageview_class
-            ,css_stylesheet
-            ,redirect_on_error
-            ,published
-            ,pagetype_id
-        );
-    
-        SET new_page_id = last_insert_id(); 
+CREATE TABLE IF NOT EXISTS page_user_access (
+     page_user_access_id     BIGINT         NOT NULL    AUTO_INCREMENT
+    ,page_id                 BIGINT         NOT NULL
+    ,user_id                 BIGINT         NOT NULL
+    ,can_edit                BOOL           NOT NULL    DEFAULT 0
+    ,created_dt              TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt             TIMESTAMP      NULL ON UPDATE CURRENT_TIMESTAMP
 
-        INSERT INTO toonces.page_hierarchy_bridge (
-             page_id
-            ,ancestor_page_id
-            ,descendant_page_id
-        ) VALUES (
-             parent_page_id
-            ,ancestor_page_id
-            ,new_page_id
-        );
-        
-    
-    END IF;
+        ,CONSTRAINT pk_page_user_access PRIMARY KEY (page_user_access_id)
+        ,CONSTRAINT ak_pageid_userid UNIQUE INDEX (page_id,user_id)
+        ,CONSTRAINT fk_page_id FOREIGN KEY (page_id) REFERENCES pages(page_id)
+        ,CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
 
-    RETURN new_page_id;
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
-END //
-DELIMITER ;
 
-/*************** WOO *********************
-
-CREATE_BLOG
-Paul Anderson 10/4/2015
-
-This SQL function generates the sql record
-and root page for a new blog.
-
-
-***************** WOO ********************/
-
-
-
-DROP FUNCTION IF EXISTS toonces.CREATE_BLOG;
-
-DELIMITER //
-
-CREATE FUNCTION toonces.CREATE_BLOG (
-     parent_page_id BIGINT
-    ,blog_url_name VARCHAR(50)
-    ,blog_display_name VARCHAR(100)
-    ,blog_pagebuilder_class VARCHAR(50)
-    ,blog_pageview_class VARCHAR(50)
-    ,css_stylesheet VARCHAR(100)
-    
-)
-
-RETURNS BIGINT
-
-NOT DETERMINISTIC
-
-BEGIN
-
-    DECLARE blog_id BIGINT;
-    DECLARE new_blog_page_id BIGINT;
-    DECLARE test_page_id BIGINT;
-
-    -- check to make sure page exists
-
-    SELECT
-        page_id
-    FROM
-        toonces.pages
-    WHERE
-        page_id = parent_page_id
-    INTO
-        test_page_id;
-
-    IF test_page_id IS NOT NULL THEN 
-        
-        -- if parent page exists, create page and blog
-        SELECT toonces.CREATE_PAGE(
-             parent_page_id             -- parent page id
-            ,blog_url_name              -- pathname
-            ,blog_display_name          -- page_title
-            ,blog_display_name          -- page_link_text
-            ,blog_pagebuilder_class     -- pagebuilder_class
-            ,blog_pageview_class        -- pageview_class
-            ,css_stylesheet             -- css_stylesheet
-            ,1                          -- redirect on error
-            ,1                          -- published
-            ,2                          -- pagetype_id - Blog root page type
-            )
-        INTO new_blog_page_id;
-
-        INSERT INTO toonces.blogs (
-            page_id
-        )
-        VALUES (
-            new_blog_page_id
-        
-        );
-        SET blog_id = last_insert_id();
-
-    END IF;
-
-    RETURN blog_id;
-
-END //
-
-DELIMITER ;
-
-
-/*************** WOO *********************
-
-Paul Anderson 10/4/2015
-
-This SQL function generates both a blog 
-post and its parent "page" to publish.
-
-
-***************** WOO ********************/
-
-DROP FUNCTION IF EXISTS toonces.CREATE_BLOG_POST;
-
-DELIMITER //
-
-CREATE FUNCTION toonces.CREATE_BLOG_POST (
-     param_page_id BIGINT
-    ,param_user_id BIGINT
-    ,param_title VARCHAR(200)
-    ,param_body TEXT
-    ,param_pagebuilder_class VARCHAR(50)
-    ,param_thumbnail_image_vector VARCHAR(50)
-)
-
-RETURNS BIGINT
-
-NOT DETERMINISTIC
-
-BEGIN
-
-    DECLARE var_parent_blog_id BIGINT;
-    DECLARE var_blog_post_page_id BIGINT;
-    DECLARE var_pathname VARCHAR(50);
-    DECLARE var_post_pageview_class VARCHAR(50);
-    DECLARE var_post_css_stylesheet VARCHAR(50);
-    DECLARE var_user_can_edit BOOL;
-
-    -- Get blog ID
-    SELECT
-        blog_id
-    INTO 
-        var_parent_blog_id
-    FROM 
-        toonces.blogs
-    WHERE
-        page_id = param_page_id;
-
-    -- Check for user existence
-    SELECT
-        1
-    INTO
-        var_user_can_edit
-    FROM
-        toonces.users tu
-    WHERE
-        tu.user_id = param_user_id
-    LIMIT 1;
-
-    
-    -- if blog page doesn't exist or user doesn't exist and have editing privileges, return NULL. Otherwise, proceed.
-    IF var_parent_blog_id IS NOT NULL AND var_user_can_edit = 1 THEN
-
-        -- get page data
-        SELECT
-             pageview_class
-            ,css_stylesheet
-        INTO 
-             var_post_pageview_class
-            ,var_post_css_stylesheet
-        FROM
-            toonces.pages
-        WHERE
-            page_id = param_page_id  
-        ;
-
-        -- generate pathname
-        -- strip all non-alphanumeric characters, lowercase and truncate
-        SET var_pathname = toonces.GENERATE_PATHNAME(param_title);
-
-        -- generate page
-        SELECT toonces.CREATE_PAGE (
-             param_page_id           -- parent_page_id BIGINT,
-            ,var_pathname               -- pathname VARCHAR(50)
-            ,param_title                  -- page_title VARCHAR(50)
-            ,param_title                  -- page_link_text VARCHAR(50)
-            ,param_pagebuilder_class      -- pagebuilder_class VARCHAR(50)
-            ,var_post_pageview_class    -- pageview_class VARCHAR(50)
-            ,var_post_css_stylesheet    -- css_stylesheet VARCHAR(100)
-            ,1                      -- redirect_on_error BOOL
-            ,0                      -- published BOOL - Blog posts are unpublished by default
-            ,3                      -- pagetype_id - Type for blog post page
-        ) INTO var_blog_post_page_id;
-        
-        -- if page creation was sucessful, proceed.
-        
-        IF var_blog_post_page_id IS NOT NULL THEN
-            -- insert record into blog_posts table
-            INSERT INTO toonces.blog_posts (
-                 blog_id
-                ,page_id
-                ,user_id
-                ,title
-                ,body
-                ,thumbnail_image_vector
-                ,published
-            ) VALUES (
-                 var_parent_blog_id
-                ,var_blog_post_page_id
-                ,param_user_id
-                ,param_title
-                ,param_body
-                ,param_thumbnail_image_vector
-                ,1
-            );
-
-            -- Add a page_user_access record
-            INSERT INTO toonces.page_user_access (
-                 page_id
-                ,user_id
-                ,can_edit
-            ) VALUES (
-                 var_blog_post_page_id
-                ,param_user_id
-                ,1
-            );
-
-        END IF;
-
-    END IF;
-
-    RETURN var_blog_post_page_id;
-
-END //
-
-DELIMITER ;
-
-
-/*************** WOO *********************
-
-GET_BLOG_POST_IDS
-
-Paul Anderson 12/6/2015
-
-This SQL function returns a string
-of blog post IDs based on the following
-parameters:
-  * param_blog_id
-        which blog to get stuff from
-  * param_items_per_page: 
-        number of blog posts to grab
-  * param_page:
-        Determines which set of posts
-        to get.
-
-***************** WOO ********************/
-
-DROP FUNCTION IF EXISTS toonces.GET_BLOG_POST_IDS;
-
-DELIMITER //
-
-CREATE FUNCTION toonces.GET_BLOG_POST_IDS (
-     param_blog_id          BIGINT UNSIGNED
-    ,param_items_per_page   INT UNSIGNED
-    ,param_page             INT UNSIGNED
-)
-
-RETURNS VARCHAR(1000)
-
-NOT DETERMINISTIC
-
-BEGIN
-    
-    -- declare return string
-    DECLARE var_id_string VARCHAR(1000);
-
-    -- create temp table to store values
-
-    CREATE TEMPORARY TABLE temp_all_posts_for_blog
-    (
-         post_ordinal BIGINT AUTO_INCREMENT NOT NULL
-        ,blog_post_id BIGINT NOT NULL 
-        
-        ,CONSTRAINT pk_temp_all_posts_for_blog PRIMARY KEY (post_ordinal)
-        ,INDEX ind_post_id (blog_post_id)
-    ) ENGINE=MEMORY;
-
-    -- Store all the blog ids in reverse chronological order
-
-    INSERT INTO temp_all_posts_for_blog
-    (
-        blog_post_id
-    ) (
-        SELECT
-            blog_post_id
-        FROM
-            toonces.blog_posts
-        WHERE
-            blog_id = param_blog_id
-        ORDER BY
-            created_dt DESC
-    );
-
-    -- get the IDS
-    SELECT
-        GROUP_CONCAT(ap.post_ordinal SEPARATOR ',')
-    INTO
-        var_id_string
-    FROM
-        temp_all_posts_for_blog ap
-    JOIN
-        toonces.blog_posts bp USING (blog_post_id)
-    WHERE
-        ap.post_ordinal BETWEEN param_items_per_page * param_page - param_items_per_page + 1 AND param_items_per_page * param_page;
-
-    DROP TEMPORARY TABLE temp_all_posts_for_blog;
-
-    RETURN var_id_string;
-
-END //
-
-DELIMITER ;
-
--- GET_PAGE_PATH
--- Initial Commit: Paul Anderson 1/23/2016
--- Acquires a page URL path from a page ID.
-DROP FUNCTION IF EXISTS toonces.GET_PAGE_PATH;
-
-DELIMITER //
-
-CREATE FUNCTION toonces.GET_PAGE_PATH(param_page_id BIGINT)
-
-RETURNS VARCHAR(2000)
-
-NOT DETERMINISTIC
-
-BEGIN
-
-    DECLARE var_page_path VARCHAR(2000) DEFAULT '';
-    DECLARE var_pathname VARCHAR(100) DEFAULT '';
-    DECLARE var_ancestor_page_id BIGINT;
-    DECLARE var_page_id BIGINT;
-
-    SET var_page_id = param_page_id;   
-
-    pathloop:LOOP
-
-        -- Query pages for the page's pathname 
-        SELECT
-             p.pathname
-            ,phb.page_id
-        INTO
-             var_pathname
-            ,var_ancestor_page_id
-        FROM
-            toonces.pages p
-        LEFT OUTER JOIN
-            toonces.page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
-        WHERE
-            p.page_id = var_page_id
-        ;
-
-        SET var_page_path = CONCAT(COALESCE(var_pathname,''),'/',var_page_path);
-
-        IF var_ancestor_page_id IS NULL THEN 
-            LEAVE pathloop; 
-        END IF;
-
-        SET var_page_id = var_ancestor_page_id;
-
-    END LOOP;
-
-    RETURN var_page_path;
-
-END //
-
-DELIMITER ;
-
-/*************************** TABLES TABLES TABLES ********************************/
-/*************************** TABLES TABLES TABLES ********************************/
-/*************************** TABLES TABLES TABLES ********************************/
-/*************************** TABLES TABLES TABLES ********************************/
-/*************************** TABLES TABLES TABLES ********************************/
-/*************************** TABLES TABLES TABLES ********************************/
-
-
-DROP TABLE IF EXISTS toonces.pages;
-
-CREATE TABLE toonces.pages (
-     page_id BIGINT NOT NULL auto_increment
-    ,pathname VARCHAR(50)
-    ,page_title VARCHAR(100)
-    ,page_link_text VARCHAR(100)
-    ,pagebuilder_class VARCHAR(50) NOT NULL
-    ,pageview_class VARCHAR(50) NOT NULL
-    ,css_stylesheet VARCHAR(100) NOT NULL
-    ,created_by VARCHAR(50)
-    ,created_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
-    ,deleted TIMESTAMP NULL
-    ,redirect_on_error BOOL
-    ,published BOOL
-    ,pagetype_id BIGINT    NOT NULL DEFAULT 0
-
-        ,PRIMARY KEY (page_id)
-        ,CONSTRAINT fk_pagetype FOREIGN KEY (pagetype_id) REFERENCES toonces.pagetypes (pagetype_id)
-);
-
-
-DROP TABLE IF EXISTS toonces.page_hierarchy_bridge;
-
-CREATE TABLE toonces.page_hierarchy_bridge (
-     bridge_id BIGINT NOT NULL auto_increment
-    ,page_id BIGINT NOT NULL
-    ,ancestor_page_id BIGINT NOT NULL
-    ,descendant_page_id BIGINT
-    ,created TIMESTAMP NOT NULL
-        ,PRIMARY KEY (bridge_id)
-        ,FOREIGN KEY (page_id)
-            REFERENCES toonces.pages(page_id)/*
-        ,FOREIGN KEY (ancestor_page_id)
-            REFERENCES toonces.pages(page_id)
-        ,FOREIGN KEY (descendant_page_id)
-            REFERENCES toonces.pages(page_id)*/
-);
-
-DROP TABLE IF EXISTS toonces.blogs;
-
-CREATE TABLE toonces.blogs (
-     blog_id BIGINT NOT NULL AUTO_INCREMENT
-    ,page_id VARCHAR(50) NOT NULL
-    ,created TIMESTAMP NOT NULL
-    ,deleted TIMESTAMP NULL
-        ,PRIMARY KEY (blog_id)
-        -- FOREIGN KEY (page_id)
-        -- REFERENCES toonces.pages(page_id)
-);
-
-DROP TABLE IF EXISTS toonces.pagetypes;
-
-CREATE TABLE toonces.pagetypes (
-     pagetype_id        BIGINT      NOT NULL
-    ,name               VARCHAR(50) NOT NULL
-    ,description        VARCHAR(512) NOT NULL
-    ,restricted_access  BOOL        NOT NULL
-        ,PRIMARY KEY (pagetype_id)
-);
-
-
-DROP TABLE IF EXISTS toonces.users;
-
-CREATE TABLE toonces.users (
-     user_id    BIGINT      NOT NULL    AUTO_INCREMENT
-    ,email      VARCHAR(40) NOT NULL
-    ,nickname   VARCHAR(32) NOT NULL
-    ,firstname  VARCHAR(32) NOT NULL
-    ,lastname   VARCHAR(32) NOT NULL
-    ,password   CHAR(128)   NOT NULL
-    ,salt       CHAR(128)   NOT NULL
-    ,created    TIMESTAMP   NOT NULL
-    ,revoked    TIMESTAMP   NULL
-    ,is_admin   BOOL        NOT NULL  DEFAULT 0
-        ,PRIMARY KEY (user_id)
-        ,UNIQUE INDEX idx_email (email)
-        ,UNIQUE INDEX idx_nickname (nickname)
-);
-
-DROP TABLE IF EXISTS toonces.blog_posts;
-
-CREATE TABLE toonces.blog_posts (
-     blog_post_id BIGINT NOT NULL AUTO_INCREMENT
-    ,blog_id BIGINT NOT NULL
-    ,page_id BIGINT NOT NULL
-    ,created_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
-    ,deleted TIMESTAMP NULL
-    ,user_id BIGINT  NOT NULL
-    ,title VARCHAR(200)
-    ,body TEXT
-    ,thumbnail_image_vector VARCHAR(50)
-    ,published BOOL
-
-    ,PRIMARY KEY (blog_post_id)
-    ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
-    ,CONSTRAINT fk_blog_post_blog FOREIGN KEY (blog_id) REFERENCES blogs (blog_id)
-    ,CONSTRAINT fk_blog_post_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
-    ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
-    
-);
-
-DROP TABLE IF EXISTS toonces.sessions;
-
-CREATE TABLE toonces.sessions (
-     session_id     BIGINT      NOT NULL    AUTO_INCREMENT
-    ,user_id        BIGINT      NOT NULL
-    ,ip_address     BIGINT      NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
-    ,started        TIMESTAMP   NOT NULL
-    ,user_agent     VARCHAR(192)
-        ,PRIMARY KEY (session_id)
-);
-
-DROP TABLE IF EXISTS toonces.page_user_access;
-
-CREATE TABLE toonces.page_user_access (
-     page_user_access_id     BIGINT  NOT NULL    AUTO_INCREMENT
-    ,page_id                 BIGINT  NOT NULL
-    ,user_id                 BIGINT  NOT NULL
-    ,can_edit                BOOL    NOT NULL    DEFAULT 0
-        ,PRIMARY KEY (page_user_access_id)
-        ,CONSTRAINT idx_pageid_userid UNIQUE INDEX 
-        (
-             page_id
-            ,user_id
-        )
-        ,CONSTRAINT fk_page_id FOREIGN KEY (page_id) REFERENCES toonces.pages(page_id)
-        ,CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES toonces.users(user_id)
-);
-
-
-DROP TABLE IF EXISTS toonces.login_attempts;
-
-CREATE TABLE toonces.login_attempts (
-
+CREATE TABLE IF NOT EXISTS login_attempts (
      login_attempt_id       BIGINT          NOT NULL    AUTO_INCREMENT
     ,attempt_user_id        BIGINT          NULL
     ,attempt_time           TIMESTAMP       NOT NULL
-    ,http_client_ip         INT UNSIGNED
-    ,http_x_forwarded_for   INT UNSIGNED
-    ,remote_addr            INT UNSIGNED
-    ,user_agent             VARCHAR(255)
+    ,http_client_ip         INT UNSIGNED    NULL
+    ,http_x_forwarded_for   INT UNSIGNED    NULL
+    ,remote_addr            INT UNSIGNED    NULL
+    ,user_agent             VARCHAR(1000)   NULL
 
-        ,PRIMARY KEY (login_attempt_id)
-);
+        ,CONSTRAINT pk_login_attempts PRIMARY KEY (login_attempt_id)
+        ,CONSTRAINT fk_login_attempt_user FOREIGN KEY (attempt_user_id) REFERENCES users (user_id)
+        ,INDEX idx_attempt_time (attempt_time)
+        ,INDEX idx_http_client_ip (http_client_ip)
+        ,INDEX idx_http_x_forwarded_for (http_x_forwarded_for)
+        ,INDEX idx_remote_addr (remote_addr)
+        ,INDEX idx_login_user_agent (user_agent)
 
-/**************** Site Administration Tools ********************/
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
-DROP TABLE IF EXISTS toonces.adminpages;
 
-CREATE TABLE toonces.adminpages (
+CREATE TABLE IF NOT EXISTS adminpages (
      adminpage_id           BIGINT          NOT NULL
     ,admin_parent_page_id   BIGINT          NOT NULL
-    ,pathname               VARCHAR(50)
-    ,page_title             VARCHAR(100)
-    ,page_link_text         VARCHAR(100)
+    ,pathname               VARCHAR(50)     NULL
+    ,page_title             VARCHAR(100)    NULL
+    ,page_link_text         VARCHAR(100)    NULL
     ,pagebuilder_class      VARCHAR(50)     NOT NULL
     ,pageview_class         VARCHAR(50)     NOT NULL
     ,css_stylesheet         VARCHAR(100)    NOT NULL
-    ,created_by             VARCHAR(50)
+    ,created_by             VARCHAR(50)     NULL
     ,created_dt             TIMESTAMP       NOT NULL
-    ,modified_dt            DATETIME
-    ,redirect_on_error      BOOL
-    ,published              BOOL
+    ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
+    ,redirect_on_error      BOOL            NOT NULL DEFAULT 0
+    ,published              BOOL            NOT NULL
 
-        ,PRIMARY KEY (adminpage_id)
-);
+        ,CONSTRAINT pk_adminpages PRIMARY KEY (adminpage_id)
+
+) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
