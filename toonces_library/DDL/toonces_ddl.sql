@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS pages (
 CREATE TABLE IF NOT EXISTS page_hierarchy_bridge (
      bridge_id          BIGINT      NOT NULL AUTO_INCREMENT
     ,page_id            BIGINT      NOT NULL
-    ,ancestor_page_id   BIGINT      NOT NULL
+    ,ancestor_page_id   BIGINT      NULL
     ,descendant_page_id BIGINT      NULL
     ,created_dt         TIMESTAMP   NOT NULL
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS page_hierarchy_bridge (
         ,CONSTRAINT fk_phb_page FOREIGN KEY (page_id) REFERENCES pages (page_id)
         ,CONSTRAINT fk_phb_ancestor FOREIGN KEY (ancestor_page_id) REFERENCES pages (page_id)
         ,CONSTRAINT fk_phb_descendant FOREIGN KEY (descendant_page_id) REFERENCES pages (page_id)
-        ,CONSTRAINT ak_page_ancestor UNIQUE KEY (page_id, ancestor_page_id)
+        ,INDEX idx_page_ancestor (page_id, ancestor_page_id)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS adminpages (
     ,pageview_class         VARCHAR(50)     NOT NULL
     ,css_stylesheet         VARCHAR(100)    NOT NULL
     ,created_by             VARCHAR(50)     NULL
-    ,created_dt             TIMESTAMP       NOT NULL
+    ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
     ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
     ,redirect_on_error      BOOL            NOT NULL DEFAULT 0
     ,published              BOOL            NOT NULL
