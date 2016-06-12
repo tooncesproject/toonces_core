@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS users (
     ,lastname       VARCHAR(32) NOT NULL
     ,password       CHAR(128)   NOT NULL
     ,salt           CHAR(128)   NOT NULL
-    ,created        TIMESTAMP   NOT NULL
+    ,created        TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
     ,modified_dt    TIMESTAMP   NULL ON UPDATE CURRENT_TIMESTAMP
     ,revoked        TIMESTAMP   NULL
     ,is_admin       BOOL        NOT NULL  DEFAULT 0

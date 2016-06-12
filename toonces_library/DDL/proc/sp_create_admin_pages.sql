@@ -46,8 +46,8 @@ BEGIN
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET loopfinished = TRUE;
 
     -- Create a temporary table storing the values of each new page ID as it's created
-    DROP TABLE IF EXISTS tmp_new_page_ids;
-    CREATE TABLE tmp_new_page_ids
+    DROP TEMPORARY TABLE IF EXISTS tmp_new_page_ids;
+    CREATE TEMPORARY TABLE tmp_new_page_ids
     (
          adminpage_id BIGINT
         ,page_id BIGINT
