@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS sessions (
         ,CONSTRAINT fk_session_user FOREIGN KEY (user_id) REFERENCES users (user_id)
         ,INDEX IDX_session_ip (ip_address)
         ,INDEX idx_session_started (started)
-        ,INDEX idx_session_useragent (user_agent) 
+
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
@@ -156,7 +156,6 @@ CREATE TABLE IF NOT EXISTS login_attempts (
         ,INDEX idx_http_client_ip (http_client_ip)
         ,INDEX idx_http_x_forwarded_for (http_x_forwarded_for)
         ,INDEX idx_remote_addr (remote_addr)
-        ,INDEX idx_login_user_agent (user_agent)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
