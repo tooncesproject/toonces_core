@@ -40,8 +40,8 @@ include_once LIBPATH.'static_classes/GrabPageURL.php';
 include_once LIBPATH.'static_classes/GrabParentPageURL.php';
 
 
-include_once LIBPATH.'BlogPageReader.php';
 include_once LIBPATH.'BlogReader.php';
+include_once LIBPATH.'BlogPageReader.php';
 include_once LIBPATH.'DivElement.php';
 include_once LIBPATH.'TagElement.php';
 include_once LIBPATH.'HeadElement.php';
