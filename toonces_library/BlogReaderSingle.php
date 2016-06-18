@@ -68,6 +68,7 @@ SQL;
 				 ':userId' => $userId
 				,':createdDT' => $this->createdDT
 				,':blogPostId' => $this->blogPostId
+				,':blogId' => $this->blogId
 		);
 
 		// Query for previous pages 
@@ -97,6 +98,8 @@ SQL;
 			bp.created_dt <= :createdDT
 		AND
 			bp.blog_post_id != :blogPostId
+		AND
+			bp.blog_id = :blogId
 		AND
 			bp.deleted IS NULL
 		AND
@@ -166,6 +169,8 @@ SQL;
 			bp.created_dt >= :createdDT
 		AND
 			bp.blog_post_id != :blogPostId
+		AND
+			bp.blog_id = :blogId
 		AND
 			bp.deleted IS NULL
 		AND
