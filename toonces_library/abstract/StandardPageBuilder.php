@@ -85,7 +85,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 		// get head attributes
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-		$headElement->setHeadTags(file_get_contents(LIBPATH.'/static_data/head_tags.html'));
+		$headElement->setHeadTags(file_get_contents(LIBPATH.'static_data/head_tags.html'));
 		array_push($this->elementArray, $headElement);
 
 		// Add everything below to the Body Element
