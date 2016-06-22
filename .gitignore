@@ -11,12 +11,8 @@ toonces_library/MySqlOOPBasics
 test2.html
 test3.html
 
-# images - for now
-*.jpg
-*.png
-*.gif
+# photoshop
 *.psd
-images/img\ edit/*
 
 # other centagon stuffs
 custom_js
@@ -25,3 +21,5 @@ toonces_library/static_data/head_tags.html
 .gitignore
 toonces_dash_mockup.html
 
+# external libraries
+ckeditor
