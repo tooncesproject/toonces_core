@@ -3,11 +3,12 @@
 <toonces_settings>
 	<!-- Standard page settings: File locations from document root -->
 	<standard_page
-		header_html_file="toonces_library/static_data/centagon_header.html" 
-		footer_html_file="toonces_library/static_data/standard_html_footer.html"
+		header_html_file="toonces_library/custom/html/centagon_header.html" 
+		footer_html_file="toonces_library/custom/html/centagon_html_footer.html"
+		head_tags_file="toonces_library/static_data/head_tags.html"
 	>
 		<body_attributes>
-			<html_attribute key="onload" value="MM_preloadImages('/images/fb-40-ro.gif','/images/tw-40-ro.gif','/images/ig-40-ro.gif','/images/sc-40-ro.gif')"/>
+			<html_attribute key="onload" value="MM_preloadImages('/toonces_library/custom/images/fb-40-ro.gif','/toonces_library/custom/images/tw-40-ro.gif','/toonces_library/custom/images/ig-40-ro.gif','/toonces_library/custom/images/sc-40-ro.gif')"/>
 		</body_attributes>
 	</standard_page>
 </toonces_settings>

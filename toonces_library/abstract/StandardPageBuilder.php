@@ -18,6 +18,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 	var $contentElement;
 	var $headerHTML;
 	var $footerHTML;
+	var $headTagsHTML;
 	var $bodyViewElement;
 
 	function createContentElement() {
@@ -44,6 +45,9 @@ abstract class StandardPageBuilder extends PageBuilder {
 
 				$footerHTMLFile = $xmlReader->getAttribute('footer_html_file');
 				$this->footerHTML = file_get_contents(ROOTPATH.$footerHTMLFile);
+				
+				$headTagsHTMLFile = $xmlReader->getAttribute('head_tags_file');
+				$this->headTagsHTML = file_get_contents(ROOTPATH.$headTagsHTMLFile);
 
 				$pageNode = $xmlReader->expand();
 				$subNodes = $pageNode->childNodes;
@@ -85,7 +89,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 		// get head attributes
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-		$headElement->setHeadTags(file_get_contents(LIBPATH.'static_data/head_tags.html'));
+		$headElement->setHeadTags($this->headTagsHTML);
 		array_push($this->elementArray, $headElement);
 
 		// Add everything below to the Body Element
