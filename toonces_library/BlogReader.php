@@ -241,7 +241,9 @@ SQL;
 			$html = $html.'<p>'.$created.'</p>'.PHP_EOL;
 			$body = htmlspecialchars($row['body'], ENT_QUOTES);
 			$body = trim(preg_replace('/\n+/', '<br>', $body));
-			$html = $html.'<p><body>'.$body.'</body></p>'.PHP_EOL;
+			// Turn URLs into links
+			$body = preg_replace('!(http|ftp|scp)(s)?:\/\/[a-zA-Z0-9\-.?&_/]+[^.,]!', "<a href=\"\\0\">\\0</a>",$body);
+			$html = $html.'<p>'.$body.'</p>'.PHP_EOL;
 
 			$html = $html.'<br>'.PHP_EOL.'<br>'.PHP_EOL;
 		}

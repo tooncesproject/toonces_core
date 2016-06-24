@@ -271,6 +271,8 @@ SQL;
 		$html = $html.'<p><h1>'.htmlspecialchars($title, ENT_QUOTES).'</h1></p>'.PHP_EOL;
 		$html = $html.'<p><h2>'.htmlspecialchars($author, ENT_QUOTES).'</h2></p>'.PHP_EOL;
 		$html = $html.'<p>'.$dateFormatted.'</p>'.PHP_EOL;
+		// Turn URLs into links
+		$body = preg_replace('!(http|ftp|scp)(s)?:\/\/[a-zA-Z0-9\-.?&_/]+[^.,]!', "<a href=\"\\0\">\\0</a>",$body);
 		$html = $html.'<p>'.$body.'</p>'.PHP_EOL;
 
 		$html = $html.'</div>'.PHP_EOL;
