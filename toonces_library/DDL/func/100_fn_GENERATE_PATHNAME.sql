@@ -41,8 +41,8 @@ BEGIN
     SET ret = REPLACE(ret, ' ','_');
 
     -- Remove any extra spaces
-    WHILE INSTR(ret, '  ') > 0 DO
-        SET ret := replace(ret, '  ', ' ');
+    WHILE INSTR(ret, '__') > 0 DO
+        SET ret := replace(ret, '__', '_');
     END WHILE;
 
     -- lowercase it
