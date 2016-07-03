@@ -16,6 +16,11 @@ BEGIN
     DECLARE c CHAR(1);
     SET len = CHAR_LENGTH( str );
 
+    -- Truncate to 50 chars and trim any trailing spaces
+    SET str = LEFT(str,50);
+    SET str = TRIM(str);
+
+
     REPEAT 
     BEGIN 
         SET c = MID( str, i, 1 );
@@ -30,8 +35,6 @@ BEGIN
     END; 
     UNTIL i > len END REPEAT;
 
-    -- truncate at 50 chars
-    SET ret = LEFT(ret, 50);
 
     -- lowercase it
     SET ret = lcase(ret);
