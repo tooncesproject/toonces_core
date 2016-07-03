@@ -14,18 +14,17 @@ BEGIN
     DECLARE i, len SMALLINT DEFAULT 1;
     DECLARE ret VARCHAR(50) DEFAULT '';
     DECLARE c CHAR(1);
-    SET len = CHAR_LENGTH( str );
+    SET len = LEAST(CHAR_LENGTH( str ),50);
 
     -- Truncate to 50 chars and trim any trailing spaces
     SET str = LEFT(str,50);
-    SET str = TRIM(str);
 
-
+    -- remove any non-alphanumeric chars
     REPEAT 
     BEGIN 
         SET c = MID( str, i, 1 );
         IF c = ' ' THEN
-            SET ret = CONCAT(ret,'_');
+            SET ret = CONCAT(ret,' ');
         ELSE 
             IF c REGEXP '[[:alnum:]]' THEN 
                 SET ret = CONCAT(ret,c); 
@@ -35,6 +34,16 @@ BEGIN
     END; 
     UNTIL i > len END REPEAT;
 
+    -- trim any traling spaces
+    SET ret = TRIM(ret);
+
+    -- replace spaces with underscores
+    SET ret = REPLACE(ret, ' ','_');
+
+    -- Remove any extra spaces
+    WHILE INSTR(ret, '  ') > 0 DO
+        SET ret := replace(ret, '  ', ' ');
+    END WHILE;
 
     -- lowercase it
     SET ret = lcase(ret);
