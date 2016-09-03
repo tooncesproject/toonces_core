@@ -21,7 +21,7 @@ abstract class InteractionElement extends Element
 	// Array of FormElementInput objects
 	var $inputArray = array();
 
-	// uh i guess i'm supposed to be able to set the title of the submit button
+	// submitName holds a text string that will appear in the submit button.
 	public $submitName;
 	public $formName;
 	public $messageVarName;
@@ -55,39 +55,25 @@ abstract class InteractionElement extends Element
 			
 			// Here:
 			// If the input object is not a textarea,  go ahead and add it.
-			if ($inputObject->hideInput == false)	
-			$this->html = $this->html.$inputObject->html;
-			
-			
+			if ($inputObject->hideInput == false and $inputObject->inputType != 'textarea')	
+				$this->html = $this->html.$inputObject->html;
 		}
 
 		$this->html = $this->html.'</form>';
 		
 		// If there are any textarea input objects, add them here?
+		foreach ($this->inputArray as $inputObject) {
+			if ($inputObject->hideInput == false and $inputObject->inputType == 'textarea')
+				$this->html = $this->html.$inputObject->html;
+		}
 
 		// Destroy the message session variable so it doesn't show when it's not supposed to.
 		unset($_SESSION[$this->messageVarName]);
 	}
 
-	function send303($paramURI = '') {
-
-		// By default, URI is current page.
-		$uri = $_SERVER[REQUEST_URI];
-		if (empty($paramURI) == false)
-			$uri = $paramURI;
-
-		$link = "http://$_SERVER[HTTP_HOST]$uri";
-		header("HTTP/1.1 303 See Other");
-		header('Location: '.$link);
-	}
-
-	public function storeMessage($message) {
-		$_SESSION[$this->messageVarName] = $message;
-	}
 
 	public function getHTML() {
-		
-		
+			
 		// Instantiate input objects
 		$this->buildInputArray();
 		// Iterate through input objects to see if any received a POST
