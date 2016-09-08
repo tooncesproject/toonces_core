@@ -28,10 +28,6 @@ interface iFormInput
 	public $hideSignalVarName;
 	public $valueVarName;
 	
-	// Constructor function accepting basic parameters of object
-	function __construct($paramName,$paramInputType,$paramParentFormName) {
-		
-	}
 	
 	// Stores a response message to the session (so the page can display a message after POST, redirect and GET) 
 	public function storeMessage($paramMessage) {
@@ -54,16 +50,12 @@ interface iFormInput
 		
 	}
 
-	// Can probably deprecate this. All it does is call the generateForm method. 
-	public function setupForm() {
-
-	}
 	
 	// Generates the input HTML.
 	// $message is a string to be displayed, optionally
 	// $renderInput is a boolean determining whether to create an input
 	// $messageClass is the CSS class of the message, defaults to form_message_notification
-	public function generateForm($renderInput, $message = NULL, $messageClass = NULL) {
+	public function getHTML($renderInput, $message = NULL, $messageClass = NULL) {
 
 	}
 }

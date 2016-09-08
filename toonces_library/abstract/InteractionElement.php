@@ -55,16 +55,16 @@ abstract class InteractionElement extends Element
 			
 			// Here:
 			// If the input object is not a textarea,  go ahead and add it.
-			if ($inputObject->hideInput == false and $inputObject->inputType != 'textarea')	
-				$this->html = $this->html.$inputObject->html;
+			if ($inputObject->hideInput == false and get_class($inputObject != 'TextareaFormInput'))	
+				$this->html = $this->html.$inputObject->getHTML;
 		}
 
 		$this->html = $this->html.'</form>';
 		
-		// If there are any textarea input objects, add them here?
+		// If there are any textarea input objects, add them here, outside the form.
 		foreach ($this->inputArray as $inputObject) {
-			if ($inputObject->hideInput == false and $inputObject->inputType == 'textarea')
-				$this->html = $this->html.$inputObject->html;
+			if ($inputObject->hideInput == false and get_class($inputObject == 'TextareaFormInput'))
+				$this->html = $this->html.$inputObject->getHTML;
 		}
 
 		// Destroy the message session variable so it doesn't show when it's not supposed to.
