@@ -15,28 +15,7 @@
 
 class TextareaFormInput extends FormInput implements iFormInput
 {
-	
-	/* inherited from FormInput
-	public $name;
-	public $inputType;
-	public $size;
-	public $postState = false;
-	public $html;
-	public $cssClass;
-	public $message;
-	public $postData;
-	public $formValue;
-	public $displayName;
-	public $renderInput = true;
-	public $hideInput = false;
-	public $messageClass = 'input_message_notification';
-	public $parentFormName;
-	public $messageVarName;
-	public $renderSignalVarName;
-	public $hideSignalVarName;
-	public $valueVarName;
-	*/
-	
+
 	public $rows;
 	public $cols;
 

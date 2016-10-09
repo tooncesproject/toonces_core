@@ -9,7 +9,7 @@
 
 require_once LIBPATH.'toonces.php';
 
-abstract class InteractionElement extends Element
+abstract class InteractionElement extends Element implements iElement
 {
 
 	// $postState:
@@ -19,19 +19,17 @@ abstract class InteractionElement extends Element
 	public $postState = false;
 
 	// Array of FormElementInput objects
-	var $inputArray = array();
+	// Paul note: gonna try having delegate object hold array
+	// var $inputArray = array();
 
 	// submitName holds a text string that will appear in the submit button.
 	public $submitName;
 	public $formName;
 	public $messageVarName;
 	
-	public function buildInputArray() {
-		// This function holds customizations for building the form array.
-		// Its responsibility is to add members to the formArray[] instance variable.
-		// FormElementInput objects will be rendered in the order they are added here.
-	}
-	
+	// This is the 
+	public $interactionDelegate;
+
 
 	public function generateFormHTML() {
 		// Utility function, not likely you'll need to override.
@@ -51,7 +49,7 @@ abstract class InteractionElement extends Element
 		$this->html = $messageHTML.PHP_EOL;
 
 		$this->html = $this->html.'<form method="post" '.$formNameHTML.'>';
-		foreach ($this->inputArray as $inputObject) {
+		foreach ($this->interactionDelegate->inputArray as $inputObject) {
 			
 			// Here:
 			// If the input object is not a textarea,  go ahead and add it.
@@ -62,7 +60,7 @@ abstract class InteractionElement extends Element
 		$this->html = $this->html.'</form>';
 		
 		// If there are any textarea input objects, add them here, outside the form.
-		foreach ($this->inputArray as $inputObject) {
+		foreach ($this->interactionDelegate->inputArray as $inputObject) {
 			if ($inputObject->hideInput == false and get_class($inputObject == 'TextareaFormInput'))
 				$this->html = $this->html.$inputObject->getHTML;
 		}
@@ -74,14 +72,23 @@ abstract class InteractionElement extends Element
 
 	public function getHTML() {
 			
-		// Instantiate input objects
-		$this->buildInputArray();
+		// If the array of input objects is empty at load time, you suck.
+		if (empty($this->interactionDelegate->inputArray))
+			throw new Exception('InteractionElement error: Array of FormInput objects must be populated!');
+		
 		// Iterate through input objects to see if any received a POST
-		foreach ($this->inputArray as $input) {
-			if ($input->postState == true)
+		foreach ($this->interactionDelegate->inputArray as $input) {
+			if ($input->postState)
 				$this->postState = true;
 		}
-	
+
+		// If the FormInput objects in the array did not detect POST data, render the form.
+		// Otherwise, defer action to the InteractionDelegate object.
+		if ($this->postState) {
+			
+		}
+		
+		
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;
 	
