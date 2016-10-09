@@ -57,3 +57,14 @@ include_once LIBPATH.'BlogFormElement.php';
 include_once LIBPATH.'BlogEditorFormElement.php';
 include_once LIBPATH.'URLCheckFormElement.php';
 include_once LIBPATH.'DeleteBlogPostFormElement.php';
+include_once LIBPATH.'interfaces/iInteractionDelegate.php';
+include_once LIBPATH.'abstract/InteractionDelegate.php';
+include_once LIBPATH.'userinterface/InteractionElement.php';
+include_once LIBPATH.'interfaces/iFormInput.php';
+include_once LIBPATH.'userinterface/FormInput.php';
+include_once LIBPATH.'userinterface/TextareaFormInput.php';
+
+
+//test
+include_once LIBPATH.'test/TestInteractionElement.php';
+include_once LIBPATH.'test/TestInteractionDelegate.php';
