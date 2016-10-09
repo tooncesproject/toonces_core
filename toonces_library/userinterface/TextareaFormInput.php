@@ -1,6 +1,6 @@
 <?php
 /*
- * FormInput
+ * TextareaFormInput
  * Initial commit: Paul Anderson 9/5/16
  *
  * Versioned from FormElementInput to simplify implementation.
@@ -68,28 +68,7 @@ class TextareaFormInput extends FormInput implements iFormInput
 
 	}
 
-	/*	
-	public function storeMessage($paramMessage) {
-		$this->message = $paramMessage;
-		$_SESSION[$this->messageVarName] = $this->message;
-	}
 
-	public function storeRenderSignal($paramRenderSignal) {
-		$this->renderInput = $paramRenderSignal;
-		$_SESSION[$this->renderSignalVarName] = $this->renderInput;
-	}
-
-	public function storeHideSignal($paramHideSignal) {
-		$this->hideInput = $paramHideSignal;
-		$_SESSION[$this->hideSignalVarName] = $this->hideInput;
-	}
-
-	public function storeValue($paramFormValue) {
-		$this->formValue = $paramFormValue;
-		$_SESSION[$this->valueVarName] = $paramFormValue;
-	}
-
-	*/
 	// $message is a string to be displayed, optionally
 	// $renderInput is a boolean determining whether to create an input
 	// $messageClass is the CSS class of the message, defaults to form_message_notification
@@ -122,10 +101,9 @@ class TextareaFormInput extends FormInput implements iFormInput
 				$formValueHTML = ' value="'.$this->formValue.'"';
 
 			$this->html = $this->html.$messageHTML.PHP_EOL;
-
-
+		
 			if ($this->renderInput == true)
-				$this->html = '<textarea name="'.$this->name.'" rows="'.$this->rows.'" cols="'.$this->cols.'" form="'.$this->parentFormName.'">'.PHP_EOL.$this->formValue.'</textarea>'.PHP_EOL;
+				$this->html = $this->html.'<textarea name="'.$this->name.'" rows="'.$this->rows.'" cols="'.$this->cols.'" form="'.$this->parentFormName.'">'.PHP_EOL.$this->formValue.'</textarea>'.PHP_EOL;
 		}
 
 		return $this->html;

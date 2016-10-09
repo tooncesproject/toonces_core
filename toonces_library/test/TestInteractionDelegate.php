@@ -11,6 +11,13 @@ class TestInteractionDelegate extends InteractionDelegate implements iInteractio
 		
 		$testElement = new FormInput('test', 'text', $this->formName);
 		$this->inputArray['test'] = $testElement;
+		
+		// text area
+		$misterTA = new TextareaFormInput('thetextarea', $this->formName);
+		$misterTA->cols = 50;
+		$misterTA->rows = 20;
+		
+		$this->inputArray['thetextarea'] = $misterTA;
 
 		$submitElement = new FormInput('submit', 'submit', $this->formName);
 		$submitElement->formValue = $this->submitName;
@@ -25,7 +32,13 @@ class TestInteractionDelegate extends InteractionDelegate implements iInteractio
 
 		$this->inputArray['test']->storeMessage($msg);
 		$this->inputArray['test']->storeValue($msg);
+		
+		$taMsg = $this->inputArray['thetextarea']->postData;
+		$this->inputArray['thetextarea']->storeMessage($taMsg);
+		$this->inputArray['thetextarea']->storeValue($taMsg);
+		
 		$this->send303();
+
 
 	}
 	

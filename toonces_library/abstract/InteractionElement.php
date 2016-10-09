@@ -41,10 +41,11 @@ class InteractionElement extends Element implements iElement
 			$messageHTML = '<div class="form_message_notification"><p>'.$_SESSION[$this->messageVarName].'</p></div>';
 
 		$formNameHTML = 'name="'.$this->formName.'"';
+		$formIdHTML = 'id="'.$this->formName.'"';
 
 		$this->html = $messageHTML.PHP_EOL;
 
-		$this->html = $this->html.'<form method="post" '.$formNameHTML.'>';
+		$this->html = $this->html.'<form method="post" '.$formNameHTML.$formIdHTML.'>';
 		foreach ($this->interactionDelegate->inputArray as $inputObject) {
 			
 			// Here:
