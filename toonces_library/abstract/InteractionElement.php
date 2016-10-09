@@ -9,7 +9,7 @@
 
 require_once LIBPATH.'toonces.php';
 
-abstract class InteractionElement extends Element implements iElement
+class InteractionElement extends Element implements iElement
 {
 
 	// $postState:
@@ -53,16 +53,16 @@ abstract class InteractionElement extends Element implements iElement
 			
 			// Here:
 			// If the input object is not a textarea,  go ahead and add it.
-			if ($inputObject->hideInput == false and get_class($inputObject != 'TextareaFormInput'))	
-				$this->html = $this->html.$inputObject->getHTML;
+			if ($inputObject->hideInput == false and get_class($inputObject) != 'TextareaFormInput')	
+				$this->html = $this->html.$inputObject->getHTML(true);
 		}
 
 		$this->html = $this->html.'</form>';
 		
 		// If there are any textarea input objects, add them here, outside the form.
 		foreach ($this->interactionDelegate->inputArray as $inputObject) {
-			if ($inputObject->hideInput == false and get_class($inputObject == 'TextareaFormInput'))
-				$this->html = $this->html.$inputObject->getHTML;
+			if ($inputObject->hideInput == false and get_class($inputObject) == 'TextareaFormInput')
+				$this->html = $this->html.$inputObject->getHTML(true);
 		}
 
 		// Destroy the message session variable so it doesn't show when it's not supposed to.
@@ -85,10 +85,11 @@ abstract class InteractionElement extends Element implements iElement
 		// If the FormInput objects in the array did not detect POST data, render the form.
 		// Otherwise, defer action to the InteractionDelegate object.
 		if ($this->postState) {
-			
+			$this->interactionDelegate->processFormData();
+		} else {
+			$this->generateFormHTML();
 		}
-		
-		
+
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;
 	

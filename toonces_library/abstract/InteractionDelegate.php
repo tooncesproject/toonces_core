@@ -7,12 +7,20 @@
  * to the server via an InteractionElement subclass.
  * 
  */
+require_once LIBPATH.'toonces.php';
 
-abstract class InteractionDelegate implements iInteractionDelegate
+abstract class InteractionDelegate // implements iInteractionDelegate
 {
 
 	// Variable to hold the input array
 	public $inputArray;
+	public $formName;
+	public $interactionElement;
+	
+	public function __construct($formName,$interactionElement) {
+		$this->formName = $formName;
+		$this->interactionElement = $interactionElement;
+	}
 	
 	// Method handling form data processing
 	public function processFormData() {
