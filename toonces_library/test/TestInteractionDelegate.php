@@ -12,18 +12,21 @@ class TestInteractionDelegate extends InteractionDelegate implements iInteractio
 		$testElement = new FormInput('test', 'text', $this->formName);
 		$this->inputArray['test'] = $testElement;
 
+		$submitElement = new FormInput('submit', 'submit', $this->formName);
+		$submitElement->formValue = $this->submitName;
+		$this->inputArray['submit'] = $submitElement;
+
 	}
 	
 	// Method handling form data processing
 	public function processFormData() {
 		
 		$msg = $this->inputArray['test']->postData;
-		// echo var_dump($this->inputArray['test']);
-		
-		
+
 		$this->inputArray['test']->storeMessage($msg);
-		
-		$this->interactionElement->generateFormHTML();
+		$this->inputArray['test']->storeValue($msg);
+		$this->send303();
+
 	}
 	
 }

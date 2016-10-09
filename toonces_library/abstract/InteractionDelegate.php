@@ -9,13 +9,13 @@
  */
 require_once LIBPATH.'toonces.php';
 
-abstract class InteractionDelegate // implements iInteractionDelegate
+abstract class InteractionDelegate implements iInteractionDelegate
 {
 
-	// Variable to hold the input array
-	public $inputArray;
-	public $formName;
-	public $interactionElement;
+	public $inputArray; 			// Variable to hold the input array
+	public $formName;				// Name of form - Required.
+	public $interactionElement;		// InterationElement object - Required.
+	public $submitName = 'Submit';	// Default text displayed on Submit button if implemented 
 	
 	public function __construct($formName,$interactionElement) {
 		$this->formName = $formName;

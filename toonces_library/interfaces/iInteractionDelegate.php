@@ -10,18 +10,14 @@ require_once LIBPATH.'toonces.php';
 
 interface  iInteractionDelegate
 {
-	
-	// Variable to hold the input array
-	//var $inputArray; 
 
-	public function buildInputArray();// {
+	public function buildInputArray();
 		// This function holds customizations for building the form array.
 		// Its responsibility is to add members to the formArray[] instance variable.
 		// FormElementInput objects will be rendered in the order they are added here.
-//	}
+
 	
-	// Method handling form data processing
-	public function processFormData(); // {
-		
-	//}
+	public function processFormData();
+		// Method handling form data processing
+
 }

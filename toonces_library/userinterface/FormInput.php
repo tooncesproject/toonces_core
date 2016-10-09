@@ -14,7 +14,7 @@
  */
 require_once LIBPATH.'toonces.php';
 
-class FormInput // implements iFormInput
+class FormInput implements iFormInput
 {
 	public $name;
 	public $inputType;

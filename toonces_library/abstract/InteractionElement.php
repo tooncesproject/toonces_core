@@ -18,16 +18,12 @@ class InteractionElement extends Element implements iElement
 	//  true - Response state - a post has been submitted
 	public $postState = false;
 
-	// Array of FormElementInput objects
-	// Paul note: gonna try having delegate object hold array
-	// var $inputArray = array();
 
 	// submitName holds a text string that will appear in the submit button.
-	public $submitName;
 	public $formName;
 	public $messageVarName;
 	
-	// This is the 
+	// This variable holds the custom InteractionDelegate object that manages input and output.
 	public $interactionDelegate;
 
 
@@ -89,6 +85,13 @@ class InteractionElement extends Element implements iElement
 		} else {
 			$this->generateFormHTML();
 		}
+
+		// If HTML header and footer have not been set externally, default to standard style.
+		if (!isset($this->htmlHeader))
+			$this->htmlHeader = '<div class="copy_block">';
+
+		if (!isset($this->htmlFooter))
+			$this->htmlFooter = '</div>';
 
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;
