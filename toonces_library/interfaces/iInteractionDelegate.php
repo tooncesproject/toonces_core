@@ -16,7 +16,7 @@ interface  iInteractionDelegate
 		// Its responsibility is to add members to the formArray[] instance variable.
 		// FormElementInput objects will be rendered in the order they are added here.
 
-	
+
 	public function processFormData();
 		// Method handling form data processing
 

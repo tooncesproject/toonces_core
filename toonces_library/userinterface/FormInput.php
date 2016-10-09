@@ -103,7 +103,7 @@ class FormInput implements iFormInput
 		$_SESSION[$this->valueVarName] = $paramFormValue;
 	}
 
-	
+
 	// $message is a string to be displayed, optionally
 	// $renderInput is a boolean determining whether to create an input
 	// $messageClass is the CSS class of the message, defaults to form_message_notification

@@ -37,8 +37,8 @@ class TextareaFormInput extends FormInput implements iFormInput
 			// Destroy the message
 			unset($_SESSION[$this->messageVarName]);
 		}
-		
-		
+
+
 		// Receive render signal if exists
 		if (isset($_SESSION[$this->renderSignalVarName])) {
 			$this->renderInput = $_SESSION[$this->renderSignalVarName];
@@ -101,7 +101,7 @@ class TextareaFormInput extends FormInput implements iFormInput
 				$formValueHTML = ' value="'.$this->formValue.'"';
 
 			$this->html = $this->html.$messageHTML.PHP_EOL;
-		
+
 			if ($this->renderInput == true)
 				$this->html = $this->html.'<textarea name="'.$this->name.'" rows="'.$this->rows.'" cols="'.$this->cols.'" form="'.$this->parentFormName.'">'.PHP_EOL.$this->formValue.'</textarea>'.PHP_EOL;
 		}
@@ -110,5 +110,5 @@ class TextareaFormInput extends FormInput implements iFormInput
 
 	}
 
-	
+
 }

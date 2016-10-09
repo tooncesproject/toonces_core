@@ -22,7 +22,7 @@ class InteractionElement extends Element implements iElement
 	// submitName holds a text string that will appear in the submit button.
 	public $formName;
 	public $messageVarName;
-	
+
 	// This variable holds the custom InteractionDelegate object that manages input and output.
 	public $interactionDelegate;
 
@@ -47,15 +47,15 @@ class InteractionElement extends Element implements iElement
 
 		$this->html = $this->html.'<form method="post" '.$formNameHTML.$formIdHTML.'>';
 		foreach ($this->interactionDelegate->inputArray as $inputObject) {
-			
+
 			// Here:
 			// If the input object is not a textarea,  go ahead and add it.
-			if ($inputObject->hideInput == false and get_class($inputObject) != 'TextareaFormInput')	
+			if ($inputObject->hideInput == false and get_class($inputObject) != 'TextareaFormInput')
 				$this->html = $this->html.$inputObject->getHTML(true);
 		}
 
 		$this->html = $this->html.'</form>';
-		
+
 		// If there are any textarea input objects, add them here, outside the form.
 		foreach ($this->interactionDelegate->inputArray as $inputObject) {
 			if ($inputObject->hideInput == false and get_class($inputObject) == 'TextareaFormInput')
@@ -68,11 +68,11 @@ class InteractionElement extends Element implements iElement
 
 
 	public function getHTML() {
-			
+
 		// If the array of input objects is empty at load time, you suck.
 		if (empty($this->interactionDelegate->inputArray))
 			throw new Exception('InteractionElement error: Array of FormInput objects must be populated!');
-		
+
 		// Iterate through input objects to see if any received a POST
 		foreach ($this->interactionDelegate->inputArray as $input) {
 			if ($input->postState)
@@ -96,7 +96,7 @@ class InteractionElement extends Element implements iElement
 
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;
-	
+
 		return $this->html;
 	}
 

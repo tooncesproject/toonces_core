@@ -15,14 +15,13 @@ interface iFormInput
 
 	// Stores a signal in the session whether or not to render the input
 	public function storeRenderSignal($paramRenderSignal);
-	
-	// Stores a signal in the session whether or not to hide the input
-	// redundant?
+
+	// Stores a signal in the session whether or not to hide the entire element
 	public function storeHideSignal($paramHideSignal);
-	
+
 	// Stores a string in the session so the form can display a value previously input by the user 
 	public function storeValue($paramFormValue);
-	
+
 	// Generates the input HTML.
 	// $message is a string to be displayed, optionally
 	// $renderInput is a boolean determining whether to create an input
