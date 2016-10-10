@@ -40,8 +40,8 @@ class FormInput implements iFormInput
 
 
 		// Validate input type
-		if (!Enumeration::validateString($paramInputType, 'InputTypes'))
-			throw new Exception('FormInput exception: Input type parameter must be a valid HTML input type '.$paramInputType.' defined in '. get_class($paramInteractionDelegate).' is not valid. See static_classes/InputTypes::enum');
+		if (!Enumeration::validateString($paramInputType, 'EnumInputTypes'))
+			throw new Exception('FormInput exception: Input type parameter must be a valid HTML input type '.$paramInputType.' defined in '. get_class($paramInteractionDelegate).' is not valid. See static_classes/EnumInputTypes::enum');
 
 		// Check to ensure paramInteractionDelegate is a subclass of InteractionDelegate.
 		if (!is_subclass_of($paramInteractionDelegate, 'InteractionDelegate'))

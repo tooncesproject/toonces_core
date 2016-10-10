@@ -1,6 +1,6 @@
 <?php
 
-// Unit test for Enumeration / InputTypes classes
+// Unit test for Enumeration / EnumInputTypes classes
 // Paul Anderson, 2016-10-09
 
 include 'config.php';
@@ -11,15 +11,15 @@ $ordinalValue = 19;
 
 // test getOrdinal method
 echo 'getOrdinal'.PHP_EOL;
-echo Enumeration::getOrdinal($stringValue, 'InputTypes').PHP_EOL;
+echo Enumeration::getOrdinal($stringValue, 'EnumInputTypes').PHP_EOL;
 
 // test getString method
 echo 'getString'.PHP_EOL;
-echo Enumeration::getString($ordinalValue, 'InputTypes').PHP_EOL;
+echo Enumeration::getString($ordinalValue, 'EnumInputTypes').PHP_EOL;
 
 // test validateString method: negative
 echo 'validateString negative'.PHP_EOL;
-$vsResult = Enumeration::validateString('foo', 'InputTypes');
+$vsResult = Enumeration::validateString('foo', 'EnumInputTypes');
 if ($vsResult) {
 	echo 'error'.PHP_EOL;
 } else {
@@ -27,7 +27,7 @@ if ($vsResult) {
 }
 
 echo 'validateString positive'.PHP_EOL;
-$vspResult = Enumeration::validateString('text', 'InputTypes');
+$vspResult = Enumeration::validateString('text', 'EnumInputTypes');
 if (!$vspResult) {
 	echo 'error'.PHP_EOL;
 } else {
@@ -35,7 +35,7 @@ if (!$vspResult) {
 }
 
 echo 'validateOrdinal negative'.PHP_EOL;
-$voResult = Enumeration::validateOrdinal(666, 'InputTypes');
+$voResult = Enumeration::validateOrdinal(666, 'EnumInputTypes');
 if ($voResult) {
 	echo 'error'.PHP_EOL;
 } else {
@@ -43,7 +43,7 @@ if ($voResult) {
 }
 
 echo 'validateOrdinal positive'.PHP_EOL;
-$vopResult = Enumeration::validateOrdinal(19, 'InputTypes');
+$vopResult = Enumeration::validateOrdinal(19, 'EnumInputTypes');
 if (!$vopResult) {
 	echo 'error'.PHP_EOL;
 } else {

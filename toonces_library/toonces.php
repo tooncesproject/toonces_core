@@ -1,7 +1,7 @@
 <?php
 
-include_once LIBPATH.'abstract/Enumeration.php';
-include_once LIBPATH.'static_classes/InputTypes.php';
+include_once LIBPATH.'static_classes/Enumeration.php';
+include_once LIBPATH.'static_classes/EnumInputTypes.php';
 include_once LIBPATH.'interfaces/iConnectInfo.php';
 include_once LIBPATH.'interfaces/iElement.php';
 include_once LIBPATH.'Element.php';
