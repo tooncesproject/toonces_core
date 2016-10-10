@@ -38,7 +38,6 @@ class FormInput implements iFormInput
 
 	function __construct($paramName,$paramInputType,$paramInteractionDelegate) {
 
-
 		// Validate input type
 		if (!Enumeration::validateString($paramInputType, 'EnumInputTypes'))
 			throw new Exception('FormInput exception: Input type parameter must be a valid HTML input type '.$paramInputType.' defined in '. get_class($paramInteractionDelegate).' is not valid. See static_classes/EnumInputTypes::enum');
@@ -159,7 +158,6 @@ class FormInput implements iFormInput
 				$formValueHTML = ' value="'.$this->formValue.'"';
 
 			$this->html = $this->html.$messageHTML.PHP_EOL;
-
 
 			if ($this->renderInput == true)
 				$this->html = $this->html.$displayNameHTML.'<input type="'.$this->inputType.'" name="'.$this->name.'" '.$classHTML.$sizeHTML.$formValueHTML.'>'.PHP_EOL;
