@@ -36,9 +36,14 @@ class InteractionElement extends Element implements iElement
 		if (isset($this->formName) == false)
 			throw new Exception('Form name must be set.');
 
-		$this->messageVarName = $this->formName.'_msg';
+
+		$this->messageVarName = $this->interactionDelegate->messageVarName;
 		if (isset($_SESSION[$this->messageVarName]))
 			$messageHTML = '<div class="form_message_notification"><p>'.$_SESSION[$this->messageVarName].'</p></div>';
+
+		// Destroy the message session variable so it doesn't show when it's not supposed to.
+		unset($_SESSION[$this->messageVarName]);
+
 
 		$formNameHTML = 'name="'.$this->formName.'"';
 		$formIdHTML = 'id="'.$this->formName.'"';
@@ -62,12 +67,14 @@ class InteractionElement extends Element implements iElement
 				$this->html = $this->html.$inputObject->getHTML(true);
 		}
 
-		// Destroy the message session variable so it doesn't show when it's not supposed to.
-		unset($_SESSION[$this->messageVarName]);
 	}
 
 
 	public function getHTML() {
+
+		// Throw an exception of an InteractionDelegate object has not been assigned by runtime.
+		if (!isset($this->interactionDelegate))
+			throw new Exception('InteractionElement error: InteractionDelegate must be assigned to this object before runtime.');
 
 		// If the array of input objects is empty at load time, you suck.
 		if (empty($this->interactionDelegate->inputArray))
@@ -79,8 +86,8 @@ class InteractionElement extends Element implements iElement
 				$this->postState = true;
 		}
 
-		// If the FormInput objects in the array did not detect POST data, render the form.
-		// Otherwise, defer action to the InteractionDelegate object.
+		// If the FormInput objects in the array detected POST data, defer action to the delegate.
+		// Otherwise, render the form.
 		if ($this->postState) {
 			$this->interactionDelegate->processFormData();
 		} else {

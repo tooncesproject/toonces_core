@@ -19,53 +19,21 @@ class TextareaFormInput extends FormInput implements iFormInput
 	public $rows;
 	public $cols;
 
-	function __construct($paramName,$paramParentFormName) {
+	function __construct($paramName,$paramInteractionDelegate) {
+
+		// Check to ensure paramInteractionDelegate is a subclass of InteractionDelegate
+		if (!is_subclass_of($paramInteractionDelegate, 'InteractionDelegate'))
+			throw new Exception('TextareaFormInput exception: interaction delegate parameter must be an InteractionDelegate subclass.');
 
 		$this->name = $paramName;
 		$this->inputType = 'hidden';
-		$this->parentFormName = $paramParentFormName;
+		$this->interactionDelegate = $paramInteractionDelegate;
+		$this->parentFormName = $this->interactionDelegate->formName;
 
-		// Make receptive to utility session variables
-		$this->messageVarName = $this->parentFormName.$this->name.'_inmsg';
-		$this->renderSignalVarName = $this->parentFormName.$this->name.'_rsig';
-		$this->hideSignalVarName = $this->parentFormName.$this->name.'_hsig';
-		$this->valueVarName = $this->parentFormName.$this->name.'_vsig';
+		// Add self to the delegate's array of FormInput objects.
+		$this->interactionDelegate->inputArray[$this->name] = $this;
 
-		// receive message if exists.
-		if (isset($_SESSION[$this->messageVarName])) {
-			$this->message = $_SESSION[$this->messageVarName];
-			// Destroy the message
-			unset($_SESSION[$this->messageVarName]);
-		}
-
-
-		// Receive render signal if exists
-		if (isset($_SESSION[$this->renderSignalVarName])) {
-			$this->renderInput = $_SESSION[$this->renderSignalVarName];
-			// Destroy the signal
-			unset($_SESSION[$this->renderSignalVarName]);
-		}
-
-		//receive hide signal if exists
-		if (isset($_SESSION[$this->hideSignalVarName])) {
-			$this->hideInput = $_SESSION[$this->hideSignalVarName];
-			// Destroy the signal
-			unset($_SESSION[$this->hideSignalVarName]);
-		}
-
-		//receive value signal if exists
-		if (isset($_SESSION[$this->valueVarName])) {
-			$this->formValue = $_SESSION[$this->valueVarName];
-			// Destroy the signal
-			unset($_SESSION[$this->valueVarName]);
-		}
-
-		// Check for post data.
-		if (isset($_POST[$this->name])) {
-			$this->postState = true;
-			$this->postData = isset($_POST[$this->name]) ? $_POST[$this->name] : NULL;
-		}
-
+		$this->acquireSignals();
 	}
 
 

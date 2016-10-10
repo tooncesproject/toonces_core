@@ -15,11 +15,23 @@ abstract class InteractionDelegate implements iInteractionDelegate
 	public $inputArray; 			// Variable to hold the input array
 	public $formName;				// Name of form - Required.
 	public $interactionElement;		// InterationElement object - Required.
-	public $submitName = 'Submit';	// Default text displayed on Submit button if implemented 
+	public $submitName = 'Submit';	// Default text displayed on Submit button if implemented
+	public $messageVarName;			// Name of variable holding a user feedback message in session.
 
+	// To construct a delegate:
+		// $formName is the name assigned to the form via InteractionElement
+		// $interactionElement is the previously instantiated InteractionElement object
 	public function __construct($formName,$interactionElement) {
+
+		// Assign the name and InteractionElement object
 		$this->formName = $formName;
 		$this->interactionElement = $interactionElement;
+
+		// Generate a variable name for the form message (feedback for user, stored in the session)
+		$this->messageVarName = $this->formName.'_msg';
+		//if (isset($_SESSION[$this->messageVarName]))
+		//	$messageHTML = '<div class="form_message_notification"><p>'.$_SESSION[$this->messageVarName].'</p></div>';
+
 	}
 
 	// Method handling form data processing
