@@ -10,7 +10,6 @@ include_once LIBPATH.'interfaces/iView.php';
 require_once LIBPATH.'PageView.php';
 include_once LIBPATH.'abstract/PageBuilder.php';
 include_once LIBPATH.'abstract/StandardPageBuilder.php';
-include_once LIBPATH.'custom/toonces_custom.php';
 include_once LIBPATH.'utility/SessionManager.php';
 include_once LIBPATH.'abstract/FormElement.php';
 include_once LIBPATH.'utility/DynamicNavigationLink.php';
@@ -65,6 +64,9 @@ include_once LIBPATH.'userinterface/InteractionElement.php';
 include_once LIBPATH.'interfaces/iFormInput.php';
 include_once LIBPATH.'userinterface/FormInput.php';
 include_once LIBPATH.'userinterface/TextareaFormInput.php';
+
+// custom
+include_once LIBPATH.'custom/toonces_custom.php';
 
 
 //test
