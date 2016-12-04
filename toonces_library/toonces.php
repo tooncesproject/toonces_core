@@ -1,7 +1,7 @@
 <?php
 
-include_once LIBPATH.'static_classes/Enumeration.php';
-include_once LIBPATH.'static_classes/EnumInputTypes.php';
+include_once LIBPATH.'utility/static/Enumeration.php';
+include_once LIBPATH.'utility/static/EnumInputTypes.php';
 include_once LIBPATH.'interfaces/iConnectInfo.php';
 include_once LIBPATH.'interfaces/iElement.php';
 include_once LIBPATH.'element/Element.php';
@@ -36,8 +36,8 @@ include_once LIBPATH.'admin/AdminViewElement.php';
 include_once LIBPATH.'element/html_component/BodyViewElement.php';
 
 include_once LIBPATH.'static_classes/SQLConn.php';
-include_once LIBPATH.'utility/UniversalConnect.php';
-include_once LIBPATH.'static_classes/GrabPageURL.php';
+include_once LIBPATH.'utility/static/UniversalConnect.php';
+include_once LIBPATH.'utility/static/GrabPageURL.php';
 include_once LIBPATH.'static_classes/GrabParentPageURL.php';
 
 
