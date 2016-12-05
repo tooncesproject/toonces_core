@@ -35,10 +35,9 @@ include_once LIBPATH.'pagebuilders/BlogPostSinglePageBuilder.php';
 include_once LIBPATH.'admin/AdminViewElement.php';
 include_once LIBPATH.'element/html_component/BodyViewElement.php';
 
-include_once LIBPATH.'static_classes/SQLConn.php';
 include_once LIBPATH.'utility/static/UniversalConnect.php';
 include_once LIBPATH.'utility/static/GrabPageURL.php';
-include_once LIBPATH.'static_classes/GrabParentPageURL.php';
+include_once LIBPATH.'utility/static/GrabParentPageURL.php';
 
 
 include_once LIBPATH.'element/blog/BlogReader.php';
