@@ -1,6 +1,5 @@
 <?php
 
-include_once LIBPATH.'admin/AdminToolBuilder.php';
 
 class AdminHomeBuilder extends AdminPageBuilder
 {
