@@ -61,7 +61,7 @@ include_once LIBPATH.'element/interactionelement/interface/iInteractionDelegate.
 include_once LIBPATH.'element/interactionelement/delegate/abstract/InteractionDelegate.php';
 include_once LIBPATH.'element/interactionelement/InteractionElement.php';
 include_once LIBPATH.'element/interactionelement/interface/iFormInput.php';
-include_once LIBPATH.'userinterface/FormInput.php';
+include_once LIBPATH.'element/interactionelement/delegate/FormInput.php';
 include_once LIBPATH.'element/interactionelement/delegate/TextareaFormInput.php';
 
 // custom
