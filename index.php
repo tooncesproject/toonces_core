@@ -11,7 +11,7 @@
 */
 
 include 'config.php';
-require_once LIBPATH.'/toonces.php';
+require_once LIBPATH.'/php/toonces.php';
 
 $sessionManager = new SessionManager();
 
