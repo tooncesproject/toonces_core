@@ -82,7 +82,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 	function buildElementArray() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'/static_data/generic_html_header.html'));
+		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'/html/generic_html_header.html'));
 		array_push($this->elementArray, $htmlHeaderElement);
 		$headElement = new HeadElement($this->pageViewReference);
 
