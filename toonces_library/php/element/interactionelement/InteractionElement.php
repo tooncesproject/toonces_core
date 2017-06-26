@@ -7,7 +7,7 @@
 
 */
 
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 class InteractionElement extends Element implements iElement
 {

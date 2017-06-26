@@ -12,7 +12,7 @@
  * 		Display input-level responses
  *
  */
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 class FormInput implements iFormInput
 {

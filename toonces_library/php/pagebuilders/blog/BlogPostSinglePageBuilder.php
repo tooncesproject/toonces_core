@@ -5,7 +5,7 @@
  * 
  */
 
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 class BlogPostSinglePageBuilder extends StandardPageBuilder
 {

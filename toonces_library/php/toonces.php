@@ -65,7 +65,7 @@ include_once LIBPATH.'php/element/interactionelement/delegate/FormInput.php';
 include_once LIBPATH.'php/element/interactionelement/delegate/TextareaFormInput.php';
 
 // custom
-include_once LIBPATH.'php/custom/toonces_custom.php';
+include_once LIBPATH.'custom/toonces_custom.php';
 
 
 //test

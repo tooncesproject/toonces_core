@@ -12,7 +12,7 @@
  */
 
 
-include_once LIBPATH.'toonces.php';
+include_once LIBPATH.'php/toonces.php';
 
 class BodyViewElement extends ViewElement implements iElement
 {
