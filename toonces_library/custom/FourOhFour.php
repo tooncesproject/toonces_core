@@ -15,7 +15,7 @@ class FourOhFour extends PageBuilder {
 
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'static_data/generic_html_header.html'));
+		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'html/generic_html_header.html'));
 
 		array_push($this->elementArray, $htmlHeaderElement);
 
@@ -25,13 +25,13 @@ class FourOhFour extends PageBuilder {
 		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
 		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
 
-		$headElement->setHeadTags(file_get_contents(LIBPATH.'static_data/head_tags.html'));
+		$headElement->setHeadTags(file_get_contents(LIBPATH.'html/head_tags.html'));
 
 		array_push($this->elementArray, $headElement);
 
 		$headerElement = new Element($this->pageViewReference);
 
-		$headerElement->setHTML(file_get_contents(LIBPATH.'static_data/body_test.html'));
+		$headerElement->setHTML(file_get_contents(LIBPATH.'html/body_test.html'));
 
 		array_push($this->elementArray, $headerElement);
 
@@ -53,7 +53,7 @@ HTML;
 		
 		$footerElement = new Element($this->pageViewReference);
 
-		$footerElement->setHTML(file_get_contents(LIBPATH.'static_data/real_footer_ish.html'));
+		$footerElement->setHTML(file_get_contents(LIBPATH.'html/real_footer_ish.html'));
 
 		array_push($this->elementArray, $footerElement);
 

@@ -24,7 +24,7 @@ class GrabParentPageURL extends GrabPageURL
 		}
 
 		// Get page's ancestor ID.
-		$query = sprintf(file_get_contents(LIBPATH.'sql/get_page_pathname_and_ancestor.sql'),$pageId);
+		$query = sprintf(file_get_contents(LIBPATH.'sql/query/get_page_pathname_and_ancestor.sql'),$pageId);
 		
 		$result = GrabPageURL::$conn->query($query);
 		
