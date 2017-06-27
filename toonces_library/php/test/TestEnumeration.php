@@ -4,7 +4,7 @@
 // Paul Anderson, 2016-10-09
 
 include 'config.php';
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 $stringValue = 'text';
 $ordinalValue = 19;

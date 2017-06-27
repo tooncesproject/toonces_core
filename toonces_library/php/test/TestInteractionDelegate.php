@@ -1,5 +1,5 @@
 <?php
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 class TestInteractionDelegate extends InteractionDelegate implements iInteractionDelegate
 {

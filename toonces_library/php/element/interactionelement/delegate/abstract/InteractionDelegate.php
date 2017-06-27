@@ -7,7 +7,7 @@
  * to the server via an InteractionElement subclass.
  * 
  */
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 abstract class InteractionDelegate implements iInteractionDelegate
 {

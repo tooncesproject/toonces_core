@@ -12,7 +12,7 @@
  * This class overrides buildPageIdQuery(). All other functions are inherited.
  *
  */
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 class BlogPageReader extends BlogReader implements iElement
 

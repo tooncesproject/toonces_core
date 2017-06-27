@@ -53,10 +53,12 @@ a:hover {
 	background-color: #000;
 	color: #CCC;
 	font-family: Georgia, "Times New Roman", Times, serif;
-	font-size: 12px;
-	background-image: url(../../images/star_field_bg_1.jpg);
+	font-size: 14px;
+	background-image: url(/toonces_library/custom/images/star_field_bg_1.jpg);
+	background-size: 100%;
 	background-repeat: no-repeat;
 	padding: 0px;
+	line-height: 160%;
 	}
 	.fungusss {
 		background-color: #906;
@@ -79,7 +81,8 @@ a:hover {
 		bottom: auto;
 		clip: rect(auto,auto,auto,auto);
 		text-align: left;
-		padding: 20px;
+		padding-right: 80px;
+		padding-left: 80px;
 		z-index: auto;
 	}
 	footer {
@@ -174,7 +177,7 @@ h3 {
 	padding: 0px;
 	}
 .pageheader {
-	background-image: url(/images/centagon_banner.png);
+	background-image: url(/toonces_library/custom/images/centagon_banner.png);
 	background-position: center top;
 	position: relative;
 	height: 190px;
@@ -188,6 +191,7 @@ h3 {
 .nav_link_active {
 	float: right;
 	width: 80px;
+	font-size: 12px;
 	text-transform: uppercase;
 	vertical-align: middle;
 	position: relative;

@@ -10,7 +10,7 @@
  * 
  */
  
-include_once LIBPATH.'toonces.php';
+include_once LIBPATH.'php/toonces.php';
 
 class GrabParentPageURL extends GrabPageURL
 {

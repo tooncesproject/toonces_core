@@ -1,6 +1,6 @@
 <?php
 
-include_once LIBPATH.'toonces.php';
+include_once LIBPATH.'php/toonces.php';
 
 abstract class PageBuilder {
 

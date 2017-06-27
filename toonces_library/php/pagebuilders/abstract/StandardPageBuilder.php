@@ -11,7 +11,7 @@
  */
 
 
-require_once LIBPATH.'toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 abstract class StandardPageBuilder extends PageBuilder {
 
