@@ -10,7 +10,7 @@
 *
 */
 
-include 'config.php';
+include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
 
 $sessionManager = new SessionManager();
