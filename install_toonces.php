@@ -117,21 +117,16 @@ $functionScripts = scandir('toonces_library/sql/func');
 for ($i = 2; $i < count($functionScripts); ++$i) {
     $path = 'toonces_library/sql/func/' . $functionScripts[$i];
     $sql = file_get_contents($path);
-    $sql = 'use toonces;' . PHP_EOL . $sql;
-//    try {
-        //die($sql.PHP_EOL);
-        //$conn->exec($sql);
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        
-        $stmt->closeCursor();
-//    } catch (PDOException $e) {
-//        die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
-//    } finally {
-//        die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
-//    }
+    $sql = str_replace('--%c', '/*', $sql);
+    $sql = str_replace('--/%c', '*/', $sql);
+    try {
+        $worked = $conn->exec($sql);
+        print(strval($worked).PHP_EOL);
+    } catch (PDOException $e) {
+        die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+    } 
 }
-
+/*
 // Run the create procedure scripts 
 $procedureScripts = scandir('toonces_library/sql/proc');
 for ($i = 2; $i < count($procedureScripts); ++$i) {
@@ -145,3 +140,4 @@ for ($i = 2; $i < count($procedureScripts); ++$i) {
  //   }
 }
 
+*/

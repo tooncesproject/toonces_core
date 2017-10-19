@@ -19,7 +19,9 @@ parameters:
 
 DROP FUNCTION IF EXISTS GET_BLOG_POST_IDS;
 
+--%c
 DELIMITER //
+--/%c
 
 CREATE FUNCTION GET_BLOG_POST_IDS (
      param_blog_id          BIGINT UNSIGNED
@@ -79,6 +81,8 @@ BEGIN
 
     RETURN var_id_string;
 
-END //
-
+END 
+--%c
+//
 DELIMITER ;
+--/%c

@@ -10,7 +10,10 @@
 */
 
 DROP FUNCTION IF EXISTS CREATE_PAGE;
+
+--%c
 DELIMITER //
+--/%c
 
 CREATE FUNCTION CREATE_PAGE  (
      parent_page_id BIGINT
@@ -127,5 +130,8 @@ BEGIN
 
     RETURN new_page_id;
 
-END //
+END
+--%c
+//
 DELIMITER ;
+--/%c

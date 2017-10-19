@@ -12,8 +12,9 @@ and root page for a new blog.
 
 
 DROP FUNCTION IF EXISTS CREATE_BLOG;
-
+--%c
 DELIMITER //
+--/%c
 
 CREATE FUNCTION CREATE_BLOG (
      parent_page_id BIGINT
@@ -76,6 +77,8 @@ BEGIN
 
     RETURN blog_id;
 
-END //
-
+END
+--%c
+//
 DELIMITER ;
+--/%c

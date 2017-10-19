@@ -3,7 +3,9 @@
 -- Acquires a page URL path from a page ID.
 DROP FUNCTION IF EXISTS toonces.GET_PAGE_PATH;
 
+--%c
 DELIMITER //
+--/%c
 
 CREATE FUNCTION toonces.GET_PAGE_PATH(param_page_id BIGINT)
 
@@ -49,6 +51,8 @@ BEGIN
 
     RETURN var_page_path;
 
-END //
-
+END
+--%c
+//
 DELIMITER ;
+--/%c
