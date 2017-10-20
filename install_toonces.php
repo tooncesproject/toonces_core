@@ -110,8 +110,6 @@ for ($i = 2; $i < count($dataScripts); ++$i) {
     }
 }
 
-
-
 // run the create function scripts
 $functionScripts = scandir('toonces_library/sql/func');
 for ($i = 2; $i < count($functionScripts); ++$i) {
@@ -120,24 +118,59 @@ for ($i = 2; $i < count($functionScripts); ++$i) {
     $sql = str_replace('--%c', '/*', $sql);
     $sql = str_replace('--/%c', '*/', $sql);
     try {
-        $worked = $conn->exec($sql);
-        print(strval($worked).PHP_EOL);
+        $isError = $conn->exec($sql);
     } catch (PDOException $e) {
         die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
-    } 
+    }
+    // Not all errors raise an exeption, even when PDO is set to do so. PDO sucks.
+    if ($isError == 1) {
+        throw new Exception('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+    }
 }
-/*
+
 // Run the create procedure scripts 
 $procedureScripts = scandir('toonces_library/sql/proc');
 for ($i = 2; $i < count($procedureScripts); ++$i) {
     $path = 'toonces_library/sql/proc/' . $procedureScripts[$i];
     $sql = file_get_contents($path);
-    
-//    try {
-        $conn->exec($sql);
-//    } catch (PDOException $e) {
-//        die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
- //   }
+    $sql = str_replace('--%c', '/*', $sql);
+    $sql = str_replace('--/%c', '*/', $sql);
+    try {
+        $isError = $conn->exec($sql);
+    } catch (PDOException $e) {
+        die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+    }
+    // Not all errors raise an exeption, even when PDO is set to do so. PDO sucks.
+    if ($isError == 1) {
+        throw new Exception('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+    }
 }
 
-*/
+// Run the setup procedures
+// Create main page
+#TODO: Need to create an all-purpose HTML page builder and fill this out.
+$sql = <<<SQL
+SELECT CREATE_PAGE (
+     0              -- parent_page_id
+    ,NULL           -- pathname
+    ,'Sorry, This is Toonces'   --page_title
+    ,NULL                       --page_link_text
+    ,                           --pagegbuilder_class
+    ,                           --pageview_class
+    ,'toonces.css'              --css_stylesheet
+    ,FALSE                      --redirect_on_error
+    ,TRUE                       --published
+    ,5
+)
+SQL;
+
+// Create admin pages
+$sql = "CALL sp_create_admin_pages";
+try {
+    $conn->exec($sql);
+} catch (PDOException $e) {
+    die('Failed to create admin pages: ' . $e->getMessage());
+}
+
+
+
