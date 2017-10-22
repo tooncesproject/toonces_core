@@ -29,6 +29,7 @@ include_once LIBPATH.'php/pagebuilders/admin/ManageUserAdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/admin/PageAdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/admin/EditPageAdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/ExtHTMLPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/blog/BlogPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/blog/BlogPostSinglePageBuilder.php';
 

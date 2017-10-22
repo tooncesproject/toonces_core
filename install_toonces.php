@@ -148,29 +148,59 @@ for ($i = 2; $i < count($procedureScripts); ++$i) {
 
 // Run the setup procedures
 // Create main page
-#TODO: Need to create an all-purpose HTML page builder and fill this out.
 $sql = <<<SQL
-SELECT CREATE_PAGE (
-     0              -- parent_page_id
-    ,NULL           -- pathname
-    ,'Sorry, This is Toonces'   --page_title
-    ,NULL                       --page_link_text
-    ,                           --pagegbuilder_class
-    ,                           --pageview_class
-    ,'toonces.css'              --css_stylesheet
-    ,FALSE                      --redirect_on_error
-    ,TRUE                       --published
+INSERT INTO pages (
+     page_title
+    ,page_link_text
+    ,pagebuilder_class
+    ,pageview_class
+    ,css_stylesheet
+    ,redirect_on_error
+    ,published
+    ,pagetype_id
+) VALUES (
+     'Sorry, This is Toonces.'
+    ,'Home Page'
+    ,'ExtHTMLPageBuilder'
+    ,'PageView'
+    ,'toonces.css'
+    ,FALSE
+    ,TRUE
     ,5
-)
+);
+
 SQL;
 
-// Create admin pages
-$sql = "CALL sp_create_admin_pages";
 try {
-    $conn->exec($sql);
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
 } catch (PDOException $e) {
-    die('Failed to create admin pages: ' . $e->getMessage());
+   die('Failed to create main page: ' . $e->getMessage()); 
+}
+
+// Get the page ID
+$sql = 'SELECT LAST_INSERT_ID()';
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$rows = $stmt->fetchAll();
+$pageID = $rows[0][0];
+
+// Insert a record into the ext_html_pages table
+$sql = "INSERT INTO ext_html_pages (page_id, html_path) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html')";
+try {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':pageID' => $pageID]);
+} catch (PDOException $e) {
+    die('Failed to insert a record into ext_html_pages: ' . $e->getMessage());
 }
 
 
+// Create admin pages
+$sql = "CALL sp_create_admin_pages(FALSE)";
+try {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+} catch (PDOException $e) {
+    die('Failed to create admin pages: ' . $e->getMessage());
+}
 

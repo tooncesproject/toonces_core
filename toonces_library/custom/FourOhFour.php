@@ -1,5 +1,5 @@
 <?php
-
+/*
 include_once LIBPATH.'ViewElement.php';
 include_once LIBPATH.'Element.php';
 include_once LIBPATH.'abstract/PageBuilder.php';
@@ -8,6 +8,8 @@ include_once LIBPATH.'DivElement.php';
 include_once LIBPATH.'TagElement.php';
 include_once LIBPATH.'HeadElement.php';
 include_once LIBPATH.'PageView.php';
+*/
+require_once LIBPATH.'/php/toonces.php';
 
 class FourOhFour extends PageBuilder {
 
