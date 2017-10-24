@@ -74,7 +74,6 @@ try {
 }
 
 // Grant the Toonces user privileges needed to use the database.
-//$sql = "GRANT SELECT, CREATE, INSERT, DELETE, EXECUTE, UPDATE, ALTER ON toonces.* TO 'toonces'@'localhost'";
 $sql = <<<SQL
     GRANT SELECT, CREATE, INSERT, DELETE, EXECUTE, UPDATE, ALTER ROUTINE ON toonces.* TO 'toonces'@'localhost';
 SQL;
@@ -83,16 +82,6 @@ try {
 } catch (PDOException $e) {
     die('Failed to grant database privileges to Toonces MySQL user: ' . $e->getMessage() . PHP_EOL);
 }
-/*
-// Close the connection and reoepen as the Toonces user.
-unset($conn);
-try {
-    $conn = new PDO("mysql:host=$mh;dbname=toonces",'toonces',$tup);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die('Failed to connect to database as Toonces user: '. $e->getMessage() . PHP_EOL);
-}
-*/
 
 // run the data scripts
 $dataScripts = scandir('toonces_library/sql/data');
@@ -203,4 +192,32 @@ try {
 } catch (PDOException $e) {
     die('Failed to create admin pages: ' . $e->getMessage());
 }
+
+// Write the SQL credentials to toonces_config.xml
+// code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it
+
+$xml = new DOMDocument();
+$xml->load('toonces-config.xml');
+$nodes = $xml->getElementsByTagName('sql_password');
+if ($nodes->length == 0) {
+    $xmlRoot = $xml->getElementsByTagName('toonces_settings');
+    $passwordElement = $xml->createElement('sql_password', $tup);
+    try {
+        $rootElement = $xmlRoot->item(0);
+        $rootElement->appendChild($passwordElement);
+         
+        } catch (Exception $e) {
+            die('Error: Failed to write MySQL password to toonces_config.xml: ' . $e . PHP_EOL);
+        }
+    
+} else {
+    $passwordElement = $nodes->item(0);
+    $passwordElement->nodeValue = $tup;
+}
+try {
+    $xml->save('toonces-config.xml');
+} catch (Exception $e) {
+    die('Error: Failed to write MySQL password to toonces_config.xml: ' . $e . PHP_EOL);
+}
+
 
