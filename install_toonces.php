@@ -6,11 +6,20 @@
  * Install script to build 
 */
 
+require_once 'config.php';
+require_once 'toonces_library/php/utility/UserManager.php';
+
 // MySQL Parameters
 $mh = null;         // MySQL host
 $mu = null;         // MySQL username
 $mp = null;         // MySQL password
 $tup = null;        // Toonces MySQL user password
+$email  = null;     // Toonces admin username
+$pw = null;         // Toonces admin password
+$$firstName = null;  // tonces user first name
+$lastName = null;   // toonces user last name
+$nickName = null;   // toonces user nickname
+
 
 // Other primitives
 $args = array();
@@ -29,12 +38,17 @@ $mh = $args['mh'];
 $mu = $args['mu'];
 $mp = $args['mp'];
 $tup = $args['tup'];
+$email = $args['email'];
+$pw = $args['pw'];
+$firstName = $args['firstname'];
+$lastName = $args['lastname'];
+$nickname = $args['nickname'];
 
 // Check for required arguments
-$allParamsPresent = isset($mh) && isset($mu) && isset($mp) && isset($tup);
+$allParamsPresent = isset($mh) && isset($mu) && isset($mp) && isset($tup) && isset($email) && isset($pw) && isset($firstName) && isset($lastName) && isset($nickname);
 
 if (!$allParamsPresent) {
-    $usageStr = 'Usage: php install_toonces.php mh=[MySQL Host] mu=[MySQL Username] mp=[MySQL Password] $tup=[Toonces Mysql User Password]' . PHP_EOL;
+    $usageStr = 'Usage: php install_toonces.php mh=[MySQL Host] mu=[MySQL Username] mp=[MySQL Password] tup=[Toonces Mysql User Password] email=[Toonces Admin Email address] pw=[Toonces Admin Password] firstname=[First name] lastname=[Last name] nickname=[Nickname]' . PHP_EOL;
     die($usageStr);
 }
 
@@ -220,4 +234,9 @@ try {
     die('Error: Failed to write MySQL password to toonces_config.xml: ' . $e . PHP_EOL);
 }
 
+// Create the admin account
+$userManager = new UserManager();
+$userManager->conn = $conn;
+$ra = $userManager->createUser($email, $pw, $pw, $firstName, $lastName, $nickname, true);
+echo var_dump($ra).PHP_EOL;
 
