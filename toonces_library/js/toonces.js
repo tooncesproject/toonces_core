@@ -43,7 +43,14 @@ function MM_swapImage() { //v3.0
         }
 }
 
-function submitform()
-{
+
+function submitform() {
   document.logoutForm.submit();
+}
+
+function recordDownloadEvent(filePath) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", filePath, true);
+    xhttp.send();
+    
 }

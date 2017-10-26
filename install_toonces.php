@@ -16,7 +16,7 @@ $mp = null;         // MySQL password
 $tup = null;        // Toonces MySQL user password
 $email  = null;     // Toonces admin username
 $pw = null;         // Toonces admin password
-$$firstName = null;  // tonces user first name
+$firstName = null;  // toonces user first name
 $lastName = null;   // toonces user last name
 $nickName = null;   // toonces user nickname
 
