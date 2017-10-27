@@ -3,7 +3,7 @@
  * install_toonces.php
  * Initial commit: Paul Anderson, 2017.10.18
  * 
- * Install script to build 
+ * Install script to build the Toonces MySQL database
 */
 
 require_once 'config.php';
@@ -53,6 +53,7 @@ if (!$allParamsPresent) {
 }
 
 // Set up MySQL Connection
+echo 'Connecting to MySQL database...' . PHP_EOL;
 try {
     $conn = new PDO("mysql:host=$mh",$mu,$mp);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -61,6 +62,7 @@ try {
 }
 
 // Create the Toonces MySQL user
+echo 'Creating \'toonces\' MySQL user...' . PHP_EOL;
 $sql = <<<SQL
     FLUSH PRIVILEGES;
     CREATE USER 'toonces'@'localhost';
@@ -80,6 +82,7 @@ try {
 $stmt->closeCursor();
 
 // Run the DDL script
+echo 'Building database...' . PHP_EOL;
 $sql = file_get_contents('toonces_library/sql/table/toonces_ddl.sql');
 try {
     $conn->exec($sql);
@@ -98,6 +101,7 @@ try {
 }
 
 // run the data scripts
+echo 'Inserting base data...' . PHP_EOL;
 $dataScripts = scandir('toonces_library/sql/data');
 for ($i = 2; $i < count($dataScripts); ++$i) { 
     
@@ -114,6 +118,7 @@ for ($i = 2; $i < count($dataScripts); ++$i) {
 }
 
 // run the create function scripts
+echo 'Compiling SQL Functions...' . PHP_EOL;
 $functionScripts = scandir('toonces_library/sql/func');
 for ($i = 2; $i < count($functionScripts); ++$i) {
     $path = 'toonces_library/sql/func/' . $functionScripts[$i];
@@ -131,7 +136,8 @@ for ($i = 2; $i < count($functionScripts); ++$i) {
     }
 }
 
-// Run the create procedure scripts 
+// Run the create procedure scripts
+echo 'Compiling SQL stored prodedures...' . PHP_EOL;
 $procedureScripts = scandir('toonces_library/sql/proc');
 for ($i = 2; $i < count($procedureScripts); ++$i) {
     $path = 'toonces_library/sql/proc/' . $procedureScripts[$i];
@@ -150,9 +156,23 @@ for ($i = 2; $i < count($procedureScripts); ++$i) {
 }
 
 // Run the setup procedures
-// Create main page
-$sql = <<<SQL
-INSERT INTO pages (
+echo 'Creating default home page...' . PHP_EOL;
+
+// Check for any existing pages:
+$sql = 'SELECT page_id FROM toonces.pages';
+$stmt = $conn->prepare($sql);
+
+try {
+    $stmt->execute();
+} catch (Exception $e) {
+    die('SQL Error: ' . $e->getMessage() . PHP_EOL);
+}
+
+$rows = $stmt->fetchAll();
+if (count($rows) == 0) {
+    // Create main page if it doesn't already exist.
+    $sql = <<<SQL
+    INSERT INTO pages (
      page_title
     ,page_link_text
     ,pagebuilder_class
@@ -161,7 +181,7 @@ INSERT INTO pages (
     ,redirect_on_error
     ,published
     ,pagetype_id
-) VALUES (
+    ) VALUES (
      'Sorry, This is Toonces.'
     ,'Home Page'
     ,'ExtHTMLPageBuilder'
@@ -170,35 +190,38 @@ INSERT INTO pages (
     ,FALSE
     ,TRUE
     ,5
-);
+    );
 
 SQL;
-
-try {
+    
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+    } catch (PDOException $e) {
+        die('Failed to create main page: ' . $e->getMessage());
+    }
+    
+    // Get the page ID
+    $sql = 'SELECT LAST_INSERT_ID()';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-} catch (PDOException $e) {
-   die('Failed to create main page: ' . $e->getMessage()); 
+    $rows = $stmt->fetchAll();
+    $pageID = $rows[0][0];
+    
+    // Insert a record into the ext_html_pages table
+    $sql = "INSERT INTO ext_html_pages (page_id, html_path) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html')";
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':pageID' => $pageID]);
+    } catch (PDOException $e) {
+        die('Failed to insert a record into ext_html_pages: ' . $e->getMessage());
+    }    
+} else {
+    echo '    Detected existing home page in database; Skipping.' . PHP_EOL;  
 }
-
-// Get the page ID
-$sql = 'SELECT LAST_INSERT_ID()';
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$rows = $stmt->fetchAll();
-$pageID = $rows[0][0];
-
-// Insert a record into the ext_html_pages table
-$sql = "INSERT INTO ext_html_pages (page_id, html_path) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html')";
-try {
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':pageID' => $pageID]);
-} catch (PDOException $e) {
-    die('Failed to insert a record into ext_html_pages: ' . $e->getMessage());
-}
-
 
 // Create admin pages
+echo 'Creating Toonces admin tools...' . PHP_EOL;
 $sql = "CALL sp_create_admin_pages(FALSE)";
 try {
     $stmt = $conn->prepare($sql);
@@ -209,7 +232,7 @@ try {
 
 // Write the SQL credentials to toonces_config.xml
 // code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it
-
+echo 'Updating toonces-config.xml...' . PHP_EOL;
 $xml = new DOMDocument();
 $xml->load('toonces-config.xml');
 $nodes = $xml->getElementsByTagName('sql_password');
@@ -235,8 +258,18 @@ try {
 }
 
 // Create the admin account
+echo 'Creating admin account...' . PHP_EOL;
 $userManager = new UserManager();
 $userManager->conn = $conn;
-$ra = $userManager->createUser($email, $pw, $pw, $firstName, $lastName, $nickname, true);
-echo var_dump($ra).PHP_EOL;
+$response = $userManager->createUser($email, $pw, $pw, $firstName, $lastName, $nickname, true);
 
+// Check UserManager's response for admin user validation.
+while ($fieldName = current($response)) {
+    
+    if ($fieldName['responseState'] == 0) {
+        die('Error creating Admin user: ' . $fieldName['responseMessage'] . PHP_EOL);
+    }
+    next($response);
+}
+
+echo 'Finished!' . PHP_EOL;
