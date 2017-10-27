@@ -12,9 +12,9 @@ such as toonces.blogs or toonces.blog_post.
 ***************** WOO ********************/
 
 DROP PROCEDURE IF EXISTS toonces.sp_delete_page;
-
+--%c
 DELIMITER //
-
+--/%c
 CREATE PROCEDURE toonces.sp_delete_page(param_page_id BIGINT)
 
 READS SQL DATA
@@ -105,6 +105,8 @@ BEGIN
         page_id = param_page_id
     ;
 
-END //
-
+END
+--%c
+//
 DELIMITER ;
+--/%c

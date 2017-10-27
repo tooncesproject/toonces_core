@@ -3,7 +3,10 @@
 -- Makes it all lowercase and free of funky characters.
 DROP FUNCTION IF EXISTS GENERATE_PATHNAME; 
 
+-- Hacky way to remove delimiter statements for execution via PDO
+--%c
 DELIMITER // 
+--/%c
 
 CREATE FUNCTION GENERATE_PATHNAME ( str VARCHAR(100) ) RETURNS VARCHAR(50)
 
@@ -48,5 +51,9 @@ BEGIN
     -- lowercase it
     SET ret = lcase(ret);
   RETURN ret; 
-END // 
+END
+
+--%c
+// 
 DELIMITER ; 
+--/%c

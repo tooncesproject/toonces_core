@@ -1,6 +1,8 @@
 DROP PROCEDURE IF EXISTS sp_create_admin_pages;
 
+--%c
 DELIMITER //
+--/%c
 
 CREATE PROCEDURE sp_create_admin_pages(param_repairpages BOOL)
 
@@ -158,6 +160,8 @@ BEGIN
 
     CLOSE pagecursor;
 
-END //
-
+END
+--%c
+//
 DELIMITER ;
+--/%c

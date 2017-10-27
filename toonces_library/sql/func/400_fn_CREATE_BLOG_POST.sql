@@ -12,7 +12,9 @@ post and its parent "page" to publish.
 
 DROP FUNCTION IF EXISTS CREATE_BLOG_POST;
 
+--%c
 DELIMITER //
+--/%c
 
 CREATE FUNCTION CREATE_BLOG_POST (
      param_page_id BIGINT
@@ -131,6 +133,8 @@ BEGIN
 
     RETURN var_blog_post_page_id;
 
-END //
-
+END 
+--%c
+//
 DELIMITER ;
+--/%c

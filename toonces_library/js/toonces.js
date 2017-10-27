@@ -43,7 +43,7 @@ function MM_swapImage() { //v3.0
         }
 }
 
-function submitform()
-{
+
+function submitform() {
   document.logoutForm.submit();
 }
