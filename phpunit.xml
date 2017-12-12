@@ -1,0 +1,12 @@
+<!-- PHPUnit Test Config File
+Initial Commit: Paul Anderson, 12/11/2017
+ -->
+<phpunit>
+	<testsuites>
+		<testsuite name="unittests">
+			<file>unittest/element/TestElement.php</file>
+			<file>unittest/element/TestPageView.php</file>
+		</testsuite>
+
+	</testsuites>
+</phpunit>
