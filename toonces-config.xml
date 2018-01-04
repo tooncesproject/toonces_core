@@ -5,5 +5,10 @@
 		<body_attributes>
 		</body_attributes>
 	</standard_page>
+	<sql_host>127.0.0.1</sql_host>
+	<sql_port>3306</sql_port>
+	<sql_db_name>toonces</sql_db_name>
+	<sql_user_name>toonces</sql_user_name>
 	<sql_password>kittycat</sql_password>
+
 </toonces_settings>

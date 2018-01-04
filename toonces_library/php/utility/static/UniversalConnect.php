@@ -30,7 +30,6 @@ class UniversalConnect
 
 		if (isset(self::$conn) == false) {
 			try {
-
 				self::$conn = new PDO("mysql:host=$host;port=$port;dbname=$dbName",$dbUserName,$pw);
 				self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			}
