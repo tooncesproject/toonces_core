@@ -19,7 +19,7 @@ class ExtHTMLPageBuilder extends StandardPageBuilder {
         
         // Query the database for this page's content HTML file
         if (!isset($this->conn))
-            $this->conn = UniversalConnect::doConnect();
+            $this->conn = $this->pageViewReference->conn;
  
         $sql = 'SELECT html_path FROM ext_html_pages WHERE page_id = :pageID';
         $stmt = $this->conn->prepare($sql);

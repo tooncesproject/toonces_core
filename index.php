@@ -217,6 +217,7 @@ $pageView = new $pageViewClass($pageId);
 $pageView->userCanEdit = $userCanEdit;
 $pageView->urlPath = $path;
 $pageView->pageIsPublished = $published;
+$pageView->conn = $conn;
 
 // If it's an admin page, pass the user's page access state to the pageView
 if ($adminSessionActive == 1 and $isAdminPage == 1) {

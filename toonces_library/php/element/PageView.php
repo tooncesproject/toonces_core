@@ -20,6 +20,7 @@ class PageView extends ViewElement implements iView
 	var $pageTypeId;
 	var $urlPath;
 	var $pageIsPublished;
+	var $conn;
 
 	public function __construct($pageViewPageId) {
 		$this->pageId = $pageViewPageId;

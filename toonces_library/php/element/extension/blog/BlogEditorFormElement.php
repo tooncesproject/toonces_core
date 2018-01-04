@@ -17,7 +17,7 @@ class BlogEditorFormElement extends BlogFormElement implements iElement
 	public function checkPathExistence($paramName) {
 
 		if (isset($this->conn) == false)
-			$this->conn = UniversalConnect::doConnect();
+			$this->conn = $this->pageViewReference->conn;
 
 		$queryParams = array (
 				':pageId' => strval($this->pageViewReference->pageId)
@@ -56,7 +56,7 @@ SQL;
 	function queryBlog() {
 
 		if (!isset($this->conn))
-			$this->conn = UniversalConnect::doConnect();
+			$this->conn = $this->pageViewReference->conn;
 
 		$query = <<<SQL
 		SELECT
@@ -88,7 +88,7 @@ SQL;
 			case 0:
 				// If no title change, exit edit mode.
 				$path = '/'.$this->pageViewReference->urlPath;
-				$this->send303($path);
+				$this->send303($path);˙
 				break;
 			case 1:
 				// Title change detected, ask if url change is desired.
@@ -133,7 +133,7 @@ SQL;
 			// If there is POST data, validate and update.
 
 			if (!isset($this->conn))
-				$this->conn = UniversalConnect::doConnect();
+			    $this->conn = $this->pageViewReference->conn;
 
 			// Get the input data
 			$titleInput = $this->inputArray['title'];

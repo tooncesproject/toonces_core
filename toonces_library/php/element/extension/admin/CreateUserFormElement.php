@@ -105,7 +105,7 @@ class CreateUserFormElement extends FormElement implements iElement
 			<p><a href="%s">Create Another User</a></p>
 			<p><a href="%s">Back to User Administration</a></p>
 HTML;
-			$parentPageUrl = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+			$parentPageUrl = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
 			$successMessage = sprintf($successMessage, $_SERVER['REQUEST_URI'],$parentPageUrl);
 
 			$this->storeMessage($successMessage);

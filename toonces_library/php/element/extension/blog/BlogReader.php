@@ -22,7 +22,7 @@ class BlogReader implements iElement
 	//construct method
 	public function __construct($pageView) {
 
-		$this->conn = UniversalConnect::doConnect();
+	    $this->conn = $this->pageViewReference->conn;
 		$this->pageViewReference = $pageView;
 		$this->blogPageId = $this->pageViewReference->pageId;
 	}
@@ -230,7 +230,7 @@ SQL;
 		foreach($queryRows as $row) {
 
 			$postPageId = $row['page_id'];
-			$postPageURL = GrabPageURL::getURL($postPageId);
+			$postPageURL = GrabPageURL::getURL($postPageId, $this->pageViewReference->conn);
 			if ($row['published'] == '0')
 				$html = $html.'<p><div class="notify_inline">Unpublished</div></p>'.PHP_EOL;
 			$title = htmlspecialchars($row['title'], ENT_QUOTES);

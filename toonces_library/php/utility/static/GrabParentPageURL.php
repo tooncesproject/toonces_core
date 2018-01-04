@@ -15,12 +15,12 @@ include_once LIBPATH.'php/toonces.php';
 class GrabParentPageURL extends GrabPageURL
 {
 	
-	public static function getURL($pageId) {
+	public static function getURL($pageId, $paramSQLConn) {
 
 		$ancestorPageId = 1;
 
 		if(empty(GrabPageURL::$conn)) {
-			GrabPageURL::$conn = UniversalConnect::doConnect();
+			GrabPageURL::$conn = $paramSQLConn;
 		}
 
 		// Get page's ancestor ID.

@@ -16,11 +16,11 @@ class GrabPageURL {
 	
 	public static $conn;
 	
-	public static function getURL($pageId) {
+	public static function getURL($pageId, $paramSQLConn) {
 		
 		
 		if(empty(GrabPageURL::$conn)) {
-			GrabPageURL::$conn = UniversalConnect::doConnect();
+			GrabPageURL::$conn = $paramSQLConn;
 		}
 		
 		return GrabPageURL::getPathnames($pageId, '');

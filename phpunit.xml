@@ -2,6 +2,13 @@
 Initial Commit: Paul Anderson, 12/11/2017
  -->
 <phpunit>
+	<php>
+		<var name="DB_HOST" value="localhost" />
+		<var name="DB_PORT" value="22" />
+		<var name="DB_DBNAME" value="toonces" />
+		<var name="DB_USERNAME" value="unittest" />
+		<var name="DB_PASSWORD" value="kittycat" />
+	</php>
 	<testsuites>
 		<testsuite name="element">
 			<file>unittest/element/TestElement.php</file>
