@@ -6,6 +6,10 @@ class UserManager
 {
 	var $conn;
 
+	function __construct($paramSQLConn) {
+        $this->conn = $paramSQLConn;	    
+	}
+
 	function createUser
 	(
 			 $email
@@ -126,13 +130,6 @@ SQL;
 
 		$emailExists = 0;
 
-		//$sql = "SELECT user_id FROM toonces.users WHERE LOWER(email) = LOWER('?')";
-		//$sql = sprintf($sql,$email);
-
-		if (isset($this->conn) == false) {
-			$this->conn = UniversalConnect::doConnect();
-		}
-
 		$stmt = $this->conn->prepare("SELECT user_id FROM toonces.users WHERE LOWER(email) = LOWER(?)");
 		$stmt->execute(array($email));
 
@@ -147,10 +144,6 @@ SQL;
 	function checkNicknameExistence($paramNickname) {
 
 		$nicknameExists = 0;
-
-		if (isset($this->conn) == false) {
-			$this->conn = UniversalConnect::doConnect();
-		}
 
 		$stmt = $this->conn->prepare("SELECT user_id FROM toonces.users WHERE LOWER(nickname) = LOWER(?)");
 		$stmt->execute(array($paramNickname));

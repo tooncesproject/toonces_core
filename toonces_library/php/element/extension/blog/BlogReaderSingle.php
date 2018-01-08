@@ -16,7 +16,7 @@ class BlogReaderSingle extends Element implements iElement
 	function queryBlog() {
 
 		if (!isset($this->conn))
-			$this->conn = UniversalConnect::doConnect();
+		    $this->conn = $this->pageViewReference->conn;
 
 		$query = <<<SQL
 		SELECT
@@ -55,7 +55,7 @@ SQL;
 		$userIsAdmin = false;
 
 		if (isset($this->conn) == false)
-			$this->conn = UniversalConnect::doConnect();
+		    $this->conn = $this->pageViewReference->conn;
 
 		// Is the user logged in? Are they an admin?
 		$adminSessionActive = $this->pageViewReference->sessionManager->adminSessionActive;
@@ -221,12 +221,12 @@ SQL;
 		if ($nextPageId != 0)
 			$nextHTML = '<div class="next_page_link"><a href="'.$nextPagePath.'">Next Post</a></div>'.PHP_EOL;
 
-		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
 
 
 		$navHTML = $navHTML.$previousHTML.$nextHTML.'</div>'.PHP_EOL;
 
-		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
 		$parentLink = '<div class="bottom_nav_container">'.PHP_EOL.'<div class="parent_page_link"><a href="'.$parentURL.'">Back to the Blog</a></div></div>'.PHP_EOL;
 		$navHTML = $navHTML.$parentLink;
 
@@ -238,7 +238,7 @@ SQL;
 	public function getHTML() {
 
 		if (!isset($this->conn))
-			$this->conn = UniversalConnect::doConnect();
+		    $this->conn = $this->pageViewReference->conn;
 
 		$this->pageId = $this->pageViewReference->pageId;
 		$title = '';

@@ -44,7 +44,7 @@ HTML;
 		FROM
 			toonces.users;
 SQL;
-		$this->conn = UniversalConnect::doConnect();
+		$this->conn = $this->pageViewReference->conn;
 		$result = $this->conn->query($SQL);
 		
 		// html template for users

@@ -23,7 +23,7 @@ class URLCheckFormElement extends FormElement implements iElement
 	public function getParentPath($pageId) {
 
 		if (isset($this->conn) == false)
-			$this->conn = UniversalConnect::doConnect();
+		    $this->conn = $this->pageViewReference->conn;
 
 		$sql = <<<SQL
 				SELECT
@@ -90,7 +90,7 @@ SQL;
 		$currentTitle = $this->pageViewReference->pageTitle;
 
 		if (isset($this->conn) == false) {
-			$this->conn = UniversalConnect::doConnect();
+		    $this->conn = $this->pageViewReference->conn;
 		}
 		$sql = "SELECT GENERATE_PATHNAME(?)";
 		$stmt = $this->conn->prepare($sql);

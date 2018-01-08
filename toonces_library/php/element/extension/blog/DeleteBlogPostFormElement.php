@@ -33,7 +33,7 @@ class DeleteBlogPostFormElement extends FormElement implements iElement
 		switch ($responseState) {
 			case 1:
 				// If the post was deleted, go to its parent page.
-				$uri = GrabParentPageURL::getURL($this->pageViewReference->pageId);
+				$uri = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
 				$this->send303($uri);
 				break;
 			default:
@@ -54,7 +54,7 @@ class DeleteBlogPostFormElement extends FormElement implements iElement
 	function elementAction() {
 
 		if (isset($this->conn) == false) 
-			$this->conn = UniversalConnect::doConnect();
+		    $this->conn = $this->pageViewReference->conn;
 
 		// stupid shit i should refactor
 		if ($this->postState == false) {

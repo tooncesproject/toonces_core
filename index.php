@@ -13,23 +13,6 @@
 include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
 
-$sessionManager = new SessionManager();
-
-$sessionManager->checkSession();
-
-// session stuff
-
-// $loginSuccess = 0;
-$adminSessionActive = 0;
-$userId = 0;
-$userIsAdmin = 0;
-
-$adminSessionActive = $sessionManager->adminSessionActive;
-
-if ($adminSessionActive == 1) {
-	$userId = $sessionManager->userId;
-	$userIsAdmin = $sessionManager->userIsAdmin;
-}
 
 // function to get page from path
 
@@ -106,6 +89,28 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 
 }
 
+// ******************** Begin procedural code ******************** 
+
+
+// establish SQL connection
+$conn = UniversalConnect::doConnect();
+
+// Instantiate session manager and check status.
+$sessionManager = new SessionManager($conn);
+
+$sessionManager->checkSession();
+// $loginSuccess = 0;
+$adminSessionActive = 0;
+$userId = 0;
+$userIsAdmin = 0;
+
+$adminSessionActive = $sessionManager->adminSessionActive;
+
+if ($adminSessionActive == 1) {
+    $userId = $sessionManager->userId;
+    $userIsAdmin = $sessionManager->userIsAdmin;
+}
+
 
 
 // set default properties for view renderer setter methods
@@ -119,8 +124,6 @@ $pageId = 1;
 //$path = $_SERVER['REQUEST_URI'];
 $url = $_SERVER['REQUEST_URI'];
 
-// establish SQL connection and query for page
-$conn = UniversalConnect::doConnect();
 
 // Acquire query string if exists
 $queryString = $_SERVER['QUERY_STRING'];
@@ -217,6 +220,7 @@ $pageView = new $pageViewClass($pageId);
 $pageView->userCanEdit = $userCanEdit;
 $pageView->urlPath = $path;
 $pageView->pageIsPublished = $published;
+$pageView->conn = $conn;
 
 // If it's an admin page, pass the user's page access state to the pageView
 if ($adminSessionActive == 1 and $isAdminPage == 1) {

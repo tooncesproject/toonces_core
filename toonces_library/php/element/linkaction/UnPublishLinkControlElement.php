@@ -28,7 +28,7 @@ class UnPublishLinkControlElement extends LinkActionControlElement
 
 			// Set connection
 			if (isset($this->conn) == false) {
-				$this->conn = UniversalConnect::doConnect();
+			    $this->conn = $this->pageViewReference->conn;
 
 			$pageId = $this->pageViewReference->pageId;
 

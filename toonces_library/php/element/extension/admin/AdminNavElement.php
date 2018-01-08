@@ -42,7 +42,7 @@ class AdminNavElement extends NavElement implements iElement
 			p.page_id
 SQL;
 		$SQL = sprintf($SQL,$this->userId);
-		$this->conn = UniversalConnect::doConnect();
+		$this->conn = $this->pageViewReference->conn;
 		$result = $this->conn->query($SQL);
 
 		// Iterate through results.

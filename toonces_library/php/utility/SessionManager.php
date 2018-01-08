@@ -13,6 +13,10 @@ class SessionManager
 	var $userLastName;
 	var $adminSessionActive;
 
+	function __construct($paramSQLConn) {
+	    $this->conn = $paramSQLConn;
+	}
+	
 // Session functions
 
 	// Check session
@@ -46,9 +50,7 @@ class SessionManager
 			WHERE 
 				user_id = :userid;
 SQL;
-			if (!isset($this->conn)) {
-				$this->conn = UniversalConnect::doConnect();
-			}
+
 			$stmt = $this->conn->prepare($SQL);
 			$stmt->execute(array(':userid' => $seshUserId));
 			foreach ($stmt as $row) {
@@ -109,8 +111,6 @@ SQL;
 		$userId = 0;
 		$nickname = '';
 		$dbPassword = '';
-
-		$this->conn = UniversalConnect::doConnect();
 
 		$sql = <<<SQL
         SELECT
