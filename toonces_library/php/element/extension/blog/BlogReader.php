@@ -22,8 +22,8 @@ class BlogReader implements iElement
 	//construct method
 	public function __construct($pageView) {
 
-	    $this->conn = $this->pageViewReference->conn;
 		$this->pageViewReference = $pageView;
+		$this->conn = $this->pageViewReference->conn;
 		$this->blogPageId = $this->pageViewReference->pageId;
 	}
 
