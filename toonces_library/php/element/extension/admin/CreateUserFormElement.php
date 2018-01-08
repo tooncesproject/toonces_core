@@ -159,7 +159,7 @@ HTML;
 			$grantAdmin = isset($grantAdminInput->postData) ? 1 : 0;
 
 			// input validation is handled by the UserManager object.
-			$userManager = new UserManager;
+			$userManager = new UserManager($this->pageViewReference->conn);
 
 			$responseArray = $userManager->createUser
 			(
