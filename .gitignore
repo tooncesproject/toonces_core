@@ -24,3 +24,6 @@ toonces_dash_mockup.html
 
 # external libraries
 ckeditor
+
+# EB stuff
+.elasticbeanstalk

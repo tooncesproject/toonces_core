@@ -88,7 +88,7 @@ SQL;
 			case 0:
 				// If no title change, exit edit mode.
 				$path = '/'.$this->pageViewReference->urlPath;
-				$this->send303($path);˙
+				$this->send303($path);
 				break;
 			case 1:
 				// Title change detected, ask if url change is desired.
