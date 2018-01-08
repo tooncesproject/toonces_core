@@ -259,8 +259,7 @@ try {
 
 // Create the admin account
 echo 'Creating admin account...' . PHP_EOL;
-$userManager = new UserManager();
-$userManager->conn = $conn;
+$userManager = new UserManager($conn);
 $response = $userManager->createUser($email, $pw, $pw, $firstName, $lastName, $nickname, true);
 
 // Check UserManager's response for admin user validation.
