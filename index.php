@@ -115,7 +115,7 @@ if ($adminSessionActive == 1) {
 
 // set default properties for view renderer setter methods
 $pageTitle = 'eff';
-$styleSheet = 'centagon_v2.css';
+$styleSheet = 'toonces.css';
 $pageViewClass = 'PageView';
 
 $pageId = 1;
@@ -145,7 +145,7 @@ $xml->load(ROOTPATH.'toonces-config.xml');
 
 $error404Node = $xml->getElementsByTagName('pagebuilder_404_class')->item(0);
 $pageBuilderClass = $error404Node->nodeValue;
-	
+
 $pathName = '';
 $pageTitle = 'Error 404';
 $pageLinkText = '';
