@@ -32,6 +32,7 @@ include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/ExtHTMLPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/blog/BlogPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/blog/BlogPostSinglePageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
 
 include_once LIBPATH.'php/element/extension/admin/AdminViewElement.php';
 include_once LIBPATH.'php/element/html_component/BodyViewElement.php';

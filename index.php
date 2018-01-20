@@ -115,7 +115,7 @@ if ($adminSessionActive == 1) {
 
 // set default properties for view renderer setter methods
 $pageTitle = 'eff';
-$styleSheet = 'centagon_v2.css';
+$styleSheet = 'toonces.css';
 $pageViewClass = 'PageView';
 
 $pageId = 1;
@@ -138,9 +138,16 @@ if (trim($path))
 	$pageId = getPage($path, $conn);
 
 // Default content state for page access is 404.
+
+// First, get the 404 pagebuiilder class from toonces-config.xml
+$xml = new DOMDocument();
+$xml->load(ROOTPATH.'toonces-config.xml');
+
+$error404Node = $xml->getElementsByTagName('pagebuilder_404_class')->item(0);
+$pageBuilderClass = $error404Node->nodeValue;
+
 $pathName = '';
-$pageBuilderClass = 'FourOhFour';
-$pageTitle = '';
+$pageTitle = 'Error 404';
 $pageLinkText = '';
 
 // Page state

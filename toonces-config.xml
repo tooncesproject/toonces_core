@@ -5,6 +5,7 @@
 		<body_attributes>
 		</body_attributes>
 	</standard_page>
+	<pagebuilder_404_class>Toonces404PageBuilder</pagebuilder_404_class>
 	<sql_host>127.0.0.1</sql_host>
 	<sql_port>3306</sql_port>
 	<sql_db_name>toonces</sql_db_name>
