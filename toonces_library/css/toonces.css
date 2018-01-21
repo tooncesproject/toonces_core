@@ -214,41 +214,33 @@ footer {
 	These classes govern the positioning and type style of navigation links
 	for blog parent apges and individual blog post pages.
 */
-.prev_page_link {
+
+.page_link {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
 	font-style: italic;
 	position: relative;
-	left: 20px;
 	width: 100px;
 	text-align: left;
 	float: left;
 	vertical-align: middle;
 	padding-top: 26px;
 }
+.prev_page_link {
+	left: 20px;
+	text-align: left;
+	float: left;
+}
 
 .next_page_link {
-	font-family: Georgia, "Times New Roman", Times, serif;
-	font-size: 12px;
-	font-style: italic;
-	position: relative;
-	right: 20px;
-	width: 100px;
+	right: 20px;;
 	text-align: right;
 	float: right;
-	vertical-align: middle;
-	padding-top: 26px;
 }
 
 .parent_page_link {
-	font-family: Georgia, "Times New Roman", Times, serif;
-	font-size: 12px;
-	font-style: italic;
-	position: relative;
-	width: 100%;
 	text-align: center;
-	vertical-align: middle;
-	padding-top: 26px;
+	width: 100%;
 }
 
 /********************* Toonces Utility and Admin **********************/
