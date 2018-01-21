@@ -275,6 +275,7 @@ footer {
 	background-image: url(../../images/toonces_smaller_banner.png);
 	background-repeat: no-repeat;
 	background-position: left top;
+	line-height: 100%;
 }
 
 /* TE_usergreeting
