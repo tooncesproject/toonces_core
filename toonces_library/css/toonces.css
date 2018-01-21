@@ -1,6 +1,10 @@
 	@charset "UTF-8";
 
-a:link { 
+/********************** HTML elements **********************/
+
+/* Default styles for standard HTML elements in Toonces pages. */
+
+a:link {
 	color: #999;
 	text-decoration:none
 }
@@ -18,38 +22,7 @@ a:hover {
 	text-decoration:none
 }
 
-	.main_container {
-	text-align: center;
-	position: relative;
-	height: auto;
-	width: 100%;
-	visibility: visible;
-	z-index: auto;
-	padding: 0px;
-	margin: 0px;
-	}
-	.type_title {
-		font-family: Tahoma, Geneva, sans-serif;
-		font-size: 18px;
-		color: #FFF;
-		text-transform: uppercase;
-		line-height: 4px;
-	}
-	.banner_img {
-		background-image: url(/images/main_logo.png);
-		height: 200px;
-		width: 800px;
-		position: relative;
-		left: 0px;
-		top: 0px;
-	}
-.copy_block {
-	padding-top: 20px;
-	padding-right: 80px;
-	padding-bottom: 60px;
-	padding-left: 80px;
-}
-	body {
+body {
 	background-color: #FFF;
 	color: #666;
 	font-family: Georgia, "Times New Roman", Times, serif;
@@ -58,33 +31,37 @@ a:hover {
 	background-repeat: no-repeat;
 	padding: 0px;
 	line-height: 160%;
-	}
-	.fungusss {
-		background-color: #906;
-		position: absolute;
-		visibility: visible;
-		height: 60px;
-		width: 60px;
-		left: 200px;
-		top: 200px;
-		right: 200px;
-		bottom: 200px;
-	}
-	.blogreader {
-		position: relative;
-		height: auto;
-		width: auto;
-		left: auto;
-		top: auto;
-		right: auto;
-		bottom: auto;
-		clip: rect(auto,auto,auto,auto);
-		text-align: left;
-		padding-right: 80px;
-		padding-left: 80px;
-		z-index: auto;
-	}
-	footer {
+}
+
+
+h1 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 30px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	color: #999;
+}
+
+h2 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 24px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	color: #999;
+}
+
+h3 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 18px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	color: #999;
+}
+
+footer {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 10px;
 	color: #999;
@@ -100,63 +77,73 @@ a:hover {
 	height: 20px;
 	white-space: normal;
 	display: inherit;
-	}
-	
-	.section_divider {
-		font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-		font-size: 18px;
-		color: #999;
-		vertical-align: middle;
-		position: relative;
-		left: auto;
-		top: auto;
-		right: auto;
-		bottom: auto;
-		background-color: #036;
-		text-align: center;
-		padding: 5px;
-		height: 30px;
-		white-space: normal;
-		display: inherit;
-	}
-.top_nav {
-	font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+
+/********************* Content CSS Classes **********************/
+
+/*  These are the custom div classes making up a standard Toonces page. */
+
+/* .main_container
+	Outermost wrapper div class for all page content.
+*/
+.main_container {
 	text-align: center;
-	height: 60px;
+	position: relative;
+	height: auto;
 	width: 100%;
-	top: 130px;
-	left: 0px;
-	overflow: hidden;
-	position: absolute;
-	vertical-align: middle;
-	padding-right: 0px;
-	padding-left: 0px;
+	visibility: visible;
+	z-index: auto;
+	padding: 0px;
+	margin: 0px;
 }
-	
-	h1 {
-	font-family: "Courier New", Courier, monospace;
-	font-size: 30px;
-	font-style: normal;
-	line-height: normal;
-	font-weight: normal;
-	color: #999;
-	}
-	h2 {
-	font-family: "Courier New", Courier, monospace;
-	font-size: 24px;
-	font-style: normal;
-	line-height: normal;
-	font-weight: normal;
-	color: #999;
-	}
-h3 {
-	font-family: "Courier New", Courier, monospace;
-	font-size: 18px;
-	font-style: normal;
-	line-height: normal;
-	font-weight: normal;
-	color: #999;
+
+/* .content_container
+	Nested within .main_container, this div class governs the
+	positioning of all content within the page.
+*/
+.content_container {
+	background-color: #FFF;
+	position: relative;
+	height: auto;
+	width: 800px;
+	top: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+	padding: 0px;
 }
+
+/* .pageheader
+	Nested within .content_container.
+	Provides a default space for titles, banners and/or navigation
+	common to all standard Toonces pages.
+*/
+.pageheader {
+	position: relative;
+	height: 190px;
+	width: 800px;
+	top: 0px;
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+}
+
+/* .copy_block
+	Div class nested within .content_container.
+	This class governs the positioning of body copy.
+*/
+.copy_block {
+	padding-top: 20px;
+	padding-right: 80px;
+	padding-bottom: 60px;
+	padding-left: 80px;
+}
+
+/* .image_block
+	Div class nested within .content_container.
+	This class governs the positioning of images.
+*/
 .image_block {
 	text-align: center;
 	vertical-align: middle;
@@ -164,58 +151,57 @@ h3 {
 	width: 800px;
 	position: static;
 }
-	.content_container {
-	background-color: #FFF;
+
+/* .section_divider
+	Div class nested within .content_container.
+	Provides a divider similar to a horizontal rule.
+*/
+.section_divider {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font-size: 18px;
+	color: #999;
+	vertical-align: middle;
+	position: relative;
+	left: auto;
+	top: auto;
+	right: auto;
+	bottom: auto;
+	background-color: #036;
+	text-align: center;
+	padding: 5px;
+	height: 30px;
+	white-space: normal;
+	display: inherit;
+}	
+
+
+/********************* Toonces blog elements **********************/
+
+/* .blogreader
+	A Div element specific to a Toonces blog.
+	Governs positioning of blog content on a blog parent page.
+	Nested within .content_container.
+*/
+.blogreader {
 	position: relative;
 	height: auto;
-	width: 800px;
-	top: 0px;
-	margin-right: auto;
-	margin-left: auto;
+	width: auto;
+	left: auto;
+	top: auto;
+	right: auto;
+	bottom: auto;
+	clip: rect(auto,auto,auto,auto);
 	text-align: left;
-	padding: 0px;
-	}
-.pageheader {
-	background-image: url(/toonces_library/custom/images/centagon_banner.png);
-	background-position: center top;
-	position: relative;
-	height: 190px;
-	width: 800px;
-	top: 0px;
-	background-repeat: no-repeat;
-	padding: 0px;
-	margin: 0px;
-	text-align: center;
+	padding-right: 80px;
+	padding-left: 80px;
+	z-index: auto;
 }
-.nav_link_active {
-	float: right;
-	width: 80px;
-	font-size: 12px;
-	text-transform: uppercase;
-	vertical-align: middle;
-	position: relative;
-}
-.nav_links_holder {
-	vertical-align: middle;
-	margin-top: 15px;
-	right: 0px;
-	
-}
-.social_icon {
-	padding: 0px;
-	height: 40px;
-	width: 60px;
-	position: static;
-	float: left;
-	text-align: center;
-}
-.soundcloud_embed {
-	height: 100px;
-	width: 100%;
-	text-align: center;
-	padding-top: 40px;
-	padding-bottom: 10px;
-}
+
+/* .bottom_nav_container
+	Div element. Governs the positioning of the "bottom nav" blocks
+	on blog parent pages and individual blog post pages.
+	Nested within .content_container.
+*/
 .bottom_nav_container {
 	height: 60px;
 	width: 100%;
@@ -223,6 +209,11 @@ h3 {
 	bottom: 0px;
 }
 
+/* page_link classes:
+	Div elements. These are nested within .bottom_nav_container elements.
+	These classes govern the positioning and type style of navigation links
+	for blog parent apges and individual blog post pages.
+*/
 .prev_page_link {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	font-size: 12px;
@@ -260,11 +251,21 @@ h3 {
 	padding-top: 26px;
 }
 
+/********************* Toonces Utility and Admin **********************/
+
+/* .notify_inline
+	Governs notification text related to InteractionElement div objects.
+*/
 .notify_inline {
 	color: #F00;
 	text-transform: uppercase;
 }
 
+/* .TE_toolbarelement
+	Positioned above and outside the .main_container element,
+	this div element appears when a page is in Admin mode, providing
+	the Toonces toolbar.
+*/
 .TE_toolbarelement {
 	color: #C36;
 	font-size: 12px;
@@ -275,10 +276,13 @@ h3 {
 	background-image: url(../../images/toonces_smaller_banner.png);
 	background-repeat: no-repeat;
 	background-position: left top;
+	line-height: 100%;
 }
 
+/* TE_usergreeting
+	Positions text for the toolbar user greeting.
+*/
 .TE_usergreeting {
-
 	position: relative;
 	left: 200px;
 	width: 150px;
@@ -287,6 +291,10 @@ h3 {
 	float: left;
 }
 
+/* TE_pagetoolelement
+	Container div nested within the TE_toolbarelement div;
+	holds the "tools" specific to the page.
+*/
 .TE_pagetoolelement {
 	position: relative;
 	left: 200px;
@@ -297,6 +305,10 @@ h3 {
 	float: left;
 	padding: 10px;
 }
+
+/* telink
+	Overrides default hyperlink colors for the Toonces toolbar.
+*/
 
 telink {
 	color: #ff884d
