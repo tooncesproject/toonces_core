@@ -216,10 +216,10 @@ SQL;
 		$navHTML = '<div class="bottom_nav_container">'.PHP_EOL;
 
 		if ($previousPageId != 0)
-			$previousHTML = '<div class="prev_page_link"><a href="'.$previousPagePath.'">Previous Post</a></div>'.PHP_EOL;
+			$previousHTML = '<div class="page_link prev_page_link"><a href="'.$previousPagePath.'">Previous Post</a></div>'.PHP_EOL;
 
 		if ($nextPageId != 0)
-			$nextHTML = '<div class="next_page_link"><a href="'.$nextPagePath.'">Next Post</a></div>'.PHP_EOL;
+			$nextHTML = '<div class="page_link next_page_link"><a href="'.$nextPagePath.'">Next Post</a></div>'.PHP_EOL;
 
 		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
 
@@ -227,7 +227,7 @@ SQL;
 		$navHTML = $navHTML.$previousHTML.$nextHTML.'</div>'.PHP_EOL;
 
 		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
-		$parentLink = '<div class="bottom_nav_container">'.PHP_EOL.'<div class="parent_page_link"><a href="'.$parentURL.'">Back to the Blog</a></div></div>'.PHP_EOL;
+		$parentLink = '<div class="bottom_nav_container">'.PHP_EOL.'<div class="page_link parent_page_link"><a href="'.$parentURL.'">Back to the Blog</a></div></div>'.PHP_EOL;
 		$navHTML = $navHTML.$parentLink;
 
 		return $navHTML;

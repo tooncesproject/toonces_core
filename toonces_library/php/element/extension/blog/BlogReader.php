@@ -204,13 +204,13 @@ SQL;
 		// If the page is greater than 1, generate a link to the previous page
 		if ($this->pageNumber > 1) {
 			$previousPageUrl = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?page='.strval($this->pageNumber - 1).'&itemsperpage='.strval($this->itemsPerPage);
-			$navHTML = $navHTML.'<div class="prev_page_link"><a href="'.$previousPageUrl.'">'.$this->newerLinkText.'</a></div>'.PHP_EOL;
+			$navHTML = $navHTML.'<div class="page_link prev_page_link"><a href="'.$previousPageUrl.'">'.$this->newerLinkText.'</a></div>'.PHP_EOL;
 		}
 
 		// If there are any newer posts, generate a link to the next page
 		if ($postCount > $this->pageNumber * $this->itemsPerPage) {
 			$nextPageUrl = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH).'?page='.strval($this->pageNumber + 1).'&itemsperpage='.strval($this->itemsPerPage);
-			$navHTML = $navHTML.'<div class="next_page_link"><a href="'.$nextPageUrl.'">'.$this->olderLinkText.'</a></div>'.PHP_EOL;
+			$navHTML = $navHTML.'<div class="page_link next_page_link"><a href="'.$nextPageUrl.'">'.$this->olderLinkText.'</a></div>'.PHP_EOL;
 		}
 
 		$navHTML = $navHTML.'</div>';
