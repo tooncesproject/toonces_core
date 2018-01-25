@@ -1,6 +1,6 @@
 <?php
 /*
- * iElement Interface
+ * iResource Interface
  * Paul Anderson 8/15/15
  * 
  * Provides an interface for implementing individual components of a page.
@@ -9,7 +9,7 @@
  * components of a page.
  * 
  * This way, any individual HTML snippet (header? Nav bar? Whatevs) can be encapsulated
- * in an Element object and retreieved by the view (iView compliant) object. 
+ * in an Element object and retreieved by the view (iHTMLView compliant) object. 
  * 
  * The idea is a 1-n relationship between the page being rendered and its individual components.
  * That way, the view object can iterate through any number of sub-view objects, each implementing
@@ -17,7 +17,7 @@
  * 
  */
 
-interface iElement
+interface iResource
 {
-	public function getHTML();
+	public function getResource();
 }

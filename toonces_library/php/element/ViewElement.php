@@ -2,21 +2,11 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class ViewElement extends Element implements iElement
+class ViewElement extends Element implements iResource
 {
 
 	var $pageElements = array();
 	var $elementsCount = 0;
-
-	// setter methods
-
-	public function setHtmlHeader ($headerString) {
-		$this->htmlHeader = $headerString;
-	}
-
-	public function setHtmlFooter ($footerString) {
-		$this->htmlFooter = $footerString;
-	}
 
 	public function addElement ($element) {
 
@@ -27,12 +17,12 @@ class ViewElement extends Element implements iElement
 
 	// execution method
 
-	public function getHTML() {
+	public function getResource() {
 
 		$pageString = "";
 
 		foreach($this->pageElements as $object) {
-			$pageString = $pageString.$object->getHTML().PHP_EOL;
+			$pageString = $pageString.$object->getResource().PHP_EOL;
 		}
 
 		$htmlString = $this->htmlHeader.$pageString.$this->htmlFooter;

@@ -46,7 +46,7 @@ class TestPageView extends TestCase
         $pageView->addElement($element);
         
         // act
-        $htmlOut = $pageView->getHTML();
+        $htmlOut = $pageView->getResource();
         
         // assert
         $this->assertEquals(preg_replace('(\n)', '', $htmlOut), $html);

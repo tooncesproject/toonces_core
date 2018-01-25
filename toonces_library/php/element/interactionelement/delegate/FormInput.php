@@ -129,7 +129,7 @@ class FormInput implements iFormInput
 	// $message is a string to be displayed, optionally
 	// $renderInput is a boolean determining whether to create an input
 	// $messageClass is the CSS class of the message, defaults to form_message_notification
-	public function getHTML($renderInput, $message = NULL, $messageClass = NULL) {
+	public function getResource($renderInput, $message = NULL, $messageClass = NULL) {
 
 		$this->html = '';
 		$classHTML = '';

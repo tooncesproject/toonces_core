@@ -36,7 +36,7 @@ class TestElement extends TestCase
         $element->html = $HTML;
         
         //act
-        $testHTML = $element->getHTML();
+        $testHTML = $element->getResource();
         
         //assert
         $this->assertEquals($testHTML, $header . PHP_EOL .  $HTML . PHP_EOL . $footer);

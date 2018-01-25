@@ -7,7 +7,7 @@ class AdminHomeBuilder extends AdminPageBuilder
 	// Override empty abstract function buildAdminTool()
 	function buildAdminTool() {
 		$this->toolElement = new Element($this->pageViewReference);
-		$this->toolElement->setHTML($this->adminPageHTML());
+		$this->toolElement->html = $this->adminPageHTML();
 	}
 
 	function adminPageHTML() {

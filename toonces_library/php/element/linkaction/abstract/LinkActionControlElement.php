@@ -16,7 +16,7 @@
  *
  */
 
-abstract class LinkActionControlElement extends Element implements iElement
+abstract class LinkActionControlElement extends Element implements iResource
 {
 	public $linkActionName;
 	public $redirectURI;
@@ -84,14 +84,14 @@ abstract class LinkActionControlElement extends Element implements iElement
 		// Post-instantiation actions here.
 	}
 
-	public function getHTML() {
+	public function getResource() {
 		// linkActionName must be set by either the objectSetup method or the instantiating function.
 		// If linkActionName is not set, throw an exception.
 		// Otherwise, execute the action.
 		$this->objectSetup();
 
 		if (isset($this->linkActionName) == false) {
-			throw new Exception('LinkActionController Exception - linkActionName (string) class variable MUST be set for children of LinkActionController abstract class at time of calling the getHTML() method.');
+			throw new Exception('LinkActionController Exception - linkActionName (string) class variable MUST be set for children of LinkActionController abstract class at time of calling the getResource() method.');
 		} else {
 
 			$actionDetected = false;

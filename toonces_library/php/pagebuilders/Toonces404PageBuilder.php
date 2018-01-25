@@ -26,7 +26,7 @@ class Toonces404PageBuilder extends StandardPageBuilder {
 		</div>
 HTML;
         
-        $element->setHTML($html);
+        $element->html = $html;
             
         $this->contentElement = $element;
             

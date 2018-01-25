@@ -14,7 +14,7 @@
  */
 require_once LIBPATH.'php/toonces.php';
 
-class BlogPageReader extends BlogReader implements iElement
+class BlogPageReader extends BlogReader implements iResource
 
 {
 	function buildPageIdQuery() {

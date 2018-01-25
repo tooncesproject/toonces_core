@@ -46,7 +46,7 @@ abstract class ToolbarElement extends ViewElement
 		$this->addElement($logoutFormElement);
 
 		$utilityElement = new Element($this->pageViewReference);
-		$utilityElement->setHTML($this->buildUtilityHTML());
+		$utilityElement->html = $this->buildUtilityHTML();
 		$this->addElement($utilityElement);
 
 		$this->toolElement = new ViewElement($this->pageViewReference);
@@ -60,7 +60,7 @@ abstract class ToolbarElement extends ViewElement
 	public function buildUtilityHTML() {
 		// Include the logout form element
 		//$logoutFormElement = new LogoutFormElement($this->pageViewReference);
-		//$this->html = $this->html.$logoutFormElement->getHTML();
+		//$this->html = $this->html.$logoutFormElement->getResource();
 
 		// HTML Template
 		$htmlTemplate = <<<HTML

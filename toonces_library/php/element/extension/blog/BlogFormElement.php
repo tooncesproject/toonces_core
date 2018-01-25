@@ -5,7 +5,7 @@
  *
  */
 
-class BlogFormElement extends FormElement implements iElement
+class BlogFormElement extends FormElement implements iResource
 {
 
 	var $conn;

@@ -9,7 +9,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class InteractionElement extends Element implements iElement
+class InteractionElement extends Element implements iResource
 {
 
 	// $postState:
@@ -56,7 +56,7 @@ class InteractionElement extends Element implements iElement
 			// Here:
 			// If the input object is not a textarea,  go ahead and add it.
 			if ($inputObject->hideInput == false and get_class($inputObject) != 'TextareaFormInput')
-				$this->html = $this->html.$inputObject->getHTML(true);
+				$this->html = $this->html.$inputObject->getResource(true);
 		}
 
 		$this->html = $this->html.'</form>';
@@ -64,13 +64,13 @@ class InteractionElement extends Element implements iElement
 		// If there are any textarea input objects, add them here, outside the form.
 		foreach ($this->interactionDelegate->inputArray as $inputObject) {
 			if ($inputObject->hideInput == false and get_class($inputObject) == 'TextareaFormInput')
-				$this->html = $this->html.$inputObject->getHTML(true);
+				$this->html = $this->html.$inputObject->getResource(true);
 		}
 
 	}
 
 
-	public function getHTML() {
+	public function getResource() {
 
 		// Throw an exception of an InteractionDelegate object has not been assigned by runtime.
 		if (!isset($this->interactionDelegate))

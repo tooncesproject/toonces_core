@@ -2,7 +2,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class AdminViewElement extends ViewElement implements iElement
+class AdminViewElement extends ViewElement implements iResource
 {
 	// instance variables
 	// inherited class variables commented out
@@ -11,25 +11,7 @@ class AdminViewElement extends ViewElement implements iElement
 	//var $pageElements = array();
 	//var $elementsCount = 0;
 	
-	//override element constructor method
-//	public function __construct() {
-		// do nothing
-//	}
-	
-	
-	// setter methods
 
-	public function setHtmlHeader ($headerString) {
-		// override with hard coded header
-		$this->htmlHeader = $this->getTopHTML();
-	}
-	
-	public function setHtmlFooter ($footerString) {
-		// override with hard coded footer
-		$this->htmlFooter = $this->getBottomHTML();
-	}
-	
-	
 	// HTML top
 	private function getTopHTML() {
 		
@@ -73,7 +55,7 @@ HTML;
 	
 	// execution method
 	
-	public function getHTML() {
+	public function getResource() {
 			
 		$pageString = "";
 		
@@ -81,7 +63,7 @@ HTML;
 		$this->htmlFooter = $this->getBottomHTML();
 		
 		foreach($this->pageElements as $object) {
-			$pageString = $pageString.$object->getHTML().PHP_EOL;	
+			$pageString = $pageString.$object->getResource().PHP_EOL;	
 		}
 		
 		$htmlString = $this->htmlHeader.$pageString.$this->htmlFooter;

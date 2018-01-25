@@ -2,7 +2,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class BlogReaderSingle extends Element implements iElement
+class BlogReaderSingle extends Element implements iResource
 
 {
 	private $conn;
@@ -235,7 +235,7 @@ SQL;
 	}
 
 
-	public function getHTML() {
+	public function getResource() {
 
 		if (!isset($this->conn))
 		    $this->conn = $this->pageViewReference->conn;

@@ -2,7 +2,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class HeadElement extends Element implements iElement {
+class HeadElement extends Element implements iResource {
 
 	//var $html;
 	//var $htmlHeader;
@@ -25,12 +25,7 @@ class HeadElement extends Element implements iElement {
 		$this->headTags = $headTagsString;
 	}
 	
-	// non-implemented setter method
-	public function setHTML($htmlString) {
-		//override as empty method
-	}
-	
-	public function getHTML() {
+	public function getResource() {
 		
 		if(empty($this->htmlHeader))
 			$this->htmlHeader = '<head>';

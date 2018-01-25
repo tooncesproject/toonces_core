@@ -1,6 +1,6 @@
 <?php
 
-class CreateUserFormElement extends FormElement implements iElement
+class CreateUserFormElement extends FormElement implements iResource
 {
 
 	private $email;

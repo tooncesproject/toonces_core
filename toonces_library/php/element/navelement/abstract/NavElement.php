@@ -1,6 +1,6 @@
 <?php
 // Initial Commit: Paul Anderson, 1/23/2016
-abstract class NavElement extends Element implements iElement
+abstract class NavElement extends Element implements iResource
 {
 	var $userId;
 	var $conn;
@@ -8,7 +8,7 @@ abstract class NavElement extends Element implements iElement
 	var $linkPages = array();
 
 	
-	function getHTML() {
+	function getResource() {
 		
 		$html = '<div class="dynamic_nav">'.PHP_EOL;
 

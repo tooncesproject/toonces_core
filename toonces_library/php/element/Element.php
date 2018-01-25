@@ -2,7 +2,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class Element implements iElement {
+class Element implements iResource {
 
 	var $html;
 	var $htmlHeader;
@@ -13,19 +13,7 @@ class Element implements iElement {
 		$this->pageViewReference = $pageView;
 	}
 
-	public function setHtmlHeader($headerString){
-		$htmlHeader = $headerString;
-	}
-
-	public function setHtmlFooter($footerString) {
-		$htmlFooter = $footerString;
-	}
-
-	public function setHTML($htmlString) {
-		$this->html = $htmlString;
-	}
-
-	public function getHTML() {
+	public function getResource() {
 
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;

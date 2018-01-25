@@ -30,7 +30,7 @@ class ExtHTMLPageBuilder extends StandardPageBuilder {
         
         // Set Content Element's HTML to the file referenced.
         try {
-            $element->setHTML(file_get_contents($htmlPath));
+            $element->html = file_get_contents($htmlPath);
         } catch (Exception $e) {
             die('Failed to get static HTML content: ' . $e->getMessage());
         }

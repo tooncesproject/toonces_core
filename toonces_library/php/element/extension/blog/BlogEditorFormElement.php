@@ -7,7 +7,7 @@
  * 
  */
 
-class BlogEditorFormElement extends BlogFormElement implements iElement
+class BlogEditorFormElement extends BlogFormElement implements iResource
 {
 
 	public $updatedBlogPostTitle;

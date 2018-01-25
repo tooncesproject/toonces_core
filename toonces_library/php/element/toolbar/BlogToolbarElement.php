@@ -41,7 +41,7 @@ class BlogToolbarElement extends ToolbarElement
 
 		// Build the new post tool
 		$newPostToolElement = new Element($this->pageViewReference);
-		$newPostToolElement->setHTML($this->buildNewpostToolElementHTML());
+		$newPostToolElement->html = $this->buildNewpostToolElementHTML();
 		$this->toolElement->addElement($newPostToolElement);
 
 

@@ -14,7 +14,7 @@
  *
  */
 
-class URLCheckFormElement extends FormElement implements iElement
+class URLCheckFormElement extends FormElement implements iResource
 {
 
 	var $conn;

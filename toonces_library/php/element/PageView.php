@@ -2,7 +2,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class PageView extends ViewElement implements iResourceView, iView
+class PageView extends ViewElement implements iResourceView, iHTMLView
 {
 	// instance variables
 
@@ -35,41 +35,14 @@ class PageView extends ViewElement implements iResourceView, iView
 
 	}
 
-	//setter methods
-
-	public function setPageTitle($pageTitleString) {
-		$this->pageTitle = $pageTitleString;
-	}
-
-	public function setStyleSheet($styleSheetFile) {
-		$this->styleSheet = $styleSheetFile;
-	}
-
-	public function setPageLinkText($pageLinkString) {
-		$this->pageLinkText = $pageLinkString;
-	}
-
-	// getter methods
-	public function getPageTitle() {
-		return $this->pageTitle;
-	}
-
-	public function getStyleSheet() {
-		return  $this->styleSheet;
-	}
-
-	public function getPageLinkText() {
-		return $this->pageLinkText;
-	}
-
 	// execution methods
 
-	public function getHTML() {
+	public function getResource() {
 
 		$htmlString = $this->htmlHeader;
 
 		foreach($this->pageElements as $object) {
-			$htmlString = $htmlString.$object->getHTML();
+			$htmlString = $htmlString.$object->getResource();
 		}
 
 		return $htmlString;
@@ -78,7 +51,7 @@ class PageView extends ViewElement implements iResourceView, iView
 
 	public function renderPage() {
 
-		echo $this->getHTML();
+		echo $this->getResource();
 
 	}
 

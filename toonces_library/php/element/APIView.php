@@ -32,7 +32,7 @@ class APIView extends JSONElement implements iResourceView
    
     public function renderPage() {
         
-        echo $this->getHTML();
+        echo $this->getResource();
         
     }
 }

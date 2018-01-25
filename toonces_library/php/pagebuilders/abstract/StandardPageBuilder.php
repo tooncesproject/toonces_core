@@ -82,7 +82,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 	function buildElementArray() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'/html/generic_html_header.html'));
+		$htmlHeaderElement->html = file_get_contents(LIBPATH.'/html/generic_html_header.html');
 		array_push($this->elementArray, $htmlHeaderElement);
 		$headElement = new HeadElement($this->pageViewReference);
 
@@ -101,7 +101,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 
 		// After the toolbar, add the header element
 		$pageHeader = new Element($this->pageViewReference);
-		$pageHeader->setHTML($this->headerHTML);
+		$pageHeader->html = $this->headerHTML;
 		$this->bodyViewElement->addElement($pageHeader);
 
 		$pageId = $this->pageViewReference->pageId;
@@ -111,7 +111,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 
 		// Add the content footer element
 		$footerElement = new Element($this->pageViewReference);
-		$footerElement->setHTML($this->footerHTML);
+		$footerElement->html = $this->footerHTML;
 		$this->bodyViewElement->addElement($footerElement);
 
 		// Add the bodyViewElement to the page element array
@@ -119,7 +119,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 
 		//Finally, create an element object with the closing HTML tag.
 		$closingElement = new Element($this->pageViewReference);
-		$closingElement->setHTML('</html>'.PHP_EOL);
+		$closingElement->html = '</html>'.PHP_EOL;
 		array_push($this->elementArray, $closingElement);
 
 

@@ -8,7 +8,7 @@
  * 
  */
 
-class DeleteBlogPostFormElement extends FormElement implements iElement
+class DeleteBlogPostFormElement extends FormElement implements iResource
 {
 
 	function buildInputArray() {

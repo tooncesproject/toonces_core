@@ -36,7 +36,7 @@ class TestViewElement extends TestCase
         $viewElement->addElement($element);
         
         // act
-        $htmlOut = $viewElement->getHTML();
+        $htmlOut = $viewElement->getResource();
         
         // assert
         $this->assertEquals(preg_replace('(\n)', '', $htmlOut), $html);

@@ -1,6 +1,6 @@
 <?php
 
-class LoginFormElement extends FormElement implements iElement
+class LoginFormElement extends FormElement implements iResource
 {
 
 	// Inherited variables commented out

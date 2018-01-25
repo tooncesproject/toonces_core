@@ -1,5 +1,5 @@
 <?php
-class AdminNavElement extends NavElement implements iElement
+class AdminNavElement extends NavElement implements iResource
 // Initial commit: Paul Anderson, 1/23/2016
 // This Element class dynamically builds a navigation menu for 
 // admin tools, including only those the user has privileges to access.

@@ -2,7 +2,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class BlogReader implements iElement
+class BlogReader implements iResource
 
 {
 	private $conn;
@@ -219,7 +219,7 @@ SQL;
 	}
 
 
-	public function getHTML() {
+	public function getResource() {
 
 		$html = '<div class="blogreader">'.PHP_EOL;
 

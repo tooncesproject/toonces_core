@@ -50,7 +50,7 @@ abstract class AdminPageBuilder extends PageBuilder
 	function buildLoginPage() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'html/generic_html_header.html'));
+		$htmlHeaderElement->html = file_get_contents(LIBPATH.'html/generic_html_header.html');
 
 		array_push($this->elementArray, $htmlHeaderElement);
 
@@ -67,10 +67,10 @@ abstract class AdminPageBuilder extends PageBuilder
 		$bodyElement = new ViewElement($this->pageViewReference);
 
 		$bodyTopElement = new Element($this->pageViewReference);
-		$bodyTopElement->setHTML($this->loginPageHTMLTop());
+		$bodyTopElement->html = $this->loginPageHTMLTop();
 		$loginFormElement = new LoginFormElement($this->pageViewReference);
 		$bodyBottomElement = new Element($this->pageViewReference);
-		$bodyBottomElement->setHTML($this->loginPageHTMLBottom());
+		$bodyBottomElement->html = $this->loginPageHTMLBottom();
 
 		$bodyElement->addElement($bodyTopElement);
 		$bodyElement->addElement($loginFormElement);
@@ -80,7 +80,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		$footerElement = new Element($this->pageViewReference);
 
-		$footerElement->setHTML(file_get_contents(LIBPATH.'html/generic_html_footer.html'));
+		$footerElement->html = file_get_contents(LIBPATH.'html/generic_html_footer.html');
 
 		array_push($this->elementArray, $footerElement);
 	}
@@ -88,7 +88,7 @@ abstract class AdminPageBuilder extends PageBuilder
 	function buildDashboardPage() {
 		// get static/generic html header, create as element
 		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'html/generic_html_header.html'));
+		$htmlHeaderElement->html = file_get_contents(LIBPATH.'html/generic_html_header.html');
 
 		array_push($this->elementArray, $htmlHeaderElement);
 
@@ -126,7 +126,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		$footerElement = new Element($this->pageViewReference);
 
-		$footerElement->setHTML(file_get_contents(LIBPATH.'html/generic_html_footer.html'));
+		$footerElement->html = file_get_contents(LIBPATH.'html/generic_html_footer.html');
 
 		array_push($this->elementArray, $footerElement);
 	}
@@ -144,7 +144,7 @@ HTML;
 		$html = sprintf($html, $_SESSION['nickname']);
 
 		$notifyElement = new Element($this->pageViewReference);
-		$notifyElement->setHTML($html);
+		$notifyElement->html = $html;
 		return $notifyElement;
 
 	}

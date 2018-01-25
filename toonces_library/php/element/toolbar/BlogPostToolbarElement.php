@@ -40,7 +40,7 @@ class BlogPostToolbarElement extends ToolbarElement
 
 		// Build the edit/cancel edit post tool
 		$editToolElement = new Element($this->pageViewReference);
-		$editToolElement->setHTML($this->buildEditToolElementHTML());
+		$editToolElement->html = $this->buildEditToolElementHTML();
 		$this->toolElement->addElement($editToolElement);
 
 		// If not in edit or urlcheck mode, display a link to publish or unpublish the page and the delete tool.
@@ -54,11 +54,11 @@ class BlogPostToolbarElement extends ToolbarElement
 			$this->toolElement->addElement($unPublishLinkConrolElement);
 
 			$publishToolElement = new Element($this->pageViewReference);
-			$publishToolElement->setHTML($this->buildPublishToolElementHTML());
+			$publishToolElement->html = $this->buildPublishToolElementHTML();
 			$this->toolElement->addElement($publishToolElement);
 
 			$deleteToolElement = new Element($this->pageViewReference);
-			$deleteToolElement->setHTML($this->buildDeleteToolElementHTML());
+			$deleteToolElement->html = $this->buildDeleteToolElementHTML();
 			$this->toolElement->addElement($deleteToolElement);
 
 		}

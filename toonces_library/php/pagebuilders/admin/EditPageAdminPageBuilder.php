@@ -25,7 +25,7 @@ HTML;
 
 	$topCopyBlock = new Element($this->pageViewReference);
 	
-	$topCopyBlock->setHTML($html);
+	$topCopyBlock->html = $html;
 
 	$this->toolElement->addElement($topCopyBlock);
 	

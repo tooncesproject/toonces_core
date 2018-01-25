@@ -3,10 +3,10 @@
 include_once LIBPATH.'php/utility/static/Enumeration.php';
 include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
 include_once LIBPATH.'php/utility/interface/iConnectInfo.php';
-include_once LIBPATH.'php/element/interface/iElement.php';
+include_once LIBPATH.'php/element/interface/iResource.php';
 include_once LIBPATH.'php/element/Element.php';
 include_once LIBPATH.'php/element/ViewElement.php';
-include_once LIBPATH.'php/element/interface/iView.php';
+include_once LIBPATH.'php/element/interface/iHTMLView.php';
 include_once LIBPATH.'php/api/iResourceView.php';
 require_once LIBPATH.'php/element/PageView.php';
 include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';

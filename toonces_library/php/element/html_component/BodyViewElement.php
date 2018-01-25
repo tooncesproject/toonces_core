@@ -5,7 +5,7 @@
  * 
  *  Provides the body element of an HTML page. As an extension of
  *  ViewElement, it allows other Element objects to be nested inside it.
- *  It overrides the getHTML function with a call to add body tags as 
+ *  It overrides the getResource function with a call to add body tags as 
  *  the HTML headers and footers and adds a function to add (n) HTML attribute
  *  key-value pairs to the body HTML element.
  *  
@@ -14,7 +14,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class BodyViewElement extends ViewElement implements iElement
+class BodyViewElement extends ViewElement implements iResource
 {
 
 	var $pageElements = array();
@@ -51,14 +51,14 @@ class BodyViewElement extends ViewElement implements iElement
 
 	// execution method
 
-	public function getHTML() {
+	public function getResource() {
 
 		$pageString = "";
 
 		$this->buildBodyTag();
 
 		foreach($this->pageElements as $object) {
-			$pageString = $pageString.$object->getHTML().PHP_EOL;
+			$pageString = $pageString.$object->getResource().PHP_EOL;
 		}
 
 		$htmlString = $this->htmlHeader.PHP_EOL.$pageString.PHP_EOL.$this->htmlFooter.PHP_EOL;
