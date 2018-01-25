@@ -2,7 +2,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class PageView extends ViewElement implements iView
+class PageView extends ViewElement implements iResourceView, iView
 {
 	// instance variables
 

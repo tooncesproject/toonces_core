@@ -121,7 +121,6 @@ $pageViewClass = 'PageView';
 $pageId = 1;
 
 // Acquire path query from request
-//$path = $_SERVER['REQUEST_URI'];
 $url = $_SERVER['REQUEST_URI'];
 
 
@@ -238,14 +237,9 @@ if ($adminSessionActive == 1 and $isAdminPage == 1) {
 $pageView->sessionManager = $sessionManager;
 
 // set PageView class variables
-
-$pageView->setStyleSheet($styleSheet);
-//$pageView->styleSheet = $styleSheet;
-
-$pageView->setPageTitle($pageTitle);
-
-$pageView->setPageLinkText($pageLinkText);
-
+$pageView->styleSheet = $styleSheet;
+$pageView->pageTitle = $pageTitle;
+$pageView->pageLinkText = $pageLinkText;
 $pageView->pageTypeId = $pageTypeId;
 
 $pageBuilder = new $pageBuilderClass($pageView);

@@ -30,6 +30,10 @@ abstract class PageBuilder {
 					$blogPostToolbarElement = new BlogPostToolbarElement($this->pageViewReference);
 					$this->toolbarElement = $blogPostToolbarElement;
 					break;
+				// REST API resource
+				case 6:
+				    // No toolbar element
+				    break;
 				default:
 					$defaultToolbarElement = new DefaultToolbarElement($this->pageViewReference);
 					$this->toolbarElement = $defaultToolbarElement;

@@ -7,6 +7,7 @@ include_once LIBPATH.'php/element/interface/iElement.php';
 include_once LIBPATH.'php/element/Element.php';
 include_once LIBPATH.'php/element/ViewElement.php';
 include_once LIBPATH.'php/element/interface/iView.php';
+include_once LIBPATH.'php/api/iResourceView.php';
 require_once LIBPATH.'php/element/PageView.php';
 include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
@@ -20,6 +21,8 @@ include_once LIBPATH.'php/element/linkaction/UnPublishLinkControlElement.php';
 include_once LIBPATH.'php/element/toolbar/BlogToolbarElement.php';
 include_once LIBPATH.'php/element/toolbar/BlogPostToolbarElement.php';
 include_once LIBPATH.'php/element/toolbar/DefaultToolbarElement.php';
+include_once LIBPATH.'/php/element/JSONElement.php';
+include_once LIBPATH.'/php/element/APIElement.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/admin/AdminHomeBuilder.php';
