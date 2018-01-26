@@ -2,7 +2,6 @@
 
 include_once LIBPATH.'php/utility/static/Enumeration.php';
 include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
-include_once LIBPATH.'php/utility/interface/iConnectInfo.php';
 include_once LIBPATH.'php/element/interface/iResource.php';
 include_once LIBPATH.'php/element/Element.php';
 include_once LIBPATH.'php/element/ViewElement.php';
