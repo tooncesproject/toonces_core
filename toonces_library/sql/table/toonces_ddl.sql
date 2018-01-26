@@ -167,7 +167,6 @@ CREATE TABLE IF NOT EXISTS adminpages (
     ,page_link_text         VARCHAR(100)    NULL
     ,pagebuilder_class      VARCHAR(50)     NOT NULL
     ,pageview_class         VARCHAR(50)     NOT NULL
-    ,css_stylesheet         VARCHAR(100)    NOT NULL
     ,created_by             VARCHAR(50)     NULL
     ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
     ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
