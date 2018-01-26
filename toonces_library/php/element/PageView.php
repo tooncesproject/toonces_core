@@ -2,12 +2,12 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class PageView extends ViewElement implements iResourceView, iHTMLView
+class PageView extends ViewElement implements iHTMLView, iResourceView
 {
 	// instance variables
 
 	var $htmlHeader;
-	var $pageElements = array();
+	var $pageElements = array(); 
 	var $pageTitle;
 	var $styleSheet;
 	var $pageLinkText;
@@ -18,7 +18,7 @@ class PageView extends ViewElement implements iResourceView, iHTMLView
 	var $userCanEdit;
 	var $userCanAccessAdminPage;
 	var $pageTypeId;
-	var $urlPath;
+	var $pageURI;
 	var $pageIsPublished;
 	var $conn;
 
@@ -27,12 +27,60 @@ class PageView extends ViewElement implements iResourceView, iHTMLView
 		parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
 	}
 
+    // Setters & getters for compliance to iHTMLView
+	public function setPageTitle($paramPageTitle) {
+	    $this->pageTitle = $paramPageTitle;
+	}
+	
+	public function getPageTitle() {
+	    return $this->pageTitle;
+	}
+	
+	public function setPageIsPublished($paramPageIsPublished) {
+	    $this->pageIsPublished = $paramPageIsPublished;
+	}
+	
+	public function getPageIsPublished() {
+	    return $this->pageIsPublished;
+	}
 
 	public function addElement ($element) {
-
 		array_push($this->pageElements,$element);
 		$this->elementsCount++;
+	}
 
+	// Setters and getters for compliance to iResourceView
+	
+	public function setPageURI($paramPageURI) {
+	    $this->pageURI = $paramPageURI;
+	}
+
+	public function getPageURI() {
+	    return $this->pageURI;
+	}
+	
+	public function setSQLConn($paramSQLConn) {
+	    $this->conn = $paramSQLConn;
+	}
+	
+	public function getSQLConn() {
+	    return $this->conn;
+	}
+	
+	public function setPageLinkText($paramPageLinkText) {
+	    $this->pageLinkText = $paramPageLinkText;
+	}
+
+	public function getPageLinkText() {
+	    return $this->pageLinkText;
+	}
+	
+	public function setPageTypeID($paramPageTypeID) {
+	    $this->pageTypeId = $paramPageTypeID;
+	}
+
+	public function getPageTypeID() {
+	   return $this->pageTypeID;
 	}
 
 	// execution methods

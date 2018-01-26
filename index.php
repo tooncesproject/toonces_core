@@ -81,7 +81,6 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 			return 0;
 		}
 	}
-
 }
 
 // ******************** Begin procedural code ******************** 
@@ -179,16 +178,13 @@ if ($allowAccess) {
 
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
-$pageView->urlPath = $path;
-$pageView->conn = $conn;
-
-// pass session manager to pageView
-$pageView->sessionManager = $sessionManager;
+$pageView->setPageURI($path);
+$pageView->setSQLConn($conn);
 
 // set PageView class variables
-$pageView->pageTitle = $pageTitle;
-$pageView->pageLinkText = $pageLinkText;
-$pageView->pageTypeId = $pageTypeId;
+$pageView->setPageTitle($pageTitle);
+$pageView->setPageLInkText($pageLinkText);
+$pageView->setPageTypeID($pageTypeId);
 
 $pageBuilder = new $pageBuilderClass($pageView);
 

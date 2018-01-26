@@ -1,11 +1,13 @@
 <?php
-interface iHTMLView
+interface iHTMLView extends iResource
 {
-	
-	public $pageTitle;
-	public $pageIsPublished;
-	
-	public function getResource();
-}
 
-?>
+	public function setPageTitle($paramPageTitle);
+	public function getPageTitle();
+
+	public function setPageIsPublished($paramPageIsPublished);
+	public function getPageIsPublished();
+
+	// Inherited from iResource, commented for ease:
+	//public function getResource();
+}

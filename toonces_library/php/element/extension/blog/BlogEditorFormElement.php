@@ -87,13 +87,13 @@ SQL;
 		switch ($responseState) {
 			case 0:
 				// If no title change, exit edit mode.
-				$path = '/'.$this->pageViewReference->urlPath;
+				$path = '/'.$this->pageViewReference->getPageURI();
 				$this->send303($path);
 				break;
 			case 1:
 				// Title change detected, ask if url change is desired.
 				$checkTitle = urlencode($this->updatedBlogPostTitle);
-				$path = $this->pageViewReference->urlPath;
+				$path = $this->pageViewReference->getPageURI();
 				$path = '/'.$path.'?mode=urlcheck&newtitle='.$checkTitle;
 				$this->send303($path);
 				break;

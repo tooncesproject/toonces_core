@@ -122,7 +122,7 @@ HTML;
 		$publishPageToolHTML = '<div class="TE_pagetoolelement">'.PHP_EOL;
 
 		// If page is unpublished, add the option to publish the page.
-		if ($this->pageViewReference->pageIsPublished == false) {
+		if (!$this->pageViewReference->getPageIsPublished()) {
 			$publishedMessage = '<p>This blog post is not yet published.<br>Only you and the site administrator can see it.</p>'.PHP_EOL;
 			$linkParams['linkaction'] = 'publishpage';
 			$link = $this->urlArray['path'].'?'.http_build_query($linkParams);

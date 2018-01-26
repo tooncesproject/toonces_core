@@ -10,11 +10,20 @@
 
 interface iResourceView
 {
-    public $pageURI;
-    public $sqlConn;
-    public $pageLinkText;
-    public $pageTypeID;
+    // Setters and getters
+    public function setPageURI($paramPageURI);
+    public function getPageURI();
+
+    public function setSQLConn($paramSQLConn);
+    public function getSQLConn();
+
+    public function setPageLinkText($paramPageLinkText);
+    public function getPageLinkText();
+    
+    public function setPageTypeID($paramPageTypeID);
+    public function getPageTypeID();
    
+    // Action methods
     public function __construct($pageViewPageId);
     public function addElement($element);
     public function renderPage();

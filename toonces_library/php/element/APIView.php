@@ -24,6 +24,39 @@ class APIView extends JSONElement implements iResourceView
     var $queryArray = array();
     var $pageId;
     
+    // iResourceView setters and getters
+    public function setPageURI($paramPageURI) {
+        $this->pageURI = $paramPageURI;
+    }
+    
+    public function getPageURI() {
+        return $this->pageURI;
+    }
+    
+    public function setSQLConn($paramSQLConn) {
+        $this->sqlConn = $paramSQLConn;
+    }
+
+    public function getSQLConn() {
+        return $this->sqlConn;
+    }
+
+    public function setPageLinkText($paramPageLinkText) {
+        $this->pageLinkText = $paramPageLinkText;
+    }
+
+    public function getPageLinkText() {
+        return $this->pageLinkText;
+    }
+    
+    public function setPageTypeID($paramPageTypeID) {
+        $this->pageTypeID = $paramPageTypeID;
+    }
+    
+    public function getPageTypeID() {
+        return $this->pageTypeID;
+    }
+
     public function checkSessionAccess() {
         // REST APIs are stateless; therefore session access does not apply.
         // Defaults to True; any authentication is handled by the resource itself.

@@ -77,7 +77,7 @@ SQL;
 				break;
 			case 1:
 				// 1: No structural change to page; exit edit mode.
-				$path = '/'.$this->pageViewReference->urlPath;
+				$path = '/'.$this->pageViewReference->getPageURI();
 				$this->send303($path);
 		}
 	}
@@ -86,8 +86,8 @@ SQL;
 
 		// Acquire exiting and proposed titles and URLs.
 		$proposedTitle = urldecode($_GET['newtitle']);
-		$currentPath = '/'.$this->pageViewReference->urlPath;
-		$currentTitle = $this->pageViewReference->pageTitle;
+		$currentPath = '/'.$this->pageViewReference->getPageURI();
+		$currentTitle = $this->pageViewReference->getPageTitle();
 
 		if (isset($this->conn) == false) {
 		    $this->conn = $this->pageViewReference->conn;
