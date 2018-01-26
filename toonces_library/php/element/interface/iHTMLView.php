@@ -2,10 +2,10 @@
 interface iHTMLView extends iResource
 {
 
-	public function setPageTitle($paramPageTitle);
+	public function setPageTitle();
 	public function getPageTitle();
 
-	public function setPageIsPublished($paramPageIsPublished);
+	public function setPageIsPublished();
 	public function getPageIsPublished();
 
 	// Inherited from iResource, commented for ease:

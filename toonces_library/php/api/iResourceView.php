@@ -11,21 +11,21 @@
 interface iResourceView
 {
     // Setters and getters
-    public function setPageURI($paramPageURI);
+    public function setPageURI();
     public function getPageURI();
 
-    public function setSQLConn($paramSQLConn);
+    public function setSQLConn();
     public function getSQLConn();
 
-    public function setPageLinkText($paramPageLinkText);
+    public function setPageLinkText();
     public function getPageLinkText();
     
-    public function setPageTypeID($paramPageTypeID);
+    public function setPageTypeID();
     public function getPageTypeID();
    
     // Action methods
-    public function __construct($pageViewPageId);
-    public function addElement($element);
+    public function __construct();
+    public function addElement();
     public function renderPage();
     public function checkSessionAccess();
     public function checkAdminSession();
