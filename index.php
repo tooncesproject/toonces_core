@@ -162,15 +162,6 @@ if ($pageRecord->rowCount() > 0) {
 	};
 }
 
-// If access state is true, build the page.
-if ($allowAccess) {
-	$pathName = $pagePathName;
-	$pageViewClass = $pagePageViewClass;
-	$pageBuilderClass = $pagePageBuilderClass;
-	$pageTitle = $pagePageTitle;
-	$pageLinkText = $pagePageLinkText;
-}
-
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
 $pageView->setPageURI($path);
@@ -179,6 +170,15 @@ $pageView->setSQLConn($conn);
 // Check page deletion state and access.
 // Note: APIView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
 $allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
+
+// If access state is true, build the page.
+if ($allowAccess) {
+    $pathName = $pagePathName;
+    $pageViewClass = $pagePageViewClass;
+    $pageBuilderClass = $pagePageBuilderClass;
+    $pageTitle = $pagePageTitle;
+    $pageLinkText = $pagePageLinkText;
+}
 
 // set PageView class variables
 $pageView->setPageTitle($pageTitle);
