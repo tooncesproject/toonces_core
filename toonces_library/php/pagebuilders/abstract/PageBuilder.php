@@ -18,7 +18,7 @@ abstract class PageBuilder {
 
 		//Check to see if the user is logged in. If so, build a toolbar element.
 
-		if ($this->pageViewReference->sessionManager->adminSessionActive == true) {
+		if ($this->pageViewReference->checkAdminSession()) {
 			switch ($this->pageViewReference->pageTypeId) {
 				// blog root
 				case 2:

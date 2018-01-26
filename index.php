@@ -160,9 +160,6 @@ if ($pageRecord->rowCount() > 0) {
 		$pageTypeId = $result['pagetype_id'];
 		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
-
-
-
 }
 
 // If access state is true, build the page.

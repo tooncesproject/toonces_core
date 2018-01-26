@@ -28,5 +28,6 @@ interface iResourceView
     public function addElement($element);
     public function renderPage();
     public function checkSessionAccess();
+    public function checkAdminSession();
     
 }

@@ -20,7 +20,8 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 	var $pageTypeId;
 	var $pageURI;
 	var $pageIsPublished;
-	var $conn;
+	var $sqlConn;
+	var $adminSessionActive;
 
 	public function __construct($pageViewPageId) {
 		$this->pageId = $pageViewPageId;
@@ -60,11 +61,11 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 	}
 	
 	public function setSQLConn($paramSQLConn) {
-	    $this->conn = $paramSQLConn;
+	    $this->sqlConn = $paramSQLConn;
 	}
 	
 	public function getSQLConn() {
-	    return $this->conn;
+	    return $this->sqlConn;
 	}
 	
 	public function setPageLinkText($paramPageLinkText) {
@@ -92,13 +93,14 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 	    $pageIsPublished = false;
 	    $userHasPageAccess = false;
 	    $userCanEdit = false;
+	    $allowAccess = false;
 
 	    // Instantiate session manager and check status.
-	    $sessionManager = new SessionManager($conn);
+	    $sessionManager = new SessionManager($this->sqlConn);
 	    $sessionManager->checkSession();
-	    $adminSessionActive = $sessionManager->adminSessionActive;
+	    $this->adminSessionActive = $sessionManager->adminSessionActive;
 
-	    if ($adminSessionActive == 1) {
+	    if ($this->adminSessionActive) {
 	        $userID = $sessionManager->userId;
 	        $userIsAdmin = $sessionManager->userIsAdmin;
 	    }
@@ -125,7 +127,7 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 
 SQL;
 	    
-	       $stmt = $this->conn->prepare($sql);
+	       $stmt = $this->sqlConn->prepare($sql);
 	       $stmt->execute(array(':userID' =>userID, ':pageID' => $this->pageId));
 	       $result = $stmt->fetchOne();
 	       
@@ -142,7 +144,7 @@ SQL;
 	    if (!$pageIsPublished) {
 	        // Allow access to page if:
 	        // user is logged in and page is admin page (defer access to page)
-	        if ($adminSessionActive && $isAdminPage) 
+	        if ($this->adminSessionActive && $isAdminPage) 
 	            $allowAccess = true;
 
 	        // user is admin
@@ -162,6 +164,10 @@ SQL;
 	    
 	}
 
+	public function checkAdminSession() {
+	    $self->checkSessionAccess();
+	    return $this->adminSessionActive;
+	}
 	public function getResource() {
 
 		$htmlString = $this->htmlHeader;
