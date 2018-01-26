@@ -21,7 +21,7 @@ include_once LIBPATH.'php/element/toolbar/BlogToolbarElement.php';
 include_once LIBPATH.'php/element/toolbar/BlogPostToolbarElement.php';
 include_once LIBPATH.'php/element/toolbar/DefaultToolbarElement.php';
 include_once LIBPATH.'/php/element/JSONElement.php';
-include_once LIBPATH.'/php/element/APIElement.php';
+include_once LIBPATH.'/php/element/APIView.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/admin/AdminHomeBuilder.php';
@@ -46,8 +46,6 @@ include_once LIBPATH.'php/utility/static/GrabParentPageURL.php';
 
 include_once LIBPATH.'php/element/extension/blog/BlogReader.php';
 include_once LIBPATH.'php/element/extension/blog/BlogPageReader.php';
-include_once LIBPATH.'php/element/html_component/DivElement.php';
-include_once LIBPATH.'php/element/html_component/TagElement.php';
 include_once LIBPATH.'php/element/html_component/HeadElement.php';
 include_once LIBPATH.'php/element/extension/blog/BlogReaderSingle.php';
 include_once LIBPATH.'php/element/extension/admin/LoginFormElement.php';
