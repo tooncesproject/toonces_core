@@ -165,7 +165,7 @@ SQL;
 	}
 
 	public function checkAdminSession() {
-	    $self->checkSessionAccess();
+	    $this->checkSessionAccess();
 	    return $this->adminSessionActive;
 	}
 	public function getResource() {
