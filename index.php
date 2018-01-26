@@ -161,9 +161,7 @@ if ($pageRecord->rowCount() > 0) {
 		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
 
-    // Check page deletion state and access.
-    // Note: APIView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
-    $allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
+
 
 }
 
@@ -180,6 +178,10 @@ if ($allowAccess) {
 $pageView = new $pageViewClass($pageId);
 $pageView->setPageURI($path);
 $pageView->setSQLConn($conn);
+
+// Check page deletion state and access.
+// Note: APIView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
+$allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
 
 // set PageView class variables
 $pageView->setPageTitle($pageTitle);
