@@ -16,7 +16,6 @@ class APIView extends JSONElement implements iResourceView
  
     // iResourceView interface vars
     public $pageURI;
-    public $pageIsPublished;
     public $sqlConn;
     public $pageLinkText;
     public $pageTypeID;
@@ -24,6 +23,12 @@ class APIView extends JSONElement implements iResourceView
     var $apiVersion;
     var $queryArray = array();
     var $pageId;
+    
+    public function checkSessionAccess() {
+        // REST APIs are stateless; therefore session access does not apply.
+        // Defaults to True; any authentication is handled by the resource itself.
+        return true;
+    }
     
     public function __construct($pageViewPageId) {
         $this->pageId = $pageViewPageId;

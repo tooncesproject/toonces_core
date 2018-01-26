@@ -20,6 +20,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 	var $footerHTML;
 	var $headTagsHTML;
 	var $bodyViewElement;
+	var $cssStyleSheet;
 
 	function createContentElement() {
 
@@ -48,6 +49,9 @@ abstract class StandardPageBuilder extends PageBuilder {
 				
 				$headTagsHTMLFile = $xmlReader->getAttribute('head_tags_file');
 				$this->headTagsHTML = file_get_contents(ROOTPATH.$headTagsHTMLFile);
+				
+				$this->cssStyleSheet = $xmlReader->getAttribute('css_stylesheet_file');
+				
 
 				$pageNode = $xmlReader->expand();
 				$subNodes = $pageNode->childNodes;
@@ -87,17 +91,16 @@ abstract class StandardPageBuilder extends PageBuilder {
 		$headElement = new HeadElement($this->pageViewReference);
 
 		// get head attributes
-		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
-		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-		$headElement->setHeadTags($this->headTagsHTML);
+		$headElement->pageTitle = $this->pageViewReference->getPageTitle();
+		$headElement->styleSheet = $this->cssStyleSheet;
+		$headElement->headTags = $this->headTagsHTML;
 		array_push($this->elementArray, $headElement);
 
 		// Add everything below to the Body Element
 
 		// If there's a toolbar, add it here.
-		if (isset($this->toolbarElement)) {
+		if (isset($this->toolbarElement))
 			$this->bodyViewElement->addElement($this->toolbarElement);
-		}
 
 		// After the toolbar, add the header element
 		$pageHeader = new Element($this->pageViewReference);

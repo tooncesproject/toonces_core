@@ -25,19 +25,19 @@ abstract class AdminPageBuilder extends PageBuilder
 		$this->buildAdminTool();
 
 		// Does user have access?
-		$this->accessGranted = 0;
-		if ($this->adminAccessOnly == 1) {
-			if ($this->pageViewReference->sessionManager->userIsAdmin == 1) {
-				$this->accessGranted = 1;
+		$this->accessGranted = false;
+		if ($this->adminAccessOnly) {
+			if ($this->pageViewReference->sessionManager->userIsAdmin) {
+				$this->accessGranted = true;
 			} else {
 				$this->accessGranted = $this->pageViewReference->userCanAccessAdminPage;
 			}
 		} else {
-			$this->accessGranted = 1;
+			$this->accessGranted = true;
 		}
 
 		// If logged in, go to dashboard, otherwise go to login page
-		if ($this->pageViewReference->sessionManager->adminSessionActive == 1) {
+		if ($this->pageViewReference->sessionManager->adminSessionActive) {
 			$this->buildDashboardPage();
 		} else {
 			$this->buildLoginPage();
@@ -57,10 +57,9 @@ abstract class AdminPageBuilder extends PageBuilder
 		$headElement = new HeadElement($this->pageViewReference);
 
 		// get head attributes
-		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
-		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-
-		$headElement->setHeadTags(file_get_contents(LIBPATH.'html/head_tags.html'));
+		$headElement->pageTitle = $this->pageViewReference->getPageTitle();
+		$headElement->styleSheet = '/toonces_library/css/toonces_admin.css';
+		$headElement->headTags = file_get_contents(LIBPATH.'html/head_tags.html');
 
 		array_push($this->elementArray, $headElement);
 
@@ -95,10 +94,9 @@ abstract class AdminPageBuilder extends PageBuilder
 		$headElement = new HeadElement($this->pageViewReference);
 
 		// get head attributes
-		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
-		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-
-		$headElement->setHeadTags(file_get_contents(LIBPATH.'html/head_tags.html'));
+		$headElement->pageTitle = $this->pageViewReference->getPageTitle();
+		$headElement->styleSheet = '/toonces_library/css/toonces_admin.css';
+		$headElement->headTags = file_get_contents(LIBPATH.'html/head_tags.html');
 
 		array_push($this->elementArray, $headElement);
 

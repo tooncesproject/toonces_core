@@ -3,7 +3,7 @@ interface iHTMLView
 {
 	
 	public $pageTitle;
-	public $styleSheet;
+	public $pageIsPublished;
 	
 	public function getResource();
 }

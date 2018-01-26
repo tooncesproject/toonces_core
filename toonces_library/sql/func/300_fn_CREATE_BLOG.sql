@@ -22,7 +22,6 @@ CREATE FUNCTION CREATE_BLOG (
     ,blog_display_name VARCHAR(100)
     ,blog_pagebuilder_class VARCHAR(50)
     ,blog_pageview_class VARCHAR(50)
-    ,css_stylesheet VARCHAR(100)
     
 )
 
@@ -57,7 +56,6 @@ BEGIN
             ,blog_display_name          -- page_link_text
             ,blog_pagebuilder_class     -- pagebuilder_class
             ,blog_pageview_class        -- pageview_class
-            ,css_stylesheet             -- css_stylesheet
             ,1                          -- redirect on error
             ,1                          -- published
             ,2                          -- pagetype_id - Blog root page type

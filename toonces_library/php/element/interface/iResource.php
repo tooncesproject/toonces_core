@@ -5,7 +5,7 @@
  * 
  * Provides an interface for implementing individual components of a page.
  * 
- * Dorktron implements the Strategy pattern (or something like it) to build up individual 
+ * Toonces implements the Strategy pattern (or something like it) to build up individual 
  * components of a page.
  * 
  * This way, any individual HTML snippet (header? Nav bar? Whatevs) can be encapsulated
@@ -18,6 +18,6 @@
  */
 
 interface iResource
-{
-	public function getResource();
+{   
+    public function getResource();
 }

@@ -85,15 +85,7 @@ SQL;
 
 		// get current cookie parameters
 		$cookieParams = session_get_cookie_params();
-/*
-		session_set_cookie_params(
-			 $cookieParams['lifetime']
-				,$cookieParams['path']
-				,$cookieParams['domain']
-				//,$secure
-				,$httponly
-		);
-*/
+
 		// set session name
 		session_name($sessionName);
 

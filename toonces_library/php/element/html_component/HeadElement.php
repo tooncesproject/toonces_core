@@ -35,7 +35,7 @@ class HeadElement extends Element implements iResource {
 		
 		$this->html = $this->htmlHeader.PHP_EOL;
 		$this->html = $this->html.'<title>'.$this->pageTitle.'</title>'.PHP_EOL;
-		$this->html = $this->html.'<link href="/toonces_library/css/'.$this->styleSheet.'" rel="stylesheet" type="text/css" />'.PHP_EOL;
+		$this->html = $this->html.'<link href="'.$this->styleSheet.'" rel="stylesheet" type="text/css" />'.PHP_EOL;
 		$this->html = $this->html.$this->headTags.PHP_EOL;
 		$this->html = $this->html.$this->htmlFooter.PHP_EOL;
 		return $this->html;

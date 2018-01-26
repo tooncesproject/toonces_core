@@ -177,7 +177,6 @@ if (count($rows) == 0) {
     ,page_link_text
     ,pagebuilder_class
     ,pageview_class
-    ,css_stylesheet
     ,redirect_on_error
     ,published
     ,pagetype_id
@@ -186,7 +185,6 @@ if (count($rows) == 0) {
     ,'Home Page'
     ,'ExtHTMLPageBuilder'
     ,'PageView'
-    ,'toonces.css'
     ,FALSE
     ,TRUE
     ,5

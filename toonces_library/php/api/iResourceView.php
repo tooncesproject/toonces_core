@@ -11,7 +11,6 @@
 interface iResourceView
 {
     public $pageURI;
-    public $pageIsPublished;
     public $sqlConn;
     public $pageLinkText;
     public $pageTypeID;
@@ -19,5 +18,6 @@ interface iResourceView
     public function __construct($pageViewPageId);
     public function addElement($element);
     public function renderPage();
+    public function checkSessionAccess();
     
 }
