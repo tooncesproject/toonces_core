@@ -63,6 +63,11 @@ class APIView extends JSONElement implements iResourceView
         return true;
     }
     
+    public function checkAdminSession() {
+        // Similarly, admin session does not apply.
+        return false;
+    }
+    
     public function __construct($pageViewPageId) {
         $this->pageId = $pageViewPageId;
         parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
