@@ -152,7 +152,7 @@ $stmt->execute(array(':pageID' => $pageId));
 
 $pageRecord = $stmt->fetchall();
 $pageExists = false;
-if ($pageRecord->rowCount() > 0) {
+if (count($pageRecord)) {
     $pageExists = true;
 	foreach ($pageRecord as $result) {
 		$pagePathName = $result['pathname'];
