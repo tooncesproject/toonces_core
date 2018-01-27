@@ -129,7 +129,7 @@ SQL;
 	
 		$stmt = $this->sqlConn->prepare($sql);
 		$stmt->execute(array(':userID' =>userID, ':pageID' => $this->pageId));
-		$result = $stmt->fetchOne();
+		$result = $stmt->fetchAll();
 		  
 		$pageIsPublished = $result['published'];
 		$pageTypeId = $result['pagetype_id'];
