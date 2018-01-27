@@ -95,7 +95,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		// get head attributes
 		$headElement->pageTitle = $this->pageViewReference->getPageTitle();
-		$headElement->styleSheet = '/toonces_library/css/toonces_admin.css';
+		$headElement->styleSheet = 'toonces_library/css/toonces_admin.css';
 		$headElement->headTags = file_get_contents(LIBPATH.'html/head_tags.html');
 
 		array_push($this->elementArray, $headElement);
