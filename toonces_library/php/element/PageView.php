@@ -128,7 +128,7 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 SQL;
 	
 		$stmt = $this->sqlConn->prepare($sql);
-		$stmt->execute(array(':userID' =>userID, ':pageID' => $this->pageId));
+		$stmt->execute(array(':userID' => $userID, ':pageID' => $this->pageId));
 		$result = $stmt->fetchAll();
 		$row = $result[0];
 		$pageIsPublished = $row['published'];
