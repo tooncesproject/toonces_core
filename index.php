@@ -127,7 +127,7 @@ $pageTypeId = 0;
 $pageIsDeleted = false;
 
 // user state
-$allowAccess = 0;
+$allowAccess = false;
 
 // get sql query
 $sql = <<<SQL
@@ -143,14 +143,17 @@ SELECT
 FROM
     toonces.pages p
 WHERE
-    p.page_id = %d;
+    p.page_id = :pageID;
 SQL;
 
-$query = sprintf($sql,$pageId);
+//$query = sprintf($sql,$pageId);
+$stmt = $conn->prepare($sql);
+$stmt->execute(array(':pageID' => $pageId));
 
-$pageRecord = $conn->query($query);
-
+$pageRecord = $stmt->fetchall();
+$pageExists = false;
 if ($pageRecord->rowCount() > 0) {
+    $pageExists = true;
 	foreach ($pageRecord as $result) {
 		$pagePathName = $result['pathname'];
 		$pagePageTitle = $result['page_title'];
@@ -160,7 +163,7 @@ if ($pageRecord->rowCount() > 0) {
 		$pageTypeId = $result['pagetype_id'];
 		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
-}
+} 
 
 // instantiate the page renderer
 $pageView = new $pageViewClass($pageId);
@@ -169,7 +172,8 @@ $pageView->setSQLConn($conn);
 
 // Check page deletion state and access.
 // Note: APIView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
-$allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
+if ($pageExists)
+    $allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
 
 // If access state is true, build the page.
 if ($allowAccess) {
