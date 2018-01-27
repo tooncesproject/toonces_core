@@ -109,7 +109,7 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 		// Query the database for publication and user access state
 		$sql = <<<SQL
 			SELECT
-				,p.published
+				 p.published
 				,p.pagetype_id
 				,CASE
 					WHEN pua.page_id IS NOT NULL THEN 1
