@@ -97,7 +97,7 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 
 		// Instantiate session manager and check status.
 		if (!$this->sessionManager)
-		   $this->$sessionManager = new SessionManager($this->sqlConn);
+		   $this->sessionManager = new SessionManager($this->sqlConn);
 		$this->sessionManager->checkSession();
 	
 		$this->adminSessionActive = $this->sessionManager->adminSessionActive;
