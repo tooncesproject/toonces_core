@@ -106,7 +106,7 @@ SQL;
 			// If no proposed title, the page must have been reached in error.
 			// Also, ability to change the page depends on user's access level.
 			// In these cases, redirect to the blog page.
-			if (empty($proposedTitle) or $this->pageViewReference->userCanEdit == false) {
+			if (empty($proposedTitle) or !$this->pageViewReference->checkUserCanEdit()) {
 				$this->send303($currentPath);
 			} else {
 				// Otherwise...

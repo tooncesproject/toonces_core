@@ -33,7 +33,7 @@ abstract class ToolbarElement extends ViewElement
 		if ($this->userIsAdmin == true) {
 			$this->userCanEdit = true;
 		} else {
-			$this->userCanEdit = $this->pageViewReference->userCanEdit;
+			$this->userCanEdit = $this->pageViewReference->checkUserCanEdit();
 		}
 
 		// set header and footer

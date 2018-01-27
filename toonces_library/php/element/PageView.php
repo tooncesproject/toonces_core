@@ -50,6 +50,10 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 		$this->elementsCount++;
 	}
 
+	public function checkUserCanEdit() {
+	    return $this->userCanEdit;
+	}
+
 	// Setters and getters for compliance to iResourceView
 
 	public function setPageURI($paramPageURI) {
@@ -92,7 +96,7 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 		$isAdminPage = false;
 		$pageIsPublished = false;
 		$userHasPageAccess = false;
-		$userCanEdit = false;
+		$this->userCanEdit = false;
 		$allowAccess = false;
 
 		// Instantiate session manager and check status.
@@ -136,7 +140,7 @@ SQL;
 		$isAdminPage = ($row['pagetype_id'] == 1) ? true : false;
 		$userHasPageAccess = $row['user_has_access'];
 		// Admin user can always edit
-		$userCanEdit = ($userIsAdmin) ? true : $row['can_edit'];
+		$this->userCanEdit = ($userIsAdmin) ? true : $row['can_edit'];
 
 		// Is the page unpublished?
 		if (!$pageIsPublished) {

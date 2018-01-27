@@ -17,7 +17,7 @@ class PublishLinkControlElement extends LinkActionControlElement
 
 
 		// Does the user have editing rights to this page?
-		$userCanEdit = $this->pageViewReference->userCanEdit;
+		$userCanEdit = $this->pageViewReference->checkUserCanEdit();
 
 		// If one or the other is true, go ahead and publish the page.
 		if ($userCanEdit) {

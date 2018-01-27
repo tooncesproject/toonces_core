@@ -18,7 +18,7 @@ class UnPublishLinkControlElement extends LinkActionControlElement
 		// This function is only called if the page is published.
 
 		// Does the user have editing rights to this page?
-		$userCanEdit = $this->pageViewReference->userCanEdit;
+	    $userCanEdit = $this->pageViewReference->checkUserCanEdit();
 
 		// Is the user admin?
 		$userIsAdmin = $this->pageViewReference->userIsAdmin;
