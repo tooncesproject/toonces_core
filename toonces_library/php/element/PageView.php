@@ -7,7 +7,7 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 	// instance variables
 
 	var $htmlHeader;
-	var $pageElements = array(); 
+	var $pageElements = array();
 	var $pageTitle;
 	var $styleSheet;
 	var $pageLinkText;
@@ -28,21 +28,21 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 		parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
 	}
 
-    // Setters & getters for compliance to iHTMLView
+	// Setters & getters for compliance to iHTMLView
 	public function setPageTitle($paramPageTitle) {
-	    $this->pageTitle = $paramPageTitle;
+		$this->pageTitle = $paramPageTitle;
 	}
-	
+
 	public function getPageTitle() {
-	    return $this->pageTitle;
+		return $this->pageTitle;
 	}
-	
+
 	public function setPageIsPublished($paramPageIsPublished) {
-	    $this->pageIsPublished = $paramPageIsPublished;
+		$this->pageIsPublished = $paramPageIsPublished;
 	}
-	
+
 	public function getPageIsPublished() {
-	    return $this->pageIsPublished;
+		return $this->pageIsPublished;
 	}
 
 	public function addElement ($element) {
@@ -51,33 +51,33 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 	}
 
 	// Setters and getters for compliance to iResourceView
-	
+
 	public function setPageURI($paramPageURI) {
-	    $this->pageURI = $paramPageURI;
+		$this->pageURI = $paramPageURI;
 	}
 
 	public function getPageURI() {
-	    return $this->pageURI;
+		return $this->pageURI;
 	}
-	
+
 	public function setSQLConn($paramSQLConn) {
-	    $this->sqlConn = $paramSQLConn;
+		$this->sqlConn = $paramSQLConn;
 	}
-	
+
 	public function getSQLConn() {
-	    return $this->sqlConn;
+		return $this->sqlConn;
 	}
-	
+
 	public function setPageLinkText($paramPageLinkText) {
-	    $this->pageLinkText = $paramPageLinkText;
+		$this->pageLinkText = $paramPageLinkText;
 	}
 
 	public function getPageLinkText() {
-	    return $this->pageLinkText;
+		return $this->pageLinkText;
 	}
-	
+
 	public function setPageTypeID($paramPageTypeID) {
-	    $this->pageTypeId = $paramPageTypeID;
+		$this->pageTypeId = $paramPageTypeID;
 	}
 
 	public function getPageTypeID() {
@@ -86,87 +86,85 @@ class PageView extends ViewElement implements iHTMLView, iResourceView
 
 	// execution methods
 	public function checkSessionAccess() {
-	    
-	    $userID = NULL;
-	    $userIsAdmin = false;
-	    $isAdminPage = false;
-	    $pageIsPublished = false;
-	    $userHasPageAccess = false;
-	    $userCanEdit = false;
-	    $allowAccess = false;
+	
+		$userID = 0;
+		$userIsAdmin = false;
+		$isAdminPage = false;
+		$pageIsPublished = false;
+		$userHasPageAccess = false;
+		$userCanEdit = false;
+		$allowAccess = false;
 
-	    // Instantiate session manager and check status.
-	    $sessionManager = new SessionManager($this->sqlConn);
-	    $sessionManager->checkSession();
-	    $this->adminSessionActive = $sessionManager->adminSessionActive;
+		// Instantiate session manager and check status.
+		if (!$this->sessionManager)
+		   $this->$sessionManager = new SessionManager($this->sqlConn);
+		$this->sessionManager->checkSession();
+	
+		$this->adminSessionActive = $this->sessionManager->adminSessionActive;
 
-	    if ($this->adminSessionActive) {
-	        $userID = $sessionManager->userId;
-	        $userIsAdmin = $sessionManager->userIsAdmin;
-	    }
-
-	    if ($userID) {
-	    // Query the database for publication and user access state
-	       $sql = <<<SQL
-            SELECT
-                ,p.published
-                ,p.pagetype_id
-                ,CASE 
-                    WHEN pua.page_id IS NOT NULL THEN 1
-                    ELSE 0
-                END AS user_has_access
-                ,COALESCE(pua.can_edit,0) AS can_edit
-            FROM
-                toonces.pages p
-            LEFT OUTER JOIN
-                toonces.page_user_access pua
-                    ON p.page_id = pua.page_id
-                    AND pua.user_id = :userID
-            WHERE
-                p.page_id = :pageID;
+		if ($this->adminSessionActive) {
+			$userID = $this->sessionManager->userId;
+			$userIsAdmin = $this->sessionManager->userIsAdmin;
+		}
+		// Query the database for publication and user access state
+		$sql = <<<SQL
+			SELECT
+				,p.published
+				,p.pagetype_id
+				,CASE
+					WHEN pua.page_id IS NOT NULL THEN 1
+					ELSE 0
+				END AS user_has_access
+				,COALESCE(pua.can_edit,0) AS can_edit
+			FROM
+				toonces.pages p
+			LEFT OUTER JOIN
+				toonces.page_user_access pua
+					ON p.page_id = pua.page_id
+					AND pua.user_id = :userID
+			WHERE
+				p.page_id = :pageID;
 
 SQL;
-	    
-	       $stmt = $this->sqlConn->prepare($sql);
-	       $stmt->execute(array(':userID' =>userID, ':pageID' => $this->pageId));
-	       $result = $stmt->fetchOne();
-	       
-	       $pageIsPublished = $result['published'];
-	       $pageTypeId = $result['pagetype_id'];
-	       $isAdminPage = ($result['pagetype_id'] == 1) ? true : false;
-	       $userHasPageAccess = $result['user_has_access'];
-	       // Admin user can always edit
-	       $userCanEdit = ($userIsAdmin) ? true : $result['can_edit']; 
+	
+		$stmt = $this->sqlConn->prepare($sql);
+		$stmt->execute(array(':userID' =>userID, ':pageID' => $this->pageId));
+		$result = $stmt->fetchOne();
+		  
+		$pageIsPublished = $result['published'];
+		$pageTypeId = $result['pagetype_id'];
+		$isAdminPage = ($result['pagetype_id'] == 1) ? true : false;
+		$userHasPageAccess = $result['user_has_access'];
+		// Admin user can always edit
+		$userCanEdit = ($userIsAdmin) ? true : $result['can_edit'];
 
-	    }
+		// Is the page unpublished?
+		if (!$pageIsPublished) {
+			// Allow access to page if:
+			// user is logged in and page is admin page (defer access to page)
+			if ($this->adminSessionActive && $isAdminPage)
+				$allowAccess = true;
 
-	    // Is the page unpublished?
-	    if (!$pageIsPublished) {
-	        // Allow access to page if:
-	        // user is logged in and page is admin page (defer access to page)
-	        if ($this->adminSessionActive && $isAdminPage) 
-	            $allowAccess = true;
+			// user is admin
+			if ($userIsAdmin)
+				$allowAccess = true;
 
-	        // user is admin
-	        if ($userIsAdmin)
-	            $allowAccess = true;
+			// page isn't necessarily admin page but user is logged in and has access
+			if ($userHasPageAccess )
+				$allowAccess = true;
 
-	        // page isn't necessarily admin page but user is logged in and has access
-	        if ($userHasPageAccess )
-	            $allowAccess = true;
+		} else {
+			// If published, page is public.
+			$allowAccess = true;
+		}
 
-	    } else {
-	        // If published, page is public.
-	        $allowAccess = true;
-	    }
-	    
-	    return $allowAccess;
-	    
+		return $allowAccess;
+	
 	}
 
 	public function checkAdminSession() {
-	    $this->checkSessionAccess();
-	    return $this->adminSessionActive;
+		$this->checkSessionAccess();
+		return $this->adminSessionActive;
 	}
 	public function getResource() {
 
