@@ -135,7 +135,7 @@ SQL;
 		$stmt->execute(array(':userID' => $userID, ':pageID' => $this->pageId));
 		$result = $stmt->fetchAll();
 		$row = $result[0];
-		$pageIsPublished = $row['published'];
+		$this->pageIsPublished = $row['published'];
 		$pageTypeId = $row['pagetype_id'];
 		$isAdminPage = ($row['pagetype_id'] == 1) ? true : false;
 		$userHasPageAccess = $row['user_has_access'];
@@ -143,7 +143,7 @@ SQL;
 		$this->userCanEdit = ($userIsAdmin) ? true : $row['can_edit'];
 
 		// Is the page unpublished?
-		if (!$pageIsPublished) {
+		if (!$this->pageIsPublished) {
 			// Allow access to page if:
 			// user is logged in and page is admin page (defer access to page)
 			if ($this->adminSessionActive && $isAdminPage)
