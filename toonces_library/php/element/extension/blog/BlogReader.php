@@ -23,7 +23,7 @@ class BlogReader implements iResource
 	public function __construct($pageView) {
 
 		$this->pageViewReference = $pageView;
-		$this->conn = $this->pageViewReference->conn;
+		$this->conn = $this->pageViewReference->getSQLConn();
 		$this->blogPageId = $this->pageViewReference->pageId;
 	}
 
@@ -230,7 +230,7 @@ SQL;
 		foreach($queryRows as $row) {
 
 			$postPageId = $row['page_id'];
-			$postPageURL = GrabPageURL::getURL($postPageId, $this->pageViewReference->conn);
+			$postPageURL = GrabPageURL::getURL($postPageId, $this->pageViewReference->getSQLConn());
 			if ($row['published'] == '0')
 				$html = $html.'<p><div class="notify_inline">Unpublished</div></p>'.PHP_EOL;
 			$title = htmlspecialchars($row['title'], ENT_QUOTES);

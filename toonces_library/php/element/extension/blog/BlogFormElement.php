@@ -146,7 +146,7 @@ SQL;
 		} else {
 
 			if (!isset($this->conn))
-			    $this->conn = $this->pageViewReference->conn;
+			    $this->conn = $this->pageViewReference->getSQLConn();
 
 			// Get the input data
 			$titleInput = $this->inputArray['title'];
@@ -220,7 +220,7 @@ SQL;
 
 			if ($this->newPageId != 0) {
 				if (!isset($this->conn))
-				    $this->conn = $this->pageViewReference->conn;
+				    $this->conn = $this->pageViewReference->getSQLConn();
 
 				$sql = 'SELECT GET_PAGE_PATH(:paramPageId)';
 				$stmt = $this->conn->prepare($sql);

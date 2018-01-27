@@ -24,7 +24,7 @@ class PublishLinkControlElement extends LinkActionControlElement
 
 			// Set connection
 			if (isset($this->conn) == false) {
-			    $this->conn = $this->pageViewReference->conn;
+			    $this->conn = $this->pageViewReference->getSQLConn();
 
 			$pageId = $this->pageViewReference->pageId;
 

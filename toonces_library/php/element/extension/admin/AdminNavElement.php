@@ -42,7 +42,7 @@ class AdminNavElement extends NavElement implements iResource
 			p.page_id
 SQL;
 		$SQL = sprintf($SQL,$this->userId);
-		$this->conn = $this->pageViewReference->conn;
+		$this->conn = $this->pageViewReference->getSQLConn();
 		$result = $this->conn->query($SQL);
 
 		// Iterate through results.

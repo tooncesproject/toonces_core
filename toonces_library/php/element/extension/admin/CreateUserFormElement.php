@@ -105,7 +105,7 @@ class CreateUserFormElement extends FormElement implements iResource
 			<p><a href="%s">Create Another User</a></p>
 			<p><a href="%s">Back to User Administration</a></p>
 HTML;
-			$parentPageUrl = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
+			$parentPageUrl = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->getSQLConn());
 			$successMessage = sprintf($successMessage, $_SERVER['REQUEST_URI'],$parentPageUrl);
 
 			$this->storeMessage($successMessage);
@@ -159,7 +159,7 @@ HTML;
 			$grantAdmin = isset($grantAdminInput->postData) ? 1 : 0;
 
 			// input validation is handled by the UserManager object.
-			$userManager = new UserManager($this->pageViewReference->conn);
+			$userManager = new UserManager($this->pageViewReference->getSQLConn());
 
 			$responseArray = $userManager->createUser
 			(

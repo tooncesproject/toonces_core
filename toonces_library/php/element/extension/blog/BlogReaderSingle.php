@@ -16,7 +16,7 @@ class BlogReaderSingle extends Element implements iResource
 	function queryBlog() {
 
 		if (!isset($this->conn))
-		    $this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 
 		$query = <<<SQL
 		SELECT
@@ -55,7 +55,7 @@ SQL;
 		$userIsAdmin = false;
 
 		if (isset($this->conn) == false)
-		    $this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 
 		// Is the user logged in? Are they an admin?
 		$adminSessionActive = $this->pageViewReference->sessionManager->adminSessionActive;
@@ -221,12 +221,12 @@ SQL;
 		if ($nextPageId != 0)
 			$nextHTML = '<div class="page_link next_page_link"><a href="'.$nextPagePath.'">Next Post</a></div>'.PHP_EOL;
 
-		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
+		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->getSQLConn());
 
 
 		$navHTML = $navHTML.$previousHTML.$nextHTML.'</div>'.PHP_EOL;
 
-		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->conn);
+		$parentURL = GrabParentPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->getSQLConn());
 		$parentLink = '<div class="bottom_nav_container">'.PHP_EOL.'<div class="page_link parent_page_link"><a href="'.$parentURL.'">Back to the Blog</a></div></div>'.PHP_EOL;
 		$navHTML = $navHTML.$parentLink;
 
@@ -238,7 +238,7 @@ SQL;
 	public function getResource() {
 
 		if (!isset($this->conn))
-		    $this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 
 		$this->pageId = $this->pageViewReference->pageId;
 		$title = '';

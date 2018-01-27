@@ -44,7 +44,7 @@ HTML;
 		FROM
 			toonces.users;
 SQL;
-		$this->conn = $this->pageViewReference->conn;
+		$this->conn = $this->pageViewReference->getSQLConn();
 		$result = $this->conn->query($SQL);
 		
 		// html template for users

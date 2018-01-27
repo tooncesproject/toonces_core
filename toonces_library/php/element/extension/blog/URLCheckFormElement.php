@@ -23,7 +23,7 @@ class URLCheckFormElement extends FormElement implements iResource
 	public function getParentPath($pageId) {
 
 		if (isset($this->conn) == false)
-		    $this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 
 		$sql = <<<SQL
 				SELECT
@@ -90,7 +90,7 @@ SQL;
 		$currentTitle = $this->pageViewReference->getPageTitle();
 
 		if (isset($this->conn) == false) {
-		    $this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 		}
 		$sql = "SELECT GENERATE_PATHNAME(?)";
 		$stmt = $this->conn->prepare($sql);

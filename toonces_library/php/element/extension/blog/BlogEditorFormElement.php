@@ -17,7 +17,7 @@ class BlogEditorFormElement extends BlogFormElement implements iResource
 	public function checkPathExistence($paramName) {
 
 		if (isset($this->conn) == false)
-			$this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 
 		$queryParams = array (
 				':pageId' => strval($this->pageViewReference->pageId)
@@ -56,7 +56,7 @@ SQL;
 	function queryBlog() {
 
 		if (!isset($this->conn))
-			$this->conn = $this->pageViewReference->conn;
+		    $this->conn = $this->pageViewReference->getSQLConn();
 
 		$query = <<<SQL
 		SELECT
@@ -133,7 +133,7 @@ SQL;
 			// If there is POST data, validate and update.
 
 			if (!isset($this->conn))
-			    $this->conn = $this->pageViewReference->conn;
+			    $this->conn = $this->pageViewReference->getSQLConn();
 
 			// Get the input data
 			$titleInput = $this->inputArray['title'];
