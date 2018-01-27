@@ -130,13 +130,13 @@ SQL;
 		$stmt = $this->sqlConn->prepare($sql);
 		$stmt->execute(array(':userID' =>userID, ':pageID' => $this->pageId));
 		$result = $stmt->fetchAll();
-		  
-		$pageIsPublished = $result['published'];
-		$pageTypeId = $result['pagetype_id'];
-		$isAdminPage = ($result['pagetype_id'] == 1) ? true : false;
-		$userHasPageAccess = $result['user_has_access'];
+		$row = $result[0];
+		$pageIsPublished = $row['published'];
+		$pageTypeId = $row['pagetype_id'];
+		$isAdminPage = ($row['pagetype_id'] == 1) ? true : false;
+		$userHasPageAccess = $row['user_has_access'];
 		// Admin user can always edit
-		$userCanEdit = ($userIsAdmin) ? true : $result['can_edit'];
+		$userCanEdit = ($userIsAdmin) ? true : $row['can_edit'];
 
 		// Is the page unpublished?
 		if (!$pageIsPublished) {
