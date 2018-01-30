@@ -22,7 +22,7 @@ class PageAdminPageBuilder extends AdminPageBuilder
 		</div>
 HTML;
 
-	$topCopyBlock = new Element($this->pageViewReference);
+	$topCopyBlock = new HTMLResource($this->pageViewReference);
 	
 	$topCopyBlock->html = $html;
 

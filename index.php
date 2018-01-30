@@ -90,7 +90,7 @@ $conn = UniversalConnect::doConnect();
 
 // set default properties for view renderer setter methods
 $pageTitle = 'Toonces Page';
-$pageViewClass = 'PageView';
+$pageViewClass = 'HTMLPageVew';
 
 $pageId = 1;
 
@@ -159,7 +159,7 @@ if (count($pageRecord)) {
 		$pagePageTitle = $result['page_title'];
 		$pagePageLinkText = $result['page_link_text'];
 		$pagePageBuilderClass = $result['pagebuilder_class'];
-		$pagePageViewClass = $result['pageview_class'];
+		$pageHTMLPageVewClass = $result['pageview_class'];
 		$pageTypeId = $result['pagetype_id'];
 		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
@@ -178,13 +178,13 @@ if ($pageExists)
 // If access state is true, build the page.
 if ($allowAccess) {
     $pathName = $pagePathName;
-    $pageViewClass = $pagePageViewClass;
+    $pageViewClass = $pageHTMLPageVewClass;
     $pageBuilderClass = $pagePageBuilderClass;
     $pageTitle = $pagePageTitle;
     $pageLinkText = $pagePageLinkText;
 }
 
-// set PageView class variables
+// set HTMLPageVew class variables
 $pageView->setPageTitle($pageTitle);
 $pageView->setPageLInkText($pageLinkText);
 $pageView->setPageTypeID($pageTypeId);

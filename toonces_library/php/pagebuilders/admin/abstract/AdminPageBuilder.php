@@ -21,7 +21,7 @@ abstract class AdminPageBuilder extends PageBuilder
 		$this->setupPageBuilder();
 
 		// build page...
-		$this->toolElement = new ViewElement($this->pageViewReference);
+		$this->toolElement = new HTMLViewResource($this->pageViewReference);
 		$this->buildAdminTool();
 
 		// Does user have access?
@@ -49,7 +49,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 	function buildLoginPage() {
 		// get static/generic html header, create as element
-		$htmlHeaderElement = new Element($this->pageViewReference);
+		$htmlHeaderElement = new HTMLResource($this->pageViewReference);
 		$htmlHeaderElement->html = file_get_contents(LIBPATH.'html/generic_html_header.html');
 
 		array_push($this->elementArray, $htmlHeaderElement);
@@ -63,12 +63,12 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		array_push($this->elementArray, $headElement);
 
-		$bodyElement = new ViewElement($this->pageViewReference);
+		$bodyElement = new HTMLViewResource($this->pageViewReference);
 
-		$bodyTopElement = new Element($this->pageViewReference);
+		$bodyTopElement = new HTMLResource($this->pageViewReference);
 		$bodyTopElement->html = $this->loginPageHTMLTop();
 		$loginFormElement = new LoginFormElement($this->pageViewReference);
-		$bodyBottomElement = new Element($this->pageViewReference);
+		$bodyBottomElement = new HTMLResource($this->pageViewReference);
 		$bodyBottomElement->html = $this->loginPageHTMLBottom();
 
 		$bodyElement->addElement($bodyTopElement);
@@ -77,7 +77,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		array_push($this->elementArray, $bodyElement);
 
-		$footerElement = new Element($this->pageViewReference);
+		$footerElement = new HTMLResource($this->pageViewReference);
 
 		$footerElement->html = file_get_contents(LIBPATH.'html/generic_html_footer.html');
 
@@ -86,7 +86,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 	function buildDashboardPage() {
 		// get static/generic html header, create as element
-		$htmlHeaderElement = new Element($this->pageViewReference);
+		$htmlHeaderElement = new HTMLResource($this->pageViewReference);
 		$htmlHeaderElement->html = file_get_contents(LIBPATH.'html/generic_html_header.html');
 
 		array_push($this->elementArray, $htmlHeaderElement);
@@ -100,7 +100,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		array_push($this->elementArray, $headElement);
 
-		$bodyElement = new AdminViewElement($this->pageViewReference);
+		$bodyElement = new AdminHTMLViewResource($this->pageViewReference);
 
 		// Add logout form to body element
 		$logoutFormElement = new LogoutFormElement($this->pageViewReference);
@@ -122,7 +122,7 @@ abstract class AdminPageBuilder extends PageBuilder
 
 		array_push($this->elementArray, $bodyElement);
 
-		$footerElement = new Element($this->pageViewReference);
+		$footerElement = new HTMLResource($this->pageViewReference);
 
 		$footerElement->html = file_get_contents(LIBPATH.'html/generic_html_footer.html');
 
@@ -141,7 +141,7 @@ abstract class AdminPageBuilder extends PageBuilder
 HTML;
 		$html = sprintf($html, $_SESSION['nickname']);
 
-		$notifyElement = new Element($this->pageViewReference);
+		$notifyElement = new HTMLResource($this->pageViewReference);
 		$notifyElement->html = $html;
 		return $notifyElement;
 

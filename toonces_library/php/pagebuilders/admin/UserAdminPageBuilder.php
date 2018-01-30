@@ -22,7 +22,7 @@ class UserAdminPageBuilder extends AdminPageBuilder
 		</div>
 HTML;
 
-	$topCopyBlock = new Element($this->pageViewReference);
+	$topCopyBlock = new HTMLResource($this->pageViewReference);
 	$topCopyBlock->html = $html;
 
 	$this->toolElement->addElement($topCopyBlock);
@@ -61,7 +61,7 @@ SQL;
 		}
 		$table = $table.'</table></div>';
 		
-		$userListElement = new Element($this->pageViewReference);
+		$userListElement = new HTMLResource($this->pageViewReference);
 		$userListElement->html = $table;
 		$userListElement->htmlHeader = '<div class="copy_block">';
 		$userListElement->htmlFooter = '</div>';
