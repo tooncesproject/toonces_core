@@ -1,6 +1,6 @@
 <?php
 /*
- * iResourceView.php
+ * iPageView.php
  * Initial commit: Paul Anderson, 1/24/2016
  * Project: API/Core/REST refactor
  * Provides an interface for duck-typing "resource view" classes assigned to a "Page"/URI as 
@@ -8,7 +8,7 @@
  */
 
 
-interface iResourceView
+interface iPageView
 {
     // Setters and getters
     public function setPageURI($paramPageURI);

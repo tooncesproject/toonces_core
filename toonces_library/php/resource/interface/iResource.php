@@ -6,14 +6,11 @@
  * Provides an interface for implementing individual components of a page.
  * 
  * Toonces implements the Strategy pattern (or something like it) to build up individual 
- * components of a page.
- * 
- * This way, any individual HTML snippet (header? Nav bar? Whatevs) can be encapsulated
- * in an Element object and retreieved by the view (iHTMLView compliant) object. 
+ * components of a page/API resource.
  * 
  * The idea is a 1-n relationship between the page being rendered and its individual components.
  * That way, the view object can iterate through any number of sub-view objects, each implementing
- * a method to return HTML.
+ * a method to return HTML or JSON.
  * 
  */
 

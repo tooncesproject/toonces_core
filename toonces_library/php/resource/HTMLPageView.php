@@ -2,7 +2,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class HTMLPageView extends HTMLViewResource implements iHTMLView, iResourceView
+class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 {
 	// instance variables
 
@@ -54,7 +54,7 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iResourceView
 	    return $this->userCanEdit;
 	}
 
-	// Setters and getters for compliance to iResourceView
+	// Setters and getters for compliance to iPageView
 
 	public function setPageURI($paramPageURI) {
 		$this->pageURI = $paramPageURI;

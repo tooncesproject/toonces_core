@@ -4,7 +4,7 @@
 *	Copyright (c) 2015 by Paul Anderson, All Rigths Reserved
 *
 *	This script is the root script for any given application in the site.
-*	It instantiates an iResourceView-compliant object which provides the base rendering for a page
+*	It instantiates an iPageView-compliant object which provides the base rendering for a page
 *
 */
 
@@ -171,7 +171,7 @@ $pageView->setPageURI($path);
 $pageView->setSQLConn($conn);
 
 // Check page deletion state and access.
-// Note: APIView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
+// Note: APIPageView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
 if ($pageExists)
     $allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
 

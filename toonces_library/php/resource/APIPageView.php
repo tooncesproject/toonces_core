@@ -1,6 +1,6 @@
 <?php
 /*
- * APIView.php
+ * APIPageView.php
  * Initial commit: Paul Anderson, 1/24/2018
  * 
  * iView implementation for REST API resources.
@@ -11,10 +11,10 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class APIView extends JSONResource implements iResourceView
+class APIPageView extends JSONResource implements iPageView
 {
  
-    // iResourceView interface vars
+    // iPageView interface vars
     public $pageURI;
     public $sqlConn;
     public $pageLinkText;
@@ -22,9 +22,11 @@ class APIView extends JSONResource implements iResourceView
     
     var $apiVersion;
     var $queryArray = array();
+    var $headers = array();
+    var $HTTPMethod;
     var $pageId;
     
-    // iResourceView setters and getters
+    // iPageView setters and getters
     public function setPageURI($paramPageURI) {
         $this->pageURI = $paramPageURI;
     }
@@ -71,10 +73,13 @@ class APIView extends JSONResource implements iResourceView
     public function __construct($pageViewPageId) {
         $this->pageId = $pageViewPageId;
         parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
+        $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];
+        $this->headers = apache_get_headers();
+        $this->apiVersion = $this->headers['Accept-version'];
+        
     }
    
     public function renderPage() {
-        
         echo $this->getResource();
         
     }
