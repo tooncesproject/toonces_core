@@ -20,8 +20,9 @@ include_once LIBPATH.'php/resource/linkaction/UnPublishLinkControlResource.php';
 include_once LIBPATH.'php/resource/toolbar/BlogToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/BlogPostToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/DefaultToolbarElement.php';
-include_once LIBPATH.'/php/resource/JSONResource.php';
-include_once LIBPATH.'/php/resource/APIPageView.php';
+include_once LIBPATH.'php/resource/JSONResource.php';
+include_once LIBPATH.'php/resource/DataResource.php';
+include_once LIBPATH.'php/resource/APIPageView.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/admin/AdminHomeBuilder.php';
@@ -35,6 +36,7 @@ include_once LIBPATH.'php/pagebuilders/ExtHTMLPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/blog/BlogPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/blog/BlogPostSinglePageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/core_services/CoreAPIPageBuilder.php';
 
 include_once LIBPATH.'php/resource/extension/admin/AdminHTMLViewResource.php';
 include_once LIBPATH.'php/resource/html_component/BodyHTMLViewResource.php';

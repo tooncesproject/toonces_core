@@ -8,7 +8,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class JSONResource implements iResource
+class DataResource implements iResource
 {
     var $dataObjects = array();
     var $elementsCount = 0;
