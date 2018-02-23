@@ -46,7 +46,7 @@ SQL;
         
         foreach ($result as $row) {
             $pageID = $row[0];
-            $resourceArray[$pageID] - array(
+            $resourceArray[$pageID] = array(
                 'pathName' => $row[1]
                 ,'pageURI' => GrabPageURL::getURL($pageID, $conn)
                 ,'pageTitle' => $row[2]

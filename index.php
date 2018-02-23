@@ -159,7 +159,7 @@ if (count($pageRecord)) {
 		$pagePageTitle = $result['page_title'];
 		$pagePageLinkText = $result['page_link_text'];
 		$pagePageBuilderClass = $result['pagebuilder_class'];
-		$pageViewClass = $result['pageview_class'];
+		$pagePageViewClass = $result['pageview_class'];
 		$pageTypeId = $result['pagetype_id'];
 		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
@@ -178,7 +178,7 @@ if ($pageExists)
 // If access state is true, build the page.
 if ($allowAccess) {
     $pathName = $pagePathName;
-    $pageViewClass = $pageHTMLPageViewClass;
+    $pageViewClass = $pagePageViewClass;
     $pageBuilderClass = $pagePageBuilderClass;
     $pageTitle = $pagePageTitle;
     $pageLinkText = $pagePageLinkText;
