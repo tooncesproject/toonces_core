@@ -159,7 +159,7 @@ if (count($pageRecord)) {
 		$pagePageTitle = $result['page_title'];
 		$pagePageLinkText = $result['page_link_text'];
 		$pagePageBuilderClass = $result['pagebuilder_class'];
-		$pageHTMLPageViewClass = $result['pageview_class'];
+		$pageViewClass = $result['pageview_class'];
 		$pageTypeId = $result['pagetype_id'];
 		$pageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
@@ -184,7 +184,7 @@ if ($allowAccess) {
     $pageLinkText = $pagePageLinkText;
 }
 
-// set HTMLPageView class variables
+// set PageView class variables
 $pageView->setPageTitle($pageTitle);
 $pageView->setPageLInkText($pageLinkText);
 $pageView->setPageTypeID($pageTypeId);
