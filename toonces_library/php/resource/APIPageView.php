@@ -59,6 +59,15 @@ class APIPageView extends JSONResource implements iPageView
         return $this->pageTypeID;
     }
 
+    public function setPageTitle($paramPageTitle) {
+        // Do nothing 
+    }
+    
+    public function getPageTitle() {
+        // API pages do not have page titles.
+        return NULL;
+    }
+    
     public function checkSessionAccess() {
         // REST APIs are stateless; therefore session access does not apply.
         // Defaults to True; any authentication is handled by the resource itself.

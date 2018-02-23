@@ -22,7 +22,10 @@ interface iPageView
     
     public function setPageTypeID($paramPageTypeID);
     public function getPageTypeID();
-   
+    
+    public function setPageTitle($paramPageTitle);
+    public function getPageTitle();
+    
     // Action methods
     public function __construct($pageViewPageId);
     public function addElement($element);
