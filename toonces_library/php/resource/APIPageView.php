@@ -97,7 +97,7 @@ class APIPageView implements iPageView, iResource
         // Iterate through the dataObjects array, creating a new array with its extracted contents
         $pageArray = array();
         foreach ($this->dataObjects as $dataResource)
-            array_push($pageArray, $dataResource->getResource);
+            array_push($pageArray, $dataResource->getResource());
 
          // Encode as JSON and return.
          $JSONString = json_encode($pageArray, JSON_PRETTY_PRINT);
