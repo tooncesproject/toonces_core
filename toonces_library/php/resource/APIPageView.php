@@ -11,7 +11,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class APIPageView implements iPageView, iResource
+class APIPageView extends DataResource implements iPageView, iResource
 {
  
     // iPageView interface vars
@@ -25,16 +25,9 @@ class APIPageView implements iPageView, iResource
     var $headers = array();
     var $HTTPMethod;
     var $pageId;
-    var $dataObjects = array();
+    // inherited from DataResource:
+    //var $dataObjects = array();
     
-    public function __construct($pageViewPageId) {
-        $this->pageId = $pageViewPageId;
-        parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
-        $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];
-        // $this->headers = apache_get_headers();
-        // $this->apiVersion = $this->headers['Accept-version'];
-    }
-
     // iPageView setters and getters
     public function setPageURI($paramPageURI) {
         $this->pageURI = $paramPageURI;
@@ -87,18 +80,22 @@ class APIPageView implements iPageView, iResource
         // Similarly, admin session does not apply.
         return false;
     }
-
-    public function addElement ($element) {
-        array_push($this->dataObjects,$element);
+    
+    public function __construct($pageViewPageId) {
+        $this->pageId = $pageViewPageId;
+        parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
+        $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];
+        // $this->headers = apache_get_headers();
+        // $this->apiVersion = $this->headers['Accept-version'];
     }
- 
+
     public function getResource() {
         // Overrides DataResource->getResource()
         // Iterate through the dataObjects array, creating a new array with its extracted contents
         $pageArray = array();
         foreach ($this->dataObjects as $dataResource)
             array_push($pageArray, $dataResource->getResource());
-
+        
          // Encode as JSON and return.
          $JSONString = json_encode($pageArray, JSON_PRETTY_PRINT);
             return $JSONString;
