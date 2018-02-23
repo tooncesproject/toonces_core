@@ -33,7 +33,7 @@ class PagesAPIPageBuilder extends PageBuilder {
                 FROM toonces.page_hierarchy_bridge
                 GROUP BY page_id
             ) phb ON p.page_id = phb.page_id
-            WHERE p.published = 1 AND p.deleted = 0
+            WHERE p.published = 1 AND p.deleted IS NULL
             ORDER BY p.page_id ASC
 SQL;
         
