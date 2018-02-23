@@ -96,8 +96,9 @@ class APIPageView extends DataResource implements iPageView, iResource
         foreach ($this->dataObjects as $dataResource)
             array_push($pageArray, $dataResource->getResource);
         
-        return $pageArray;
-        
+         // Encode as JSON and return.
+         $JSONString = json_encode($pageArray, JSON_PRETTY_PRINT);
+            return $JSONString;
     }
    
     public function renderPage() {
