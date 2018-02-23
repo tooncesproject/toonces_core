@@ -90,7 +90,7 @@ $conn = UniversalConnect::doConnect();
 
 // set default properties for view renderer setter methods
 $pageTitle = 'Toonces Page';
-$pageViewClass = 'HTMLPageView';
+$defaultPageViewClass = 'HTMLPageView';
 
 $pageId = 1;
 
@@ -123,8 +123,8 @@ $pageTitle = 'Error 404';
 $pageLinkText = '';
 
 // Page state
-$pageTypeId = 0;
-$pageIsDeleted = false;
+$loadedPageTypeId = 0;
+$loadedPageIsDeleted = false;
 
 // user state
 $allowAccess = false;
@@ -155,39 +155,41 @@ $pageExists = false;
 if (count($pageRecord)) {
     $pageExists = true;
 	foreach ($pageRecord as $result) {
-		$pagePathName = $result['pathname'];
-		$pagePageTitle = $result['page_title'];
-		$pagePageLinkText = $result['page_link_text'];
-		$pagePageBuilderClass = $result['pagebuilder_class'];
-		$pagePageViewClass = $result['pageview_class'];
-		$pageTypeId = $result['pagetype_id'];
-		$pageIsDeleted = empty($result['deleted']) ? false : true; 
+		$loadedPagePathName = $result['pathname'];
+		$loadedPagePageTitle = $result['page_title'];
+		$loadedPageLinkText = $result['page_link_text'];
+		$loadedPageBuilderClass = $result['pagebuilder_class'];
+		$loadedPageViewClass = $result['pageview_class'];
+		$loadedPageTypeId = $result['pagetype_id'];
+		$loadedPageIsDeleted = empty($result['deleted']) ? false : true; 
 	};
 } 
 
 // instantiate the page renderer
-$pageView = new $pageViewClass($pageId);
+$pageView = new $loadedPageViewClass($pageId);
 $pageView->setPageURI($path);
 $pageView->setSQLConn($conn);
 
 // Check page deletion state and access.
 // Note: APIPageView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
 if ($pageExists)
-    $allowAccess = !$pageIsDeleted && $pageView->checkSessionAccess();
+    $allowAccess = !$loadedPageIsDeleted && $pageView->checkSessionAccess();
 
 // If access state is true, build the page.
 if ($allowAccess) {
-    $pathName = $pagePathName;
-    $pageViewClass = $pagePageViewClass;
-    $pageBuilderClass = $pagePageBuilderClass;
-    $pageTitle = $pagePageTitle;
-    $pageLinkText = $pagePageLinkText;
+    $pathName = $loadedPagePathName;
+    $pageBuilderClass = $loadedPageBuilderClass;
+    $pageTitle = $loadedPagePageTitle;
+    $pageLinkText = $loadedPageLinkText;
+} else {
+    // If no access, reset PageView class to default
+    $pageView = new $defaultPageViewClass($pageId);
 }
 
 // set PageView class variables
 $pageView->setPageTitle($pageTitle);
 $pageView->setPageLInkText($pageLinkText);
-$pageView->setPageTypeID($pageTypeId);
+$pageView->setPageTypeID($loadedPageTypeId);
 
 $pageBuilder = new $pageBuilderClass($pageView);
 
