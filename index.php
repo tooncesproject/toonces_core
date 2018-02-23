@@ -90,7 +90,7 @@ $conn = UniversalConnect::doConnect();
 
 // set default properties for view renderer setter methods
 $pageTitle = 'Toonces Page';
-$pageViewClass = 'HTMLPageVew';
+$pageViewClass = 'HTMLPageView';
 
 $pageId = 1;
 
@@ -184,7 +184,7 @@ if ($allowAccess) {
     $pageLinkText = $pagePageLinkText;
 }
 
-// set HTMLPageVew class variables
+// set HTMLPageView class variables
 $pageView->setPageTitle($pageTitle);
 $pageView->setPageLInkText($pageLinkText);
 $pageView->setPageTypeID($pageTypeId);
