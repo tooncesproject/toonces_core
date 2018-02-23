@@ -74,8 +74,8 @@ class APIPageView extends JSONResource implements iPageView
         $this->pageId = $pageViewPageId;
         parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
         $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];
-        $this->headers = apache_get_headers();
-        $this->apiVersion = $this->headers['Accept-version'];
+        // $this->headers = apache_get_headers();
+        // $this->apiVersion = $this->headers['Accept-version'];
         
     }
    
