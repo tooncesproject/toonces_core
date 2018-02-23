@@ -13,7 +13,7 @@ class CoreAPIPageBuilder extends PageBuilder {
     
     function buildPage() {
         // Acquire the necessary data
-        $pageID = $this->pageViewReference->pageID;
+        $pageID = $this->pageViewReference->pageId;
         $sqlConn = $this->pageViewReference->sqlConn;
         $rootURI = GrabPageURL::getURL($pageID, $sqlConn);
         
