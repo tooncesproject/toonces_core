@@ -5,6 +5,7 @@ include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
 include_once LIBPATH.'php/resource/interface/iResource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';
 include_once LIBPATH.'php/resource/HTMLViewResource.php';
+include_once LIBPATH.'php/resource/interface/iHTMLView.php';
 include_once LIBPATH.'php/resource/interface/iHTMLView.php';    
 include_once LIBPATH.'php/resource/HTMLPageView.php';
 include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';
