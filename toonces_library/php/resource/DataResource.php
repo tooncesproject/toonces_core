@@ -11,20 +11,15 @@ include_once LIBPATH.'php/toonces.php';
 class DataResource implements iResource
 {
     var $dataObjects = array();
-    var $elementsCount = 0;
     
     
     public function addElement ($element) {
-        
         array_push($this->dataObjects,$element);
-        $this->elementsCount++;
-        
     }
     
     // execution method
     public function getResource() {
-        
         return $this->dataObjects;
-        
     }
+
 }

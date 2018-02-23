@@ -11,7 +11,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class APIPageView extends JSONResource implements iPageView
+class APIPageView extends DataResource implements iPageView, iResource
 {
  
     // iPageView interface vars
@@ -25,6 +25,8 @@ class APIPageView extends JSONResource implements iPageView
     var $headers = array();
     var $HTTPMethod;
     var $pageId;
+    // inherited from DataResource:
+    //var $dataObjects = array();
     
     // iPageView setters and getters
     public function setPageURI($paramPageURI) {
@@ -85,6 +87,16 @@ class APIPageView extends JSONResource implements iPageView
         $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];
         // $this->headers = apache_get_headers();
         // $this->apiVersion = $this->headers['Accept-version'];
+    }
+
+    public function getResource() {
+        // Overrides DataResource->getResource()
+        // Iterate through the dataObjects array, creating a new array with its extracted contents
+        $pageArray = array();
+        foreach ($this->dataObjects as $dataResource)
+            array_push($pageArray, $dataResource->getResource);
+        
+        return $pageArray;
         
     }
    
