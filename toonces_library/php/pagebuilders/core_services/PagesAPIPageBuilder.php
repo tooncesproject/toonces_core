@@ -63,5 +63,6 @@ SQL;
         $dataResource->dataObjects = $resourceArray;
         array_push($this->elementArray, $dataResource);
         
+        return $this->elementArray;
     }
 }
