@@ -8,7 +8,7 @@
  *
  */
 
-class LinLinkActionControlResource extends LinLinkActionControlResource
+class PublishLinkControlResource extends LinkActionControlResource
 {
 
 	var $conn;
