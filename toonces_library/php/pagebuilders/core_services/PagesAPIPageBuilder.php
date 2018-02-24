@@ -25,14 +25,10 @@ class PagesAPIPageBuilder extends PageBuilder {
                 ,p.created_dt
                 ,p.modified_dt
                 ,pt.name AS page_type
-                ,phb.ancestor_page_id
+                ,phb.page_id AS ancestor_page_id
             FROM toonces.pages p
             JOIN toonces.pagetypes pt ON p.pagetype_id = pt.pagetype_id
-            LEFT JOIN (
-                SELECT page_id, MIN(ancestor_page_id) AS ancestor_page_id
-                FROM toonces.page_hierarchy_bridge
-                GROUP BY page_id
-            ) phb ON p.page_id = phb.page_id
+            LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
             WHERE p.published = 1 AND p.deleted IS NULL
             ORDER BY p.page_id ASC
 SQL;

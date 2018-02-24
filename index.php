@@ -154,26 +154,24 @@ $pageRecord = $stmt->fetchall();
 $pageExists = false;
 if (count($pageRecord)) {
     $pageExists = true;
-	foreach ($pageRecord as $result) {
-		$loadedPagePathName = $result['pathname'];
-		$loadedPagePageTitle = $result['page_title'];
-		$loadedPageLinkText = $result['page_link_text'];
-		$loadedPageBuilderClass = $result['pagebuilder_class'];
-		$loadedPageViewClass = $result['pageview_class'];
-		$loadedPageTypeId = $result['pagetype_id'];
-		$loadedPageIsDeleted = empty($result['deleted']) ? false : true; 
-	};
+	$loadedPagePathName = $result[0]['pathname'];
+	$loadedPagePageTitle = $result[0]['page_title'];
+	$loadedPageLinkText = $result[0]['page_link_text'];
+	$loadedPageBuilderClass = $result[0]['pagebuilder_class'];
+	$loadedPageViewClass = $result[0]['pageview_class'];
+	$loadedPageTypeId = $result[0]['pagetype_id'];
+	$loadedPageIsDeleted = empty($result[0]['deleted']) ? false : true; 
 } 
-
-// instantiate the page renderer
-$pageView = new $loadedPageViewClass($pageId);
-$pageView->setPageURI($path);
-$pageView->setSQLConn($conn);
 
 // Check page deletion state and access.
 // Note: APIPageView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
-if ($pageExists)
+if ($pageExists) {
+    // instantiate the page renderer
+    $pageView = new $loadedPageViewClass($pageId);
+    $pageView->setPageURI($path);
+    $pageView->setSQLConn($conn);
     $allowAccess = !$loadedPageIsDeleted && $pageView->checkSessionAccess();
+}
 
 // If access state is true, build the page.
 if ($allowAccess) {
@@ -184,6 +182,8 @@ if ($allowAccess) {
 } else {
     // If no access, reset PageView class to default
     $pageView = new $defaultPageViewClass($pageId);
+    $pageView->setPageURI($path);
+    $pageView->setSQLConn($conn);
 }
 
 // set PageView class variables
