@@ -154,13 +154,13 @@ $pageRecord = $stmt->fetchall();
 $pageExists = false;
 if (count($pageRecord)) {
     $pageExists = true;
-	$loadedPagePathName = $result[0]['pathname'];
-	$loadedPagePageTitle = $result[0]['page_title'];
-	$loadedPageLinkText = $result[0]['page_link_text'];
-	$loadedPageBuilderClass = $result[0]['pagebuilder_class'];
-	$loadedPageViewClass = $result[0]['pageview_class'];
-	$loadedPageTypeId = $result[0]['pagetype_id'];
-	$loadedPageIsDeleted = empty($result[0]['deleted']) ? false : true; 
+    $loadedPagePathName = $pageRecord[0]['pathname'];
+    $loadedPagePageTitle = $pageRecord[0]['page_title'];
+    $loadedPageLinkText = $pageRecord[0]['page_link_text'];
+    $loadedPageBuilderClass = $pageRecord[0]['pagebuilder_class'];
+    $loadedPageViewClass = $pageRecord[0]['pageview_class'];
+    $loadedPageTypeId = $pageRecord[0]['pagetype_id'];
+    $loadedPageIsDeleted = empty($pageRecord[0]['deleted']) ? false : true;
 } 
 
 // Check page deletion state and access.
