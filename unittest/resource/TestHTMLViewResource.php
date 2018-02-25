@@ -11,7 +11,7 @@ class TestHTMLViewResource extends TestCase
     {
         // arrange
         $pageID = 1;
-        $pageView = new HTMLPageVew($pageID);
+        $pageView = new HTMLPageView($pageID);
         $viewElement = new HTMLViewResource($pageView);
         $element = new HTMLResource($pageView);
         
@@ -27,7 +27,7 @@ class TestHTMLViewResource extends TestCase
     {
         // Arrange
         $pageID = 1;
-        $pageView = new HTMLPageVew($pageID);
+        $pageView = new HTMLPageView($pageID);
         $viewElement = new HTMLViewResource($pageView);
         $element = new HTMLResource($pageView);
         

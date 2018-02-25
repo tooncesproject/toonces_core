@@ -184,7 +184,7 @@ if (count($rows) == 0) {
      'Sorry, This is Toonces.'
     ,'Home Page'
     ,'ExtHTMLPageBuilder'
-    ,'HTMLPageVew'
+    ,'HTMLPageView'
     ,FALSE
     ,TRUE
     ,5

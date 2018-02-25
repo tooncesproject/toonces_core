@@ -10,7 +10,7 @@ class TestHTMLResource extends TestCase
     public function testElementConstruct()
     {
         // Arrange
-        $pageView = new HTMLPageVew(0);
+        $pageView = new HTMLPageView(0);
         
         
         // Act
@@ -18,13 +18,13 @@ class TestHTMLResource extends TestCase
         
         // Assert
         $this->assertInstanceOf(Element::class, $element);
-        $this->assertInstanceOf(HTMLPageVew::class, $pageView);
+        $this->assertInstanceOf(HTMLPageView::class, $pageView);
     }
 
     public function testGetHTML()
     {
         //arrange
-        $pageView = new HTMLPageVew(0);
+        $pageView = new HTMLPageView(0);
         $element = new HTMLResource($pageView);
         
         $header = 'Header';

@@ -5,25 +5,25 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
-class TestHTMLPageVew extends TestCase
+class TestHTMLPageView extends TestCase
 {
     
-    public function testConstructHTMLPageVew()
+    public function testConstructHTMLPageView()
     {
         // arrange
         $pageID = 1;
         // act
-        $pageView = new HTMLPageVew($pageID);
+        $pageView = new HTMLPageView($pageID);
         
         // assert
-        $this->assertInstanceOf(HTMLPageVew::class, $pageView);
+        $this->assertInstanceOf(HTMLPageView::class, $pageView);
     }
     
     public function testAddElement()
     {
         // arrange
         $pageID = 1;
-        $pageView = new HTMLPageVew($pageID);
+        $pageView = new HTMLPageView($pageID);
         $element = new HTMLResource($pageView);
         
         // act
@@ -38,7 +38,7 @@ class TestHTMLPageVew extends TestCase
     {
         // arrange
         $pageID = 1;
-        $pageView = new HTMLPageVew($pageID);
+        $pageView = new HTMLPageView($pageID);
         $element = new HTMLResource($pageView);
         
         $html = '</html>';

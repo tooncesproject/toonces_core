@@ -4,7 +4,7 @@
  * Initial commit: Paul Anderson, 1/24/2018
  * 
  * iView implementation for REST API resources.
- * Analagous to the web view renderer element HTMLPageVew.
+ * Analagous to the web view renderer element HTMLPageView.
  * Generates a resource's JSON response.
  * 
  */
