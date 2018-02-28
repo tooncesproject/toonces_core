@@ -12,6 +12,7 @@ class SessionManager
 	var $userFirstName;
 	var $userLastName;
 	var $adminSessionActive;
+	private $loginString;
 
 	function __construct($paramSQLConn) {
 	    $this->conn = $paramSQLConn;
@@ -142,20 +143,29 @@ SQL;
 		$formPassword = hash('sha512', $formPassword.$this->salt);
 		if ($formPassword != '' and $dbPassword == $formPassword and $bruteForce == 0) {
 			$loginSuccess = 1;
-			// set sesh vars
-			$_SESSION['userId'] = $this->userId;
-			$_SESSION['nickname'] = $this->nickname;
-			$_SESSION['userFirstName'] = $this->userFirstName;
-			$_SESSION['userLastName'] = $this->userLastName;
-			$_SESSION['loginString'] = hash('sha512',$dbPassword, $_SERVER['HTTP_USER_AGENT']);
-
-			$this->adminSessionActive = 1;
+			// Set login state
+			$this->loginString = hash('sha512',$dbPassword, $_SERVER['HTTP_USER_AGENT']);
 
 		} else {
 			$loginSuccess = 0;
 		}
 
 		return $loginSuccess;
+	}
+
+	function setSessionParams() {
+	       // Check that the necessary instance variables are set
+	       $sessionValid = isset($this->userId) && isset($this->nickname) && isset($this->userFirstName) && isset($this->userLastName);
+	       if (!$sessionValid) 
+	           throw new Exception('Programming error: setSessionParams must only be called after login function.');
+	       
+	       // Otherwise: Set sesh vars.
+           $_SESSION['userId'] = $this->userId;
+	       $_SESSION['nickname'] = $this->nickname;
+	       $_SESSION['userFirstName'] = $this->userFirstName;
+	       $_SESSION['userLastName'] = $this->userLastName;
+	       $_SESSION['loginString'] = $this->loginString;
+	       $this->adminSessionActive = 1;
 	}
 
 	function logout() {

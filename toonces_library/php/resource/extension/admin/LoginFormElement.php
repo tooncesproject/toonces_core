@@ -85,6 +85,9 @@ class LoginFormElement extends FormElement implements iResource
 
 			if ($doAttemptLogin == true) {
 				$loginSuccess = $this->pageViewReference->sessionManager->login($email,$password);
+				if ($loginSuccess)
+				    $this->pageViewReference->sessionManager->setSessionParams();
+				    
 			}
 
 			// If login was not successful, display the login fail message.

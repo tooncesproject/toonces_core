@@ -10,7 +10,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-class EnumInputTypes
+class EnumInputTypes extends Enumeration
 {
 
 	public static $enum = array

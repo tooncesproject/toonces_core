@@ -11,6 +11,8 @@ require_once LIBPATH.'php/toonces.php';
 
 class CoreAPIPageBuilder extends PageBuilder {
     
+    var $apiDelegate;
+    
     function buildPage() {
         // Acquire the necessary data
         $pageID = $this->pageViewReference->pageId;

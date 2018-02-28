@@ -10,6 +10,8 @@
 
 class PagesAPIPageBuilder extends PageBuilder {
     
+    var $apiDelegate;
+    
     function buildPage() {
         $conn = $this->pageViewReference->sqlConn;
         
