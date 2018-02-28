@@ -13,6 +13,11 @@ abstract class APIPageBuilder
 
     var $apiDelegate;
     var $implementedMethods = array();
+    var $pageViewReference;
+    
+    function __construct($pageview) {
+        $this->pageViewReference = $pageview;
+    }
     
     // For each HTTP method, the default response is a general error.
     function getAction($getParams) {
@@ -60,6 +65,12 @@ abstract class APIPageBuilder
         return $responseArray;
     }
     
+    function connectAction() {
+        // Override this method to generate the API's response to CONNECT requests.
+        $responseArray = array();
+        return $responseArray;
+    }
+    
     function buildPage() {
         // Unlike the HTML PageBuilder, you shouldn't override this method. Instead,
         // override the "action" methods to determine the resource's behavior based
@@ -85,6 +96,8 @@ abstract class APIPageBuilder
                 break;
             case 'DELETE':
                 $pageArray = $this->deleteAction(file_get_contents('php://input'));
+            case 'CONNECT':
+                $pageArray = $this->connectAction();
                 break;
         }
         
