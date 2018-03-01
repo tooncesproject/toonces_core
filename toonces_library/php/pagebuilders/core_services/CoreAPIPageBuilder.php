@@ -13,7 +13,7 @@ class CoreAPIPageBuilder extends PageBuilder {
     
     var $apiDelegate;
     
-    function buildPage() {
+    function getAction($getParams) {
         // Acquire the necessary data
         $pageID = $this->pageViewReference->pageId;
         $sqlConn = $this->pageViewReference->sqlConn;

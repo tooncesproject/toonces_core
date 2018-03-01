@@ -17,10 +17,13 @@ abstract class APIPageBuilderDelegate implements iAPIPageBuilderDelegate {
         // require authentication.
         return false;
     }
-    
+
     function detectAPIVersion() {
-        // Most of the time, you shouldn't need to override this method.
+        // You'll only ever need to override this method if you use a different system of
+        // versioning from the default (Accept-version header).
+        $headers = apache_request_headers();
+        return $headers['Accept-version'];
+        
     }
-    
     
 }

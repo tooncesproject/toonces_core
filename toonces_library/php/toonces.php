@@ -38,6 +38,7 @@ include_once LIBPATH.'php/pagebuilders/blog/BlogPostSinglePageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
 include_once LIBPATH.'php/utility/interface/iAPIPageBuilderDelegate.php';
 include_once LIBPATH.'php/utility/abstract/APIPageBuilderDelegate.php';
+include_once LIBPATH.'php/utility/CoreAPIPageBuilderDelegate.php';
 include_once LIBPATH.'php/pagebuilders/core_services/CoreAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/PagesAPIPageBuilder.php';
 
