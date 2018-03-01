@@ -9,7 +9,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class CoreAPIPageBuilderDelegate extends APIPageBuilder implements iAPIPageBuilderDelegate {
+class CoreAPIPageBuilderDelegate extends APIPageBuilderDelegate implements iAPIPageBuilderDelegate {
  
     var $pageView;
     
