@@ -85,9 +85,7 @@ class APIPageView extends DataResource implements iPageView, iResource
     public function __construct($pageViewPageId) {
         $this->pageId = $pageViewPageId;
         parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
-        $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];
-        // Instantiate a SessionManager
-        $this->sessionManager = new SessionManager($this->sqlConn);   
+        $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];   
     }
 
     public function getResource() {

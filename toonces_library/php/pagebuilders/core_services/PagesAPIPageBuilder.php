@@ -29,7 +29,7 @@ class PagesAPIPageBuilder extends APIPageBuilder {
         $userIsAdmin = false;
         $userID = $this->apiDelegate->authenticateUser() ?? 0;
         if ($userID)
-            $userIsAdmin = (int)$this->pageViewReference->sessionManager->userIsAdmin;
+            $userIsAdmin = (int)$this->apiDelegate->sessionManager->userIsAdmin;
 
         // Does the GET request include the parameter 'pageid'?
         $requestedPageID = NULL;
