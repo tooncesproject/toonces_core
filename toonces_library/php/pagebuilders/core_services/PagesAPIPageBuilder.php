@@ -12,13 +12,14 @@ require_once LIBPATH.'php/toonces.php';
 class PagesAPIPageBuilder extends APIPageBuilder {
     
     var $apiDelegate;
+    var $conn;
     
     function getAction($getParams) {
         
         // Process:
         // If client is authenticated, include unpublished and deleted pages if the user has access.
         // If the GET parameters request a specific Page ID, serve the page metadata.
-        $conn = $this->pageViewReference->sqlConn;
+        $this->conn = $this->pageViewReference->sqlConn;
         $responseArray = array();
 
         // Instantiate the delegate object
@@ -81,7 +82,7 @@ class PagesAPIPageBuilder extends APIPageBuilder {
                     )
                 ORDER BY p.page_id ASC
 SQL;
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'pageID' => $pageID, 'userIsAdmin' => $userIsAdmin));
             $result = $stmt->fetchAll();
          
@@ -92,7 +93,7 @@ SQL;
             $responseArray[$pageID] = array(
                   'pageID' => $topRow[0]
                 ,'pathName' => $topRow[1]
-                ,'pageURI' => GrabPageURL::getURL($topRow[0], $conn)
+                ,'pageURI' => GrabPageURL::getURL($topRow[0], $this->conn)
                 ,'pageTitle' => $topRow[2]
                 ,'pageLinkText' => $topRow[3]
                 ,'pagebuilderClass' => $topRow[4]
@@ -134,7 +135,7 @@ SQL;
                 ORDER BY p.page_id ASC
 SQL;
     
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'userIsAdmin' => $userIsAdmin));
             $result = $stmt->fetchAll();
             
@@ -143,7 +144,7 @@ SQL;
                 $pageID = $row[0];
                 $responseArray[$pageID] = array(
                     'pathName' => $row[1]
-                    ,'pageURI' => GrabPageURL::getURL($pageID, $conn)
+                    ,'pageURI' => GrabPageURL::getURL($pageID, $this->conn)
                     ,'pageTitle' => $row[2]
                     ,'pageLinkText' => $row[3]
                     ,'pagebuilderClass' => $row[4]
