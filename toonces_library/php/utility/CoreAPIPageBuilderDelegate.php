@@ -39,4 +39,13 @@ class CoreAPIPageBuilderDelegate extends APIPageBuilderDelegate implements iAPIP
         return $userId;
     }
 
+    function validateHeaders() {
+        $headersValid = false;
+        $headers = apache_request_headers();
+        if (array_key_exists('content-type', $headers))
+            if ($headers['content-type'] == 'application/json')
+                $headersValid = true;
+        
+        return $headersValid;
+    }
 }

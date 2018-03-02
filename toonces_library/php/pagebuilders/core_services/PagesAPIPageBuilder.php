@@ -25,6 +25,16 @@ class PagesAPIPageBuilder extends APIPageBuilder {
         if (!$this->apiDelegate)
             $this->apiDelegate = new CoreAPIPageBuilderDelegate($this->pageViewReference);
         
+        // Check headers validation
+        if ($this->apiDelegate->validateHeaders()) {
+            $this->performGet($getParams);
+        } else {
+            header('fuck you!', true, 500);
+        }
+    }
+    
+    function performGet($getParams) {
+    
         // Check user authentication
         $userIsAdmin = false;
         $userID = $this->apiDelegate->authenticateUser() ?? 0;
@@ -88,7 +98,7 @@ SQL;
                 ,'pagebuilderClass' => $topRow[4]
                 ,'pageViewClass' => $topRow[5]
                 ,'pageType' => $topRow[8]
-                ,'ancestorPageID' => $ropRow[9]
+                ,'ancestorPageID' =>$topRow[9]
             );
          
             // Make an array of children

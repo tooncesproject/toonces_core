@@ -13,5 +13,6 @@ interface iAPIPageBuilderDelegate {
     
     function authenticateUser();
     function detectAPIVersion();
+    function validateHeaders();
 
 }

@@ -26,4 +26,10 @@ abstract class APIPageBuilderDelegate implements iAPIPageBuilderDelegate {
         
     }
     
+    function validateHeaders() {
+        // Override if the resource requires any specific HTTP headers - Validate them here.
+        // Return true/false: headers are valid.
+        return true;
+    }
+    
 }
