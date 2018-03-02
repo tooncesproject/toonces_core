@@ -11,7 +11,7 @@ require_once LIBPATH.'php/toonces.php';
 abstract class APIPageBuilder
 {
 
-    var $resourceArray;
+    var $resourceArray = array();
     var $apiDelegate;
     var $implementedMethods = array();
     var $pageViewReference;
