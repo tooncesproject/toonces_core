@@ -19,7 +19,7 @@ class PagesAPIPageBuilder extends APIPageBuilder {
         // If client is authenticated, include unpublished and deleted pages if the user has access.
         // If the GET parameters request a specific Page ID, serve the page metadata.
         $conn = $this->pageViewReference->sqlConn;
-        $resourceArray = array();
+        $responseArray = array();
 
         // Instantiate the delegate object
         if (!$this->apiDelegate)
@@ -79,7 +79,7 @@ SQL;
              // Outer record is the page's metadata,
              // inner record is any children.
             $topRow = $result[0];
-            $resourceArray[$pageID] = array(
+            $responseArray[$pageID] = array(
                   'pageID' => $topRow[0]
                 ,'pathName' => $topRow[1]
                 ,'pageURI' => GrabPageURL::getURL($topRow[0], $conn)
@@ -96,7 +96,7 @@ SQL;
             foreach ($result as $row)
                  array_push($children, $row[10]);
          
-            $resourceArray['children'] = $children;
+            $responseArray['children'] = $children;
 
         } else {
             // Query the toonces core database for accessible pages.
@@ -131,7 +131,7 @@ SQL;
             // Build the array to be returned
             foreach ($result as $row) {
                 $pageID = $row[0];
-                $resourceArray[$pageID] = array(
+                $responseArray[$pageID] = array(
                     'pathName' => $row[1]
                     ,'pageURI' => GrabPageURL::getURL($pageID, $conn)
                     ,'pageTitle' => $row[2]
@@ -146,10 +146,9 @@ SQL;
         }
         // Create a new DataResource object and populate the builder.
         $dataResource = new DataResource($this->pageViewReference);
-        $dataResource->dataObjects = $resourceArray;
-        array_push($this->elementArray, $dataResource);
-        
-        return $this->elementArray;
+        $dataResource->dataObjects = $responseArray;
+        array_push($this->resourceArray, $dataResource);
+
     }
 
 }

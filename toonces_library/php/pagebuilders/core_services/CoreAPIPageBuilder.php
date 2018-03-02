@@ -39,13 +39,11 @@ SQL;
         $resourceArray = array();
         foreach ($result as $row)
             $resourceArray[$row[1]] = $rootURI . '/' . $row[0];
-        
+
         // Create a new DataResource object and populate the builder.
         $dataResource = new DataResource($this->pageViewReference);
         $dataResource->dataObjects = $resourceArray;
-        array_push($this->elementArray, $dataResource);
-        
-        return $this->elementArray;
+        array_push($this->resourceArray, $dataResource);
         
     }
     
