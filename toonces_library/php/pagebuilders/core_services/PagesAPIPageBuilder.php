@@ -30,7 +30,7 @@ class PagesAPIPageBuilder extends APIPageBuilder {
         if ($this->apiDelegate->validateHeaders()) {
             $this->performGet($getParams);
         } else {
-            header('fuck you!', true, 500);
+            header('HTTP/1.1 500 Internal Server Error', true, 510);
         }
     }
     

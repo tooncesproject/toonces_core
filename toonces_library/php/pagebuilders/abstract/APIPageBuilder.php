@@ -24,29 +24,29 @@ abstract class APIPageBuilder
     function getAction($getParams) {
         // Override this method to generate the API's response to GET requests.
         // $getParams provides an array of URL parameters.
-        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        header('HTTP/1.1 500 Internal Server Error', true, 501);
     }
     
     function postAction($postData) {
         // Override this method to generate the API's response to POST requests.
         // the buildPage() method provides the $postData parameter.
-        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        header('HTTP/1.1 500 Internal Server Error', true, 501);
     }
 
     function headAction($getParams) {
         // Override this method to generate the API's response to HEAD requests.
-        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        header('HTTP/1.1 500 Internal Server Error', true, 501);
     }
     
     function putAction($putData) {
         // Override this method to generate the API's response to PUT requests.
         // the buildPage() method provides the $putData parameter.
-        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        header('HTTP/1.1 500 Internal Server Error', true, 501);
     }
     
     function optionsAction() {
         // Override this method to generate the API's response to OPTIONS requests.
-        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        header('HTTP/1.1 500 Internal Server Error', true, 501);
     }
     
     function deleteAction($deletePayload) {
