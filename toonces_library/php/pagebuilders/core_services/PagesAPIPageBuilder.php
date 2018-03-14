@@ -30,9 +30,10 @@ class PagesAPIPageBuilder extends APIPageBuilder {
         if ($this->apiDelegate->validateHeaders()) {
             $this->performGet($getParams);
         } else {
-            header('HTTP/1.1 500 Internal Server Error', true, 510);
+            header('HTTP/1.1 500 Internal Server Error', true, 500);
         }
     }
+    
     
     function performGet($getParams) {
     
@@ -89,6 +90,7 @@ SQL;
              // Build the array for the DataResource.
              // Outer record is the page's metadata,
              // inner record is any children.
+            // TODO: Account for cases when parent or child results are empty.
             $topRow = $result[0];
             $responseArray[$pageID] = array(
                   'pageID' => $topRow[0]
