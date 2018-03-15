@@ -229,31 +229,103 @@ SQL;
         if ($userID)
             $userIsAdmin = (int)$this->apiDelegate->sessionManager->userIsAdmin;
 
+        $inputIsValid = false;
+        $thumbnailImageVector = NULL;
         $responseArray = array();
         if ($this->apiDelegate->validateHeaders()) {
             // If headers are valid, next validate the payload
             // The requred JSON structure is as follows:
-            // NO
-            // ONE REQUEST PER POST
             // {
-            //   [blog root page ID]:               <- numeric and must actually exist
-            //      title                               <- Char length > 0
-            //      body                                <- Char length > 0
-            //      thumbnailImageURI (Optional)        <- Must resolve to an existing file
+            //      "blogPageID":(value)                   <- numeric and must actually exist
+            //      "title":(value)                        <- Char length > 0
+            //      "body":(value)                         <- Char length > 0
+            //      "thumbnailImageURI": (Optional)        <- Must resolve to an existing file
             // }
-            
+
             $payloadArray = json_decode($postData, true);
             
             if ($payloadArray) {
-                // If the payload is JSON, iterate through its rows.
-                foreach ($payloadArray as $rootPageID => $blogParams) {
-                    // Validate 
+                // Validate blogPageID
+                if (array_key_exists('blogPageID', $payloadArray)) {
+                    $sql = <<<SQL
+                        SELECT b.page_id
+                        FROM blogs b
+                        JOIN pages p ON b.page_id = p.page_id
+                        LEFT JOIN page_user_access pua ON p.page_id pua.page_id AND pua.user_id = :userID
+                        WHERE p.page_id = :pageID
+                            AND (pua.page_id IS NOT NULL OR :userIsAdmin = TRUE)
+SQL;
+                    $stmt = $this->conn->prepare($sql);
+                    $stmt->execute(array('userID' => $userID, 'pageID' => $payloadArray['blogPageID'], 'userIsAdmin' => $userIsAdmin));
+                    $result = $stmt->fetchAll();
+                    if ($result[0][0])
+                        $inputIsValid = true;
+                }
+                
+                // validate title and body
+                if (array_key_exists('title', $payloadArray) && array_key_exists('body', $payloadArray)) {
+                    if (strlen($payloadArray['title']) > 0 && strlen($payloadArray['body']) > 0) {
+                        $inputIsValid = true;
+                    } else {
+                        $inputIsValid = false;
+                    }
                     
                 }
-            }
-            
+                // validate thumbnailImageURI
+                if (array_key_exists('thumbnailImageURI', $payloadArray)) {
+                    if (!filesize($payloadArray['thumbnailImageURI'])) {
+                        $inputIsValid = false;
+                    } else {
+                        $thumbnailImageVector = $payloadArray['thumbnailImageURI'];
+                    }
+                } // thumbnail validation 
+            } // payload array validation
+        } // headers validation
+        
+        // If input is valid, go to town
+        if ($inputIsValid) {
+            // Insert the blog post
+            $stmtParams = array(
+                 'pageID' => $payloadArray['blogPageID']
+                ,'userID' => $userID
+                ,'title' => $payloadArray['title']
+                ,'body' => $payloadArray['body']
+                ,'thumbnailImageVector' => $thumbnailImageVector
+            );
 
-        }
+            $sql = <<<SQL
+                SELECT CREATE_BLOG_POST (
+                     :pageID                        --  param_page_id BIGINT
+                    ,:userID                        --  param_user_id BIGINT
+                    ,:title                         --  param_title VARCHAR(200)
+                    ,:body                          --  param_body TEXT
+                    ,'BlogPostSinglePageBuilder'    --  param_pagebuilder_class VARCHAR(50)
+                    ,:thumbnailImageVector          --  param_thumbnail_image_vector VARCHAR(50)
+                )
+SQL;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
+            
+            // Create the response array
+            $newBlogPostPageID = $result[0];
+            $responseArray = array(
+                'blogPostPageID' => $newBlogPostPageID
+               ,'title' => $payloadArray['title']
+               ,'body' => $payloadArray['body']
+               ,'thumbnailImageURI' => $thumbnailImageVector
+            );
+
+            // Create a new DataResource object and populate the builder.
+            $dataResource = new DataResource($this->pageViewReference);
+            $dataResource->dataObjects = $responseArray;
+            array_push($this->resourceArray, $dataResource);
+
+        } else {
+            // No valid input? sorry bruh.
+            header('HTTP/1.1 500 Internal Server Error', true, 500);
+        }            
+        
     }
 
 }
