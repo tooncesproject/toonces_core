@@ -229,25 +229,29 @@ SQL;
         if ($userID)
             $userIsAdmin = (int)$this->apiDelegate->sessionManager->userIsAdmin;
 
-        $inputIsValid = false;
+        $requestIsValid = false;
         $thumbnailImageVector = NULL;
         $responseArray = array();
-        if ($this->apiDelegate->validateHeaders()) {
-            // If headers are valid, next validate the payload
-            // The requred JSON structure is as follows:
-            // {
-            //      "blogPageID":(value)                   <- numeric and must actually exist
-            //      "title":(value)                        <- Char length > 0
-            //      "body":(value)                         <- Char length > 0
-            //      "thumbnailImageURI": (Optional)        <- Must resolve to an existing file
-            // }
-
+        $errorMessage = NULL;
+        // Validate the request.
+        do {
+            // headers
+            if (!$this->apiDelegate->validateHeaders()) {
+                $errorMessage = 'Hey yo, that\'s a shitty fucking API request. Try again.';
+                break;
+            }
+            // Payload is well-formed JSON
             $payloadArray = json_decode($postData, true);
-            
-            if ($payloadArray) {
-                // Validate blogPageID
-                if (array_key_exists('blogPageID', $payloadArray)) {
-                    $sql = <<<SQL
+            if (!$payloadArray) {
+                $errorMessage = 'Your JSON is hella wack.';
+                break;
+            }
+            // Validate blogPageID
+            if (!array_key_exists('blogPageID', $payloadArray)) {
+                $errorMessage = 'Your JSON is hella wack.';
+                break;
+            }
+            $sql = <<<SQL
                         SELECT b.page_id
                         FROM blogs b
                         JOIN pages p ON b.page_id = p.page_id
@@ -255,35 +259,27 @@ SQL;
                         WHERE p.page_id = :pageID
                             AND (pua.page_id IS NOT NULL OR :userIsAdmin = TRUE)
 SQL;
-                    $stmt = $this->conn->prepare($sql);
-                    $stmt->execute(array('userID' => $userID, 'pageID' => $payloadArray['blogPageID'], 'userIsAdmin' => $userIsAdmin));
-                    $result = $stmt->fetchAll();
-                    if ($result[0][0])
-                        $inputIsValid = true;
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute(array('userID' => $userID, 'pageID' => $payloadArray['blogPageID'], 'userIsAdmin' => $userIsAdmin));
+            $result = $stmt->fetchAll();
+            if (!$result[0][0]) {
+                   $errorMessage = 'That blog page ID is bogus.';
+                   break;
+            }
+            // validate thumbnailImageURI
+            if (array_key_exists('thumbnailImageURI', $payloadArray)) {
+                if (!filesize($payloadArray['thumbnailImageURI'])) {
+                    $errorMessage = 'thumbnailImageURI file not found.';
+                    break;
                 }
-                
-                // validate title and body
-                if (array_key_exists('title', $payloadArray) && array_key_exists('body', $payloadArray)) {
-                    if (strlen($payloadArray['title']) > 0 && strlen($payloadArray['body']) > 0) {
-                        $inputIsValid = true;
-                    } else {
-                        $inputIsValid = false;
-                    }
-                    
-                }
-                // validate thumbnailImageURI
-                if (array_key_exists('thumbnailImageURI', $payloadArray)) {
-                    if (!filesize($payloadArray['thumbnailImageURI'])) {
-                        $inputIsValid = false;
-                    } else {
-                        $thumbnailImageVector = $payloadArray['thumbnailImageURI'];
-                    }
-                } // thumbnail validation 
-            } // payload array validation
-        } // headers validation
-        
+            }
+            
+            // If we've reached this point, the request has passed validation
+            $requestIsValid = true;
+        } while (false);
+
         // If input is valid, go to town
-        if ($inputIsValid) {
+        if ($requestIsValid) {
             // Insert the blog post
             $stmtParams = array(
                  'pageID' => $payloadArray['blogPageID']
@@ -316,16 +312,18 @@ SQL;
                ,'thumbnailImageURI' => $thumbnailImageVector
             );
 
-            // Create a new DataResource object and populate the builder.
-            $dataResource = new DataResource($this->pageViewReference);
-            $dataResource->dataObjects = $responseArray;
-            array_push($this->resourceArray, $dataResource);
 
         } else {
             // No valid input? sorry bruh.
-            header('HTTP/1.1 500 Internal Server Error', true, 500);
-        }            
+            header("HTTP/1.1 401 Unauthorized");
+            $responseArray['errorCode'] = 401;
+            $responseArray['errorMessage'] = $errorMessage;
+        }
+        
+        // Create a new DataResource object and populate the builder.
+        $dataResource = new DataResource($this->pageViewReference);
+        $dataResource->dataObjects = $responseArray;
+        array_push($this->resourceArray, $dataResource);
         
     }
-
 }
