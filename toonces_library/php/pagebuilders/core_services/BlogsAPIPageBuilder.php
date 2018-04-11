@@ -14,6 +14,7 @@ class BlogsAPIPageBuilder extends APIPageBuilder {
     var $apiDelegate;
     var $conn;
     
+    /*
     function getAllBlogs($paramUserID) {
         // Query for all blogs the user has access to.
         $sql = <<<SQL
@@ -82,7 +83,7 @@ SQL;
         
         // Query the database for all the blog's posts.
         $sql = <<<SQL
-            SELECT
+user            SELECT
                  b.blog_id
                 ,b.name
                 ,b.description
@@ -168,8 +169,13 @@ SQL;
       
     }
     
-    function getAction($getParams) {
+    */
+    
+    //function getAction($getParams) {
         
+        
+        
+        // fuck the stuff below
         // GET functionality:
         // Without blog_id GET parameter:
         //  Respond with a list of Blogs that exist on the site.
@@ -182,15 +188,17 @@ SQL;
         //  With authentication, respond with any blogs/posts the user is authorized to access.
         
         // Check user authentication
+        /*
         $userIsAdmin = false;
         $userID = $this->apiDelegate->authenticateUser() ?? 0;
         if ($userID)
             $userIsAdmin = (int)$this->apiDelegate->sessionManager->userIsAdmin;
-
+        */
             
-        $outputArray = NULL;
+        // $outputArray = NULL;
         
-        if ($this->apiDelegate->validateHeaders()) {
+        //if ($this->apiDelegate->validateHeaders()) {
+            /*
             // Check for GET parameters
             $requestedBlogID = NULL;
             if (array_key_exists('blog_id', $getParams))
@@ -201,9 +209,13 @@ SQL;
                 $outputArray = $this->getRequestedBlog($userID, $requestedBlogID);        
             } else {
                 $outputArray = $this->getAllBlogs($userID);
-            }
-        }
+            }*/
+                        
+           
+        //}
 
+        
+        /*   
         if ($outputArray) {
             // Create a new DataResource object and populate the builder.
             $dataResource = new DataResource($this->pageViewReference);
@@ -213,9 +225,11 @@ SQL;
             // if $outputArray is null here, either the request headers or GET parameters failed validation.
             header('HTTP/1.1 500 Internal Server Error', true, 500);
         }
+        */
         
-    }
+    //}
     
+    /*
     function postAction($postData) {
         // POST functionality:
         // Validate user authentication
@@ -325,5 +339,14 @@ SQL;
         $dataResource->dataObjects = $responseArray;
         array_push($this->resourceArray, $dataResource);
         
+    }
+    */
+        
+    function buildPage() {
+        //  It's a BlogDataResource
+        $blogDataResource = new BlogDataResource($this->pageViewReference);
+        array_push($this->resourceArray, $blogDataResource);
+        return $this->resourceArray;
+            
     }
 }

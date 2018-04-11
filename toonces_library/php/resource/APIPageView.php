@@ -101,6 +101,7 @@ class APIPageView extends DataResource implements iPageView, iResource
     }
    
     public function renderPage() {
+        // TODO: Validate objects, encode JSON here, acquire HTTP status, echo with header.
         echo $this->getResource();
         
     }
