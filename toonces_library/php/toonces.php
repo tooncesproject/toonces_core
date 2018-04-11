@@ -2,6 +2,7 @@
 
 include_once LIBPATH.'php/utility/static/Enumeration.php';
 include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
+include_once LIBPATH.'php/utility/static/EnumHTTPResponse.php';
 include_once LIBPATH.'php/resource/interface/iResource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';
 include_once LIBPATH.'php/resource/HTMLViewResource.php';
@@ -21,7 +22,8 @@ include_once LIBPATH.'php/resource/toolbar/BlogToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/BlogPostToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/DefaultToolbarElement.php';
 include_once LIBPATH.'php/resource/JSONResource.php';
-include_once LIBPATH.'php/resource/DataResource.php';
+include_once LIBPATH.'php/resource/rest/DataResource.php';
+include_once LIBPATH.'php/resource/rest/abstract/DataFieldResource.php';
 include_once LIBPATH.'php/resource/APIPageView.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
