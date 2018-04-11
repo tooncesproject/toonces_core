@@ -91,6 +91,10 @@ class APIPageView extends DataResource implements iPageView, iResource
     public function getResource() {
         // Overrides DataResource->getResource()
         // Iterate through the dataObjects array, creating a new array with its extracted contents
+        
+        
+        
+        /*
         $pageArray = array();
         foreach ($this->dataObjects as $dataResource)
             array_push($pageArray, $dataResource->getResource());
@@ -98,11 +102,39 @@ class APIPageView extends DataResource implements iPageView, iResource
          // Encode as JSON and return.
          $JSONString = json_encode($pageArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             return $JSONString;
+        */
     }
    
     public function renderPage() {
-        // TODO: Validate objects, encode JSON here, acquire HTTP status, echo with header.
-        echo $this->getResource();
+        // APIPageView allows only a single root resource object; throw an exception if 
+        // this isn't the case.
+        if (count($this->dataObjects != 1))
+            throw new Exception('Error: An APIPageBuilder must instantiate one and only one data object per page.');
+            
+        $dataObject = $this->dataObjects[0];
+        
+        $dataOut = array();
+        // Execute the object
+        $resourceData = $dataObject->getResource();
+        // If the resource has a status message, add it to the output
+        if ($dataObject->statusMessage)
+            $resourceData['status'] = $dataObject->statusMessage;
+        
+        // Append the resource's output
+        array_push($dataOut, $resourceData);
+        
+        // Once executed, the resource must have an HTTP status.
+        // If it doesn't, throw an exception.
+        $httpStatus = $dataObject->httpStatus;
+        $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
+        if (!$httpStatusString)
+            throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
+        
+        // Encode as JSON and render.
+        $JSONString = json_encode($dataOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        header($httpStatusString, true, $httpStatus);
+        echo($JSONString);
+
         
     }
 }
