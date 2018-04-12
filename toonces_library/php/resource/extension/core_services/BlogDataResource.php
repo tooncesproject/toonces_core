@@ -51,7 +51,7 @@ class BlogDataResource extends DataResource implements iResource {
                 ,bp.blog_post_id
                 ,p2.page_id AS blog_post_page_id
                 ,bp.title AS blog_post_title
-                ,bp.created AS blog_post_created
+                ,bp.created_dt AS blog_post_created
                 ,bp.modified AS blog_post_modified
                 ,p2.published
                 ,p2.deleted
