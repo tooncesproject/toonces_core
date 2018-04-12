@@ -36,6 +36,7 @@ class BlogDataResource extends DataResource implements iResource {
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $blogID = $this->validateIdParameter();
+        $sqlConn = $this->pageViewReference->getSQLConn;
         
         // Acquire the user id if this is an authenticated request.
         $userID = $this->authenticateUser() ?? 0;
@@ -82,7 +83,7 @@ SQL;
         // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
         $result = null;
         if ($blogID !== 0) {
-            $stmt = $this->conn->prepare($sql);
+            $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
             $result = $stmt->fetchAll();
         }
@@ -98,7 +99,7 @@ SQL;
                 // If the outer record has not repeated, create a 'blog' record in the array.
                 if ($row['blog_id'] != $lastID) {
                     $blog = array(
-                         'pageURI' => GrabPageURL::getURL($row[3], $this->conn)
+                         'pageURI' => GrabPageURL::getURL($row[3], $sqlConn)
                         ,'blogName' => $row[1]
                         ,'blogDescription' => $row[2]
                         ,'pageID' => $row[3]
@@ -111,7 +112,7 @@ SQL;
                 // If the row contains a "child" (AKA blog post), append it to the blog record.
                 if (!empty($row[5])) {
                     $blogPost = array(
-                         'pageURI' => GrabPageURL::getURL($row[5], $this->conn)
+                         'pageURI' => GrabPageURL::getURL($row[5], $sqlConn)
                         ,'pageID' => $row[6]
                         ,'blogPostTitle' => $row[7]
                         ,'blogPostCreated' => $row[8]
