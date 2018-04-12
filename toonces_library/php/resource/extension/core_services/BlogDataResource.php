@@ -99,7 +99,8 @@ SQL;
                 // If the outer record has not repeated, create a 'blog' record in the array.
                 if ($row['blog_id'] != $lastID) {
                     $blog = array(
-                         'pageURI' => GrabPageURL::getURL($row[3], $sqlConn)
+                         'url' => $this->resourceURL . '?id=' . strval($row[0])
+                        ,'pageURI' => GrabPageURL::getURL($row[3], $sqlConn)
                         ,'blogName' => $row[1]
                         ,'blogDescription' => $row[2]
                         ,'pageID' => $row[3]
