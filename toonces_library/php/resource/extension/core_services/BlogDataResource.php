@@ -36,7 +36,7 @@ class BlogDataResource extends DataResource implements iResource {
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $blogID = $this->validateIdParameter();
-        $sqlConn = $this->pageViewReference->getSQLConn;
+        $sqlConn = $this->pageViewReference->getSQLConn();
         
         // Acquire the user id if this is an authenticated request.
         $userID = $this->authenticateUser() ?? 0;
