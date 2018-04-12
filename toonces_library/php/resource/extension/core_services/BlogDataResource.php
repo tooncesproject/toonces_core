@@ -127,14 +127,14 @@ SQL;
                 }
    
             }
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
         } else {
             // If no result, status is 404.
             // Note: By a design choice, get requests to unauthorized pages return a 404, not a 401;
             // This is intentional as it obfuscates resources that the user isn't explicity authorized to access.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
         }
-        
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+
         return $this->dataObjects;
     }
     
