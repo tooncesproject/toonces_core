@@ -4,6 +4,7 @@ include_once LIBPATH.'php/utility/static/Enumeration.php';
 include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
 include_once LIBPATH.'php/utility/static/EnumHTTPResponse.php';
 include_once LIBPATH.'php/resource/interface/iResource.php';
+include_once LIBPATH.'php/resource/abstract/Resource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';
 include_once LIBPATH.'php/resource/HTMLViewResource.php';
 include_once LIBPATH.'php/resource/interface/iPageView.php';

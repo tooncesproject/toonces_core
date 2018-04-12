@@ -108,9 +108,11 @@ class APIPageView extends DataResource implements iPageView, iResource
     public function renderPage() {
         // APIPageView allows only a single root resource object; throw an exception if 
         // this isn't the case.
+        // TODO: FIX THIS
+        /*
         if (count($this->dataObjects != 1))
             throw new Exception('Error: An APIPageBuilder must instantiate one and only one data object per page.');
-            
+        */  
         $dataObject = $this->dataObjects[0];
         
         $dataOut = array();
@@ -134,7 +136,6 @@ class APIPageView extends DataResource implements iPageView, iResource
         $JSONString = json_encode($dataOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         header($httpStatusString, true, $httpStatus);
         echo($JSONString);
-
         
     }
 }

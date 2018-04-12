@@ -1,6 +1,6 @@
 <?php
 
-include_once LIBPATH.'php/toonces.php';
+require_once LIBPATH.'php/toonces.php';
 
 class HTMLResource implements iResource {
 
@@ -9,11 +9,9 @@ class HTMLResource implements iResource {
 	var $htmlFooter;
 	var $pageViewReference;
 
-	public function __construct($pageView) {
-		$this->pageViewReference = $pageView;
-	}
 
-	public function getResource() {
+
+	protected function getResource() {
 
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;
