@@ -35,6 +35,9 @@ class APIPageView extends DataResource implements iPageView, iResource
     }
     
     public function getPageURI() {
+        if (!$this->pageURI)
+            $this->setPageURI(GrabPageURL::getURL($this->pageId, $this->sqlConn));
+ 
         return $this->pageURI;
     }
     
