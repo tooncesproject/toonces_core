@@ -11,9 +11,9 @@ require_once LIBPATH.'php/toonces.php';
 abstract class Resource {
 
     // PageViewReference is an iPageView-compliant object responsible for rendering the resource.
-    protected $pageViewReference;
+    public $pageViewReference;
     
-    protected function __construct($pageView) {
+    public function __construct($pageView) {
         // All Resource subclasses have a reference to the PageView object upon instantiation. 
         $this->pageViewReference = $pageView;
     }
