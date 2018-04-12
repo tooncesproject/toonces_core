@@ -25,7 +25,7 @@ class DataResource extends Resource implements iResource
         
         // If there is no SessionManager object, instantiate one now.
         if (!$this->sessionManager)
-            $this->sessionManager = new SessionManager($this->pageView->getSQLConn());
+            $this->sessionManager = new SessionManager($this->pageViewReference->getSQLConn());
             
         if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
             $email = $_SERVER['PHP_AUTH_USER'];
