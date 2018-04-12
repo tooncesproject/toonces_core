@@ -93,7 +93,7 @@ SQL;
         // inner record is any children.
         $responseArray = NULL;
         
-        if ($result) {
+        if (count($result) > 0) {
             $lastID = null;
             foreach ($result as $row) {
                 // If the outer record has not repeated, create a 'blog' record in the array.
