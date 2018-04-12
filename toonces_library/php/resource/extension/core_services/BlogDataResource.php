@@ -68,7 +68,7 @@ class BlogDataResource extends DataResource implements iResource {
             -- 2nd join to pages is for the blog posts
             LEFT JOIN pages p2 ON bp.page_id = p2.page_id
             WHERE
-                (b.blod_id = :blogID OR :blogID IS NULL) 
+                (b.blog_id = :blogID OR :blogID IS NULL) 
                 AND
                 (
                     (p.published = 1 AND p.deleted IS NULL)
