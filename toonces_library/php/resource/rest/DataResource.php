@@ -64,7 +64,7 @@ class DataResource extends Resource implements iResource
                 break;
             
             if (!is_int($_GET['id'])) {          // it's an integer? 
-                $id = $_GET['ID'];
+                $id = $_GET['id'];
             } else {
                 $id = 0;
             }
@@ -147,7 +147,7 @@ class DataResource extends Resource implements iResource
         if ($this->validateHeaders()) {
             
             // Get the resource URI
-            $resourceURI = $this->pageViewReference->getPageURI;
+            $resourceURI = $this->pageViewReference->getPageURI();
             // Build the full URL path
             $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
             $this->resourceURL = $scheme . $_SERVER['HTTP_HOST'] . '/' . $resourceURI;
