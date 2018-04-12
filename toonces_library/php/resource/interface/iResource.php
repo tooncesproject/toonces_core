@@ -16,5 +16,5 @@
 
 interface iResource
 {   
-    protected function getResource();
+    public function getResource();
 }

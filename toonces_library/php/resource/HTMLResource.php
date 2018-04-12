@@ -11,7 +11,7 @@ class HTMLResource implements iResource {
 
 
 
-	protected function getResource() {
+	public function getResource() {
 
 		//add header and footer
 		$this->html = $this->htmlHeader.PHP_EOL.$this->html.PHP_EOL.$this->htmlFooter;
