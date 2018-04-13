@@ -147,8 +147,10 @@ class DataResource extends Resource implements iResource
         // Validate headers. If valid, call the appropriate method depending on the request HTTP method.
         if ($this->validateHeaders()) {
             
-            // Get the resource URI
-            $resourceURI = $this->pageViewReference->getPageURI();
+            // Get the resource URI if it hasn't already been set externally
+            if (!$this->resourceURI)
+                $resourceURI = $this->pageViewReference->getPageURI();
+
             // Build the full URL path
             $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
             $this->resourceURL = $scheme . $_SERVER['HTTP_HOST'] . '/' . $resourceURI;

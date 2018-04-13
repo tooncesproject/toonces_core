@@ -107,9 +107,8 @@ SQL;
 
                 // Append the blog post record to the blog record
                 if ($blogPost)
-                    array_push($this->dataObjects[$row[0]]['blogPosts'], $blog_post);
-                
-   
+                    array_push($this->dataObjects[$row[0]]['blogPosts'], $blogPosts);
+
             }
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
         } else {
