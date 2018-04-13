@@ -26,6 +26,7 @@ include_once LIBPATH.'php/resource/JSONResource.php';
 include_once LIBPATH.'php/resource/rest/DataResource.php';
 include_once LIBPATH.'php/resource/rest/abstract/DataFieldResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php';
+include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
 include_once LIBPATH.'php/resource/APIPageView.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
