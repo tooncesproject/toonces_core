@@ -41,7 +41,7 @@ class BlogPostDataResource extends DataResource implements iResource {
             LEFT JOIN page_user_access pua ON bp.page_id = pua.page_id AND (pua.user_id = :userID)
             LEFT JOIN users u ON pua.user_id = u.user_id
             WHERE
-                (b.blog_id = :blogID OR :blogID IS NULL)
+                (bp.blog_id = :blogID OR :blogID IS NULL)
                 AND
                 (bp.blog_post_id = :blogPostID OR :blogPostID IS NULL) 
                 AND
