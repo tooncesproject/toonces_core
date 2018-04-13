@@ -58,7 +58,7 @@ SQL;
         $result = null;
         if ($blogID !== 0 && $blogPostID !== 0) {
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
+            $stmt->execute(array('userID' => $userID, 'blogID' => $blogID, 'blogPostID' => $blogPostID));
             $result = $stmt->fetchAll();
         }
 
