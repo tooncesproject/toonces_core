@@ -47,6 +47,7 @@ include_once LIBPATH.'php/utility/abstract/APIPageBuilderDelegate.php';
 include_once LIBPATH.'php/utility/CoreAPIPageBuilderDelegate.php';
 include_once LIBPATH.'php/pagebuilders/core_services/CoreAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/PagesAPIPageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/core_services/BlogPostAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/BlogsAPIPageBuilder.php';
 
 include_once LIBPATH.'php/resource/extension/admin/AdminHTMLViewResource.php';
