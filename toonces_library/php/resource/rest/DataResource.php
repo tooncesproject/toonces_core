@@ -52,19 +52,20 @@ class DataResource extends Resource implements iResource
     }
 
 
-    public function validateIdParameter() {
-        // By design, most endpoints will accept an "id" parameter in GET/PUT/DELETE requests.
+    public function validateIntParameter($parameterKey) {
+        // This method provides basic validation for any named GET parameters expecting an integer.
         // There are 3 possible states:
-        //      1. No ID parameter - return null
-        //      2. ID parameter is set, but isn's an integer - Return 0
-        //      3. ID parameter is set and is an integer - Return ID
+        //      1. Key not found in parameters - return null
+        //      2. Key is set, but value isn's an integer - Return 0
+        //      3. Key is set and value is an integer - Return value.
         $id = null;
+        $getParams = $this->parameters;
         do {
-            if (!array_key_exists('id', $_GET)) // Parameter exists?
+            if (!array_key_exists($parameterKey, $getParams)) // Parameter exists?
                 break;
             
-            if (!is_int($_GET['id'])) {          // it's an integer? 
-                $id = $_GET['id'];
+            if (!is_int($getParams[$parameterKey])) {          // it's an integer? 
+                $id = $getParams[$parameterKey];
             } else {
                 $id = 0;
             }

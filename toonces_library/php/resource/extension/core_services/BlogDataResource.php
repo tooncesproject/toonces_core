@@ -3,7 +3,7 @@
  * BlogDataResource.php
  * Initial Commit: Paul Anderson, 4/10/2018
  * 
- * A DataResource object definining the inputs and outputs for a Blogs endpoint.
+ * A DataResource class definining the inputs and outputs for a Blogs endpoint.
  * 
 */
 
@@ -35,7 +35,7 @@ class BlogDataResource extends DataResource implements iResource {
     function getAction() {
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
-        $blogID = $this->validateIdParameter();
+        $blogID = $this->validateIntParameter('id');
         $sqlConn = $this->pageViewReference->getSQLConn();
         
         // Acquire the user id if this is an authenticated request.
@@ -49,13 +49,6 @@ class BlogDataResource extends DataResource implements iResource {
                 ,p.page_id
                 ,phb.page_id AS ancestor_page_id
                 ,bp.blog_post_id
-                ,p2.page_id AS blog_post_page_id
-                ,bp.title AS blog_post_title
-                ,bp.created_dt AS blog_post_created
-                ,bp.modified_dt AS blog_post_modified
-                ,p2.published
-                ,p2.deleted
-                ,p2.page_link_text 
             FROM blogs b
             JOIN pages p ON b.page_id = p.page_id
             -- 1st join to PHB is to get the parent page ID
@@ -64,9 +57,6 @@ class BlogDataResource extends DataResource implements iResource {
             LEFT JOIN page_hierarchy_bridge phb2 ON p.page_id = phb2.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
             LEFT JOIN users u ON pua.user_id = u.user_id
-            LEFT JOIN blog_posts bp ON b.blog_id = bp.blog_id
-            -- 2nd join to pages is for the blog posts
-            LEFT JOIN pages p2 ON bp.page_id = p2.page_id
             WHERE
                 (b.blog_id = :blogID OR :blogID IS NULL) 
                 AND
@@ -111,20 +101,15 @@ SQL;
                 $this->dataObjects[$row[0]] = $blog;
 
                 // If the row contains a "child" (AKA blog post), append it to the blog record.
-                if (!empty($row[5])) {
-                    $blogPost = array(
-                         'pageURI' => GrabPageURL::getURL($row[5], $sqlConn)
-                        ,'pageID' => $row[6]
-                        ,'blogPostTitle' => $row[7]
-                        ,'blogPostCreated' => $row[8]
-                        ,'blogPostModified' => $row[9]
-                        ,'pagePublished' => $row[10]
-                        ,'pageDeleted' => $row[11]
-                        ,'pageLinkText' => $row[12]
-                    );
-                    // Append the blog post record to the blog record
+                $blogPostResource = new BlogPostDataResource($this->pageViewReference);
+                $blogPostResource->resourceURL = 'blogposts/';
+                $blogPostResource->parameters = array('blog_id' => $result[0]);
+                $blogPost = $blogPostResource->getResource();
+
+                // Append the blog post record to the blog record
+                if ($blogPost)
                     array_push($this->dataObjects[$row[0]]['blogPosts'], $blog_post);
-                }
+                
    
             }
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
