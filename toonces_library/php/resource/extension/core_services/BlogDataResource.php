@@ -48,7 +48,6 @@ class BlogDataResource extends DataResource implements iResource {
                 ,b.description
                 ,p.page_id
                 ,phb.page_id AS ancestor_page_id
-                ,bp.blog_post_id
             FROM blogs b
             JOIN pages p ON b.page_id = p.page_id
             -- 1st join to PHB is to get the parent page ID
