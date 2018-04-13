@@ -101,7 +101,7 @@ SQL;
 
                 // If the row contains a "child" (AKA blog post), append it to the blog record.
                 $blogPostResource = new BlogPostDataResource($this->pageViewReference);
-                $blogPostResource->resourceURL = 'blogposts/';
+                $blogPostResource->resourceURI = 'blogposts/';
                 $blogPostResource->parameters = array('blog_id' => $row[0]);
                 $blogPost = $blogPostResource->getResource();
 
