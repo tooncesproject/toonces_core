@@ -17,6 +17,7 @@ class DataResource extends Resource implements iResource
     var $httpStatus;
     var $sessionManager;
     var $resourceURL;
+    var $resourceURI;
 
     function authenticateUser() {
         // Toonces Core Services API uses Basic Auth for authentication, and the same
@@ -149,11 +150,11 @@ class DataResource extends Resource implements iResource
             
             // Get the resource URI if it hasn't already been set externally
             if (!$this->resourceURI)
-                $resourceURI = $this->pageViewReference->getPageURI();
+                $this->resourceURI = $this->pageViewReference->getPageURI();
 
             // Build the full URL path
             $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
-            $this->resourceURL = $scheme . $_SERVER['HTTP_HOST'] . '/' . $resourceURI;
+            $this->resourceURL = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceURI;
         
             $method = $_SERVER['REQUEST_METHOD'];
             switch ($method) {
