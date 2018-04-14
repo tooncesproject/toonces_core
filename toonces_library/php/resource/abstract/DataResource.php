@@ -2,13 +2,13 @@
 /*
  * DataResource.php
  * Initial Commit: Paul Anderson, 2/20/2018
- * iResource implementation representing nested data objects.
+ * Abstract class providing common functionality for REST API resources.
  *
  */
 
 include_once LIBPATH.'php/toonces.php';
 
-class DataResource extends Resource implements iResource
+abstract class DataResource extends Resource implements iResource
 {
     var $dataObjects = array();
     var $fields = array();
@@ -99,7 +99,7 @@ class DataResource extends Resource implements iResource
                 
                 // Is the POST/PUT data missing any required fields?
                 $fieldExists = array_key_exists($key, $data);
-                if ($field->isRequired && !$fieldExists) {
+                if (!$field->alowNull && !$fieldExists) {
                     // Required key missing
                     array_push($missingFields, $key);
                 }
@@ -168,7 +168,6 @@ class DataResource extends Resource implements iResource
                     $this->headAction();
                     break;
                 case 'PUT':
-                    // $this->putAction(file_get_contents('php://input'));
                     $this->putAction();
                     break;
                 case 'OPTIONS':
@@ -189,26 +188,84 @@ class DataResource extends Resource implements iResource
     
     public function getAction() {
         // Override to define the resource's response to a GET request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
     
     public function postAction() {
-        // foo
+        // Override to define the resource's response to a POST request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
 
     public function headAction() {
-        // foo
+        // Override to define the resource's response to a HEAD request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
     
     public function putAction() {
-        // foo
+        // Override to define the resource's response to a PUT request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
     
     public function deleteAction() {
-        // foo
+        // Override to define the resource's response to a DELETE request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
     
     public function connectAction() {
-        // foo
+        // Override to define the resource's response to a CONNECT request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
+    
+    public function optionsAction() {
+        // Automatically scans the "action" methods to test whether they are implemented.
+        $notAllowedStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+        $allowedVerbs = array();
 
+        // GET?
+        $this->getAction();
+        if ($this->httpStatus != $notAllowedStatus)
+            array_push($allowedVerbs, 'GET');
+        
+        // POST?
+        $this->postAction();
+        if ($this->httpStatus != $notAllowedStatus)
+            array_push($allowedVerbs, 'POST');
+        
+        // HEAD?
+        $this->headAction();
+        if ($this->httpStatus != $notAllowedStatus)
+            array_push($allowedVerbs, 'HEAD');
+
+        // PUT?
+        $this->putAction();
+        if ($this->httpStatus != $notAllowedStatus)
+            array_push($allowedVerbs, 'PUT');
+                
+        // DELETE?
+        $this->deleteAction();
+        if ($this->httpStatus != $notAllowedStatus)
+            array_push($allowedVerbs, 'DELETE');
+        
+        // CONNECT?
+        $this->connectAction();
+        if ($this->httpStatus != $notAllowedStatus)
+            array_push($allowedVerbs, 'CONNECT');
+        
+        // OPTIONS (obviously)
+        array_push($allowedVerbs, 'OPTIONS');
+        
+        // clear the data array, transmit a header and return.
+        $this->dataObjects = array();
+        $headerString = 'Allow:' . implode(',', $allowedVerbs);
+        header($headerString);
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+        return $this->dataObjects;
+        
+    }
 }

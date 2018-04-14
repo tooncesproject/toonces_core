@@ -231,15 +231,91 @@ SQL;
         return $this->dataObjects;
     }
     
-    function putResource($putData) {
+    function putAction() {
+        // Responds to a PUT request to update an existing blog resource.
         // Validate fields in PUT data for data type
-        // Update existing resource
+        // set up the field validators.
+        $this->buildFields();
+        // allow the ancestor page ID field to be null.
+        $this->fields['ancestorPageID']->allowNull = true;
+
+        // Connect to SQL
+        $sqlConn = $this->pageViewReference->getSQLConn();
+
+        // The blogID should be set in the URL parameters.
+        $blogID = $this->validateIntParameter('id');
+
+        // Acquire the PUT body (if not already set)
+        if (count($this->dataObjects) == 0)
+            $this->dataObjects = json_decode(file_get_contents("php://input"), true);
+        
+        // Go through authentication/validation sequence
+        do {
+            // Authenticate the user.
+            $userID = $this->authenticateUser();
+            if (empty($userID)) {
+                // Authentication failed.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                $this->statusMessage = 'Access denied. Go away.';
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+            
+            // Validate fields in PUT data for data type
+            if (!$this->validateData($this->dataObjects)) {
+                // Not valid? Respond with status message
+                // HTTP status would already be set by the validateData method inherited from DataResource
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+           
+            // Check that the user has access to the blog page (and that it exists).
+            $sql = <<<SQL
+            SELECT
+                 p.page_id
+            FROM blogs b
+            JOIN pages p ON b.page_id = p.page_id
+            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
+            LEFT JOIN users u ON pua.user_id = u.user_id
+            WHERE
+                b.blogID = :blogID
+                AND
+                (
+                    (p.published = 1 AND p.deleted IS NULL)
+                    OR
+                    pua.user_id IS NOT NULL
+                    OR
+                    u.is_admin = TRUE
+                )
+SQL;
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
+            $result = $stmt->fetchall();
+            
+            if (!$result) {
+                // No access or blog doesn't exist? Return a 404 error.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
+            
+            // So far so good - Update the blog's info.
+            $pageID = $result[0][0];
+            $sql = "UPDATE pages SET page_title = :blogName WHERE page_id = :pageID";
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute(array('blogTitle' => $this->dataObjects['blogTitle'], 'pageID' => $pageID));
+            
+            // return the updated blog record.
+            // Return the newly created blog.
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+            $this->parameters['id'] = $blogID;
+            $this->dataObjects = array();
+            $this->dataObjects = $this->getAction(); 
+            
+        } while (false);
+        
+        return $this->dataObjects;
     }
-    
-    function deleteResource() {
-        // Delete resource
-    }
-    
+
     
 }
 

@@ -23,7 +23,7 @@ include_once LIBPATH.'php/resource/toolbar/BlogToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/BlogPostToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/DefaultToolbarElement.php';
 include_once LIBPATH.'php/resource/JSONResource.php';
-include_once LIBPATH.'php/resource/rest/DataResource.php';
+include_once LIBPATH.'php/resource/abstract/DataResource.php';
 include_once LIBPATH.'php/utility/abstract/FieldValidator.php';
 include_once LIBPATH.'php/utility/interface/iFieldValidator.php';
 include_once LIBPATH.'php/utility/StringFieldValidator.php';
