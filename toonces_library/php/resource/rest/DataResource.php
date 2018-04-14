@@ -38,7 +38,7 @@ class DataResource extends Resource implements iResource
                 $userID = $this->sessionManager->userId;
         }
             
-        return $userId;
+        return $userID;
     }
 
     function validateHeaders() {
@@ -90,7 +90,7 @@ class DataResource extends Resource implements iResource
             // (JSON should already be validated and converted to array at this point).
             if (!is_array($data)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                $this->statusMessage = 'The API only accepts well-formed JSON.';
+                $this->statusMessage = 'The API only accepts well-formed JSON.  ';
                 break;
             }
             
