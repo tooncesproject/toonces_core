@@ -14,9 +14,10 @@ class BlogDataResource extends DataResource implements iResource {
 
     function buildFields() {
         // Define the sub-resources of this resource.
-        // url
+
         $pathName = new StringDataFieldResource(); // "pathName": null,
         $pathName->maxLength = 50;
+        $pathName->allowNull=true;
         $this->fields['pathName'] = $pathName;
 
         $blogName = new StringDataFieldResource(); // "pageTitle": "Sorry, This is Toonces.",
@@ -79,6 +80,7 @@ SQL;
         $responseArray = NULL;
         
         if (count($result) > 0) {
+            // TODO: fix query so it doesn't include children
             $lastID = null;
             foreach ($result as $row) {
                 // If the outer record has not repeated, create a 'blog' record in the array.
@@ -144,7 +146,7 @@ SQL;
                 break;
             }
 
-            // Check that the user has access to the ancestor page (and that it exists).
+            // Check that the user has access to the ancestor page (and that it exists). 
             $sql = <<<SQL
             SELECT
                  p.page_id
@@ -166,7 +168,7 @@ SQL;
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'pageID' => $ancestorPageID));
             $result = $stmt->fetchall();
-            
+
             if (!$result) {
                 // No access or ancestor doesn't exist? Return a 400 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
@@ -175,6 +177,23 @@ SQL;
                 break;
             }
             
+            // Next: Validate pathname, generate one from the title if not explicitly supplied.
+            if (!array_key_exists('pathName', $this->dataObjects)) {
+                // If it's not supplied, generate one from the title.
+                $sql = "SELECT GENERATE_PATHNAME(:blogName)";
+                $stmt = $sqlConn->prepare($sql);
+                $stmt->execute(array('blogName' => $this->dataObjects['blogName']));
+                $result = $stmt->fetchall();
+                $this->dataObjects['pathName'] = $result[0];
+            } else if (!ctype_alnum(str_replace('_', '', $this->dataObjects['pathName']))) {
+                // Otherwise, if the supplied path name contains non-alphanumeric chars other than underscore,
+                // invalidate the request.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'pathName may only contain alphanumeric characters or underscores.';
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+
             // So far so good. get busy.
             $sql = <<<SQL
             SELECT CREATE_BLOG (
@@ -184,13 +203,20 @@ SQL;
                 ,'BlogPageBuilder'      -- blog_pagebuilder_class VARCHAR(50)
                 ,'HTMLPageView'         -- blog_pageview_class VARCHAR(50)
             )
-SQL;
-            $stmt = $sqlConn->prepare($sql);
-            $stmt->execute($this->dataObjects);
-            $result = $stmt->fetchall();
+SQL;        
 
-            $blogID = $result[0];
-            
+            try {
+                $stmt = $sqlConn->prepare($sql);
+                $stmt->execute($this->dataObjects);
+                $result = $stmt->fetchall();
+                $blogID = $result[0];
+            } catch (PDOException $e) {
+                // If this failed, it's probably because a child with that pathname already exists.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+                $this->statusMessage = 'Creation of blog in database failed, possibly due to duplicate pathname or other database error. Try changing the title or supplying the pathName explicitly.';
+                $this->dataObjects = array('status' => $this->statusMessage);
+            }         
+
             // Return the newly created blog.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = $blogID;
