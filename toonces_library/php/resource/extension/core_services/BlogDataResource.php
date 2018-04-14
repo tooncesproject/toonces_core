@@ -164,7 +164,7 @@ SQL;
 SQL;
             $ancestorPageID = $this->dataObjects['ancestorPageID'];
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute(array('userID' => $userID, 'ancestorPageID' => $ancestorPageID));
+            $stmt->execute(array('userID' => $userID, 'pageID' => $ancestorPageID));
             $result = $stmt->fetchall();
             
             if (!$result) {
