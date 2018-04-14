@@ -8,7 +8,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class StringFieldValidator implements iFieldValidator {
+class StringFieldValidator extends FieldValidator implements iFieldValidator {
     
     public $allowNull;
     public $maxLength;

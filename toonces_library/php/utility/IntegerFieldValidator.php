@@ -8,9 +8,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class IntegerFieldValidator implements iFieldValidator {
-    
-    public $allowNull;
+class IntegerFieldValidator extends FieldValidator implements iFieldValidator {
 
     public function validateData($data) {
         // Verifies that the data is a string and (if applicable) does not exceed the max length.

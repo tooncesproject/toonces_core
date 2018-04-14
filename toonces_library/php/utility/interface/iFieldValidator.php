@@ -10,6 +10,5 @@
 require_once LIBPATH.'php/toonces.php';
 
 interface iFieldValidator {
-    public $allowNull;
     public function validateData($data);
 }
