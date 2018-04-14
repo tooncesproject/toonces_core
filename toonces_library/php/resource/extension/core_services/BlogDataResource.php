@@ -16,16 +16,12 @@ class BlogDataResource extends DataResource implements iResource {
         // Define the sub-resources of this resource.
         // url
         $pathName = new StringDataFieldResource(); // "pathName": null,
+        $pathName->maxLength = 50;
         $this->fields['pathName'] = $pathName;
-        
-        $pageURI = new StringDataFieldResource(); // pageURI": "",
-        $this->fields['pageURI'] = $pageURI;
-        
-        $pageTitle = new StringDataFieldResource(); // "pageTitle": "Sorry, This is Toonces.",
-        $this->fields['pageTitle'] = $pageTitle;
-        
-        $pageLinkText = new StringDataFieldResource(); // "pageLinkText": "Home Page",
-        $this->fields['pageLinkText'] = $pageLinkText;
+
+        $blogName = new StringDataFieldResource(); // "pageTitle": "Sorry, This is Toonces.",
+        $blogName->maxLength = 50;
+        $this->fields['blogName'] = $blogName;
         
         $ancestorPageID = new IntegerDataFieldResource(); // "ancestorPageID": null
         $this->fields['ancestorPageID'] = $ancestorPageID;
@@ -121,8 +117,89 @@ SQL;
         return $this->dataObjects;
     }
     
-    function postResource($postData) {
-        // Validate fields in post data for data type
+    function postAction() {
+        // Validates as POST request and responds.
+
+        $sqlConn = $this->pageViewReference->getSQLConn();
+        // Acquire the POST body (if not already set)
+        if (count($this->dataObjects) == 0)
+            $this->dataObjects = json_encode($_POST);
+        
+        do {
+            // Authenticate the user.
+            $userID = $this->authenticateUser();
+            if (empty($userID)) {
+                // Authentication failed.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                $this->statusMessage = 'Access denied. Go away.';
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+            
+            // Validate fields in post data for data type        
+            if (!$this->validateData($this->dataObjects)) {
+                // Not valid? Respond with status message
+                // HTTP status would already be set by the validateData method inherited from DataResource
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+
+            // Check that the user has access to the ancestor page (and that it exists).
+            $sql = <<<SQL
+            SELECT
+                 p.page_id
+            FROM pages p
+            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
+            LEFT JOIN users u ON pua.user_id = u.user_id
+            WHERE
+                p.page_id = :pageID 
+                AND
+                (
+                    (p.published = 1 AND p.deleted IS NULL)
+                    OR
+                    pua.user_id IS NOT NULL
+                    OR
+                    u.is_admin = TRUE
+                )
+SQL;
+            $ancestorPageID = $this->dataObjects['ancestorPageID'];
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute(array('userID' => $userID, $ancestorPageID));
+            $result = $stmt->fetchall();
+            
+            if (!$result) {
+                // No access or ancestor doesn't exist? Return a 400 error.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'Ancestor page ID not found';
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+            
+            // So far so good. get busy.
+            $sql = <<<SQL
+            SELECT CREATE_BLOG (
+                 :ancestorPageID        -- parent_page_id BIGINT
+                ,:pathName              -- blog_url_name VARCHAR(50)
+                ,:blogName              -- blog_display_name VARCHAR(100)
+                ,'BlogPageBuilder'      -- blog_pagebuilder_class VARCHAR(50)
+                ,'HTMLPageView'         -- blog_pageview_class VARCHAR(50)
+            )
+SQL;
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute($this->dataObjects);
+            $result = $stmt->fetchall();
+
+            $blogID = $result[0];
+            
+            // Return the newly created blog.
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+            $this->parameters['id'] = $blogID;
+            $this->dataObjects = $this->getAction();
+            
+
+        } while (false);
+        
+        return $this->dataObjects;
     }
     
     function putResource($putData) {
