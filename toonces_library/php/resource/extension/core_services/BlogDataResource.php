@@ -41,7 +41,7 @@ class BlogDataResource extends DataResource implements iResource {
         $sql = <<<SQL
             SELECT
                  b.blog_id
-                ,b.name
+                ,p.name
                 ,b.description
                 ,p.page_id
                 ,phb.page_id AS ancestor_page_id
@@ -206,7 +206,7 @@ SQL;
                 ,'HTMLPageView'         -- blog_pageview_class VARCHAR(50)
             )
 SQL;
-            
+
             try {
                 $stmt = $sqlConn->prepare($sql);
                 $stmt->execute($this->dataObjects);

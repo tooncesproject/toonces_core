@@ -22,7 +22,7 @@ class IntegerFieldValidator extends FieldValidator implements iFieldValidator {
                 // Data is a string?
                 if (!is_int($data)) {
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                    $this->statusMessage = 'This object must be a string.';
+                    $this->statusMessage = 'This object must be an Integer.';
                     break;
                 }
                 
