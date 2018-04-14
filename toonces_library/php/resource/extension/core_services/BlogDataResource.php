@@ -184,7 +184,7 @@ SQL;
                 $stmt = $sqlConn->prepare($sql);
                 $stmt->execute(array('blogName' => $this->dataObjects['blogName']));
                 $result = $stmt->fetchall();
-                $this->dataObjects['pathName'] = $result[0];
+                $this->dataObjects['pathName'] = $result[0][0];
             } else if (!ctype_alnum(str_replace('_', '', $this->dataObjects['pathName']))) {
                 // Otherwise, if the supplied path name contains non-alphanumeric chars other than underscore,
                 // invalidate the request.
@@ -208,7 +208,7 @@ SQL;
                 $stmt = $sqlConn->prepare($sql);
                 $stmt->execute($this->dataObjects);
                 $result = $stmt->fetchall();
-                $blogID = $result[0];
+                $blogID = $result[0][0];
             } catch (PDOException $e) {
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
@@ -219,8 +219,7 @@ SQL;
             // Return the newly created blog.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = $blogID;
-            $this->dataObjects = $this->getAction();
-            
+            $this->dataObjects = $this->getAction(); 
 
         } while (false);
         
