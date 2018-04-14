@@ -193,8 +193,7 @@ SQL;
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }
-
-            // So far so good. get busy.
+ 
             $sql = <<<SQL
             SELECT CREATE_BLOG (
                  :ancestorPageID        -- parent_page_id BIGINT
@@ -203,8 +202,8 @@ SQL;
                 ,'BlogPageBuilder'      -- blog_pagebuilder_class VARCHAR(50)
                 ,'HTMLPageView'         -- blog_pageview_class VARCHAR(50)
             )
-SQL;        
-
+SQL;
+            
             try {
                 $stmt = $sqlConn->prepare($sql);
                 $stmt->execute($this->dataObjects);
