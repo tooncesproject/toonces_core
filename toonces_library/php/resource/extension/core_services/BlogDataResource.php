@@ -121,6 +121,9 @@ SQL;
     
     function postAction() {
         // Validates as POST request and responds.
+        
+        // set up the field validators.
+        $this->buildFields();
 
         $sqlConn = $this->pageViewReference->getSQLConn();
         // Acquire the POST body (if not already set)
