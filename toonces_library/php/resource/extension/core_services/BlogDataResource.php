@@ -41,7 +41,7 @@ class BlogDataResource extends DataResource implements iResource {
         $sql = <<<SQL
             SELECT
                  b.blog_id
-                ,p.name
+                ,p.page_title
                 ,b.description
                 ,p.page_id
                 ,phb.page_id AS ancestor_page_id
