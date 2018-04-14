@@ -214,6 +214,7 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 $this->statusMessage = 'Creation of blog in database failed, possibly due to duplicate pathname or other database error. Try changing the title or supplying the pathName explicitly.';
                 $this->dataObjects = array('status' => $this->statusMessage);
+                break;
             }         
 
             // Return the newly created blog.
