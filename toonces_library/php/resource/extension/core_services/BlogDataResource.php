@@ -123,7 +123,7 @@ SQL;
         $sqlConn = $this->pageViewReference->getSQLConn();
         // Acquire the POST body (if not already set)
         if (count($this->dataObjects) == 0)
-            $this->dataObjects = json_encode($_POST);
+            $this->dataObjects = json_decode(file_get_contents("php://input"), true);
         
         do {
             // Authenticate the user.
@@ -164,7 +164,7 @@ SQL;
 SQL;
             $ancestorPageID = $this->dataObjects['ancestorPageID'];
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute(array('userID' => $userID, $ancestorPageID));
+            $stmt->execute(array('userID' => $userID, 'ancestorPageID' => $ancestorPageID));
             $result = $stmt->fetchall();
             
             if (!$result) {
