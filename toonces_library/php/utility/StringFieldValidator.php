@@ -1,16 +1,17 @@
 <?php
 /*
- * StringDataFieldResource.php
+ * StringFieldValidator.php
  * Initial commit: Paul Anderson, 4/10/2018
- * 
- * DataFieldResource class providing structure and validation for strings in a REST API
-*/
+ *
+ * iFieldValidator-compliant class providing validation for strings in a REST API or other application.
+ */
 
 require_once LIBPATH.'php/toonces.php';
 
-class StringDataFieldResource extends DataFieldResource {
+class StringFieldValidator implements iFieldValidator {
     
-    public $maxLength; 
+    public $allowNull;
+    public $maxLength;
     public function validateData($data) {
         // Verifies that the data is a string and (if applicable) does not exceed the max length.
         $dataValid = false;
@@ -26,7 +27,7 @@ class StringDataFieldResource extends DataFieldResource {
                     $this->statusMessage = 'This object must be a string.';
                     break;
                 }
-            
+                
                 // If applicable, length does not exceed the specified maximum?
                 if ($this->maxLength) {
                     if (strlen($data) > $this->maxLength) {
@@ -35,13 +36,13 @@ class StringDataFieldResource extends DataFieldResource {
                         break;
                     }
                 }
-        
+                
                 // If we're here, data is okie dokie
                 $dataValid = true;
             } while (false);
         }
         return $dataValid;
-
+        
     }
     
 }

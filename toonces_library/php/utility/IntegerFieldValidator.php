@@ -1,15 +1,17 @@
 <?php
 /*
- * IntegerDataFieldResource.php
- * Initial commit: Paul Anderson, 4/10/2018
+ * IntegerFieldValidator.php
+ * Initial commit: Paul Anderson, 4/13/2018
  *
- * DataFieldResource class providing structure and validation for integers in a REST API
+ * iFieldValidator-compliant class providing validation for integers in a REST API or other application.
  */
 
 require_once LIBPATH.'php/toonces.php';
 
-class IntegerDataFieldResource extends DataFieldResource {
+class IntegerFieldValidator implements iFieldValidator {
     
+    public $allowNull;
+
     public function validateData($data) {
         // Verifies that the data is a string and (if applicable) does not exceed the max length.
         $dataValid = false;
@@ -32,5 +34,5 @@ class IntegerDataFieldResource extends DataFieldResource {
         }
         return $dataValid;
         
-    }   
+    }
 }

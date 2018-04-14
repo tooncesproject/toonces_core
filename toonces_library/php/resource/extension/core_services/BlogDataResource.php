@@ -15,16 +15,16 @@ class BlogDataResource extends DataResource implements iResource {
     function buildFields() {
         // Define the sub-resources of this resource.
 
-        $pathName = new StringDataFieldResource(); // "pathName": null,
+        $pathName = new StringFieldValidator();
         $pathName->maxLength = 50;
         $pathName->allowNull=true;
         $this->fields['pathName'] = $pathName;
 
-        $blogName = new StringDataFieldResource(); // "pageTitle": "Sorry, This is Toonces.",
+        $blogName = new StringFieldValidator();
         $blogName->maxLength = 50;
         $this->fields['blogName'] = $blogName;
         
-        $ancestorPageID = new IntegerDataFieldResource(); // "ancestorPageID": null
+        $ancestorPageID = new IntegerFieldValidator();
         $this->fields['ancestorPageID'] = $ancestorPageID;
         
     }
