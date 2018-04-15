@@ -278,7 +278,7 @@ SQL;
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
             LEFT JOIN users u ON pua.user_id = u.user_id
             WHERE
-                b.blogID = :blogID
+                b.blog_id = :blogID
                 AND
                 (
                     (p.published = 1 AND p.deleted IS NULL)
@@ -316,6 +316,73 @@ SQL;
         return $this->dataObjects;
     }
 
-    
+    function deleteAction() {
+        // Responds to a DELETE request to delete a resouce.
+        // Performs a "soft delete" of the page specified in request parameters.
+
+        // Connect to SQL
+        $sqlConn = $this->pageViewReference->getSQLConn();
+        
+        // The blogID should be set in the URL parameters.
+        $blogID = $this->validateIntParameter('id');
+
+        
+        // Go through authentication/validation sequence
+        do {
+            // Authenticate the user.
+            $userID = $this->authenticateUser();
+            if (empty($userID)) {
+                // Authentication failed.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                $this->statusMessage = 'Access denied. Go away.';
+                $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+
+            // Check that the user has access to the blog page (and that it exists).
+            $sql = <<<SQL
+            SELECT
+                 p.page_id
+            FROM blogs b
+            JOIN pages p ON b.page_id = p.page_id
+            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
+            LEFT JOIN users u ON pua.user_id = u.user_id
+            WHERE
+                b.blog_id = :blogID
+                AND
+                (
+                    (p.published = 1 AND p.deleted IS NULL)
+                    OR
+                    pua.user_id IS NOT NULL
+                    OR
+                    u.is_admin = TRUE
+                )
+SQL;
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
+            $result = $stmt->fetchall();
+            
+            if (!$result) {
+                // No access or blog doesn't exist? Return a 404 error.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
+
+            // So far so good - delete the page
+            $pageID = $result[0][0];
+            // Note: sp_delete_page is recursive; it also soft-deletes any children the page has.
+            $sql = "CALL sp_delete_page(:pageID)";
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute(array('pageID' => $pageID));
+            
+            // set up the response.
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
+            $this->dataObjects = array();
+            
+        } while (false);
+
+        return $this->dataObjects;
+            
+    }
 }
 
