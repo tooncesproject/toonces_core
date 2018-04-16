@@ -302,7 +302,7 @@ SQL;
             $pageID = $result[0][0];
             $sql = "UPDATE pages SET page_title = :blogName WHERE page_id = :pageID";
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute(array('blogTitle' => $this->dataObjects['blogTitle'], 'pageID' => $pageID));
+            $stmt->execute(array('blogName' => $this->dataObjects['blogName'], 'pageID' => $pageID));
             
             // return the updated blog record.
             // Return the newly created blog.
