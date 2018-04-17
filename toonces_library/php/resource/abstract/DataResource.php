@@ -15,6 +15,7 @@ abstract class DataResource extends Resource implements iResource
     var $resourceID;
     var $statusMessage = '';
     var $httpStatus;
+    var $httpMethod;
     var $sessionManager;
     var $resourceURL;
     var $resourceURI;
@@ -155,9 +156,12 @@ abstract class DataResource extends Resource implements iResource
             // Build the full URL path
             $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
             $this->resourceURL = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceURI;
+            
+            // Acquire the HTTP verb from the server if not set externally.
+            if (!$this->httpMethod)
+                $this->httpMethod = $_SERVER['REQUEST_METHOD'];
         
-            $method = $_SERVER['REQUEST_METHOD'];
-            switch ($method) {
+            switch ($this->httpMethod) {
                 case 'GET':
                     $this->getAction();
                     break;
@@ -177,6 +181,9 @@ abstract class DataResource extends Resource implements iResource
                 case 'CONNECT':
                     $this->connectAction();
                     break;
+                default:
+                    // If not supported, throw an exception.
+                    throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
             }
         } else {
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
