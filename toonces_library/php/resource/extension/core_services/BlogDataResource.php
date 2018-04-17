@@ -95,7 +95,7 @@ SQL;
                 $blogPostResource = new BlogPostDataResource($this->pageViewReference);
                 $blogPostResource->resourceURI = 'coreservices/blogposts/';
                 $blogPostResource->parameters = array('blog_id' => $row[0]);
-                $blogPost = $blogPostResource->getResource();
+                $blogPost = $blogPostResource->getAction();
 
                 // Append the blog post record to the blog record
                 if ($blogPost)
