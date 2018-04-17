@@ -334,9 +334,9 @@ SQL;
             $sql = <<<SQL
             UPDATE blog_posts
             SET
-                title = :title
-                body = :body
-                published = :published
+                 title = :title
+                ,body = :body
+                ,published = :published
             WHERE blog_post_id = :blogPostID;
 SQL;
             $stmt = $sqlConn->prepare($sql);
