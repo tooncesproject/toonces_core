@@ -195,7 +195,7 @@ SQL;
                 ,:userID                -- param_user_id BIGINT
                 ,:title                 -- param_title VARCHAR(50)
                 ,:body                  -- param_body TEXT
-                ,'BlogPageBuilder'      -- param_pagebuilder_class VARCHAR(50)
+                ,'BlogPostSinglePageBuilder'  -- param_pagebuilder_class VARCHAR(50)
                 ,''                     -- param_thumbnail_image_vector VARCHAR(50) (note: not implemented)
             )
 SQL;
@@ -208,12 +208,12 @@ SQL;
                 'body' => $this->dataObjects['body'],
             );
             
-            $blogPostID;
+            $blogPostPageID;
             try {
                 $stmt = $sqlConn->prepare($sql);
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchall();
-                $blogPostID = $result[0][0];
+                $blogPostPageID = $result[0][0];
             } catch (PDOException $e) {
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
@@ -221,6 +221,13 @@ SQL;
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }
+            
+            // Query the database for the BlogPostID, because goddammit
+            $sql = "SELECT blog_post_id FROM blog_posts WHERE page_id = :pageID";
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute(array('pageID' => $blogPostPageID));
+            $result = $stmt->fetchAll();
+            $blogPostID = $result[0][0];
             
             // Return the newly created blog post.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
