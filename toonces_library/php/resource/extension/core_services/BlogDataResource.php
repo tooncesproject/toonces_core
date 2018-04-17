@@ -49,8 +49,6 @@ class BlogDataResource extends DataResource implements iResource {
             JOIN pages p ON b.page_id = p.page_id
             -- 1st join to PHB is to get the parent page ID
             LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
-            -- 2nd join to PHB is to get any children
-            LEFT JOIN page_hierarchy_bridge phb2 ON p.page_id = phb2.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
             LEFT JOIN users u ON pua.user_id = u.user_id
             WHERE
@@ -80,24 +78,20 @@ SQL;
         $responseArray = NULL;
         
         if (count($result) > 0) {
-            // TODO: fix query so it doesn't include children
-            $lastID = null;
             foreach ($result as $row) {
                 // If the outer record has not repeated, create a 'blog' record in the array.
-                if ($row['blog_id'] != $lastID) {
-                    $blog = array(
-                         'url' => $this->resourceURL . '?id=' . strval($row[0])
-                        ,'pageURI' => GrabPageURL::getURL($row[3], $sqlConn)
-                        ,'blogName' => $row[1]
-                        ,'blogDescription' => $row[2]
-                        ,'pageID' => $row[3]
-                        ,'ancestorPageID' => $row[4]
-                        ,'blogPosts' => array()
-                    );
-                }
+                $blog = array(
+                     'url' => $this->resourceURL . '?id=' . strval($row[0])
+                    ,'pageURI' => GrabPageURL::getURL($row[3], $sqlConn)
+                    ,'blogName' => $row[1]
+                    ,'blogDescription' => $row[2]
+                    ,'pageID' => $row[3]
+                    ,'ancestorPageID' => $row[4]
+                    ,'blogPosts' => array()
+                );
+
                 $this->dataObjects[$row[0]] = $blog;
 
-                // If the row contains a "child" (AKA blog post), append it to the blog record.
                 $blogPostResource = new BlogPostDataResource($this->pageViewReference);
                 $blogPostResource->resourceURI = 'coreservices/blogposts/';
                 $blogPostResource->parameters = array('blog_id' => $row[0]);

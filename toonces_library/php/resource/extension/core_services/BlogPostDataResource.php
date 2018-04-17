@@ -27,7 +27,7 @@ class BlogPostDataResource extends DataResource implements iResource {
         $this->fields['body'] = $body;
         
         $blogID = new IntegerFieldValidator();
-        $this->fields['blog_id'] = $blogID;
+        $this->fields['blogID'] = $blogID;
         
         # todo: make a boolean field validator??
         $published = new IntegerFieldValidator();

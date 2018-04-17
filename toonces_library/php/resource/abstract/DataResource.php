@@ -221,51 +221,11 @@ abstract class DataResource extends Resource implements iResource
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function optionsAction() {
-        // Automatically scans the "action" methods to test whether they are implemented.
-        $notAllowedStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-        $allowedVerbs = array();
-
-        // GET?
-        $this->getAction();
-        if ($this->httpStatus != $notAllowedStatus)
-            array_push($allowedVerbs, 'GET');
-        
-        // POST?
-        $this->postAction();
-        if ($this->httpStatus != $notAllowedStatus)
-            array_push($allowedVerbs, 'POST');
-        
-        // HEAD?
-        $this->headAction();
-        if ($this->httpStatus != $notAllowedStatus)
-            array_push($allowedVerbs, 'HEAD');
-
-        // PUT?
-        $this->putAction();
-        if ($this->httpStatus != $notAllowedStatus)
-            array_push($allowedVerbs, 'PUT');
-                
-        // DELETE?
-        $this->deleteAction();
-        if ($this->httpStatus != $notAllowedStatus)
-            array_push($allowedVerbs, 'DELETE');
-        
-        // CONNECT?
-        $this->connectAction();
-        if ($this->httpStatus != $notAllowedStatus)
-            array_push($allowedVerbs, 'CONNECT');
-        
-        // OPTIONS (obviously)
-        array_push($allowedVerbs, 'OPTIONS');
-        
-        // clear the data array, transmit a header and return.
-        $this->dataObjects = array();
-        $headerString = 'Allow:' . implode(',', $allowedVerbs);
-        header($headerString);
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-        return $this->dataObjects;
-        
+        // Override to define the resource's response to a OPTIONS request.
+        // Default behavior is a 'method not allowed' error (if it isn't implemented).
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
+    
 }
