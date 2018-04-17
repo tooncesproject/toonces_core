@@ -78,22 +78,16 @@ BEGIN
         page_id = param_page_id
     ;
 
-    -- Soft-delete blog_posts record: Set page_id to zero (we won't delete the content).
-    UPDATE
+    -- Hard-delete any record in blog posts, if it exists.
+    DELETE FROM
         toonces.blog_posts
-    SET
-         page_id = 0
-        ,deleted = CURRENT_TIMESTAMP()
     WHERE
-        page_id = param_page_id
+        page_id = param_page_id;
     ;
     
-    -- Soft-delete blogs record: Set page_id to zero (we won't delete the content).
-    UPDATE
+    -- Hard-delete any record in blogs, if it exists
+    DELETE FROM
         toonces.blogs
-    SET
-         page_id = 0
-        ,deleted = CURRENT_TIMESTAMP()
     WHERE
         page_id = param_page_id
     ;
