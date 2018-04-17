@@ -82,7 +82,7 @@ BEGIN
     DELETE FROM
         toonces.blog_posts
     WHERE
-        page_id = param_page_id;
+        page_id = param_page_id
     ;
     
     -- Hard-delete any record in blogs, if it exists
