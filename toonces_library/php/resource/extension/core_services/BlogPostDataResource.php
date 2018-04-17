@@ -208,19 +208,20 @@ SQL;
                 'body' => $this->dataObjects['body'],
             );
             
-            $blogPostPageID;
-            try {
-                $stmt = $sqlConn->prepare($sql);
-                $stmt->execute($sqlParams);
-                $result = $stmt->fetchall();
-                $blogPostPageID = $result[0][0];
-            } catch (PDOException $e) {
+
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute($sqlParams);
+            $result = $stmt->fetchall();
+            $blogPostPageID = $result[0][0];
+
+            if (!$blogPostPageID) {
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 $this->statusMessage = 'Creation of blog in database failed, possibly due to duplicate blog post title or other database error. Try a different title.';
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }
+
             
             // Query the database for the BlogPostID, because goddammit
             $sql = "SELECT blog_post_id FROM blog_posts WHERE page_id = :pageID";
