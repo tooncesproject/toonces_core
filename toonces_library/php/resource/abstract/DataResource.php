@@ -99,7 +99,7 @@ abstract class DataResource extends Resource implements iResource
                 
                 // Is the POST/PUT data missing any required fields?
                 $fieldExists = array_key_exists($key, $data);
-                if (!$field->alowNull && !$fieldExists) {
+                if (!$field->allowNull && !$fieldExists) {
                     // Required key missing
                     array_push($missingFields, $key);
                 }
