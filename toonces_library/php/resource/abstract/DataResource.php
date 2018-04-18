@@ -138,7 +138,8 @@ abstract class DataResource extends Resource implements iResource
         
         return $postValid;
     }
-    
+
+
     public function addElement ($element) {
         array_push($this->dataObjects,$element);
     }
@@ -160,31 +161,26 @@ abstract class DataResource extends Resource implements iResource
             // Acquire the HTTP verb from the server if not set externally.
             if (!$this->httpMethod)
                 $this->httpMethod = $_SERVER['REQUEST_METHOD'];
-        
-            switch ($this->httpMethod) {
-                case 'GET':
-                    $this->getAction();
-                    break;
-                case 'POST':
-                    $this->postAction();
-                    break;
-                case 'HEAD':
-                    $this->headAction();
-                    break;
-                case 'PUT':
-                    $this->putAction();
-                    break;
-                case 'OPTIONS':
-                    break;
-                case 'DELETE':
-                    $this->deleteAction();
-                case 'CONNECT':
-                    $this->connectAction();
-                    break;
-                default:
-                    // If not supported, throw an exception.
-                    throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
-            }
+
+            // Act depending on the HTTP verb.
+            // Note: Not using a switch statement here to preserve object state.
+            if ($this->httpMethod == 'GET')
+                $this->getAction();
+            elseif ($this->httpMethod == 'POST')
+                $this->postAction();
+            elseif ($this->httpMethod == 'HEAD')
+                $this->headAction();
+            elseif ($this->httpMethod == 'PUT')
+                $this->putAction();
+            elseif ($this->httpMethod == 'OPTIONS')
+                $this->optionsAction();
+            elseif ($this->httpMethod == 'DELETE')
+                $this->deleteAction();
+            elseif ($this->httpMethod == 'CONNECT')
+                $this->connectAction();
+            else
+                throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
+
         } else {
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Missing required HTTP headers.';
