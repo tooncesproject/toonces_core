@@ -10,10 +10,6 @@
 require_once LIBPATH.'php/toonces.php';
 
 class BlogsAPIPageBuilder extends APIPageBuilder {
-    
-    var $apiDelegate;
-    var $conn;
-
         
     function buildPage() {
         //  It's a BlogDataResource

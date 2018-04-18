@@ -21,7 +21,7 @@ class APIPageView extends DataResource implements iPageView, iResource
     public $pageTypeID;
     
     public $sessionManager;
-    var $apiVersion;
+    public $apiVersion;
     var $queryArray = array();
     var $headers = array();
     var $HTTPMethod;
@@ -87,8 +87,9 @@ class APIPageView extends DataResource implements iPageView, iResource
     
     public function __construct($pageViewPageId) {
         $this->pageId = $pageViewPageId;
-        parse_str($_SERVER['QUERY_STRING'], $this->queryArray);
-        $this->HTTPMethod = $_SERVER['REQUEST_METHOD'];   
+        // Detect API version
+        $headers = apache_request_headers();
+        $this->apiVersion = $headers['Accept-version'];
     }
 
     public function getResource() {
