@@ -351,9 +351,10 @@ SQL;
 SQL;
             $stmt = $sqlConn->prepare($sql);
             $sqlParams = array(
-                'title' => $this->dataObjects['title'],
-                'body' => $this->dataObjects['body'],
-                'published' => $this->dataObjects['published']
+                 'title' => $this->dataObjects['title']
+                ,'body' => $this->dataObjects['body']
+                ,'published' => $this->dataObjects['published']
+                ,'blogPostID' => $blogPostID
             );
             $stmt->execute($sqlParams);
 
