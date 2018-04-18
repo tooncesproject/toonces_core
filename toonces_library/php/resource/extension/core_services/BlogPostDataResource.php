@@ -30,7 +30,9 @@ class BlogPostDataResource extends DataResource implements iResource {
         $this->fields['blogID'] = $blogID;
 
         $published = new BooleanFieldValidator();
+        $published->allowNull = true;
         $this->fields['published'] = $published;
+        
     }
 
     function getAction() {
