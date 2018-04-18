@@ -28,6 +28,7 @@ include_once LIBPATH.'php/utility/abstract/FieldValidator.php';
 include_once LIBPATH.'php/utility/interface/iFieldValidator.php';
 include_once LIBPATH.'php/utility/StringFieldValidator.php';
 include_once LIBPATH.'php/utility/IntegerFieldValidator.php';
+include_once LIBPATH.'php/utility/BooleanFieldValidator.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
 include_once LIBPATH.'php/resource/APIPageView.php';
