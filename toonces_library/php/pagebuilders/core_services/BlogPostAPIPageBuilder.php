@@ -17,8 +17,8 @@ class BlogPostAPIPageBuilder extends APIPageBuilder {
         
     function buildPage() {
         //  It's a BlogPostDataResource
-        $blogDataResource = new BlogPostDataResource($this->pageViewReference);
-        array_push($this->resourceArray, $blogDataResource);
+        $blogPostDataResource = new BlogPostDataResource($this->pageViewReference);
+        array_push($this->resourceArray, $blogPostDataResource);
         return $this->resourceArray;
             
     }

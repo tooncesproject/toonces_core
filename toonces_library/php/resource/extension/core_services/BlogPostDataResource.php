@@ -343,9 +343,14 @@ SQL;
             $stmt->execute($this->dataObjects);
 
             // Second: the page record.
-            $sql = "UPDATE pages SET page_title = :title WHERE page_id = :pageID";
+            $sql = "UPDATE pages SET page_title = :title, published = :published WHERE page_id = :pageID";
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute(array('title' => $this->dataObjects['title'], 'pageID' => $resultPageID));
+            $sqlParams = array(
+                'title' => $this->dataObjects['title'],
+                'published' => $this->dataObjects['published'],
+                'pageID' => $this->dataObjects['pageID']
+            );
+            $stmt->execute($sqlParams);
             
             // woot!
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
