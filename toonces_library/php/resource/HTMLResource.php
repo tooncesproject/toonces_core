@@ -2,7 +2,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class HTMLResource implements iResource {
+class HTMLResource extends Resource implements iResource {
 
 	var $html;
 	var $htmlHeader;

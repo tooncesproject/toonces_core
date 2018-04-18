@@ -347,7 +347,7 @@ SQL;
             $sqlParams = array(
                 'title' => $this->dataObjects['title'],
                 'published' => $this->dataObjects['published'],
-                'pageID' => $this->dataObjects['pageID']
+                'pageID' => $resultPageID
             );
             $stmt->execute($sqlParams);
             
