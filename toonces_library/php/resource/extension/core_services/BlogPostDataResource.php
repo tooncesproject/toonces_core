@@ -353,7 +353,7 @@ SQL;
             $sqlParams = array(
                  'title' => $this->dataObjects['title']
                 ,'body' => $this->dataObjects['body']
-                ,'published' => $this->dataObjects['published']
+                ,'published' => intval($this->dataObjects['published'])
                 ,'blogPostID' => $blogPostID
             );
             $stmt->execute($sqlParams);
@@ -362,20 +362,22 @@ SQL;
             $sql = "UPDATE pages SET page_title = :title, published = :published WHERE page_id = :pageID";
             $stmt = $sqlConn->prepare($sql);
             $sqlParams = array(
-                'title' => $this->dataObjects['title'],
-                'published' => $this->dataObjects['published'],
-                'pageID' => $resultPageID
+                'title' => $this->dataObjects['title']
+                ,'published' => intval($this->dataObjects['published'])
+                ,'pageID' => $resultPageID
             );
             $stmt->execute($sqlParams);
             
             // woot!
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             
+            // Clear the data array and serialize the updated record.
+            $this->dataObjects = array();
+            $this->getAction();
+            
         } while (false);
         
-        // Clear the data array and eturn the updated record.
-        $this->dataObjects = array();
-        return $this->getAction();
+        return $this->dataObjects;
     }
 
     function deleteAction() {

@@ -23,7 +23,7 @@ class BooleanFieldValidator extends FieldValidator implements iFieldValidator {
                 // Data is a string?
                 if (!is_bool($data)) {
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                    $this->statusMessage = 'This object must be an Integer.';
+                    $this->statusMessage = 'This object must be a Boolean.';
                     break;
                 }
                 
