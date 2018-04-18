@@ -59,6 +59,7 @@ class BlogPostDataResource extends DataResource implements iResource {
                 ,u.user_id
                 ,bp.title
                 ,bp.body
+                ,p.published
                 ,bp.thumbnail_image_vector
             FROM blog_posts bp
             JOIN pages p ON p.page_id = bp.page_id
@@ -103,7 +104,8 @@ SQL;
                     ,'user_id' => $row[6]
                     ,'title' => $row[7]
                     ,'body' => $row[8]
-                    ,'thumbnail_image_vector' => $row[9]
+                    ,'published' => $row[9]
+                    ,'thumbnail_image_vector' => $row[10]
                 );
                 $this->dataObjects[$row[0]] = $blogPost;
             }
@@ -270,7 +272,14 @@ SQL;
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }
-                
+
+            // Reject the PUT if the 'id' parameter is not set.
+            if (!isset($blogPostID)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+                $this->statusMessage = 'PUT requests require the parameter "id" in the query string to specify a blog post to be updated.';
+                break;
+            }
+
             // Validate fields in post data for data type
             if (!$this->validateData($this->dataObjects)) {
                 // Not valid? Respond with status message
@@ -341,7 +350,12 @@ SQL;
             WHERE blog_post_id = :blogPostID;
 SQL;
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute($this->dataObjects);
+            $sqlParams = array(
+                'title' => $this->dataObjects['title'],
+                'body' => $this->dataObjects['body'],
+                'published' => $this->dataObjects['published']
+            );
+            $stmt->execute($sqlParams);
 
             // Second: the page record.
             $sql = "UPDATE pages SET page_title = :title, published = :published WHERE page_id = :pageID";
@@ -365,7 +379,7 @@ SQL;
 
     function deleteAction() {
         // Responds to a DELETE request to delete a resouce.
-        // Performs a "soft delete" of the page specified in request parameters.
+        // Performs a "hard delete" of the page specified in request parameters.
         
         // Connect to SQL
         $sqlConn = $this->pageViewReference->getSQLConn();
@@ -386,6 +400,13 @@ SQL;
                 break;
             }
             
+            // Reject the request if the 'id' parameter is not set.
+            if (!isset($blogPostID)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+                $this->statusMessage = 'DELETE requests require the parameter "id" in the query string to specify a blog post to be deleted.';
+                break;
+            }
+
             // Check that the user has access to the blog page (and that it exists).
             $sql = <<<SQL
             SELECT
@@ -417,7 +438,7 @@ SQL;
             
             // So far so good - delete the page
             $pageID = $result[0][0];
-            // Note: sp_delete_page is recursive; it also soft-deletes any children the page has.
+            // Note: sp_delete_page is recursive; it also deletes any children the page has.
             $sql = "CALL sp_delete_page(:pageID)";
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('pageID' => $pageID));

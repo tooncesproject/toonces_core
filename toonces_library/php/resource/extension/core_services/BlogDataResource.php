@@ -204,7 +204,12 @@ SQL;
 
             try {
                 $stmt = $sqlConn->prepare($sql);
-                $stmt->execute($this->dataObjects);
+                $sqlParams = array(
+                     'ancestorPageID' => $this->dataObjects['ancestorPageID']
+                    ,'pathName' => $this->dataObjects['pathName']
+                    ,'blogName'=> $this->dataObjects['blogName']
+                );
+                $stmt->execute($sqlParams);
                 $result = $stmt->fetchall();
                 $blogID = $result[0][0];
             } catch (PDOException $e) {
@@ -255,7 +260,14 @@ SQL;
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }
-            
+
+            // Reject the PUT if the 'id' parameter is not set.
+            if (!isset($blogID)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+                $this->statusMessage = 'PUT requests require the parameter "id" in the query string to specify a blog to be updated.';
+                break;
+            }
+
             // Validate fields in PUT data for data type
             if (!$this->validateData($this->dataObjects)) {
                 // Not valid? Respond with status message
@@ -331,6 +343,13 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                 $this->statusMessage = 'Access denied. Go away.';
                 $this->dataObjects = array('status' => $this->statusMessage);
+                break;
+            }
+            
+            // id parameter must be set - reject if not.
+            if (!isset($blogID)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+                $this->statusMessage = 'DELETE requests require the parameter "id" in the query string to specify a blog to be deleted.';
                 break;
             }
 
