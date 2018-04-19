@@ -303,7 +303,6 @@ $stmt = $conn->prepare($sql);
 try {
     $stmt->execute(array('csPageId' => $csPageId));
     $result = $stmt->fetchAll();
-    $csPageId = $result[0][0];
 } catch (PDOException $e) {
     die ('Failed to create Core Services API (blogs): ' . $e->getMessage());
 }
@@ -326,7 +325,6 @@ $stmt = $conn->prepare($sql);
 try {
     $stmt->execute(array('csPageId' => $csPageId));
     $result = $stmt->fetchAll();
-    $csPageId = $result[0][0];
 } catch (PDOException $e) {
     die ('Failed to create Core Services API (blog posts): ' . $e->getMessage());
 }
