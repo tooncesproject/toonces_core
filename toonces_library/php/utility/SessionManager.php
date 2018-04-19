@@ -166,7 +166,11 @@ SQL;
         $loginAttemptId = $result[0][0];
         
 		// Check for brute-force attack
-		$bruteForce = $this->checkBruteForce();
+		$bruteForce = $this->checkBruteForce(
+		       $loginAttemptVars['httpClientIp']
+		      ,$loginAttemptVars['httpXForwardedFor']
+		      ,$loginAttemptVars['remoteAddr']
+		);
 
 		// if successful, begin session
 		$this->salt = isset($this->salt) ? $this->salt : '';
@@ -225,7 +229,12 @@ SQL;
 
 	}
 
-	function checkBruteForce() {
+	function checkBruteForce(
+	       $httpClientIp
+	      ,$httpXForwardedFor
+	      ,$remoteAddr
+	    )
+	{
 
 		// Check for prior login attempts
 		$tenMinutesAgo = date('Y-m-d h:i:s', time() - (10 * 60));
@@ -235,40 +244,37 @@ SQL;
 			$checkUserID = 0;
 		}
 
-		$SQL = <<<SQL
+		$sql = <<<SQL
 		SELECT
 			COUNT(*) AS attemptcount
 		FROM
-			toonces.login_attempts
+			login_attempt
 		WHERE
-			attempt_time >= '%s'
+			attempt_time >= :attemptTime
         AND
             attempt_success = FALSE
 		AND (
-			http_client_ip = INET_ATON('%s')
+			http_client_ip = INET_ATON(:httpClientIp)
 		OR
-			http_x_forwarded_for = INET_ATON('%s')
+			http_x_forwarded_for = INET_ATON(:httpXForwardedFor)
 		OR
-			remote_addr = INET_ATON('%s')
+			remote_addr = INET_ATON(:remoteAddr)
 		OR
-			attempt_user_id = %s
+			attempt_user_id = :checkUserId
 		);
 SQL;
 
-		$SQL = sprintf
-		(
-			 $SQL
-			,$tenMinutesAgo
-			,$loginAttemptVars[':http_client_ip']
-			,$loginAttemptVars[':http_x_forwarded_for']
-			,$loginAttemptVars[':remote_addr']
-			,$checkUserID
+		$stmt = $this->conn->prepare($sql);
+		$sqlParams = array(
+			 'attemptTime' => $tenMinutesAgo
+			,'httpClientIp' => $httpClientIp
+			,'httpXForwardedFor' => $httpXForwardedFor
+			,'remoteAddr' => $remoteAddr
+			,'checkUserId' => $checkUserID
 		);
-
-		$checkAttemptResponse = $this->conn->query($SQL);
-
-		foreach ($checkAttemptResponse as $row)
-			$attemptCount = $row['attemptcount'];
+        $stmt->execute($sqlParams);
+		$result = $stmt->fetchAll();
+        $attemptCount = $result[0][0];
 
 		// If more than 30 attempts in the past 10 minutes, reject login attempt.
 		if ($attemptCount > 30) {
