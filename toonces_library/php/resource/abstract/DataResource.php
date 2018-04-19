@@ -34,7 +34,7 @@ abstract class DataResource extends Resource implements iResource
             $email = $_SERVER['PHP_AUTH_USER'];
             $pw = $_SERVER['PHP_AUTH_PW'];
                 
-            $loginSuccess = $this->sessionManager->login($email, $pw);
+            $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->pageId);
             if ($loginSuccess)
                 $userID = $this->sessionManager->userId;
         }

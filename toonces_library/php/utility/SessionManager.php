@@ -98,7 +98,7 @@ SQL;
 	}
 
 	// login
-	function login($email,$formPassword) {
+	function login($email,$formPassword, $pageId) {
 
 		//vars
 		$userId = 0;
@@ -135,8 +135,42 @@ SQL;
 			$this->userIsAdmin = $row['is_admin'];
 		}
 
-		// Check for brute-force attack and record login attempt
-		$bruteForce = $this->checkBruteForce();
+		// Record login attempt
+		$loginAttemptId = null;
+		$sql = <<<SQL
+        CALL sp_record_login_attempt
+        (   
+             :pageId    		              -- param_attempt_page_id     BIGINT
+            ,:httpMethod		              -- param_http_method              VARCHAR(10)
+            ,:userId 		                 -- param_attempt_user_id          BIGINT UNSIGNED
+            ,:attemptTime		             -- param_attempt_time             TIMESTAMP
+            ,INET_ATON(:httpClientIp)		    -- param_http_client_ip           INT UNSIGNED
+            ,INET_ATON(:httpXForwardedFor)		-- param_http_x_forwarded_for     INT UNSIGNED
+            ,INET_ATON(:httpRemoteAddr)		      -- param_remote_addr              INT UNSIGNED
+            ,:userAgent		                   -- param_user_agent               VARCHAR(1000)
+        )
+SQL;
+		$stmt = $this->conn->prepare($sql);
+		$loginAttemptVars = array(
+		     'pageId' => $pageId
+		    ,'httpMethod' => $_SERVER['REQUEST_METHOD']
+		    ,'userId' => isset($this->userId) ? strval($this->userId) : null
+		    ,'attemptTime' => date('Y-m-d h:i:s', time())
+		    ,'httpClientIp' => isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : null
+		    ,'httpXForwardedFor' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null
+		    ,'httpRemoteAddr' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null
+		    ,'userAgent' => $_SERVER['HTTP_USER_AGENT']
+		);
+        $stmt->execute($loginAttemptVars);
+        $result = $stmt->fetchAll();
+        $loginAttemptId = $result[0][0];
+        
+		// Check for brute-force attack
+		$bruteForce = $this->checkBruteForce(
+		       $loginAttemptVars['httpClientIp']
+		      ,$loginAttemptVars['httpXForwardedFor']
+		      ,$loginAttemptVars['remoteAddr']
+		);
 
 		// if successful, begin session
 		$this->salt = isset($this->salt) ? $this->salt : '';
@@ -145,7 +179,10 @@ SQL;
 			$loginSuccess = 1;
 			// Set login state
 			$this->loginString = hash('sha512',$dbPassword, $_SERVER['HTTP_USER_AGENT']);
-
+			// Update the record in login_attempt indicating success
+			$sql = "UPDATE login_attempt SET attempt_success = TRUE WHERE login_attempt_id = :loginAttemptId";
+			$stmt = $this->conn->prepare($sql);
+			$stmt->execute(array('loginAttemptId' => $loginAttemptId));
 		} else {
 			$loginSuccess = 0;
 		}
@@ -192,40 +229,12 @@ SQL;
 
 	}
 
-	function checkBruteForce() {
-
-		// build query array
-		$loginAttemptVars = array();
-
-		$loginAttemptVars[':attempt_user_id'] = isset($this->userId) ? strval($this->userId) : null;
-		$loginAttemptVars[':attempt_time'] = date('Y-m-d h:i:s', time());
-		$loginAttemptVars[':http_client_ip'] = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : null;
-		$loginAttemptVars[':http_x_forwarded_for'] = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null;
-		$loginAttemptVars[':remote_addr'] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
-		$loginAttemptVars[':user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-
-		// Insert login attempt record
-		$stmt = <<<SQL
-		INSERT INTO toonces.login_attempts
-		(
-			 attempt_user_id
-			,attempt_time
-			,http_client_ip
-			,http_x_forwarded_for
-			,remote_addr
-			,user_agent
-		) VALUES (
-			 :attempt_user_id
-			,:attempt_time
-			,INET_ATON(:http_client_ip)
-			,INET_ATON(:http_x_forwarded_for)
-			,INET_ATON(:remote_addr)
-			,:user_agent
-		)
-SQL;
-
-		$stmt = $this->conn->prepare($stmt,$loginAttemptVars);
-		$stmt->execute($loginAttemptVars);
+	function checkBruteForce(
+	       $httpClientIp
+	      ,$httpXForwardedFor
+	      ,$remoteAddr
+	    )
+	{
 
 		// Check for prior login attempts
 		$tenMinutesAgo = date('Y-m-d h:i:s', time() - (10 * 60));
@@ -235,38 +244,37 @@ SQL;
 			$checkUserID = 0;
 		}
 
-		$SQL = <<<SQL
+		$sql = <<<SQL
 		SELECT
 			COUNT(*) AS attemptcount
 		FROM
-			toonces.login_attempts
+			login_attempt
 		WHERE
-			attempt_time >= '%s'
+			attempt_time >= :attemptTime
+        AND
+            attempt_success = FALSE
 		AND (
-			http_client_ip = INET_ATON('%s')
+			http_client_ip = INET_ATON(:httpClientIp)
 		OR
-			http_x_forwarded_for = INET_ATON('%s')
+			http_x_forwarded_for = INET_ATON(:httpXForwardedFor)
 		OR
-			remote_addr = INET_ATON('%s')
+			remote_addr = INET_ATON(:remoteAddr)
 		OR
-			attempt_user_id = %s
+			attempt_user_id = :checkUserId
 		);
 SQL;
 
-		$SQL = sprintf
-		(
-			 $SQL
-			,$tenMinutesAgo
-			,$loginAttemptVars[':http_client_ip']
-			,$loginAttemptVars[':http_x_forwarded_for']
-			,$loginAttemptVars[':remote_addr']
-			,$checkUserID
+		$stmt = $this->conn->prepare($sql);
+		$sqlParams = array(
+			 'attemptTime' => $tenMinutesAgo
+			,'httpClientIp' => $httpClientIp
+			,'httpXForwardedFor' => $httpXForwardedFor
+			,'remoteAddr' => $remoteAddr
+			,'checkUserId' => $checkUserID
 		);
-
-		$checkAttemptResponse = $this->conn->query($SQL);
-
-		foreach ($checkAttemptResponse as $row)
-			$attemptCount = $row['attemptcount'];
+        $stmt->execute($sqlParams);
+		$result = $stmt->fetchAll();
+        $attemptCount = $result[0][0];
 
 		// If more than 30 attempts in the past 10 minutes, reject login attempt.
 		if ($attemptCount > 30) {
