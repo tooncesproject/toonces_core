@@ -151,7 +151,7 @@ for ($i = 2; $i < count($procedureScripts); ++$i) {
     }
     // Not all errors raise an exeption, even when PDO is set to do so. PDO sucks.
     if ($isError == 1) {
-        throw new Exception('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+        throw new Exception('SQL execution failed for file ' . $path . PHP_EOL);
     }
 }
 
