@@ -93,7 +93,7 @@ abstract class DataResource extends Resource implements iResource
             SELECT
                  p.page_id
                 ,p.pathname
-                ,p.title
+                ,p.page_title
             FROM page_hierarchy_bridge phb
             JOIN pages p ON phb.descendant_page_id = p.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
