@@ -153,6 +153,7 @@ SQL;
 		$stmt = $this->conn->prepare($sql);
 		$loginAttemptVars = array(
 		     'pageId' => $pageId
+		    ,'httpMethod' => $_SERVER['REQUEST_METHOD']
 		    ,'userId' => isset($this->userId) ? strval($this->userId) : null
 		    ,'attemptTime' => date('Y-m-d h:i:s', time())
 		    ,'httpClientIp' => isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : null
