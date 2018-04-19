@@ -95,17 +95,17 @@ SQL;
             foreach ($result as $row) {
                 $blogPost = array(
                      'url' => $this->resourceURL . '?id=' . strval($row[0])
-                    ,'blog_id' => $row[1]
-                    ,'page_id' => $row[2]
-                    ,'page_uri' => GrabPageURL::getURL($row[2], $sqlConn)
-                    ,'created_dt' => $row[3]
-                    ,'modified_dt' => $row[4]
+                    ,'blogID' => $row[1]
+                    ,'pageID' => $row[2]
+                    ,'pageUri' => GrabPageURL::getURL($row[2], $sqlConn)
+                    ,'createdDate' => $row[3]
+                    ,'modifiedDate' => $row[4]
                     ,'deleted' => $row[5]
-                    ,'user_id' => $row[6]
+                    ,'userID' => $row[6]
                     ,'title' => $row[7]
                     ,'body' => $row[8]
                     ,'published' => $row[9]
-                    ,'thumbnail_image_vector' => $row[10]
+                    ,'thumbnailImageVector' => $row[10]
                 );
                 $this->dataObjects[$row[0]] = $blogPost;
             }
