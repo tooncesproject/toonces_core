@@ -22,7 +22,6 @@ CREATE FUNCTION CREATE_PAGE  (
     ,page_link_text VARCHAR(50)
     ,pagebuilder_class VARCHAR(50)
     ,pageview_class VARCHAR(50)
-    ,css_stylesheet VARCHAR(100)
     ,redirect_on_error BOOL
     ,published BOOL
     ,pagetype_id BIGINT
@@ -100,7 +99,6 @@ BEGIN
             ,page_link_text
             ,pagebuilder_class
             ,pageview_class
-            ,css_stylesheet
             ,redirect_on_error
             ,published
             ,pagetype_id
@@ -110,7 +108,6 @@ BEGIN
             ,page_link_text
             ,pagebuilder_class
             ,pageview_class
-            ,css_stylesheet
             ,redirect_on_error
             ,published
             ,pagetype_id

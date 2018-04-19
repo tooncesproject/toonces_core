@@ -22,8 +22,8 @@ class UserAdminPageBuilder extends AdminPageBuilder
 		</div>
 HTML;
 
-	$topCopyBlock = new Element($this->pageViewReference);
-	$topCopyBlock->setHTML($html);
+	$topCopyBlock = new HTMLResource($this->pageViewReference);
+	$topCopyBlock->html = $html;
 
 	$this->toolElement->addElement($topCopyBlock);
 	$this->toolElement->addElement($this->buildUserList());
@@ -44,7 +44,7 @@ HTML;
 		FROM
 			toonces.users;
 SQL;
-		$this->conn = $this->pageViewReference->conn;
+		$this->conn = $this->pageViewReference->getSQLConn();
 		$result = $this->conn->query($SQL);
 		
 		// html template for users
@@ -61,10 +61,10 @@ SQL;
 		}
 		$table = $table.'</table></div>';
 		
-		$userListElement = new Element($this->pageViewReference);
-		$userListElement->setHTML($table);
-		$userListElement->setHtmlHeader('<div class="copy_block">');
-		$userListElement->setHtmlFooter('</div>');
+		$userListElement = new HTMLResource($this->pageViewReference);
+		$userListElement->html = $table;
+		$userListElement->htmlHeader = '<div class="copy_block">';
+		$userListElement->htmlFooter = '</div>';
 		
 		return $userListElement;
 		

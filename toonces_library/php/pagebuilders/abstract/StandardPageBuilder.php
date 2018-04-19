@@ -19,19 +19,20 @@ abstract class StandardPageBuilder extends PageBuilder {
 	var $headerHTML;
 	var $footerHTML;
 	var $headTagsHTML;
-	var $bodyViewElement;
+	var $bodyHTMLViewResource;
+	var $cssStyleSheet;
 
 	function createContentElement() {
 
 		// Insert code here to create a content element
-		// $this->contentElement = new Element($this->pageViewReference);
+		// $this->contentElement = new HTMLResource($this->pageViewReference);
 
 	}
 
 	function buildPage() {
 
-		// Instantiate the BodyViewElement
-		$this->bodyViewElement = new BodyViewElement($this->pageViewReference);
+		// Instantiate the BodyHTMLViewResource
+		$this->bodyHTMLViewResource = new BodyHTMLViewResource($this->pageViewReference);
 
 		// Acquire the toonces-configuration.xml file
 		$xmlReader = new XMLReader();
@@ -48,6 +49,9 @@ abstract class StandardPageBuilder extends PageBuilder {
 				
 				$headTagsHTMLFile = $xmlReader->getAttribute('head_tags_file');
 				$this->headTagsHTML = file_get_contents(ROOTPATH.$headTagsHTMLFile);
+				
+				$this->cssStyleSheet = $xmlReader->getAttribute('css_stylesheet_file');
+				
 
 				$pageNode = $xmlReader->expand();
 				$subNodes = $pageNode->childNodes;
@@ -61,7 +65,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 								$nodeAttributes = $attributeNode->attributes;
 								$keyItem = $nodeAttributes->getNamedItem('key');
 								$valueItem = $nodeAttributes->getNamedItem('value');
-								$this->bodyViewElement->addBodyAttribute($keyItem->nodeValue, $valueItem->nodeValue);
+								$this->bodyHTMLViewResource->addBodyAttribute($keyItem->nodeValue, $valueItem->nodeValue);
 							}
 						}
 					}
@@ -81,45 +85,44 @@ abstract class StandardPageBuilder extends PageBuilder {
 
 	function buildElementArray() {
 		// get static/generic html header, create as element
-		$htmlHeaderElement = new Element($this->pageViewReference);
-		$htmlHeaderElement->setHTML(file_get_contents(LIBPATH.'/html/generic_html_header.html'));
+		$htmlHeaderElement = new HTMLResource($this->pageViewReference);
+		$htmlHeaderElement->html = file_get_contents(LIBPATH.'/html/generic_html_header.html');
 		array_push($this->elementArray, $htmlHeaderElement);
 		$headElement = new HeadElement($this->pageViewReference);
 
 		// get head attributes
-		$headElement->setPageTitle($this->pageViewReference->getPageTitle());
-		$headElement->setStyleSheet($this->pageViewReference->getStyleSheet());
-		$headElement->setHeadTags($this->headTagsHTML);
+		$headElement->pageTitle = $this->pageViewReference->getPageTitle();
+		$headElement->styleSheet = $this->cssStyleSheet;
+		$headElement->headTags = $this->headTagsHTML;
 		array_push($this->elementArray, $headElement);
 
 		// Add everything below to the Body Element
 
 		// If there's a toolbar, add it here.
-		if (isset($this->toolbarElement)) {
-			$this->bodyViewElement->addElement($this->toolbarElement);
-		}
+		if (isset($this->toolbarElement))
+			$this->bodyHTMLViewResource->addElement($this->toolbarElement);
 
 		// After the toolbar, add the header element
-		$pageHeader = new Element($this->pageViewReference);
-		$pageHeader->setHTML($this->headerHTML);
-		$this->bodyViewElement->addElement($pageHeader);
+		$pageHeader = new HTMLResource($this->pageViewReference);
+		$pageHeader->html = $this->headerHTML;
+		$this->bodyHTMLViewResource->addElement($pageHeader);
 
 		$pageId = $this->pageViewReference->pageId;
 
 		// Add the content element, which holds the page content.
-		$this->bodyViewElement->addElement($this->contentElement);
+		$this->bodyHTMLViewResource->addElement($this->contentElement);
 
 		// Add the content footer element
-		$footerElement = new Element($this->pageViewReference);
-		$footerElement->setHTML($this->footerHTML);
-		$this->bodyViewElement->addElement($footerElement);
+		$footerElement = new HTMLResource($this->pageViewReference);
+		$footerElement->html = $this->footerHTML;
+		$this->bodyHTMLViewResource->addElement($footerElement);
 
-		// Add the bodyViewElement to the page element array
-		array_push($this->elementArray, $this->bodyViewElement);
+		// Add the bodyHTMLViewResource to the page element array
+		array_push($this->elementArray, $this->bodyHTMLViewResource);
 
 		//Finally, create an element object with the closing HTML tag.
-		$closingElement = new Element($this->pageViewReference);
-		$closingElement->setHTML('</html>'.PHP_EOL);
+		$closingElement = new HTMLResource($this->pageViewReference);
+		$closingElement->html = '</html>'.PHP_EOL;
 		array_push($this->elementArray, $closingElement);
 
 

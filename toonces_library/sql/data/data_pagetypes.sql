@@ -11,6 +11,7 @@ INSERT INTO toonces.pagetypes
     ,(3,    'blog post',    'Individual post entry for a blog',                     0)
     ,(4,    'content page', 'Non-blog dynamic content page',                        0)
     ,(5,    'standard page','Uses XML configuration for page',                      0)
+    ,(6,    'api resource', 'A non-web resource in a REST API',                     0)
 ON DUPLICATE KEY UPDATE
      name = VALUES (name)
     ,description = VALUES (description)

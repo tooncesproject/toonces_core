@@ -14,7 +14,7 @@ class Toonces404PageBuilder extends StandardPageBuilder {
     function createContentElement() {
 
         // Instantiate an Element
-        $element = new Element($this->pageViewReference);
+        $element = new HTMLResource($this->pageViewReference);
         $pageID = $this->pageViewReference->pageId;
         
         $html= <<<HTML
@@ -26,7 +26,7 @@ class Toonces404PageBuilder extends StandardPageBuilder {
 		</div>
 HTML;
         
-        $element->setHTML($html);
+        $element->html = $html;
             
         $this->contentElement = $element;
             

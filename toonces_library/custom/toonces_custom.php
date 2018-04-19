@@ -1,3 +1,4 @@
 <?php
 
-include LIBPATH.'custom/FourOhFour.php';
+// Register custom code here
+// i.e., include_once LIBPATH.'/foo.php';

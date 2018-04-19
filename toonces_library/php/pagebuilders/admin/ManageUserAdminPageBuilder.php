@@ -22,9 +22,9 @@ class ManageUserAdminPageBuilder extends AdminPageBuilder
 		</div>
 HTML;
 
-	$topCopyBlock = new Element($this->pageViewReference);
+	$topCopyBlock = new HTMLResource($this->pageViewReference);
 	
-	$topCopyBlock->setHTML($html);
+	$topCopyBlock->html = $html;
 
 	$this->toolElement->addElement($topCopyBlock);
 	

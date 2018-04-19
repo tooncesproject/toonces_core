@@ -4,15 +4,12 @@
 *	Copyright (c) 2015 by Paul Anderson, All Rigths Reserved
 *
 *	This script is the root script for any given application in the site.
-*	It instantiates a PageView object which provides the base rendering for a page
-*
-*
+*	It instantiates an iPageView-compliant object which provides the base rendering for a page
 *
 */
 
 include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
-
 
 // function to get page from path
 
@@ -42,7 +39,6 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 
 	$query = sprintf(file_get_contents(LIBPATH.'/sql/query/retrieve_child_page_ids.sql'),$pageid);
 
-
 	$descenantPages = $conn->query($query);
 
 	if (!$descenantPages) {
@@ -60,7 +56,6 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 	// if a page was found and the end of the array has been reached, return the descendant ID
 	// otherwise continue recursion
 	$nextDepthCount = ++$depthCount;
-
 
 	if ($pageFound && (!array_key_exists($nextDepthCount, $pathArray) OR trim($pathArray[$nextDepthCount]) == '')) {
 		return $descendantPageId;
@@ -86,44 +81,21 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 			return 0;
 		}
 	}
-
 }
 
 // ******************** Begin procedural code ******************** 
 
-
 // establish SQL connection
 $conn = UniversalConnect::doConnect();
 
-// Instantiate session manager and check status.
-$sessionManager = new SessionManager($conn);
-
-$sessionManager->checkSession();
-// $loginSuccess = 0;
-$adminSessionActive = 0;
-$userId = 0;
-$userIsAdmin = 0;
-
-$adminSessionActive = $sessionManager->adminSessionActive;
-
-if ($adminSessionActive == 1) {
-    $userId = $sessionManager->userId;
-    $userIsAdmin = $sessionManager->userIsAdmin;
-}
-
-
-
 // set default properties for view renderer setter methods
-$pageTitle = 'eff';
-$styleSheet = 'toonces.css';
-$pageViewClass = 'PageView';
+$pageTitle = 'Toonces Page';
+$defaultPageViewClass = 'HTMLPageView';
 
 $pageId = 1;
 
 // Acquire path query from request
-//$path = $_SERVER['REQUEST_URI'];
 $url = $_SERVER['REQUEST_URI'];
-
 
 // Acquire query string if exists
 $queryString = $_SERVER['QUERY_STRING'];
@@ -151,102 +123,73 @@ $pageTitle = 'Error 404';
 $pageLinkText = '';
 
 // Page state
-$published = 0;
-$isAdminPage = 0;
-$pageTypeId = 0;
-$pageIsDeleted = false;
+$loadedPageTypeId = 0;
+$loadedPageIsDeleted = false;
 
 // user state
-$allowAccess = 0;
-$userCanEdit = 0;
-$userHasPageAccess = 0;
+$allowAccess = false;
 
 // get sql query
-$query = sprintf(file_get_contents(LIBPATH.'/sql/query/retrieve_page_by_id.sql'),$userId,$pageId);
+$sql = <<<SQL
+SELECT
+     p.page_id
+    ,p.pathname
+    ,p.page_title
+    ,p.page_link_text
+    ,p.pagebuilder_class
+    ,p.pageview_class
+    ,p.pagetype_id
+    ,p.deleted
+FROM
+    toonces.pages p
+WHERE
+    p.page_id = :pageID;
+SQL;
 
-$pageRecord = $conn->query($query);
+//$query = sprintf($sql,$pageId);
+$stmt = $conn->prepare($sql);
+$stmt->execute(array(':pageID' => $pageId));
 
-if ($pageRecord->rowCount() > 0) {
-	foreach ($pageRecord as $result) {
-		$pagePathName = $result['pathname'];
-		$pageStyleSheet = $result['css_stylesheet'];
-		$pagePageViewClass = $result['pageview_class'];
-		$pagePageBuilderClass = $result['pagebuilder_class'];
-		$pagePageTitle = $result['page_title'];
-		$pagePageLinkText = $result['page_link_text'];
-		$published = $result['published'];
-		$isAdminPage = ($result['pagetype_id'] == 1) ? 1 : 0;
-		$pageTypeId = $result['pagetype_id'];
-		$userHasPageAccess = $result['user_has_access'];
-		$userCanEdit = $result['can_edit'];
-		$pageIsDeleted = empty($result['deleted']) ? false : true; 
-	};
+$pageRecord = $stmt->fetchall();
+$pageExists = false;
+if (count($pageRecord)) {
+    $pageExists = true;
+    $loadedPagePathName = $pageRecord[0]['pathname'];
+    $loadedPagePageTitle = $pageRecord[0]['page_title'];
+    $loadedPageLinkText = $pageRecord[0]['page_link_text'];
+    $loadedPageBuilderClass = $pageRecord[0]['pagebuilder_class'];
+    $loadedPageViewClass = $pageRecord[0]['pageview_class'];
+    $loadedPageTypeId = $pageRecord[0]['pagetype_id'];
+    $loadedPageIsDeleted = empty($pageRecord[0]['deleted']) ? false : true;
+} 
 
-	// Manage access.
-	// Is the page deleted?
-	if ($pageIsDeleted == false) {
-		// Is the page unpublished?
-		if ($published == 0) {
-			// Allow access to page if:
-			// user is logged in and page is admin page (defer access to page)
-			if ($adminSessionActive == 1 and  $isAdminPage == 1) {
-				$allowAccess = 1;
-			}
-			// user is admin
-			if ($sessionManager->userIsAdmin == 1) {
-				$allowAccess = 1;
-			}
-
-			// page isn't necessarily admin page but user is logged in and has access
-			if ($userHasPageAccess == 1) {
-				$allowAccess = 1;
-			}
-
-		} else {
-			// If published, page is public.
-			$allowAccess = 1;
-		}
-	}
-	// If the user is an admin/root user, set userCanEdit to true
-	if ($sessionManager->userIsAdmin == true)
-		$userCanEdit = true;
+// Check page deletion state and access.
+// Note: APIPageView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
+if ($pageExists) {
+    // instantiate the page renderer
+    $pageView = new $loadedPageViewClass($pageId);
+    $pageView->setPageURI($path);
+    $pageView->setSQLConn($conn);
+    $allowAccess = !$loadedPageIsDeleted && $pageView->checkSessionAccess();
 }
 
 // If access state is true, build the page.
-if ($allowAccess == 1) {
-	$pathName = $pagePathName;
-	$styleSheet = $pageStyleSheet;
-	$pageViewClass = $pagePageViewClass;
-	$pageBuilderClass = $pagePageBuilderClass;
-	$pageTitle = $pagePageTitle;
-	$pageLinkText = $pagePageLinkText;
+if ($allowAccess) {
+    $pathName = $loadedPagePathName;
+    $pageBuilderClass = $loadedPageBuilderClass;
+    $pageTitle = $loadedPagePageTitle;
+    $pageLinkText = $loadedPageLinkText;
+} else {
+    // If no access, reset PageView class to default
+    $pageView = new $defaultPageViewClass($pageId);
+    $pageView->setPageURI($path);
+    $pageView->setSQLConn($conn);
 }
-
-// instantiate the page renderer
-$pageView = new $pageViewClass($pageId);
-$pageView->userCanEdit = $userCanEdit;
-$pageView->urlPath = $path;
-$pageView->pageIsPublished = $published;
-$pageView->conn = $conn;
-
-// If it's an admin page, pass the user's page access state to the pageView
-if ($adminSessionActive == 1 and $isAdminPage == 1) {
-	$pageView->userCanAccessAdminPage = $userHasPageAccess;
-}
-
-// pass session manager to pageView
-$pageView->sessionManager = $sessionManager;
 
 // set PageView class variables
-
-$pageView->setStyleSheet($styleSheet);
-//$pageView->styleSheet = $styleSheet;
-
 $pageView->setPageTitle($pageTitle);
-
-$pageView->setPageLinkText($pageLinkText);
-
-$pageView->pageTypeId = $pageTypeId;
+$pageView->setPageLInkText($pageLinkText);
+$pageView->setPageTypeID($loadedPageTypeId);
 
 $pageBuilder = new $pageBuilderClass($pageView);
 
@@ -256,10 +199,4 @@ foreach($pageElements as $element) {
 	$pageView->addElement($element);
 }
 
-
 $pageView->renderPage();
-
-
-
-
-?>

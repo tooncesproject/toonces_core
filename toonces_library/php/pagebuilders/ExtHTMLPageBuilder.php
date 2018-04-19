@@ -14,12 +14,12 @@ class ExtHTMLPageBuilder extends StandardPageBuilder {
     function createContentElement() {
         
         // Instantiate an Element
-        $element = new Element($this->pageViewReference);
+        $element = new HTMLResource($this->pageViewReference);
         $pageID = $this->pageViewReference->pageId;
         
         // Query the database for this page's content HTML file
         if (!isset($this->conn))
-            $this->conn = $this->pageViewReference->conn;
+            $this->conn = $this->pageViewReference->getSQLConn();
  
         $sql = 'SELECT html_path FROM ext_html_pages WHERE page_id = :pageID';
         $stmt = $this->conn->prepare($sql);
@@ -30,7 +30,7 @@ class ExtHTMLPageBuilder extends StandardPageBuilder {
         
         // Set Content Element's HTML to the file referenced.
         try {
-            $element->setHTML(file_get_contents($htmlPath));
+            $element->html = file_get_contents($htmlPath);
         } catch (Exception $e) {
             die('Failed to get static HTML content: ' . $e->getMessage());
         }

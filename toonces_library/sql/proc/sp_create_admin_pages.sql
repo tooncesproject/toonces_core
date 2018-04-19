@@ -19,7 +19,6 @@ BEGIN
     DECLARE var_page_link_text VARCHAR(100);
     DECLARE var_pagebuilder_class VARCHAR(50);
     DECLARE var_pageview_class VARCHAR(50);
-    DECLARE var_css_stylesheet VARCHAR(100);
     DECLARE var_redirect_on_error BOOL;
     DECLARE var_published BOOL;
 
@@ -39,7 +38,6 @@ BEGIN
             ,page_link_text
             ,pagebuilder_class
             ,pageview_class
-            ,css_stylesheet
             ,redirect_on_error
             ,published
         FROM
@@ -70,7 +68,6 @@ BEGIN
             ,var_page_link_text
             ,var_pagebuilder_class
             ,var_pageview_class
-            ,var_css_stylesheet
             ,var_redirect_on_error
             ,var_published
         ;
@@ -138,7 +135,6 @@ BEGIN
                 ,var_page_link_text     -- page_link_text VARCHAR(50)
                 ,var_pagebuilder_class  -- pagebuilder_class VARCHAR(50)
                 ,var_pageview_class     -- pageview_class VARCHAR(50)
-                ,var_css_stylesheet     -- css_stylesheet VARCHAR(100)
                 ,var_redirect_on_error  -- redirect_on_error BOOL
                 ,var_published          -- published BOOL
                 ,1                      -- pagetype_id BIGINT - type for admin page (1)

@@ -17,7 +17,7 @@
  		// Check for edit mode signal from GET, and if applicable, check for user access.
  		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
  		
- 		if ($mode == 'newpost' and $this->pageViewReference->userCanEdit == true) {
+ 		if ($mode == 'newpost' and $this->pageViewReference->checkUserCanEdit()) {
  			$blogFormElement = new BlogFormElement($this->pageViewReference);
  			$this->contentElement = $blogFormElement;
  		} else {

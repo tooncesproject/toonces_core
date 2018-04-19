@@ -7,7 +7,7 @@ class TestInteractionElement extends StandardPageBuilder
 	function createContentElement() {
 
 		// Insert code here to create a content element
-		// $this->contentElement = new Element($this->pageViewReference);
+		// $this->contentElement = new HTMLResource($this->pageViewReference);
 		$this->contentElement = new InteractionElement($this->pageViewReference);
 		$this->contentElement->formName = 'dank';
 

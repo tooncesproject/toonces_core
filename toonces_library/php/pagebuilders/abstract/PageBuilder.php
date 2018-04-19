@@ -18,7 +18,7 @@ abstract class PageBuilder {
 
 		//Check to see if the user is logged in. If so, build a toolbar element.
 
-		if ($this->pageViewReference->sessionManager->adminSessionActive == true) {
+		if ($this->pageViewReference->checkAdminSession()) {
 			switch ($this->pageViewReference->pageTypeId) {
 				// blog root
 				case 2:
@@ -30,6 +30,10 @@ abstract class PageBuilder {
 					$blogPostToolbarElement = new BlogPostToolbarElement($this->pageViewReference);
 					$this->toolbarElement = $blogPostToolbarElement;
 					break;
+				// REST API resource
+				case 6:
+				    // No toolbar element
+				    break;
 				default:
 					$defaultToolbarElement = new DefaultToolbarElement($this->pageViewReference);
 					$this->toolbarElement = $defaultToolbarElement;

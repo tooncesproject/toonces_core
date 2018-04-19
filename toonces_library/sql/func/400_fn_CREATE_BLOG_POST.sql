@@ -35,7 +35,6 @@ BEGIN
     DECLARE var_blog_post_page_id BIGINT;
     DECLARE var_pathname VARCHAR(50);
     DECLARE var_post_pageview_class VARCHAR(50);
-    DECLARE var_post_css_stylesheet VARCHAR(50);
     DECLARE var_user_can_edit BOOL;
 
     -- Get blog ID
@@ -66,10 +65,8 @@ BEGIN
         -- get page data
         SELECT
              pageview_class
-            ,css_stylesheet
         INTO 
              var_post_pageview_class
-            ,var_post_css_stylesheet
         FROM
             pages
         WHERE
@@ -88,7 +85,6 @@ BEGIN
             ,param_title                  -- page_link_text VARCHAR(50)
             ,param_pagebuilder_class      -- pagebuilder_class VARCHAR(50)
             ,var_post_pageview_class    -- pageview_class VARCHAR(50)
-            ,var_post_css_stylesheet    -- css_stylesheet VARCHAR(100)
             ,1                      -- redirect_on_error BOOL
             ,0                      -- published BOOL - Blog posts are unpublished by default
             ,3                      -- pagetype_id - Type for blog post page

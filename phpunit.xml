@@ -12,8 +12,8 @@ Initial Commit: Paul Anderson, 12/11/2017
 	<testsuites>
 		<testsuite name="element">
 			<file>unittest/element/TestElement.php</file>
-			<file>unittest/element/TestPageView.php</file>
-			<file>unittest/element/TestViewElement.php</file>
+			<file>unittest/element/TestHTMLPageView.php</file>
+			<file>unittest/element/TestHTMLViewResource.php</file>
 		</testsuite>
 
 	</testsuites>

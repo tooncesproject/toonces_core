@@ -15,7 +15,7 @@ class BlogPostSinglePageBuilder extends StandardPageBuilder
 		$mode = (isset($_GET['mode'])) ? $_GET['mode'] : '';
 
 		// If user doesn't have editing capability, ignore the mode.
-		if ($this->pageViewReference->userCanEdit == false) {
+		if (!$this->pageViewReference->checkUserCanEdit()) {
 			$mode = '';
 		}
 		switch ($mode) {
