@@ -1,5 +1,5 @@
 # toonces_core
-A cute little PHP website framework.
+A cute little LAMP app framework.
 Because fuck Wordpress. A work in progress.
 
 # How To Install:
