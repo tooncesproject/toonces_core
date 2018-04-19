@@ -29,6 +29,7 @@ include_once LIBPATH.'php/utility/interface/iFieldValidator.php';
 include_once LIBPATH.'php/utility/StringFieldValidator.php';
 include_once LIBPATH.'php/utility/IntegerFieldValidator.php';
 include_once LIBPATH.'php/utility/BooleanFieldValidator.php';
+include_once LIBPATH.'php/resource/extension/core_services/CoreServicesDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
 include_once LIBPATH.'php/resource/APIPageView.php';
@@ -47,10 +48,8 @@ include_once LIBPATH.'php/pagebuilders/blog/BlogPostSinglePageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/APIPageBuilder.php';
 include_once LIBPATH.'php/utility/interface/iAPIPageBuilderDelegate.php';
-include_once LIBPATH.'php/utility/abstract/APIPageBuilderDelegate.php';
-include_once LIBPATH.'php/utility/CoreAPIPageBuilderDelegate.php';
-include_once LIBPATH.'php/pagebuilders/core_services/CoreAPIPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/core_services/PagesAPIPageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/core_services/CoreServicesAPIPageBuilder.php';
+
 include_once LIBPATH.'php/pagebuilders/core_services/BlogPostAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/BlogsAPIPageBuilder.php';
 

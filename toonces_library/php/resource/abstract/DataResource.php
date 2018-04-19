@@ -77,7 +77,63 @@ abstract class DataResource extends Resource implements iResource
         return $id;        
     }
 
+    function getSubResources() {
+        // Acquires any endpoints that are children of the current endpoint and provides the URLs of those endpoints.
+        // Return:
+        //      true if resources are available. Resources added to DataObjects and $httpStatus set to 200.
+        //      false if no resources are available. $httpStatus set to 418 (haha)
 
+        $sqlConn = $this->pageViewReference->getSQLConn();
+        
+        // Acquire the user id if this is an authenticated request.
+        $userID = $this->authenticateUser() ?? 0;
+        
+        // Query the database for any children of the current page.
+        $sql = <<<SQL
+            SELECT
+                 p.page_id
+                ,p.pathname
+                ,p.title
+            FROM page_hierarchy_bridge phb
+            JOIN pages p ON phb.descendant_page_id = p.page_id
+            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
+            LEFT JOIN users u ON pua.user_id = u.user_id
+            WHERE
+                (phb.page_id = :pageID) 
+                AND
+                (
+                    (p.published = 1 AND p.deleted IS NULL)
+                    OR
+                    pua.user_id IS NOT NULL
+                    OR
+                    u.is_admin = TRUE
+                )
+            ORDER BY p.page_id ASC
+SQL;
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(array('userID' => $userID, 'pageID' => $this->pageViewReference->pageId));
+        $result = $stmt->fetchAll();
+        if ($result) {
+            // Results? Serialize the output.
+            $subResources = array();
+            foreach ($result as $row) {
+                $subResources[$row[0]] = array(
+                     'url' => $this->resourceURL . '/' . $row[1]
+                    ,'title' => $row[2]
+                );
+            }
+            $this->dataObjects['resources'] = $subResources;
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+            return true;
+        } else {
+            // No joy? Return a general error.
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_418_IM_A_TEAPOT', 'EnumHTTPResponse');
+            return false;
+        }
+        
+
+    }
+    
     public function validateData($data) {
         // Iterate through keys in dataObjects array
         $postValid = false;
