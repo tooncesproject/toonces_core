@@ -5,7 +5,6 @@ SELECT
     ,p.page_link_text
     ,p.pagebuilder_class
     ,p.pageview_class
-    ,p.css_stylesheet
     ,p.published
     ,p.pagetype_id
     ,p.deleted
