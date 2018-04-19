@@ -228,6 +228,109 @@ try {
     die('Failed to create admin pages: ' . $e->getMessage());
 }
 
+// Create Core Services API
+echo 'Creating Core Services API...' . PHP_EOL;
+
+// Does the coreservices page already exist? If so, delete it.
+$result = null;
+$sql = <<<SQL
+    SELECT
+        p.page_id
+    FROM page_hierarchy_bridge phb
+    JOIN pages p ON phb.descendant_page_id = p.page_id
+    WHERE
+        phb.page_id = 1
+        AND
+        p.pathname = 'coreservices'
+SQL;
+try {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetchAll();
+} catch (PDOException $e) {
+    die ('Failed to create Core Services API: ' . $e->getMessage());
+}
+if ($result) {
+    $sql = "CALL sp_delete_page(:pageId)";
+    $stmt = $conn->prepare($sql);
+    try {
+        $stmt->execute(array('pageId' => $result[0][0]));
+    } catch (PDOException $e) {
+        die ('Failed to create Core Services API: ' . $e->getMessage());
+    }
+}
+
+// Now create the core services endpoints.
+// Core Services root
+$csPageId = null;
+$sql = <<<SQL
+    SELECT CREATE_PAGE (
+         1                              -- parent_page_id BIGINT
+        ,'coreservices'                 -- ,pathname VARCHAR(50)
+        ,'Toonces Core Services'        -- ,page_title VARCHAR(50)
+        ,'Toonces Core Services'        -- ,page_link_text VARCHAR(50)
+        ,'CoreServicesAPIPageBuilder'   -- ,pagebuilder_class VARCHAR(50)
+        ,'APIPageView'                  -- ,pageview_class VARCHAR(50)
+        ,FALSE                          -- ,redirect_on_error BOOL
+        ,FALSE                          -- ,published BOOL
+        ,6                              -- ,pagetype_id BIGINT
+    )
+SQL;
+$stmt = $conn->prepare($sql);
+try {
+    $stmt->execute();
+    $result = $stmt->fetchAll();
+    $csPageId = $result[0][0];
+} catch (PDOException $e) {
+    die ('Failed to create Core Services API: ' . $e->getMessage());
+}
+
+// Blogs endpoint
+$sql = <<<SQL
+    SELECT CREATE_PAGE (
+         :csPageId                          -- parent_page_id BIGINT
+        ,'blogs'                            -- ,pathname VARCHAR(50)
+        ,'Toonces Core Services - Blogs'    -- ,page_title VARCHAR(50)
+        ,'Toonces Core Services - Blogs'    -- ,page_link_text VARCHAR(50)
+        ,'BlogsAPIPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
+        ,'APIPageView'                      -- ,pageview_class VARCHAR(50)
+        ,FALSE                              -- ,redirect_on_error BOOL
+        ,FALSE                              -- ,published BOOL
+        ,6                                  -- ,pagetype_id BIGINT
+    )
+SQL;
+$stmt = $conn->prepare($sql);
+try {
+    $stmt->execute(array('csPageId' => $csPageId));
+    $result = $stmt->fetchAll();
+    $csPageId = $result[0][0];
+} catch (PDOException $e) {
+    die ('Failed to create Core Services API (blogs): ' . $e->getMessage());
+}
+
+// Blog Posts endpoint
+$sql = <<<SQL
+    SELECT CREATE_PAGE (
+         :csPageId                              -- parent_page_id BIGINT
+        ,'blogposts'                            -- ,pathname VARCHAR(50)
+        ,'Toonces Core Services - Blog Posts'   -- ,page_title VARCHAR(50)
+        ,'Toonces Core Services - Blog Posts'   -- ,page_link_text VARCHAR(50)
+        ,'BlogPostAPIPageBuilder'               -- ,pagebuilder_class VARCHAR(50)
+        ,'APIPageView'                          -- ,pageview_class VARCHAR(50)
+        ,FALSE                                  -- ,redirect_on_error BOOL
+        ,FALSE                                  -- ,published BOOL
+        ,6                                      -- ,pagetype_id BIGINT
+    )
+SQL;
+$stmt = $conn->prepare($sql);
+try {
+    $stmt->execute(array('csPageId' => $csPageId));
+    $result = $stmt->fetchAll();
+    $csPageId = $result[0][0];
+} catch (PDOException $e) {
+    die ('Failed to create Core Services API (blog posts): ' . $e->getMessage());
+}
+
 // Write the SQL credentials to toonces_config.xml
 // code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it
 echo 'Updating toonces-config.xml...' . PHP_EOL;
