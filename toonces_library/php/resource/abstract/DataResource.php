@@ -118,7 +118,7 @@ SQL;
             $subResources = array();
             foreach ($result as $row) {
                 $subResources[$row[0]] = array(
-                     'url' => $this->resourceURL . '/' . $row[1]
+                     'url' => $this->resourceURL . $row[1]
                     ,'title' => $row[2]
                 );
             }
