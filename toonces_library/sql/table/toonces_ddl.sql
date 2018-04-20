@@ -153,23 +153,23 @@ CREATE TABLE IF NOT EXISTS meta_http_method (
 
 CREATE TABLE IF NOT EXISTS login_attempt (
      login_attempt_id       BIGINT          NOT NULL    AUTO_INCREMENT
-    ,attempt_uri            VARCHAR(1000)   NULL
+    ,page_id                BIGINT          NULL
     ,meta_http_method_id    BIGINT          NULL
-    ,attempt_user_id        BIGINT UNSIGNED NULL
+    ,attempt_user_id        BIGINT          NULL
     ,attempt_time           TIMESTAMP       NOT NULL
     ,http_client_ip         INT UNSIGNED    NULL
     ,http_x_forwarded_for   INT UNSIGNED    NULL
     ,remote_addr            INT UNSIGNED    NULL
-    ,attempt_success        BOOL            NULL
+    ,attempt_success        BOOL            NOT NULL DEFAULT FALSE
     ,user_agent             VARCHAR(1000)   NULL
 
         ,CONSTRAINT pk_login_attempts PRIMARY KEY (login_attempt_id)
+        ,CONSTRAINT fk_login_attempt_page FOREIGN KEY (page_id) REFERENCES pages (page_id)
         ,CONSTRAINT fk_login_attempt_user FOREIGN KEY (attempt_user_id) REFERENCES users (user_id)
-        ,CONSTRAINT fk_login_attempt_meta_http_method FOREIGN KEY (meta_http_method_id) REFERENCES meta_http_method(meta_http_method_id)
+        ,CONSTRAINT fk_login_attempt_http_method FOREIGN KEY (meta_http_method_id) REFERENCES meta_http_method (meta_http_method_id)
         ,INDEX idx_attempt_time (attempt_time)
         ,INDEX idx_http_client_ip (http_client_ip)
         ,INDEX idx_http_x_forwarded_for (http_x_forwarded_for)
-        ,INDEX idx_meta_http_method_id (meta_http_method_id)
         ,INDEX idx_remote_addr (remote_addr)
         ,INDEX idx_attempt_success (attempt_success)
 
