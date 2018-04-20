@@ -18,7 +18,9 @@ require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 class TestSetupTooncesDatabase extends SqlDependentTestCase {
     
-    public function testSetupTooncesDatabase() {
+    public function testSetupDatabase() {
+        
+            
         // ARRANGE
         $sqlConn = $this->getConnection();
         // ACT
@@ -39,10 +41,10 @@ class TestSetupTooncesDatabase extends SqlDependentTestCase {
         DROP USER toonces;
 SQL;
         if (!$setupFailure)
-            //$sqlConn->exec($sql);
+            $sqlConn->exec($sql);
 
         // ASSERT
         $this->assertFalse($setupFailure);
-
+    
     }
 }
