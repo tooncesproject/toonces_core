@@ -116,7 +116,7 @@ SQL;
     
     function postAction() {
         // Validates as POST request and responds.
-        
+
         // set up the field validators.
         $this->buildFields();
 
@@ -128,6 +128,7 @@ SQL;
         do {
             // Authenticate the user.
             $userID = $this->authenticateUser();
+
             if (empty($userID)) {
                 // Authentication failed.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
@@ -150,7 +151,7 @@ SQL;
                  p.page_id
             FROM pages p
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 p.page_id = :pageID 
                 AND
@@ -166,7 +167,6 @@ SQL;
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'pageID' => $ancestorPageID));
             $result = $stmt->fetchall();
-
             if (!$result) {
                 // No access or ancestor doesn't exist? Return a 400 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
@@ -201,7 +201,8 @@ SQL;
                 ,'HTMLPageView'         -- blog_pageview_class VARCHAR(50)
             )
 SQL;
-
+            
+            $blogID = null;
             try {
                 $stmt = $sqlConn->prepare($sql);
                 $sqlParams = array(
@@ -212,6 +213,7 @@ SQL;
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchall();
                 $blogID = $result[0][0];
+
             } catch (PDOException $e) {
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
@@ -219,7 +221,13 @@ SQL;
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }         
-
+            
+            // Check to ensure blog ID was actually created'
+            if (!$blogID) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'Blog creation failed, possibly due to a dupliate pathName. Try changing the or supplying the pathName explicitly.';
+                break;
+            }
             // Return the newly created blog.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = strval($blogID);

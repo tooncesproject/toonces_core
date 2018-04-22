@@ -8,6 +8,10 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<var name="DB_DBNAME" value="toonces" />
 		<var name="DB_USERNAME" value="unittest" />
 		<var name="DB_PASSWORD" value="kittycat" />
+		<var name="TOONCES_USERNAME" value="email@example.com" />
+		<var name="TOONCES_PASSWORD" value="correcthorsebatterystaple" />
+		<var name="NON_ADMIN_USERNAME" value="user@example.com" />
+		<var name="NON_ADMIN_PASSWORD" value="reallySecurePassword" />
 	</php>
 	<testsuites>
 		<testsuite name="installers">
