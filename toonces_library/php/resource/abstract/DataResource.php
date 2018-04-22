@@ -45,17 +45,18 @@ abstract class DataResource extends Resource implements iResource
     function validateHeaders() {
         // Confirms that the HTTP request has the required headers.
         $headersValid = false;
-        $headers = apache_request_headers();
-        if (array_key_exists('content-type', $headers))
-            if ($headers['content-type'] == 'application/json')
+
+        if (array_key_exists('CONTENT_TYPE', $_SERVER))
+            if ($_SERVER['CONTENT_TYPE'] == 'application/json')
                 $headersValid = true;
                 
-                return $headersValid;
+            return $headersValid;
     }
 
 
     public function validateIntParameter($parameterKey) {
         // This method provides basic validation for any named GET parameters expecting an integer.
+        // It will return an integer.
         // There are 3 possible states:
         //      1. Key not found in parameters - return null
         //      2. Key is set, but value isn's an integer - Return 0
@@ -66,8 +67,8 @@ abstract class DataResource extends Resource implements iResource
             if (!array_key_exists($parameterKey, $getParams)) // Parameter exists?
                 break;
             
-            if (!is_int($getParams[$parameterKey])) {          // it's an integer? 
-                $id = $getParams[$parameterKey];
+            if (is_int(intval($getParams[$parameterKey]))) {          // it's an integer?
+                $id = intval($getParams[$parameterKey]);
             } else {
                 $id = 0;
             }
@@ -193,11 +194,6 @@ SQL;
         } while (false);
         
         return $postValid;
-    }
-
-
-    public function addElement ($element) {
-        array_push($this->dataObjects,$element);
     }
     
 
