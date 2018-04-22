@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
-require_once __DIR__ . '../../ServerDependentTestCase.php';
 include_once LIBPATH.'php/resource/abstract/DataResource.php';
 
 // testable data resource
@@ -21,12 +20,49 @@ class TestableDataResource extends DataResource {
 }
 
 class TestDataResource extends SqlDependentTestCase {
-    /*
+
     public function testAuthenticateUser() {
+        // ARRANGE
+        // Instantiate with a PageView object
+        $apiPageView = new APIPageView(1);
+        $dr = new TestableDataResource($apiPageView);
+        // Set up SQL connection
+        $sqlConn = $this->getConnection();
+        $apiPageView->setSQLConn($sqlConn);
         
+        // Set up Toonces database fixture
+        $this->destroyTestDatabase();
+        $this->buildTestDatabase();
+        
+        // ACT
+        // Attempt login with no user
+        if (array_key_exists('PHP_AUTH_USER', $_SERVER))
+            unset($_SERVER['PHP_AUTH_USER']);
+        
+         if (array_key_exists('PHP_AUTH_PW', $_SERVER))
+             unset($_SERVER['PHP_AUTH_PW']);
+        
+        $noLogin = $dr->authenticateUser();
+             
+        // Attempt authentication with bogus user
+        $_SERVER['PHP_AUTH_USER'] = 'badguy@evil.com';
+        $_SERVER['PHP_AUTH_PW'] = 'bogusPassword';
+        
+        $badLogin = $dr->authenticateUser();
+        
+        // Attempt with valid user
+        $_SERVER['PHP_AUTH_USER'] = 'email@example.com';
+        $_SERVER['PHP_AUTH_PW'] = 'mySecurePassword';
+        
+        $goodLogin = $dr->authenticateUser();
+        
+        // ASSERT
+        $this->assertNull($noLogin);
+        $this->assertNull($badLogin);
+        $this->assertTrue(is_int(intval($goodLogin)));
     }
-    */
-    
+
+
     public function testValidateHeaders() {
         // ARRANGE
         // Instantiate with a PageView object
@@ -142,9 +178,117 @@ class TestDataResource extends SqlDependentTestCase {
 
     }
 
-    /*
     public function testGetResource() {
+        // This test also covers the "action" methods of the abstract class.
+        // 
         
+        // ARRANGE
+        // Instantiate base objects
+        $apiPageView = new APIPageView(1);
+        $dr = new TestableDataResource($apiPageView);
+        $testObjectArray = array('testObject' => 'foo');
+        $dr->dataObjects = $testObjectArray;
+        
+        // Inject HTTP host
+        $_SERVER['HTTP_HOST'] = 'example.com';
+        
+        // Inject Resource URI
+        $dr->resourceURI = 'path';
+        
+        // ACT
+        // Call the method without the default valid header
+        if (isset($_SERVER['CONTENT_TYPE']))
+            $_SERVER['CONTENT_TYPE'] = 'foo';
+
+        $noHeaderResult = $dr->getResource();
+        $noHeaderStatus = $dr->httpStatus;
+        
+        // Try it with valid content type header but no HTTP verb
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        if (isset($_SERVER['REQUEST_METHOD']))
+            unset($_SERVER['REQUEST_METHOD']);
+        $caughtException = false;
+        try {
+            $dr->getResource;
+        } finally {
+            $caughtException = true;
+            print "ASS" . PHP_EOL;
+        }
+        
+        // Call the method with each "supported" HTTP verb.
+        // Also, we include the required content-type header.
+        
+        // GET
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $getResult = $dr->getResource(); 
+        $getStatus = $dr->httpStatus;
+        $httpURL = $dr->resourceURL;
+        
+        // POST
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['HTTPS'] = 'on';
+        $postResult = $dr->getResource();
+        $postStatus = $dr->httpStatus;
+        $httpsURL = $dr->resourceURL;
+        
+        // HEAD
+        $_SERVER['REQUEST_METHOD'] = 'HEAD';
+        $headResult = $dr->getResource();
+        $headStatus = $dr->httpStatus;
+        
+        // PUT
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        $putResult = $dr->getResource();
+        $putStatus = $dr->httpStatus;
+        
+        // OPTIONS
+        $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+        $optionsResult = $dr->getResource();
+        $optionsStatus = $dr->httpStatus;
+        
+        // DELETE
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+        $deleteResult = $dr->getResource();
+        $deleteStatus = $dr->httpStatus;
+        
+        // CONNECT
+        $_SERVER['REQUEST_METHOD'] = 'CONNECT';
+        $connectResult = $dr->getResource();
+        $connectStatus = $dr->httpStatus;
+
+        // ASSERT
+        // No content-type header
+        $this->assertEquals($noHeaderStatus, Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'));
+        
+        // No HTTP verb
+        $this->assertTrue($caughtException);
+
+        // GET
+        // Only one assertion for $testObjectArray - We just wanna know it will return something.
+        $this->assertSame($testObjectArray, $getResult);
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $getStatus);
+        // One assertion for 'http' URL scheme - We won't repeat this.
+        $this->assertSame($httpURL, 'http://example.com/path');
+        
+        // POST
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $postStatus);
+        // One assertion for 'https' URL scheme - We won't repeat this.
+        $this->assertSame($httpsURL, 'https://example.com/path');
+
+        // HEAD
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $headStatus);
+        
+        // PUT
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $putStatus);
+        
+        // OPTIONS
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $optionsStatus);
+        
+        // DELETE
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $deleteStatus);
+        
+        // CONNECT
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $connectStatus);
     }
-    */
+
 }

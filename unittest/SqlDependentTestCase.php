@@ -12,7 +12,7 @@
  */
 use PHPUnit\Framework\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
-include_once '../setupTooncesDatabase.php';
+require_once __DIR__ . '/../setupTooncesDatabase.php';
 
 abstract class SqlDependentTestCase extends TestCase
 {
