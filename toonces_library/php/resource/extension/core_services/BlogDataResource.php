@@ -222,7 +222,7 @@ SQL;
 
             // Return the newly created blog.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-            $this->parameters['id'] = $blogID;
+            $this->parameters['id'] = strval($blogID);
             $this->dataObjects = array();
             $this->dataObjects = $this->getAction(); 
 
@@ -314,7 +314,7 @@ SQL;
             // return the updated blog record.
             // Return the newly created blog.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-            $this->parameters['id'] = $blogID;
+            $this->parameters['id'] = strval($blogID);
             $this->dataObjects = array();
             $this->dataObjects = $this->getAction(); 
             

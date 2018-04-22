@@ -56,6 +56,7 @@ abstract class DataResource extends Resource implements iResource
 
     public function validateIntParameter($parameterKey) {
         // This method provides basic validation for any named GET parameters expecting an integer.
+        // It will return an integer.
         // There are 3 possible states:
         //      1. Key not found in parameters - return null
         //      2. Key is set, but value isn's an integer - Return 0
@@ -66,8 +67,8 @@ abstract class DataResource extends Resource implements iResource
             if (!array_key_exists($parameterKey, $getParams)) // Parameter exists?
                 break;
             
-            if (is_int($getParams[$parameterKey])) {          // it's an integer?
-                $id = $getParams[$parameterKey];
+            if (is_int(intval($getParams[$parameterKey]))) {          // it's an integer?
+                $id = intval($getParams[$parameterKey]);
             } else {
                 $id = 0;
             }

@@ -57,7 +57,7 @@ class TestDataResource extends SqlDependentTestCase {
         $dr = new TestableDataResource($apiPageView);
         
         $parameterArray = array(
-             'valid' => 666
+             'valid' => '666'
             ,'invalid' => 'foo'
             ,'null' => null
         );
