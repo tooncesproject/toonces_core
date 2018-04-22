@@ -10,10 +10,14 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<var name="DB_PASSWORD" value="kittycat" />
 	</php>
 	<testsuites>
-		<testsuite name="element">
-			<file>unittest/element/TestElement.php</file>
-			<file>unittest/element/TestHTMLPageView.php</file>
-			<file>unittest/element/TestHTMLViewResource.php</file>
+		<testsuite name="installer">
+			<file>unittest/install/TestSetupDatabase.php</file>
+		</testsuite>
+		<testsuite name="resource">
+			<file>unittest/resource/TestDataResource.php</file>
+			<file>unittest/resource/TestHTMLPageView.php</file>
+			<file>unittest/resource/TestHTMLResource.php</file>
+			<file>unittest/resource/TestHTMLViewResource.php</file>
 		</testsuite>
 
 	</testsuites>
