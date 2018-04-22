@@ -1,6 +1,6 @@
 <?php
 /*
- * TestInstallToonces.php
+ * TestSetupDatabase.php
  * Initial commit: Paul Anderson, 4/20/2018
  * 
  * PHPUnit test case for the Toonces database installation script.
@@ -20,28 +20,23 @@ class TestSetupTooncesDatabase extends SqlDependentTestCase {
     
     public function testSetupDatabase() {
         
-            
         // ARRANGE
         $sqlConn = $this->getConnection();
+        $this->destroyTestDatabase();
         // ACT
         $setupFailure = setupTooncesDatabase(
-             $sqlConn                // SQL connection object (PDO)
+             $sqlConn               // SQL connection object (PDO)
             ,'kittycat'             // Toonces MySQL user password
             ,'email@example.com'    // Toonces admin username
             ,'mySecurePassword'     // Toonces admin password
             ,'Paul'                 // toonces user first name
             ,'Anderson'             // toonces user last name
-            ,'God of Toonces'       // toonces user nickname
+            ,'Dark Lord of Toonces' // toonces user nickname
             ,'%'                    // PHP host IP/domain
             );
 
         // Tear down db
-        $sql = <<<SQL
-        DROP DATABASE toonces;
-        DROP USER toonces;
-SQL;
-        if (!$setupFailure)
-            $sqlConn->exec($sql);
+        $this->destroyTestDatabase();
 
         // ASSERT
         $this->assertFalse($setupFailure);

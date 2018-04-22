@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
-class TestBlogDataResource extends TestCase {
+class TestBlogDataResource extends SqlDependentTestCase {
     
     function testConstruct() {
         // Test constructor method of BlogDataResource class

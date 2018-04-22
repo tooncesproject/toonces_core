@@ -11,7 +11,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class APIPageView extends DataResource implements iPageView, iResource
+class APIPageView implements iPageView, iResource
 {
  
     // iPageView interface vars
@@ -24,6 +24,7 @@ class APIPageView extends DataResource implements iPageView, iResource
     public $apiVersion;
     var $queryArray = array();
     var $headers = array();
+    var $dataObjects = array();
     var $HTTPMethod;
     var $pageId;
     // inherited from DataResource:
@@ -34,6 +35,10 @@ class APIPageView extends DataResource implements iPageView, iResource
         $this->pageURI = $paramPageURI;
     }
     
+    public function addElement($element) {
+        array_push($this->dataObjects, $element);
+    }
+
     public function getPageURI() {
         if (!$this->pageURI)
             $this->setPageURI(GrabPageURL::getURL($this->pageId, $this->sqlConn));
