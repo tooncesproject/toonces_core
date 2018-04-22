@@ -17,7 +17,7 @@ class TestHTMLResource extends TestCase
         $element = new HTMLResource($pageView);
         
         // Assert
-        $this->assertInstanceOf(Element::class, $element);
+        $this->assertInstanceOf(HTMLResource::class, $element);
         $this->assertInstanceOf(HTMLPageView::class, $pageView);
     }
 
