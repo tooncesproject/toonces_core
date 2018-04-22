@@ -45,11 +45,8 @@ abstract class DataResource extends Resource implements iResource
     function validateHeaders() {
         // Confirms that the HTTP request has the required headers.
         $headersValid = false;
-       // $headers = apache_request_headers();
-        
-        //if (array_key_exists('content-type', $headers))
+
         if (array_key_exists('CONTENT_TYPE', $_SERVER))
-            //if ($headers['content-type'] == 'application/json')
             if ($_SERVER['CONTENT_TYPE'] == 'application/json')
                 $headersValid = true;
                 

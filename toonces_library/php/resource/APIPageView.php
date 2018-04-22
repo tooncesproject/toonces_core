@@ -93,9 +93,7 @@ class APIPageView implements iPageView, iResource
     public function __construct($pageViewPageId) {
         $this->pageId = $pageViewPageId;
         // Detect API version
-        //$headers = apache_request_headers();
-        //$this->apiVersion = $headers['Accept-version'];
-        $this->apiVersion = $_SERVER['ACCEPT_VERSION'];
+        $this->apiVersion = $_SERVER['HTTP_ACCEPT_VERSION'];
     }
 
     public function getResource() {
