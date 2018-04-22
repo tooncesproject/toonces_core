@@ -56,6 +56,8 @@ class TestDataResource extends SqlDependentTestCase {
         
         $goodLogin = $dr->authenticateUser();
         
+        $this->destroyTestDatabase();
+        
         // ASSERT
         $this->assertNull($noLogin);
         $this->assertNull($badLogin);
@@ -114,11 +116,59 @@ class TestDataResource extends SqlDependentTestCase {
         
     }
 
-    /*
+    
     public function testGetSubResources() {
+        // ARRANGE
+
+        // Set up SQL connection
+        $sqlConn = $this->getConnection();
         
+        
+        // Set up Toonces database fixture
+        $this->destroyTestDatabase();
+        $this->buildTestDatabase();
+        // We'll use the 'coreservices' API root for our test.
+        // The APIPageView object needs to know its page ID.
+        $sql = <<<SQL
+        SELECT
+            page_id
+        FROM
+            toonces.pages
+        WHERE
+            pathname = 'coreservices'
+SQL;
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $pageId = $result[0][0];
+        $apiPageView = new APIPageView($pageId);
+        $apiPageView->setSQLConn($sqlConn);
+        $dr = new TestableDataResource($apiPageView);
+        
+        // ACT
+        $_SERVER['PHP_AUTH_USER'] = 'badhacker@asshole.com';
+        $_SERVER['PHP_AUTH_PW'] = '12345';
+        $resultUnauthenticated = $dr->getSubResources();
+        $dataUnauthenticated = $dr->dataObjects;
+        
+        // Authenticate and then do it again.
+        $_SERVER['PHP_AUTH_USER'] = 'email@example.com';
+        $_SERVER['PHP_AUTH_PW'] = 'mySecurePassword';
+        $resultAuthenticated = $dr->getSubResources();
+        $dataAuthenticated = $dr->dataObjects;
+        $statusAuthenticated = $dr->httpStatus;
+        
+        $this->destroyTestDatabase();
+
+        // ASSERT
+        $this->assertFalse($resultUnauthenticated);
+        $this->assertEquals(0, count($dataUnauthenticated));
+        
+        $this->assertTrue($resultAuthenticated);
+        $this->assertGreaterThan(0, count($dataAuthenticated));
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $statusAuthenticated);
     }
-    */
+    
 
     public function testValidateData () {
         // ARRANGE
@@ -212,7 +262,6 @@ class TestDataResource extends SqlDependentTestCase {
             $dr->getResource;
         } finally {
             $caughtException = true;
-            print "ASS" . PHP_EOL;
         }
         
         // Call the method with each "supported" HTTP verb.
