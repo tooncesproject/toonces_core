@@ -32,7 +32,8 @@ SQL;
     try {
         $stmt->execute(['phpHost' => $phpHost, 'password' => $tup]);
     } catch (PDOException $e) {
-        die('Failed to create Toonces database user: ' . $e->getMessage() . PHP_EOL);
+        echo('Failed to create Toonces database user: ' . $e->getMessage() . PHP_EOL);
+        throw $e;
     }
     
     $stmt->closeCursor();
@@ -43,7 +44,8 @@ SQL;
     try {
         $conn->exec($sql);
     } catch (PDOException $e) {
-        die('Failed to build Toonces core database: ' . $e->getMessage() . PHP_EOL);
+        echo('Failed to build Toonces core database: ' . $e->getMessage() . PHP_EOL);
+        throw $e;
     }
     
     // Grant the Toonces user privileges needed to use the database.
@@ -54,7 +56,8 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['phpHost' => $phpHost]);
     } catch (PDOException $e) {
-        die('Failed to grant database privileges to Toonces MySQL user: ' . $e->getMessage() . PHP_EOL);
+        echo('Failed to grant database privileges to Toonces MySQL user: ' . $e->getMessage() . PHP_EOL);
+        throw $e;
     }
     
     // run the data scripts
@@ -72,7 +75,8 @@ SQL;
                 $stmt->execute();
                 $stmt->closeCursor();
             } catch (PDOException $e) {
-                die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+                echo('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+                throw $e;
             }
         }
     }
@@ -89,7 +93,8 @@ SQL;
             try {
                 $isError = $conn->exec($sql);
             } catch (PDOException $e) {
-                die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+                echo('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+                throw $e;
             }
             // Not all errors raise an exeption, even when PDO is set to do so. PDO sucks.
             if ($isError == 1) {
@@ -110,7 +115,8 @@ SQL;
             try {
                 $isError = $conn->exec($sql);
             } catch (PDOException $e) {
-                die('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+                echo('SQL execution failed for file ' . $path . ': ' . $e->getMessage() . PHP_EOL);
+                throw $e;
             }
             // Not all errors raise an exeption, even when PDO is set to do so. PDO sucks.
             if ($isError == 1) {
@@ -129,7 +135,8 @@ SQL;
     try {
         $stmt->execute();
     } catch (Exception $e) {
-        die('SQL Error: ' . $e->getMessage() . PHP_EOL);
+        echo('SQL Error: ' . $e->getMessage() . PHP_EOL);
+        throw $e;
     }
     
     $rows = $stmt->fetchAll();
@@ -160,7 +167,8 @@ SQL;
             $stmt = $conn->prepare($sql);
             $stmt->execute();
         } catch (PDOException $e) {
-            die('Failed to create main page: ' . $e->getMessage());
+            echo('Failed to create main page: ' . $e->getMessage());
+            throw $e;
         }
         
         // Get the page ID
@@ -176,7 +184,8 @@ SQL;
             $stmt = $conn->prepare($sql);
             $stmt->execute([':pageID' => $pageID]);
         } catch (PDOException $e) {
-            die('Failed to insert a record into ext_html_pages: ' . $e->getMessage());
+            echo('Failed to insert a record into ext_html_pages: ' . $e->getMessage());
+            throw $e;
         }
     } else {
         echo '    Detected existing home page in database; Skipping.' . PHP_EOL;
@@ -189,7 +198,8 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute();
     } catch (PDOException $e) {
-        die('Failed to create admin pages: ' . $e->getMessage());
+        echo('Failed to create admin pages: ' . $e->getMessage());
+        throw $e;
     }
     
     // Create Core Services API
@@ -212,7 +222,8 @@ SQL;
         $stmt->execute();
         $result = $stmt->fetchAll();
     } catch (PDOException $e) {
-        die ('Failed to create Core Services API: ' . $e->getMessage());
+        echo('Failed to create Core Services API: ' . $e->getMessage());
+        throw $e;
     }
     if ($result) {
         $sql = "CALL sp_delete_page(:pageId)";
@@ -220,7 +231,8 @@ SQL;
         try {
             $stmt->execute(array('pageId' => $result[0][0]));
         } catch (PDOException $e) {
-            die ('Failed to create Core Services API: ' . $e->getMessage());
+            echo('Failed to create Core Services API: ' . $e->getMessage());
+            throw $e;
         }
     }
     
@@ -246,7 +258,8 @@ SQL;
         $result = $stmt->fetchAll();
         $csPageId = $result[0][0];
     } catch (PDOException $e) {
-        die ('Failed to create Core Services API: ' . $e->getMessage());
+        echo('Failed to create Core Services API: ' . $e->getMessage());
+        throw $e;
     }
     
     // Blogs endpoint
@@ -268,7 +281,8 @@ SQL;
         $stmt->execute(array('csPageId' => $csPageId));
         $result = $stmt->fetchAll();
     } catch (PDOException $e) {
-        die ('Failed to create Core Services API (blogs): ' . $e->getMessage());
+        echo('Failed to create Core Services API (blogs): ' . $e->getMessage());
+        throw $e;
     }
     
     // Blog Posts endpoint
@@ -290,7 +304,8 @@ SQL;
         $stmt->execute(array('csPageId' => $csPageId));
         $result = $stmt->fetchAll();
     } catch (PDOException $e) {
-        die ('Failed to create Core Services API (blog posts): ' . $e->getMessage());
+        echo('Failed to create Core Services API (blog posts): ' . $e->getMessage());
+        throw $e;
     }
     
     // Write the SQL credentials to toonces_config.xml
@@ -307,7 +322,8 @@ SQL;
             $rootElement->appendChild($passwordElement);
             
         } catch (Exception $e) {
-            die('Error: Failed to write MySQL password to toonces_config.xml: ' . $e . PHP_EOL);
+            echo('Error: Failed to write MySQL password to toonces_config.xml: ' . $e->getMessage() . PHP_EOL);
+            throw $e;
         }
         
     } else {
@@ -317,7 +333,8 @@ SQL;
     try {
         $xml->save('toonces-config.xml');
     } catch (Exception $e) {
-        die('Error: Failed to write MySQL password to toonces_config.xml: ' . $e . PHP_EOL);
+        echo('Error: Failed to write MySQL password to toonces_config.xml: ' . $e->getMessage() . PHP_EOL);
+        throw $e;
     }
     
     // Create the admin account
@@ -329,7 +346,7 @@ SQL;
     while ($fieldName = current($response)) {
         
         if ($fieldName['responseState'] == 0) {
-            die('Error creating Admin user: ' . $fieldName['responseMessage'] . PHP_EOL);
+            echo('Error creating Admin user: ' . $fieldName['responseMessage'] . PHP_EOL);
         }
         next($response);
     }
