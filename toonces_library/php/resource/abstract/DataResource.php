@@ -48,9 +48,9 @@ abstract class DataResource extends Resource implements iResource
        // $headers = apache_request_headers();
         
         //if (array_key_exists('content-type', $headers))
-        if (array_key_exists('HTTP_CONTENT_TYPE', $_SERVER))
+        if (array_key_exists('CONTENT_TYPE', $_SERVER))
             //if ($headers['content-type'] == 'application/json')
-            if ($_SERVER['HTTP_CONTENT_TYPE'] == 'application/json')
+            if ($_SERVER['CONTENT_TYPE'] == 'application/json')
                 $headersValid = true;
                 
             return $headersValid;

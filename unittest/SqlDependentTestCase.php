@@ -37,19 +37,7 @@ abstract class SqlDependentTestCase extends TestCase
         return $this->conn;
     }
 
-    // lifted from https://github.com/tymondesigns/jwt-auth/issues/28
-    public function makeServerFixture($method, $uri, array $data = [], array $headers = [])
-    {
-        //if ($this->token && !isset($headers['Content-type'])) {
-        //    $headers['Content-type'] = "Bearer: $this->token";
-        //}
-        
-        $server = $this->transformHeadersToServerVars($headers);
-        
-        $this->call(strtoupper($method), $uri, $data, [], [], $server);
-        
-        return $this;
-    }
+
 
     public function destroyTestDatabase() {
         // Drops toonces user and database.
@@ -81,9 +69,3 @@ SQL;
     
 }
 
-// PROCEDURAL DEPENDENCIES
-function apache_request_headers() {
-    return array (
-        'Accept-version' => 1
-    );
-}

@@ -35,15 +35,15 @@ class TestDataResource extends SqlDependentTestCase {
         
 
         // ACT
-        //$invalidResult = $dr->validateHeaders();
+        // Go without header
+        $invalidResult = $dr->validateHeaders();
         
-        // Inject the required header
-        $_SERVER['HTTP_CONTENT_TYPE'] = 'application/json';
-        //die(var_dump($_SERVER));
+        // Inject the required header for a valid result
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
         $validResult = $dr->validateHeaders();
 
         // ASSERT
-        //$this->assertFalse($invalidResult);
+        $this->assertFalse($invalidResult);
         $this->assertTrue($validResult);
     }
 
