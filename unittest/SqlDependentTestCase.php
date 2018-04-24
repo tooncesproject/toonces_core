@@ -38,7 +38,6 @@ abstract class SqlDependentTestCase extends TestCase
     }
 
 
-
     public function destroyTestDatabase() {
         // Drops toonces user and database.
         $sqlConn = $this->getConnection();
@@ -49,6 +48,7 @@ SQL;
         $sqlConn->exec($sql);
             
     }
+
 
     public function buildTestDatabase() {
         // Calls the setupTooncesDatabase function

@@ -146,6 +146,7 @@ SQL;
             }
 
             // Check that the user has access to the ancestor page (and that it exists). 
+            // Note: A user must be an admin or explicitly given acces to the ancestor page in order to create a blog.
             $sql = <<<SQL
             SELECT
                  p.page_id
@@ -156,8 +157,6 @@ SQL;
                 p.page_id = :pageID 
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
-                    OR
                     pua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
@@ -249,10 +248,8 @@ SQL;
 
         // Connect to SQL
         $sqlConn = $this->pageViewReference->getSQLConn();
-
         // The blogID should be set in the URL parameters.
         $blogID = $this->validateIntParameter('id');
-
         // Acquire the PUT body (if not already set)
         if (count($this->dataObjects) == 0)
             $this->dataObjects = json_decode(file_get_contents("php://input"), true);
@@ -291,22 +288,20 @@ SQL;
             FROM blogs b
             JOIN pages p ON b.page_id = p.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 b.blog_id = :blogID
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
-                    OR
                     pua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
                 )
 SQL;
+
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
             $result = $stmt->fetchall();
-            
             if (!$result) {
                 // No access or blog doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -321,6 +316,7 @@ SQL;
             
             // return the updated blog record.
             // Return the newly created blog.
+
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = strval($blogID);
             $this->dataObjects = array();
