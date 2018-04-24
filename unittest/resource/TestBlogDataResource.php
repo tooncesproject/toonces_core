@@ -381,4 +381,99 @@ SQL;
 
     }
 
+    /**
+     * @depends testGetAction
+     */
+    function testDeleteAction() {
+        // Unit tests the DeleteAction method
+        // ARRANGE
+        $sqlConn = $this->getConnection();
+        $apiPageView = new APIPageView(1);
+        $apiPageView->setSQLConn($sqlConn);
+        $bdr = new BlogDataResource($apiPageView);
+        
+        // Acquire an exiting blog ID
+        // (Depends on testPostAction())
+        $sql = "SELECT blog_id FROM blogs ORDER BY blog_id DESC LIMIT 1";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute();
+        $blogIdResult = $stmt->fetchAll();
+        $blogId = $blogIdResult[0][0];
+        
+        // ACT
+        // DELETE method without id parameter set
+        $this->setAdminAuth();
+        $noParamResult = $bdr->deleteAction();
+        $noParamStatus = $bdr->httpStatus;
+        
+        // DELETE unpublished page without any login
+        $this->unsetBasicAuth();
+        $bdr->parameters['id'] = strval($blodId);
+        $noLoginResult = $bdr->deleteAction();
+        $noLoginStatus = $bdr->httpStatus;
+        
+        $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(array('blogId' => $blogId));
+        $sqlResult = $stmt->fetchAll();
+        $blogDeletedWithoutLogin = ($sqlResult) ? false : true;
+        
+        // DELETE unpublished page without admin login
+        $this->setNonAdminAuth();
+        $bdr->parameters['id'] = strval($blodId);
+        $nonAdminResult = $bdr->deleteAction();
+        $nonAdminStatus = $bdr->httpStatus;
+        
+        $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(array('blogId' => $blogId));
+        $sqlResult = $stmt->fetchAll();
+        $blogDeletedWithoutAdminLogin = ($sqlResult) ? false : true;
+        
+        // DELETE with bogus id parameter
+        $this->setAdminAuth();
+        $bdr->parameters['id'] = '12345';
+        $bogusParamResult = $bdr->deleteAction();
+        $bogusParamStatus = $bdr->httpStatus;
+        
+        $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(array('blogId' => $blogId));
+        $sqlResult = $stmt->fetchAll();
+        $blogDeletedWithBogusId = ($sqlResult) ? false : true;
+        
+        // Legit delete
+        $bdr->parameters['id'] = strval($blogId);
+        $legitResult = $bdr->deleteAction();
+        $legitStatus = $bdr->httpStatus;
+        
+        $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(array('blogId' => $blogId));
+        $sqlResult = $stmt->fetchAll();
+        $blogDeletedLegitimately = ($sqlResult) ? false : true;
+        
+        
+        //ASSERT
+        // DELETE method without id parameter set
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $noParamStatus);
+
+        // DELETE unpublished page without any login
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $noLoginStatus);
+        $this->assertFalse($blogDeletedWithoutLogin);
+
+        // DELETE unpublished page without admin login
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminStatus);
+        $this->assertFalse($blogDeletedWithoutAdminLogin);
+        
+        // DELETE with bogus id parameter
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusParamStatus);
+        $this->assertFalse($blogDeletedWithBogusId);
+        
+        // Legit delete
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $legitStatus);
+        $this->assertTrue($blogDeletedLegitimately);
+        
+    }
+
 }
