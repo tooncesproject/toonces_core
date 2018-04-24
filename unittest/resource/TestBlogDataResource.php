@@ -259,4 +259,126 @@ SQL;
         
     }
 
+    /**
+     * @depends testPutAction
+     */
+    function testGetAction() {
+        // Test the getAction method
+        // ARRANGE
+        $sqlConn = $this->getConnection();
+        $apiPageView = new APIPageView(1);
+        $apiPageView->setSQLConn($sqlConn);
+        $bdr = new BlogDataResource($apiPageView);
+        
+        // Acquire an exiting blog ID
+        // (Depends on testPostAction())
+        $sql = "SELECT blog_id FROM blogs ORDER BY blog_id DESC LIMIT 1";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute();
+        $blogIdResult = $stmt->fetchAll();
+        $blogId = $blogIdResult[0][0];
+        
+        // Create a 2nd blog but make it unpublished
+        $this->setAdminAuth();
+        $postData = array(
+             'blogName' => 'Another Unpublished Blog'
+            ,'pathName' => 'anotherunpublishedblog'
+            ,'ancestorPageID' => 1
+        );
+        $bdr->dataObjects = $postData;
+        $postResponse = $bdr->postAction();
+        $newBlogId =  key($postResponse);
+        $newBlogIdStr = strval($newBlogId);
+        $blogData = $postResponse[$newBlogIdStr];
+        $newPageId = $blogData['pageID'];
+
+        $sql = "UPDATE pages SET published = FALSE WHERE page_id = :newPageId";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(array('newPageId' => $newPageId));
+        
+        // ACT
+        // Bad authenticated GET, no parameters
+        $this->setBadAuth();
+        $bdr->dataObjects = array();
+        $badAuthNpOutput = $bdr->getAction();
+        $badAuthNpStatus = $bdr->httpStatus;
+
+        // Unauthenticated GET with unpublished ID parameter
+        $this->unsetBasicAuth();
+        $bdr->dataObjects = array();
+        $bdr->parameters['id'] = $newBlogIdStr;
+        $noAuthUnpublishedOutput = $bdr->getAction();
+        $noAuthUnpublishedStatus = $bdr->httpStatus;
+        
+        // Non-admin authenticated GET with unpublished ID parameter
+        $this->setNonAdminAuth();
+        $bdr->dataObjects = array();
+        $bdr->parameters['id'] = $newBlogIdStr;
+        $nonAdminUnpubOutput = $bdr->getAction();
+        $nonAdminUnpubStatus = $bdr->httpStatus;
+
+        // Authenticated GET with bogus ID parameter
+        $this->setAdminAuth();
+        $bdr->dataObjects = array();
+        $bdr->parameters['id'] = '666';
+        $bogusParamOutput = $bdr->getAction();
+        $bogusParamStatus = $bdr->httpStatus;
+        
+        // Admin authenticated GET, no parameters
+        $this->setAdminAuth();
+        $bdr->dataObjects = array();
+        $bdr->parameters = array();
+        $adminAuthNpOutput = $bdr->getAction();
+        $adminAuthNpStatus = $bdr->httpStatus;
+
+        // Admin authenticated GET with ID parameter
+        $this->setAdminAuth();
+        $bdr->dataObjects = array();
+        $bdr->parameters['id'] = $newBlogIdStr;
+        $adminParamOutput = $bdr->getAction();
+        $adminParamStatus = $bdr->httpStatus;
+        
+        // Unauthenticated GET, no parameters
+        $this->unsetBasicAuth();
+        $bdr->dataObjects = array();
+        $bdr->parameters = array();
+        $noParamsOutput = $bdr->getAction();
+        $noParamsStatus = $bdr->httpStatus;
+        
+        // ASSERT
+        // Bad authenticated GET, no parameters
+        $this->assertFalse(isset($badAuthNpOutput[$newBlogIdStr]));
+        
+        // Unauthenticated GET with unpublished ID parameter
+        $this->assertFalse(isset($noAuthUnpublishedOutput[$newBlogIdStr]));
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthUnpublishedStatus);
+
+        // Non-admin authenticated GET with unpublished ID parameter
+        $this->assertFalse(isset($nonAdminUnpubOutput[$newBlogIdStr]));
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminUnpubStatus);
+
+        // Authenticated GET with bogus ID parameter
+        $this->assertFalse(isset($bogusParamOutput[$newBlogIdStr]));
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusParamStatus);
+
+        // Admin authenticated GET, no parameters
+        $this->assertTrue(isset($adminAuthNpOutput[$newBlogId]));
+        $this->assertTrue(isset($adminAuthNpOutput[$blogId]));
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $adminAuthNpStatus);
+
+        // Admin authenticated GET with ID parameter
+        $this->assertTrue(isset($adminParamOutput[$newBlogIdStr]));
+        $this->assertFalse(isset($adminParamOutput[strval($blogId)]));
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $adminParamStatus);
+        
+        // (additionally, let's check some of the data)
+        $this->assertSame($postData['blogName'], $adminParamOutput[$newBlogIdStr]['blogName']);
+
+        // Unauthenticated GET, no parameters
+        $this->assertFalse(isset($noParamsOutput[$newBlogIdStr]));
+        $this->assertTrue(isset($noParamsOutput[strval($blogId)]));
+        $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $noParamsStatus);
+
+    }
+
 }

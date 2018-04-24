@@ -50,7 +50,7 @@ class BlogDataResource extends DataResource implements iResource {
             -- 1st join to PHB is to get the parent page ID
             LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 (b.blog_id = :blogID OR :blogID IS NULL) 
                 AND
@@ -364,7 +364,7 @@ SQL;
             FROM blogs b
             JOIN pages p ON b.page_id = p.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 b.blog_id = :blogID
                 AND
