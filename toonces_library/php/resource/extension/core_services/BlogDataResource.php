@@ -50,7 +50,7 @@ class BlogDataResource extends DataResource implements iResource {
             -- 1st join to PHB is to get the parent page ID
             LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 (b.blog_id = :blogID OR :blogID IS NULL) 
                 AND
@@ -116,7 +116,7 @@ SQL;
     
     function postAction() {
         // Validates as POST request and responds.
-        
+
         // set up the field validators.
         $this->buildFields();
 
@@ -128,6 +128,7 @@ SQL;
         do {
             // Authenticate the user.
             $userID = $this->authenticateUser();
+
             if (empty($userID)) {
                 // Authentication failed.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
@@ -145,18 +146,17 @@ SQL;
             }
 
             // Check that the user has access to the ancestor page (and that it exists). 
+            // Note: A user must be an admin or explicitly given acces to the ancestor page in order to create a blog.
             $sql = <<<SQL
             SELECT
                  p.page_id
             FROM pages p
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 p.page_id = :pageID 
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
-                    OR
                     pua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
@@ -166,7 +166,6 @@ SQL;
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'pageID' => $ancestorPageID));
             $result = $stmt->fetchall();
-
             if (!$result) {
                 // No access or ancestor doesn't exist? Return a 400 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
@@ -201,7 +200,8 @@ SQL;
                 ,'HTMLPageView'         -- blog_pageview_class VARCHAR(50)
             )
 SQL;
-
+            
+            $blogID = null;
             try {
                 $stmt = $sqlConn->prepare($sql);
                 $sqlParams = array(
@@ -212,6 +212,7 @@ SQL;
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchall();
                 $blogID = $result[0][0];
+
             } catch (PDOException $e) {
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
@@ -219,7 +220,13 @@ SQL;
                 $this->dataObjects = array('status' => $this->statusMessage);
                 break;
             }         
-
+            
+            // Check to ensure blog ID was actually created'
+            if (!$blogID) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'Blog creation failed, possibly due to a dupliate pathName. Try changing the or supplying the pathName explicitly.';
+                break;
+            }
             // Return the newly created blog.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = strval($blogID);
@@ -241,10 +248,8 @@ SQL;
 
         // Connect to SQL
         $sqlConn = $this->pageViewReference->getSQLConn();
-
         // The blogID should be set in the URL parameters.
         $blogID = $this->validateIntParameter('id');
-
         // Acquire the PUT body (if not already set)
         if (count($this->dataObjects) == 0)
             $this->dataObjects = json_decode(file_get_contents("php://input"), true);
@@ -283,22 +288,20 @@ SQL;
             FROM blogs b
             JOIN pages p ON b.page_id = p.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 b.blog_id = :blogID
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
-                    OR
                     pua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
                 )
 SQL;
+
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
             $result = $stmt->fetchall();
-            
             if (!$result) {
                 // No access or blog doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -313,6 +316,7 @@ SQL;
             
             // return the updated blog record.
             // Return the newly created blog.
+
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = strval($blogID);
             $this->dataObjects = array();
@@ -360,13 +364,11 @@ SQL;
             FROM blogs b
             JOIN pages p ON b.page_id = p.page_id
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON pua.user_id = u.user_id
+            LEFT JOIN users u ON u.user_id = :userID
             WHERE
                 b.blog_id = :blogID
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
-                    OR
                     pua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE

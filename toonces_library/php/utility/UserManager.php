@@ -108,18 +108,28 @@ class UserManager
 				,salt
 				,is_admin
 			) VALUES (
-				 '%s'
-				,'%s'
-				,'%s'
-				,'%s'
-				,'%s'
-				,'%s'
-				,%s
+				 :email
+				,:nickname
+				,:firstName
+				,:lastName
+				,:password
+				,:salt
+				,:isAdmin
 			)
 SQL;
 
-			$sql = sprintf($sql,$email,$nickname,$firstName,$lastName,$password,$salt,$isAdmin);
-			$this->conn->query($sql);
+			$stmt = $this->conn->prepare($sql);
+            $params = array(
+                 'email' => $email
+                ,'nickname' => $nickname
+                ,'firstName' => $firstName
+                ,'lastName' => $lastName
+                ,'password' => $password
+                ,'salt' => $salt
+                ,'isAdmin' => intval($isAdmin)
+            );
+			$stmt->execute($params);
+
 		}
 
 		return $responseArray;

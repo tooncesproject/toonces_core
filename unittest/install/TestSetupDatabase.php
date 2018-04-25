@@ -25,14 +25,14 @@ class TestSetupTooncesDatabase extends SqlDependentTestCase {
         $this->destroyTestDatabase();
         // ACT
         $setupFailure = setupTooncesDatabase(
-             $sqlConn               // SQL connection object (PDO)
-            ,'kittycat'             // Toonces MySQL user password
-            ,'email@example.com'    // Toonces admin username
-            ,'mySecurePassword'     // Toonces admin password
-            ,'Paul'                 // toonces user first name
-            ,'Anderson'             // toonces user last name
-            ,'Dark Lord of Toonces' // toonces user nickname
-            ,'%'                    // PHP host IP/domain
+             $sqlConn                       // SQL connection object (PDO)
+            ,'kittycat'                     // Toonces MySQL user password
+            ,$GLOBALS['TOONCES_USERNAME']   // Toonces admin username
+            ,$GLOBALS['TOONCES_PASSWORD']   // Toonces admin password
+            ,'Paul'                         // toonces user first name
+            ,'Anderson'                     // toonces user last name
+            ,'Dark Lord of Toonces'         // toonces user nickname
+            ,'%'                            // PHP host IP/domain
             );
 
         // Tear down db

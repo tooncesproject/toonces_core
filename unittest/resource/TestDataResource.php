@@ -51,8 +51,8 @@ class TestDataResource extends SqlDependentTestCase {
         $badLogin = $dr->authenticateUser();
         
         // Attempt with valid user
-        $_SERVER['PHP_AUTH_USER'] = 'email@example.com';
-        $_SERVER['PHP_AUTH_PW'] = 'mySecurePassword';
+        $_SERVER['PHP_AUTH_USER'] = $GLOBALS['TOONCES_USERNAME'];
+        $_SERVER['PHP_AUTH_PW'] = $GLOBALS['TOONCES_PASSWORD'];
         
         $goodLogin = $dr->authenticateUser();
         
@@ -152,8 +152,8 @@ SQL;
         $dataUnauthenticated = $dr->dataObjects;
         
         // Authenticate and then do it again.
-        $_SERVER['PHP_AUTH_USER'] = 'email@example.com';
-        $_SERVER['PHP_AUTH_PW'] = 'mySecurePassword';
+        $_SERVER['PHP_AUTH_USER'] = $GLOBALS['TOONCES_USERNAME'];
+        $_SERVER['PHP_AUTH_PW'] = $GLOBALS['TOONCES_PASSWORD'];
         $resultAuthenticated = $dr->getSubResources();
         $dataAuthenticated = $dr->dataObjects;
         $statusAuthenticated = $dr->httpStatus;
