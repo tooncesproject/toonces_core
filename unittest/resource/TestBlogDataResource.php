@@ -474,6 +474,10 @@ SQL;
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $legitStatus);
         $this->assertTrue($blogDeletedLegitimately);
         
+        // All done. Tear down the fixture.
+        $this->destroyTestDatabase();
+        
+        
     }
 
 }

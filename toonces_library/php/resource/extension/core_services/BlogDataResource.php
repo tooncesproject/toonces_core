@@ -369,8 +369,6 @@ SQL;
                 b.blog_id = :blogID
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
-                    OR
                     pua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
