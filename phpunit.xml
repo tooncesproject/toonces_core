@@ -19,6 +19,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 		</testsuite>
 		<testsuite name="resources">
 			<file>unittest/resource/TestDataResource.php</file>
+			<file>unittest/resource/TestBlogDataResource.php</file>
 			<file>unittest/resource/TestHTMLPageView.php</file>
 			<file>unittest/resource/TestHTMLResource.php</file>
 			<file>unittest/resource/TestHTMLViewResource.php</file>

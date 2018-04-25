@@ -27,9 +27,9 @@ abstract class SqlDependentTestCase extends TestCase
                 $port = $GLOBALS['DB_PORT'];
                 $dbUserName = $GLOBALS['DB_USERNAME'];
                 $pw = $GLOBALS['DB_PASSWORD'];
-                
-                self::$pdo = new PDO("mysql:host=$host;port=$port;",$dbUserName,$pw);
-
+                $newPdo = new PDO("mysql:host=$host;port=$port;",$dbUserName,$pw);
+                $newPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$pdo = $newPdo;
             }
             $this->conn = self::$pdo;
         }
@@ -42,8 +42,8 @@ abstract class SqlDependentTestCase extends TestCase
         // Drops toonces user and database.
         $sqlConn = $this->getConnection();
         $sql = <<<SQL
-        DROP DATABASE toonces;
-        DROP USER toonces;
+        DROP DATABASE IF EXISTS toonces;
+        DROP USER IF EXISTS toonces;
 SQL;
         $sqlConn->exec($sql);
             

@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS adminpages (
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-CREATE TABLE IF NOT EXISTS ext_html_pages (
+CREATE TABLE IF NOT EXISTS ext_html_page (
      ext_html_page_id       BIGINT          NOT NULL AUTO_INCREMENT
     ,page_id                BIGINT          NOT NULL
     ,html_path              VARCHAR(200)    NOT NULL
@@ -203,8 +203,8 @@ CREATE TABLE IF NOT EXISTS ext_html_pages (
     ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
     ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
 
-        ,CONSTRAINT pk_ext_html_pages PRIMARY KEY (ext_html_page_id)
-        ,CONSTRAINT fk_ext_html_pages_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
+        ,CONSTRAINT pk_ext_html_page PRIMARY KEY (ext_html_page_id)
+        ,CONSTRAINT fk_ext_html_page_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
         ,CONSTRAINT ak_page_id UNIQUE INDEX (page_id)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;

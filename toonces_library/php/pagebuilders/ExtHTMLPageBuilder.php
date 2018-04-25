@@ -21,7 +21,7 @@ class ExtHTMLPageBuilder extends StandardPageBuilder {
         if (!isset($this->conn))
             $this->conn = $this->pageViewReference->getSQLConn();
  
-        $sql = 'SELECT html_path FROM ext_html_pages WHERE page_id = :pageID';
+        $sql = 'SELECT html_path FROM ext_html_page WHERE page_id = :pageID';
         $stmt = $this->conn->prepare($sql);
         
         $stmt->execute(['pageID' => $pageID]);
