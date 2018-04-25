@@ -14,7 +14,7 @@ class ExtHTMLPageBuilder extends StandardPageBuilder {
     function createContentElement() {
         
         // Pretty simple here - It's just an extHtmlResource object.
-        $this->contentElement = new ExtHtmlResource($this->pageViewReference->pageId); 
+        $this->contentElement = new ExtHtmlResource($this->pageViewReference); 
         
     }
     
