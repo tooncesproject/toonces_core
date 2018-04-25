@@ -31,5 +31,6 @@ class ExtHtmlResource extends HTMLResource implements iResource {
             echo('Failed to get static HTML content: ' . $e->getMessage());
             throw $e;
         }
+        return $this->html;
     }
 }
