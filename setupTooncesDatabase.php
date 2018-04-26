@@ -323,6 +323,15 @@ SQL;
         )
 SQL;
 
+    $stmt = $conn->prepare($sql);
+    try {
+        $stmt->execute(array('csPageId' => $csPageId));
+        $result = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        echo('Failed to create Core Services API (HTML resources): ' . $e->getMessage());
+        throw $e;
+    }
+
     // Write the SQL credentials to toonces_config.xml
     // code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it
     echo 'Updating toonces-config.xml...' . PHP_EOL;
