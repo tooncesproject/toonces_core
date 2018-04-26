@@ -1,6 +1,6 @@
 <?php
 /*
- * APIPageView.php
+ * JsonPageView.php
  * Initial commit: Paul Anderson, 1/24/2018
  * 
  * iView implementation for REST API resources.
@@ -11,7 +11,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class APIPageView implements iPageView, iResource
+class JsonPageView implements iPageView, iResource
 {
  
     // iPageView interface vars
@@ -21,14 +21,15 @@ class APIPageView implements iPageView, iResource
     public $pageTypeID;
     
     public $sessionManager;
-    public $apiVersion;
+    
     var $queryArray = array();
     var $headers = array();
     var $dataObjects = array();
     var $HTTPMethod;
     var $pageId;
-    // inherited from DataResource:
-    //var $dataObjects = array();
+    
+    public $apiVersion;
+    
     
     // iPageView setters and getters
     public function setPageURI($paramPageURI) {
@@ -100,7 +101,7 @@ class APIPageView implements iPageView, iResource
         // Overrides DataResource->getResource()
         // Validates the nested resource and returns it.
         
-        // APIPageView allows only a single root resource object; throw an exception if
+        // JsonPageView allows only a single root resource object; throw an exception if
         // this isn't the case.
         if (count($this->dataObjects) != 1)
             throw new Exception('Error: An APIPageBuilder must instantiate one and only one data object per page.');

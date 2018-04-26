@@ -20,8 +20,8 @@ class TestBlogDataResource extends SqlDependentTestCase {
         // Test the BuildFields method of BlogDataResource
         // Expected outcome: BDR holds an array of FieldValidator objects
         // ARRANGE
-        $apiPageView = new APIPageView(1);
-        $bdr = new BlogDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $bdr = new BlogDataResource($jsonPageView);
         
         // ACT
         $bdr->buildFields();
@@ -43,10 +43,10 @@ class TestBlogDataResource extends SqlDependentTestCase {
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
         
-        $apiPageView = new APIPageView(1);
-        $apiPageView->setSQLConn($sqlConn);
+        $jsonPageView = new JsonPageView(1);
+        $jsonPageView->setSQLConn($sqlConn);
         
-        $bdr = new BlogDataResource($apiPageView);
+        $bdr = new BlogDataResource($jsonPageView);
         
         // Create an unpublished page 
         $unpublishedPageId = intval($this->createUnpublishedPage());
@@ -152,9 +152,9 @@ SQL;
         // ARRANGE
         // Required objects
         $sqlConn = $this->getConnection();
-        $apiPageView = new APIPageView(1);
-        $apiPageView->setSQLConn($sqlConn);
-        $bdr = new BlogDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $jsonPageView->setSQLConn($sqlConn);
+        $bdr = new BlogDataResource($jsonPageView);
         
         // Acquire an exiting blog ID
         // (Depends on testPostAction())
@@ -266,9 +266,9 @@ SQL;
         // Test the getAction method
         // ARRANGE
         $sqlConn = $this->getConnection();
-        $apiPageView = new APIPageView(1);
-        $apiPageView->setSQLConn($sqlConn);
-        $bdr = new BlogDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $jsonPageView->setSQLConn($sqlConn);
+        $bdr = new BlogDataResource($jsonPageView);
         
         // Acquire an exiting blog ID
         // (Depends on testPostAction())
@@ -388,9 +388,9 @@ SQL;
         // Unit tests the DeleteAction method
         // ARRANGE
         $sqlConn = $this->getConnection();
-        $apiPageView = new APIPageView(1);
-        $apiPageView->setSQLConn($sqlConn);
-        $bdr = new BlogDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $jsonPageView->setSQLConn($sqlConn);
+        $bdr = new BlogDataResource($jsonPageView);
         
         // Acquire an exiting blog ID
         // (Depends on testPostAction())

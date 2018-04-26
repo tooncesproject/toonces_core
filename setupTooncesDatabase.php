@@ -246,7 +246,7 @@ SQL;
             ,'Toonces Core Services'        -- ,page_title VARCHAR(50)
             ,'Toonces Core Services'        -- ,page_link_text VARCHAR(50)
             ,'CoreServicesAPIPageBuilder'   -- ,pagebuilder_class VARCHAR(50)
-            ,'APIPageView'                  -- ,pageview_class VARCHAR(50)
+            ,'JsonPageView'                  -- ,pageview_class VARCHAR(50)
             ,FALSE                          -- ,redirect_on_error BOOL
             ,FALSE                          -- ,published BOOL
             ,6                              -- ,pagetype_id BIGINT
@@ -270,7 +270,7 @@ SQL;
             ,'Toonces Core Services - Blogs'    -- ,page_title VARCHAR(50)
             ,'Toonces Core Services - Blogs'    -- ,page_link_text VARCHAR(50)
             ,'BlogsAPIPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
-            ,'APIPageView'                      -- ,pageview_class VARCHAR(50)
+            ,'JsonPageView'                      -- ,pageview_class VARCHAR(50)
             ,FALSE                              -- ,redirect_on_error BOOL
             ,FALSE                              -- ,published BOOL
             ,6                                  -- ,pagetype_id BIGINT
@@ -293,7 +293,7 @@ SQL;
             ,'Toonces Core Services - Blog Posts'   -- ,page_title VARCHAR(50)
             ,'Toonces Core Services - Blog Posts'   -- ,page_link_text VARCHAR(50)
             ,'BlogPostAPIPageBuilder'               -- ,pagebuilder_class VARCHAR(50)
-            ,'APIPageView'                          -- ,pageview_class VARCHAR(50)
+            ,'JsonPageView'                          -- ,pageview_class VARCHAR(50)
             ,FALSE                                  -- ,redirect_on_error BOOL
             ,FALSE                                  -- ,published BOOL
             ,6                                      -- ,pagetype_id BIGINT

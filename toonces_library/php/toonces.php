@@ -32,7 +32,7 @@ include_once LIBPATH.'php/utility/BooleanFieldValidator.php';
 include_once LIBPATH.'php/resource/extension/core_services/CoreServicesDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
-include_once LIBPATH.'php/resource/APIPageView.php';
+include_once LIBPATH.'php/resource/JsonPageView.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/admin/AdminHomeBuilder.php';
