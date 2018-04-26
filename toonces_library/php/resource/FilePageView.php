@@ -31,7 +31,7 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         // If applicable - Say, this is a GET request - Start the transfer.
         if ($resourceUri) {
             // Extract the file name 
-            $filename = preg_replace('^.+/', $resourceUri);
+            $filename = preg_replace('^.+/', '', $resourceUri);
             $headerStr = 'Content-Disposition: attachment; filename="' . $filename . '"';
             header($headerStr);
             // Stop output buffering

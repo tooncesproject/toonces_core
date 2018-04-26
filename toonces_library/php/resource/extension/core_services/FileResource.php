@@ -43,6 +43,7 @@ class FileResource extends Resource implements iResource {
             }
             
             // Okie dokie? Add the vector to the output data.
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->outputData = $fileVector;
         } while (false);
         
@@ -71,17 +72,17 @@ class FileResource extends Resource implements iResource {
                     if ($this->httpMethod == 'GET')
                         $this->getAction();
                         elseif ($this->httpMethod == 'POST')
-                        $this->postAction();
+                        //$this->postAction();
                         elseif ($this->httpMethod == 'HEAD')
-                        $this->headAction();
+                        //$this->headAction();
                         elseif ($this->httpMethod == 'PUT')
-                        $this->putAction();
+                        //$this->putAction();
                         elseif ($this->httpMethod == 'OPTIONS')
-                        $this->optionsAction();
+                        //$this->optionsAction();
                         elseif ($this->httpMethod == 'DELETE')
-                        $this->deleteAction();
+                        //$this->deleteAction();
                         elseif ($this->httpMethod == 'CONNECT')
-                        $this->connectAction();
+                        //$this->connectAction();
                         else
                             throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
                             
