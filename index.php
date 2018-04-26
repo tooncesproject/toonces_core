@@ -180,10 +180,12 @@ if ($allowAccess) {
     $pageTitle = $loadedPagePageTitle;
     $pageLinkText = $loadedPageLinkText;
 } else {
-    // If no access, reset PageView class to default
+    // If no access, reset PageView class to default and send a 404 header.
     $pageView = new $defaultPageViewClass($pageId);
     $pageView->setPageURI($path);
     $pageView->setSQLConn($conn);
+    $httpStatusString = Enumeration::getString(404, 'EnumHTTPResponse');
+    header($httpStatusString, true, 404);
 }
 
 // set PageView class variables
