@@ -27,7 +27,7 @@ class FileResource extends Resource implements iResource {
         if (!isset($this->requestPath))
             $this->requestPath = $_SERVER['REQUEST_URI'];
         
-        $filename = preg_replace('^.+/', '', $this->requestPath);
+        $filename = preg_replace('~^.+/~', '', $this->requestPath);
         $fileVector = $this->resourcePath . $filename;
         
         
