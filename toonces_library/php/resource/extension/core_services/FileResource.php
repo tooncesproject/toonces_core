@@ -71,6 +71,7 @@ class FileResource extends Resource implements iResource {
                     // Note: Not using a switch statement here to preserve object state.
                     if ($this->httpMethod == 'GET')
                         $this->getAction();
+                    /*
                         elseif ($this->httpMethod == 'POST')
                         //$this->postAction();
                         elseif ($this->httpMethod == 'HEAD')
@@ -83,6 +84,8 @@ class FileResource extends Resource implements iResource {
                         //$this->deleteAction();
                         elseif ($this->httpMethod == 'CONNECT')
                         //$this->connectAction();
+                         * 
+                         */
                         else
                             throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
                             
