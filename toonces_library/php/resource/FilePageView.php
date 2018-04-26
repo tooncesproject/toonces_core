@@ -42,8 +42,7 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
             readfile($resourcePath);
         } else {
             header($httpStatusString, true, $httpStatus);
-            // Yeah it's hacky, but I want to show the standard 404 page.
-            echo file_get_contents('http://127.0.0.1/buttpoop69420');
+
         }
 
         
