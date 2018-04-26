@@ -10,7 +10,6 @@ include_once LIBPATH.'php/resource/HTMLViewResource.php';
 include_once LIBPATH.'php/resource/interface/iPageView.php';
 include_once LIBPATH.'php/resource/interface/iHTMLView.php';    
 include_once LIBPATH.'php/resource/HTMLPageView.php';
-include_once LIBPATH.'php/resource/FilePageView.php';
 include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
 include_once LIBPATH.'php/utility/SessionManager.php';
@@ -35,6 +34,7 @@ include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php'
 include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/FileResource.php';
 include_once LIBPATH.'php/resource/abstract/ApiPageView.php';
+include_once LIBPATH.'php/resource/FilePageView.php';
 include_once LIBPATH.'php/resource/JsonPageView.php';
 
 include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
