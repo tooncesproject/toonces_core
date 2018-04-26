@@ -1,12 +1,12 @@
 <?php
 /**
  * @author paulanderson
- * 
+ *
  * TestApiPageView.php
  * Initial commit: Paul Anderson, 4/25/2018
- * 
+ *
  * Unit tests for the ApiPageView class
- * 
+ *
 */
 
 use PHPUnit\Framework\TestCase;
@@ -24,7 +24,7 @@ class TestApiPageView extends SqlDependentTestCase {
 
     // We will omit unit tests for simple setter/getter methods.
     // I'm not THAT pedantic. --Paul
-    
+
     function testConstruct() {
         // ARRANGE
         $pageId = 1;
@@ -33,7 +33,7 @@ class TestApiPageView extends SqlDependentTestCase {
 
         //ACT
         $apv = new ConcreteApiPageView($pageId);
-        
+
         // ASSERT
         $this->assertEquals($pageId, $apv->pageId);
         $this->assertSame($version, $apv->apiVersion);
@@ -61,10 +61,10 @@ class TestApiPageView extends SqlDependentTestCase {
 
         // ASSERT
         $this->assertSame($pagePath, $testpath);
-        
+
         // tear down fixture
         $this->destroyTestDatabase();
-        
+
     }
 
     /**
@@ -73,7 +73,7 @@ class TestApiPageView extends SqlDependentTestCase {
     function testGetResource() {
         // ARRANGE
         $apv = new ConcreteApiPageView(1);
-        
+
         $tooManyDataObjects = array('oneObject' => 'foo', 'oneObjectTooMany' => 'bar');
         $justOneDataObject = array('oneObject' => 'foo');
 
@@ -86,16 +86,16 @@ class TestApiPageView extends SqlDependentTestCase {
         } finally {
             $failed = true;
         }
-        
+
         // With correct setup, it should just return the same array as set.
         $apv->dataObjects = $justOneDataObject;
         $output = $apv->getResource();
-        
+
         // ASSERT
         $this->assertTrue($failed);
         $this->assertSame($justOneDataObject, $output);
-        
+
     }
 
-    
+
 }

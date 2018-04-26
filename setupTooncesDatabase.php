@@ -23,21 +23,21 @@ function setupTooncesDatabase(
         FLUSH PRIVILEGES;
         CREATE USER 'toonces'@:phpHost;
         SET PASSWORD FOR 'toonces'@:phpHost = PASSWORD(:password);
-        
+
 SQL;
     $stmt = $conn->prepare($sql);
     $stmt->fetchAll();
     $stmt->closeCursor();
-    
+
     try {
         $stmt->execute(['phpHost' => $phpHost, 'password' => $tup]);
     } catch (PDOException $e) {
         echo('Failed to create Toonces database user: ' . $e->getMessage() . PHP_EOL);
         throw $e;
     }
-    
+
     $stmt->closeCursor();
-    
+
     // Run the DDL script
     echo 'Building database...' . PHP_EOL;
     $sql = file_get_contents('toonces_library/sql/table/toonces_ddl.sql');
@@ -47,7 +47,7 @@ SQL;
         echo('Failed to build Toonces core database: ' . $e->getMessage() . PHP_EOL);
         throw $e;
     }
-    
+
     // Grant the Toonces user privileges needed to use the database.
     $sql = <<<SQL
         GRANT SELECT, CREATE, INSERT, DELETE, EXECUTE, UPDATE, ALTER ROUTINE ON toonces.* TO 'toonces'@:phpHost;
@@ -59,12 +59,12 @@ SQL;
         echo('Failed to grant database privileges to Toonces MySQL user: ' . $e->getMessage() . PHP_EOL);
         throw $e;
     }
-    
+
     // run the data scripts
     echo 'Inserting base data...' . PHP_EOL;
     $dataScripts = scandir('toonces_library/sql/data');
     for ($i = 2; $i < count($dataScripts); ++$i) {
-        
+
         // Only execute if it's a SQL file
         if (strtolower(substr($dataScripts[$i], -4)) == '.sql') {
             $path = 'toonces_library/sql/data/' . $dataScripts[$i];
@@ -80,7 +80,7 @@ SQL;
             }
         }
     }
-    
+
     // run the create function scripts
     echo 'Compiling SQL Functions...' . PHP_EOL;
     $functionScripts = scandir('toonces_library/sql/func');
@@ -102,7 +102,7 @@ SQL;
             }
         }
     }
-    
+
     // Run the create procedure scripts
     echo 'Compiling SQL stored prodedures...' . PHP_EOL;
     $procedureScripts = scandir('toonces_library/sql/proc');
@@ -124,21 +124,21 @@ SQL;
             }
         }
     }
-    
+
     // Run the setup procedures
     echo 'Creating default home page...' . PHP_EOL;
-    
+
     // Check for any existing pages:
     $sql = 'SELECT page_id FROM toonces.pages';
     $stmt = $conn->prepare($sql);
-    
+
     try {
         $stmt->execute();
     } catch (Exception $e) {
         echo('SQL Error: ' . $e->getMessage() . PHP_EOL);
         throw $e;
     }
-    
+
     $rows = $stmt->fetchAll();
     if (count($rows) == 0) {
         // Create main page if it doesn't already exist.
@@ -160,9 +160,9 @@ SQL;
         ,TRUE
         ,5
         );
-        
+
 SQL;
-        
+
         try {
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -170,14 +170,14 @@ SQL;
             echo('Failed to create main page: ' . $e->getMessage());
             throw $e;
         }
-        
+
         // Get the page ID
         $sql = 'SELECT LAST_INSERT_ID()';
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll();
         $pageID = $rows[0][0];
-        
+
         // Insert a record into the ext_html_page table
         $sql = "INSERT INTO ext_html_page (page_id, html_path) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html')";
         try {
@@ -190,7 +190,7 @@ SQL;
     } else {
         echo '    Detected existing home page in database; Skipping.' . PHP_EOL;
     }
-    
+
     // Create admin pages
     echo 'Creating Toonces admin tools...' . PHP_EOL;
     $sql = "CALL sp_create_admin_pages(FALSE)";
@@ -201,10 +201,10 @@ SQL;
         echo('Failed to create admin pages: ' . $e->getMessage());
         throw $e;
     }
-    
+
     // Create Core Services API
     echo 'Creating Core Services API...' . PHP_EOL;
-    
+
     // Does the coreservices page already exist? If so, delete it.
     $result = null;
     $sql = <<<SQL
@@ -235,7 +235,7 @@ SQL;
             throw $e;
         }
     }
-    
+
     // Now create the core services endpoints.
     // Core Services root
     $csPageId = null;
@@ -261,7 +261,7 @@ SQL;
         echo('Failed to create Core Services API: ' . $e->getMessage());
         throw $e;
     }
-    
+
     // Blogs endpoint
     $sql = <<<SQL
         SELECT CREATE_PAGE (
@@ -284,7 +284,7 @@ SQL;
         echo('Failed to create Core Services API (blogs): ' . $e->getMessage());
         throw $e;
     }
-    
+
     // Blog Posts endpoint
     $sql = <<<SQL
         SELECT CREATE_PAGE (
@@ -307,7 +307,7 @@ SQL;
         echo('Failed to create Core Services API (blog posts): ' . $e->getMessage());
         throw $e;
     }
-    
+
     // Write the SQL credentials to toonces_config.xml
     // code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it
     echo 'Updating toonces-config.xml...' . PHP_EOL;
@@ -320,12 +320,12 @@ SQL;
         try {
             $rootElement = $xmlRoot->item(0);
             $rootElement->appendChild($passwordElement);
-            
+
         } catch (Exception $e) {
             echo('Error: Failed to write MySQL password to toonces_config.xml: ' . $e->getMessage() . PHP_EOL);
             throw $e;
         }
-        
+
     } else {
         $passwordElement = $nodes->item(0);
         $passwordElement->nodeValue = $tup;
@@ -336,23 +336,23 @@ SQL;
         echo('Error: Failed to write MySQL password to toonces_config.xml: ' . $e->getMessage() . PHP_EOL);
         throw $e;
     }
-    
+
     // Create the admin account
     echo 'Creating admin account...' . PHP_EOL;
     $userManager = new UserManager($conn);
     $response = $userManager->createUser($email, $pw, $pw, $firstName, $lastName, $nickname, true);
-    
+
     // Check UserManager's response for admin user validation.
     while ($fieldName = current($response)) {
-        
+
         if ($fieldName['responseState'] == 0) {
             echo('Error creating Admin user: ' . $fieldName['responseMessage'] . PHP_EOL);
         }
         next($response);
     }
-    
+
     echo 'Finished!' . PHP_EOL;
-    
+
     // Indicate success
     return false;
 }

@@ -2,9 +2,9 @@
 /*
 * TestBlogDataResource.php
 * Initial commit: Paul Anderson, 4/17/2018
-* 
+*
 * Unit tests for the BlogDataResource class
-*  
+*
 */
 
 use PHPUnit\Framework\TestCase;
@@ -22,10 +22,10 @@ class TestBlogDataResource extends SqlDependentTestCase {
         // ARRANGE
         $jsonPageView = new JsonPageView(1);
         $bdr = new BlogDataResource($jsonPageView);
-        
+
         // ACT
         $bdr->buildFields();
-        
+
         // ASSERT
         foreach ($bdr->fields as $field) {
             $this->assertTrue(is_subclass_of($field, FieldValidator::class));
@@ -37,23 +37,23 @@ class TestBlogDataResource extends SqlDependentTestCase {
         // Cases:
         //  test invalid input
         //  test valid input
-        
+
         // ARRANGE
         $sqlConn = $this->getConnection();
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
-        
+
         $jsonPageView = new JsonPageView(1);
         $jsonPageView->setSQLConn($sqlConn);
-        
+
         $bdr = new BlogDataResource($jsonPageView);
-        
-        // Create an unpublished page 
+
+        // Create an unpublished page
         $unpublishedPageId = intval($this->createUnpublishedPage());
-        
+
         // Create a non-admin user
         $this->createNonAdminUser();
-        
+
         // Mock up post data
         $postData = array('blogName' => 'Good Blog', 'ancestorPageID' => $unpublishedPageId, 'pathname' => 'pathname');
         $badPostData = array('blogName' => 'Bad Blog', 'ancestorPageID' => 666);
@@ -65,7 +65,7 @@ class TestBlogDataResource extends SqlDependentTestCase {
         $this->unsetBasicAuth();
         $nonAuthenticatedOutput = $bdr->postAction();
         $nonAuthenticatedStatus = $bdr->httpStatus;
-        
+
         // Attempt authentication with bogus user
         $this->setBadAuth();
         $bdr->dataObjects = $postData;
@@ -73,7 +73,7 @@ class TestBlogDataResource extends SqlDependentTestCase {
         $unauthorizedStatus = $bdr->httpStatus;
 
         // Bad post (unpublished ancestor page, non-admin user without explicit access to ancestor.).
-        $this->setNonAdminAuth();   
+        $this->setNonAdminAuth();
         $bdr->dataObjects = $unpublishedPostData;
         $unpublishedOutput = $bdr->postAction();
         $unpublishedStatus = $bdr->httpStatus;
@@ -85,17 +85,17 @@ class TestBlogDataResource extends SqlDependentTestCase {
         $bdr->dataObjects = $badPostData;
         $badAncestorOutput = $bdr->postAction();
         $badAncestorStatus = $bdr->httpStatus;
-        
+
         // good post with admin user
         $bdr->dataObjects = $unpublishedPostData;
         $goodOutput = $bdr->postAction();
         $goodStatus = $bdr->httpStatus;
-        
+
         // Extract output from "good" post
         $blogIdStr = key($goodOutput);
         $blogId = intval($blogIdStr);
         $blogData = $goodOutput[$blogIdStr];
-        
+
         // Query the database to ensure a record was inserted
         $blogName = null;
         $blogInserted = false;
@@ -103,7 +103,7 @@ class TestBlogDataResource extends SqlDependentTestCase {
         SELECT p.page_title
         FROM blogs b
         JOIN pages p ON b.page_id = p.page_id
-        WHERE b.blog_id = :blogId        
+        WHERE b.blog_id = :blogId
 SQL;
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('blogId' => $blogId));
@@ -116,23 +116,23 @@ SQL;
         $bdr->dataObjects = $unpublishedPostData;
         $dupeOutput = $bdr->postAction();
         $dupeStatus = $bdr->httpStatus;
-        
+
         // ASSERT
         // Unauthenticated post
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $nonAuthenticatedStatus);
-        
+
         // Invalid auth post
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $unauthorizedStatus);
-        
+
         // Access restricted post
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $unpublishedStatus);
 
         // Nonexistent ancestor post
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badAncestorStatus);
-        
+
         // Valid post
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $goodStatus);
-        
+
         // Record was inserted
         $this->assertTrue($blogInserted);
         // Record has correct data
@@ -140,7 +140,7 @@ SQL;
 
         // duplicate post
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $dupeStatus);
-        
+
     }
 
 
@@ -155,7 +155,7 @@ SQL;
         $jsonPageView = new JsonPageView(1);
         $jsonPageView->setSQLConn($sqlConn);
         $bdr = new BlogDataResource($jsonPageView);
-        
+
         // Acquire an exiting blog ID
         // (Depends on testPostAction())
         $sql = "SELECT blog_id FROM blogs ORDER BY blog_id DESC LIMIT 1";
@@ -163,11 +163,11 @@ SQL;
         $stmt->execute();
         $blogIdResult = $stmt->fetchAll();
         $blogId = $blogIdResult[0][0];
-        
+
         // most other dependencies are injected by testPostAction.
         $goodInput = array('blogName' => 'New Blog Name');
         $badInput = array();
-        
+
         // ACT
         // ID parameter not set
         $bdr->dataObjects = $goodInput;
@@ -180,7 +180,7 @@ SQL;
         $this->unsetBasicAuth();
         $nonAuthenticatedOutput = $bdr->putAction();
         $nonAuthenticatedStatus = $bdr->httpStatus;
-        
+
         // Bad auth
         $bdr->parameters['id'] = $blogId;
         $bdr->dataObjects = $goodInput;
@@ -209,7 +209,7 @@ SQL;
         $this->setNonAdminAuth();
         $invalidOutput = $bdr->putAction();
         $invalidStatus = $bdr->httpStatus;
-        
+
         // OK input
         $bdr->parameters['id'] = $blogId;
         $bdr->dataObjects = $goodInput;
@@ -231,14 +231,14 @@ SQL;
         $result = $stmt->fetchAll();
         if ($result)
             $name = $result[0][0];
-        
+
         // ASSERT
         // ID parameter not set
         $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $noIdStatus);
 
         // No auth
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $nonAuthenticatedStatus);
-        
+
         // Bad auth
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $unauthorizedStatus);
 
@@ -253,10 +253,10 @@ SQL;
 
         // good input
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $goodStatus);
-        
+
         // Name changed in database
         $this->assertSame($goodInput['blogName'], $name);
-        
+
     }
 
     /**
@@ -269,7 +269,7 @@ SQL;
         $jsonPageView = new JsonPageView(1);
         $jsonPageView->setSQLConn($sqlConn);
         $bdr = new BlogDataResource($jsonPageView);
-        
+
         // Acquire an exiting blog ID
         // (Depends on testPostAction())
         $sql = "SELECT blog_id FROM blogs ORDER BY blog_id DESC LIMIT 1";
@@ -277,7 +277,7 @@ SQL;
         $stmt->execute();
         $blogIdResult = $stmt->fetchAll();
         $blogId = $blogIdResult[0][0];
-        
+
         // Create a 2nd blog but make it unpublished
         $this->setAdminAuth();
         $postData = array(
@@ -295,7 +295,7 @@ SQL;
         $sql = "UPDATE pages SET published = FALSE WHERE page_id = :newPageId";
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('newPageId' => $newPageId));
-        
+
         // ACT
         // Bad authenticated GET, no parameters
         $this->setBadAuth();
@@ -309,7 +309,7 @@ SQL;
         $bdr->parameters['id'] = $newBlogIdStr;
         $noAuthUnpublishedOutput = $bdr->getAction();
         $noAuthUnpublishedStatus = $bdr->httpStatus;
-        
+
         // Non-admin authenticated GET with unpublished ID parameter
         $this->setNonAdminAuth();
         $bdr->dataObjects = array();
@@ -323,7 +323,7 @@ SQL;
         $bdr->parameters['id'] = '666';
         $bogusParamOutput = $bdr->getAction();
         $bogusParamStatus = $bdr->httpStatus;
-        
+
         // Admin authenticated GET, no parameters
         $this->setAdminAuth();
         $bdr->dataObjects = array();
@@ -337,18 +337,18 @@ SQL;
         $bdr->parameters['id'] = $newBlogIdStr;
         $adminParamOutput = $bdr->getAction();
         $adminParamStatus = $bdr->httpStatus;
-        
+
         // Unauthenticated GET, no parameters
         $this->unsetBasicAuth();
         $bdr->dataObjects = array();
         $bdr->parameters = array();
         $noParamsOutput = $bdr->getAction();
         $noParamsStatus = $bdr->httpStatus;
-        
+
         // ASSERT
         // Bad authenticated GET, no parameters
         $this->assertFalse(isset($badAuthNpOutput[$newBlogIdStr]));
-        
+
         // Unauthenticated GET with unpublished ID parameter
         $this->assertFalse(isset($noAuthUnpublishedOutput[$newBlogIdStr]));
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthUnpublishedStatus);
@@ -370,7 +370,7 @@ SQL;
         $this->assertTrue(isset($adminParamOutput[$newBlogIdStr]));
         $this->assertFalse(isset($adminParamOutput[strval($blogId)]));
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $adminParamStatus);
-        
+
         // (additionally, let's check some of the data)
         $this->assertSame($postData['blogName'], $adminParamOutput[$newBlogIdStr]['blogName']);
 
@@ -391,7 +391,7 @@ SQL;
         $jsonPageView = new JsonPageView(1);
         $jsonPageView->setSQLConn($sqlConn);
         $bdr = new BlogDataResource($jsonPageView);
-        
+
         // Acquire an exiting blog ID
         // (Depends on testPostAction())
         $sql = "SELECT blog_id FROM blogs ORDER BY blog_id DESC LIMIT 1";
@@ -399,61 +399,61 @@ SQL;
         $stmt->execute();
         $blogIdResult = $stmt->fetchAll();
         $blogId = $blogIdResult[0][0];
-        
+
         // ACT
         // DELETE method without id parameter set
         $this->setAdminAuth();
         $noParamResult = $bdr->deleteAction();
         $noParamStatus = $bdr->httpStatus;
-        
+
         // DELETE unpublished page without any login
         $this->unsetBasicAuth();
         $bdr->parameters['id'] = strval($blodId);
         $noLoginResult = $bdr->deleteAction();
         $noLoginStatus = $bdr->httpStatus;
-        
+
         $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('blogId' => $blogId));
         $sqlResult = $stmt->fetchAll();
         $blogDeletedWithoutLogin = ($sqlResult) ? false : true;
-        
+
         // DELETE unpublished page without admin login
         $this->setNonAdminAuth();
         $bdr->parameters['id'] = strval($blodId);
         $nonAdminResult = $bdr->deleteAction();
         $nonAdminStatus = $bdr->httpStatus;
-        
+
         $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('blogId' => $blogId));
         $sqlResult = $stmt->fetchAll();
         $blogDeletedWithoutAdminLogin = ($sqlResult) ? false : true;
-        
+
         // DELETE with bogus id parameter
         $this->setAdminAuth();
         $bdr->parameters['id'] = '12345';
         $bogusParamResult = $bdr->deleteAction();
         $bogusParamStatus = $bdr->httpStatus;
-        
+
         $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('blogId' => $blogId));
         $sqlResult = $stmt->fetchAll();
         $blogDeletedWithBogusId = ($sqlResult) ? false : true;
-        
+
         // Legit delete
         $bdr->parameters['id'] = strval($blogId);
         $legitResult = $bdr->deleteAction();
         $legitStatus = $bdr->httpStatus;
-        
+
         $sql = "SELECT blog_id FROM blogs WHERE blog_id = :blogId";
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('blogId' => $blogId));
         $sqlResult = $stmt->fetchAll();
         $blogDeletedLegitimately = ($sqlResult) ? false : true;
-        
-        
+
+
         //ASSERT
         // DELETE method without id parameter set
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $noParamStatus);
@@ -465,19 +465,19 @@ SQL;
         // DELETE unpublished page without admin login
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminStatus);
         $this->assertFalse($blogDeletedWithoutAdminLogin);
-        
+
         // DELETE with bogus id parameter
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusParamStatus);
         $this->assertFalse($blogDeletedWithBogusId);
-        
+
         // Legit delete
         $this->assertEquals(EnumHTTPResponse::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $legitStatus);
         $this->assertTrue($blogDeletedLegitimately);
-        
+
         // All done. Tear down the fixture.
         $this->destroyTestDatabase();
-        
-        
+
+
     }
 
 }
