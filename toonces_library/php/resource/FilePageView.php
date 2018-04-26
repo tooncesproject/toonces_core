@@ -27,13 +27,11 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
         if (!$httpStatusString)
             throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
-        
-        
+
         // If applicable - Say, this is a GET request - Start the transfer.
         if ($resourceUri) {
-            // Extract the file name 
-            $filename = preg_replace('~^.+/~', '', $resourceUri);
-            $headerStr = 'Content-Disposition: attachment; filename="' . $filename . '"';
+
+            $headerStr = "Content-Type: application/octet-stream";
             header($headerStr);
             // Stop output buffering
             if (ob_get_level()) {
