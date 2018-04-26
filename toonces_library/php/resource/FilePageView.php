@@ -18,6 +18,9 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         // $dataObject will be a FileResource or similar Resource subclass instance.
         $dataObject = $this->getResource();
 
+        // Execute the object.
+        $resourceUri = $dataObject->getResource();
+
         // Once executed, the resource must have an HTTP status.
         // If it doesn't, throw an exception.
         $httpStatus = $dataObject->httpStatus;
@@ -25,8 +28,6 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         if (!$httpStatusString)
             throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
         
-        // Execute the object. 
-        $resourceUri = $dataObject->getResource();
         
         // If applicable - Say, this is a GET request - Start the transfer.
         if ($resourceUri) {
