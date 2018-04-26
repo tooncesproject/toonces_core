@@ -308,6 +308,21 @@ SQL;
         throw $e;
     }
 
+    // HTML Files endpoint
+    $sql = <<<SQL
+        SELECT CREATE_PAGE (
+             :csPageId                              -- parent_page_id BIGINT
+            ,'htmlresources'                        -- ,pathname VARCHAR(50)
+            ,'Toonces Core Services - HTML Files'   -- ,page_title VARCHAR(50)
+            ,'Toonces Core Services - HTML Files'   -- ,page_link_text VARCHAR(50)
+            ,'HtmlFilePageBuilder'                  -- ,pagebuilder_class VARCHAR(50)
+            ,'FilePageView'                         -- ,pageview_class VARCHAR(50)
+            ,TRUE                                   -- ,redirect_on_error BOOL
+            ,FALSE                                  -- ,published BOOL
+            ,6                                      -- ,pagetype_id BIGINT
+        )
+SQL;
+
     // Write the SQL credentials to toonces_config.xml
     // code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it
     echo 'Updating toonces-config.xml...' . PHP_EOL;

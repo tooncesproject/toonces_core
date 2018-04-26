@@ -12,7 +12,6 @@ abstract class APIPageBuilder
 {
 
     var $resourceArray = array();
-    var $apiDelegate;
     var $pageViewReference;
     
     function __construct($pageview) {
