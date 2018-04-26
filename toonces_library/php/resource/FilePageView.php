@@ -19,7 +19,7 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         $dataObject = $this->getResource();
 
         // Execute the object.
-        $resourceUri = $dataObject->getResource();
+        $resourcePath = $dataObject->getResource();
 
         // Once executed, the resource must have an HTTP status.
         // If it doesn't, throw an exception.
@@ -29,8 +29,8 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
             throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
 
         // If applicable - Say, this is a GET request - Start the transfer.
-        if ($resourceUri) {
-
+        if ($resourcePath) {
+            header($httpStatusString, true, $httpStatus);
             $headerStr = "Content-Type: application/octet-stream";
             header($headerStr);
             // Stop output buffering
@@ -39,7 +39,9 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
             }
             
             flush();
-            readfile($resourceUri);
+            readfile($resourcePath);
+        } else {
+            header($httpStatusString, true, $httpStatus);
         }
 
         
