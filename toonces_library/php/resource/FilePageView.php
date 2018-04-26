@@ -10,7 +10,7 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class BinaryPageview extends ApiPageView implements iPageView, iResource {
+class FilePageview extends ApiPageView implements iPageView, iResource {
 
     public function renderPage() {
         // Called by index.php - Serves a file download, if applicable.
