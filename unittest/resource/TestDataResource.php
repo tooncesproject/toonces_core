@@ -24,11 +24,11 @@ class TestDataResource extends SqlDependentTestCase {
     public function testAuthenticateUser() {
         // ARRANGE
         // Instantiate with a PageView object
-        $apiPageView = new APIPageView(1);
-        $dr = new TestableDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $dr = new TestableDataResource($jsonPageView);
         // Set up SQL connection
         $sqlConn = $this->getConnection();
-        $apiPageView->setSQLConn($sqlConn);
+        $jsonPageView->setSQLConn($sqlConn);
         
         // Set up Toonces database fixture
         $this->destroyTestDatabase();
@@ -68,8 +68,8 @@ class TestDataResource extends SqlDependentTestCase {
     public function testValidateHeaders() {
         // ARRANGE
         // Instantiate with a PageView object
-        $apiPageView = new APIPageView(1);
-        $dr = new TestableDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $dr = new TestableDataResource($jsonPageView);
         
 
         // ACT
@@ -91,8 +91,8 @@ class TestDataResource extends SqlDependentTestCase {
 
         // ARRANGE
         // Instantiate with a PageView object
-        $apiPageView = new APIPageView(1);
-        $dr = new TestableDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $dr = new TestableDataResource($jsonPageView);
         
         $parameterArray = array(
              'valid' => '666'
@@ -128,7 +128,7 @@ class TestDataResource extends SqlDependentTestCase {
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
         // We'll use the 'coreservices' API root for our test.
-        // The APIPageView object needs to know its page ID.
+        // The JsonPageView object needs to know its page ID.
         $sql = <<<SQL
         SELECT
             page_id
@@ -141,9 +141,9 @@ SQL;
         $stmt->execute();
         $result = $stmt->fetchAll();
         $pageId = $result[0][0];
-        $apiPageView = new APIPageView($pageId);
-        $apiPageView->setSQLConn($sqlConn);
-        $dr = new TestableDataResource($apiPageView);
+        $jsonPageView = new JsonPageView($pageId);
+        $jsonPageView->setSQLConn($sqlConn);
+        $dr = new TestableDataResource($jsonPageView);
         
         // ACT
         $_SERVER['PHP_AUTH_USER'] = 'badhacker@asshole.com';
@@ -173,8 +173,8 @@ SQL;
     public function testValidateData () {
         // ARRANGE
         // Instantiate base objects
-        $apiPageView = new APIPageView(1);
-        $dr = new TestableDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $dr = new TestableDataResource($jsonPageView);
         
         // Set up the DataResource object's field validators.
         $nullableField = new StringFieldValidator();
@@ -234,8 +234,8 @@ SQL;
         
         // ARRANGE
         // Instantiate base objects
-        $apiPageView = new APIPageView(1);
-        $dr = new TestableDataResource($apiPageView);
+        $jsonPageView = new JsonPageView(1);
+        $dr = new TestableDataResource($jsonPageView);
         $testObjectArray = array('testObject' => 'foo');
         $dr->dataObjects = $testObjectArray;
         

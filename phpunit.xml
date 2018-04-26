@@ -18,12 +18,16 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/install/TestSetupDatabase.php</file>
 		</testsuite>
 		<testsuite name="resources">
+			<file>unittest/resource/TestApiPageView.php</file>
+			<file>unittest/resource/TestJsonPageView.php</file>
 			<file>unittest/resource/TestDataResource.php</file>
 			<file>unittest/resource/TestBlogDataResource.php</file>
 			<file>unittest/resource/TestHTMLPageView.php</file>
 			<file>unittest/resource/TestHTMLResource.php</file>
 			<file>unittest/resource/TestHTMLViewResource.php</file>
 		</testsuite>
-
+		<testsuite name="pagebuilders">
+			<file>unittest/pagebuilder/TestExtHtmlPageBuilder.php</file>
+		</testsuite>
 	</testsuites>
 </phpunit>
