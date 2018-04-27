@@ -16,6 +16,7 @@ class FileResource extends Resource implements iResource {
     var $requestPath;
     var $httpStatus;
     var $fileData;
+    var $httpMethod;
     
     public function validateHeaders() {
         // whatevs
