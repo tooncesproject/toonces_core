@@ -116,9 +116,12 @@ class FileResource extends Resource implements iResource {
                         //$this->postAction();
                         elseif ($this->httpMethod == 'HEAD')
                         //$this->headAction();
+                     */
                         elseif ($this->httpMethod == 'PUT')
-                        //$this->putAction();
+                            $this->putAction();
+                        /*
                         elseif ($this->httpMethod == 'OPTIONS')
+                        
                         //$this->optionsAction();
                         elseif ($this->httpMethod == 'DELETE')
                         //$this->deleteAction();
