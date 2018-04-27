@@ -79,7 +79,7 @@ class FileResource extends Resource implements iResource {
                 
                 // Attempt to copy the file.
                 try {
-                     file_put_contents($filename, $this->fileData);
+                     file_put_contents($fileVector, $this->fileData);
                      $this->httpStatus = $successHttpStatus;
                 } catch (Exception $e) {
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
