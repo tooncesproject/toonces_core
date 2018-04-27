@@ -15,7 +15,7 @@ class FileResource extends Resource implements iResource {
     var $resourcePath;
     var $requestPath;
     var $httpStatus;
-    var $outputData;
+    var $fileData;
     
     public function validateHeaders() {
         // whatevs
@@ -44,11 +44,51 @@ class FileResource extends Resource implements iResource {
             
             // Okie dokie? Add the vector to the output data.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-            $this->outputData = $fileVector;
+            $this->fileData = $fileVector;
         } while (false);
         
-        return $this->outputData;
+        return $this->fileData;
         
+    }
+
+    public function putAction() {
+        // Acquire the file name
+        if (!isset($this->requestPath))
+            $this->requestPath = $_SERVER['REQUEST_URI'];
+            
+            $filename = preg_replace('~^.+/~', '', $this->requestPath);
+            $fileVector = $this->resourcePath . $filename;
+            
+            // Acquire the PUT body (if not already set)
+            if (count($this->dataObjects) == 0)
+                $this->fileData = file_get_contents("php://input");
+            
+            do {
+                // Go through the validation sequcence. 
+                // Filename length
+                if (strlen($filename) == 0) {
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                    break;
+                }
+
+                // default successful HTTP status is 201 (created), but it will respond with 200 if the file
+                // already exists.
+                $successHttpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
+                if (file_exists($fileVector))
+                    $successHttpStatus = Enumeration::getOrdinal('HTTP_201_OK', 'EnumHTTPResponse');
+                
+                // Attempt to copy the file.
+                try {
+                     file_put_contents($filename, $this->fileData);
+                     $this->httpStatus = $successHttpStatus;
+                } catch (Exception $e) {
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+                    break;
+                }
+               
+
+            } while (false);
+
     }
     
     public function getResource() {
@@ -94,6 +134,6 @@ class FileResource extends Resource implements iResource {
             $this->statusMessage = 'Missing required HTTP headers.';
         }
         
-        return $this->outputData;
+        return $this->fileData;
     }
 }
