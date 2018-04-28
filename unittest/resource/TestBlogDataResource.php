@@ -61,20 +61,20 @@ class TestBlogDataResource extends SqlDependentTestCase {
 
         // ACT
         // Attempt post without authentication
-        $bdr->dataObjects = $postData;
+        $bdr->resourceData = $postData;
         $this->unsetBasicAuth();
         $nonAuthenticatedOutput = $bdr->postAction();
         $nonAuthenticatedStatus = $bdr->httpStatus;
 
         // Attempt authentication with bogus user
         $this->setBadAuth();
-        $bdr->dataObjects = $postData;
+        $bdr->resourceData = $postData;
         $unauthorizedOutput = $bdr->postAction();
         $unauthorizedStatus = $bdr->httpStatus;
 
         // Bad post (unpublished ancestor page, non-admin user without explicit access to ancestor.).
         $this->setNonAdminAuth();
-        $bdr->dataObjects = $unpublishedPostData;
+        $bdr->resourceData = $unpublishedPostData;
         $unpublishedOutput = $bdr->postAction();
         $unpublishedStatus = $bdr->httpStatus;
 
@@ -82,12 +82,12 @@ class TestBlogDataResource extends SqlDependentTestCase {
         $this->setAdminAuth();
 
         // Bad post (bogus ancestorPageID)
-        $bdr->dataObjects = $badPostData;
+        $bdr->resourceData = $badPostData;
         $badAncestorOutput = $bdr->postAction();
         $badAncestorStatus = $bdr->httpStatus;
 
         // good post with admin user
-        $bdr->dataObjects = $unpublishedPostData;
+        $bdr->resourceData = $unpublishedPostData;
         $goodOutput = $bdr->postAction();
         $goodStatus = $bdr->httpStatus;
 
@@ -113,7 +113,7 @@ SQL;
             $blogInserted = true;
 
         // Post with duplicate pathname
-        $bdr->dataObjects = $unpublishedPostData;
+        $bdr->resourceData = $unpublishedPostData;
         $dupeOutput = $bdr->postAction();
         $dupeStatus = $bdr->httpStatus;
 
@@ -170,27 +170,27 @@ SQL;
 
         // ACT
         // ID parameter not set
-        $bdr->dataObjects = $goodInput;
+        $bdr->resourceData = $goodInput;
         $noIdResult = $bdr->putAction();
         $noIdStatus = $bdr->httpStatus;
 
         // No auth
         $bdr->parameters['id'] = strval($blogId);
-        $bdr->dataObjects = $goodInput;
+        $bdr->resourceData = $goodInput;
         $this->unsetBasicAuth();
         $nonAuthenticatedOutput = $bdr->putAction();
         $nonAuthenticatedStatus = $bdr->httpStatus;
 
         // Bad auth
         $bdr->parameters['id'] = $blogId;
-        $bdr->dataObjects = $goodInput;
+        $bdr->resourceData = $goodInput;
         $this->setBadAuth();
         $unauthorizedResult = $bdr->putAction();
         $unauthorizedStatus = $bdr->httpStatus;
 
         // Non-admin auth, no access
         $bdr->parameters['id'] = $blogId;
-        $bdr->dataObjects = $goodInput;
+        $bdr->resourceData = $goodInput;
         $this->setNonAdminAuth();
         $nonAdminAuth = $bdr->putAction();
         $nonAdminStatus = $bdr->httpStatus;
@@ -198,21 +198,21 @@ SQL;
 
         // Bogus id parameter
         $bdr->parameters['id'] = '666';
-        $bdr->dataObjects = $goodInput;
+        $bdr->resourceData = $goodInput;
         $this->setAdminAuth();
         $badIdOutput = $bdr->putAction();
         $badIdStatus = $bdr->httpStatus;
 
         // Invalid input
         $bdr->parameters['id'] = $blogId;
-        $bdr->dataObjects = $badInput;
+        $bdr->resourceData = $badInput;
         $this->setNonAdminAuth();
         $invalidOutput = $bdr->putAction();
         $invalidStatus = $bdr->httpStatus;
 
         // OK input
         $bdr->parameters['id'] = $blogId;
-        $bdr->dataObjects = $goodInput;
+        $bdr->resourceData = $goodInput;
         $this->setAdminAuth();
         $goodOutput = $bdr->putAction();
         $goodStatus = $bdr->httpStatus;
@@ -285,7 +285,7 @@ SQL;
             ,'pathName' => 'anotherunpublishedblog'
             ,'ancestorPageID' => 1
         );
-        $bdr->dataObjects = $postData;
+        $bdr->resourceData = $postData;
         $postResponse = $bdr->postAction();
         $newBlogId =  key($postResponse);
         $newBlogIdStr = strval($newBlogId);
@@ -299,48 +299,48 @@ SQL;
         // ACT
         // Bad authenticated GET, no parameters
         $this->setBadAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $badAuthNpOutput = $bdr->getAction();
         $badAuthNpStatus = $bdr->httpStatus;
 
         // Unauthenticated GET with unpublished ID parameter
         $this->unsetBasicAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $bdr->parameters['id'] = $newBlogIdStr;
         $noAuthUnpublishedOutput = $bdr->getAction();
         $noAuthUnpublishedStatus = $bdr->httpStatus;
 
         // Non-admin authenticated GET with unpublished ID parameter
         $this->setNonAdminAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $bdr->parameters['id'] = $newBlogIdStr;
         $nonAdminUnpubOutput = $bdr->getAction();
         $nonAdminUnpubStatus = $bdr->httpStatus;
 
         // Authenticated GET with bogus ID parameter
         $this->setAdminAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $bdr->parameters['id'] = '666';
         $bogusParamOutput = $bdr->getAction();
         $bogusParamStatus = $bdr->httpStatus;
 
         // Admin authenticated GET, no parameters
         $this->setAdminAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $bdr->parameters = array();
         $adminAuthNpOutput = $bdr->getAction();
         $adminAuthNpStatus = $bdr->httpStatus;
 
         // Admin authenticated GET with ID parameter
         $this->setAdminAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $bdr->parameters['id'] = $newBlogIdStr;
         $adminParamOutput = $bdr->getAction();
         $adminParamStatus = $bdr->httpStatus;
 
         // Unauthenticated GET, no parameters
         $this->unsetBasicAuth();
-        $bdr->dataObjects = array();
+        $bdr->resourceData = array();
         $bdr->parameters = array();
         $noParamsOutput = $bdr->getAction();
         $noParamsStatus = $bdr->httpStatus;

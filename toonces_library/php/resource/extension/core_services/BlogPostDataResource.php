@@ -94,7 +94,7 @@ SQL;
             // 
             foreach ($result as $row) {
                 $blogPost = array(
-                     'url' => $this->resourceURL . '?id=' . strval($row[0])
+                     'url' => $this->resourceUrl . '?id=' . strval($row[0])
                     ,'blogID' => $row[1]
                     ,'pageID' => $row[2]
                     ,'pageUri' => GrabPageURL::getURL($row[2], $sqlConn)
@@ -107,7 +107,7 @@ SQL;
                     ,'published' => $row[9]
                     ,'thumbnailImageVector' => $row[10]
                 );
-                $this->dataObjects[$row[0]] = $blogPost;
+                $this->resourceData[$row[0]] = $blogPost;
             }
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
         } else {
@@ -117,7 +117,7 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
         }
         
-        return $this->dataObjects;
+        return $this->resourceData;
     }
     
     function postAction() {
@@ -128,8 +128,8 @@ SQL;
         
         $sqlConn = $this->pageViewReference->getSQLConn();
         // Acquire the POST body (if not already set)
-        if (count($this->dataObjects) == 0)
-            $this->dataObjects = json_decode(file_get_contents("php://input"), true);
+        if (count($this->resourceData) == 0)
+            $this->resourceData = json_decode(file_get_contents("php://input"), true);
             
         do {
             // Authenticate the user.
@@ -138,15 +138,15 @@ SQL;
                 // Authentication failed.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                 $this->statusMessage = 'Access denied. Go away.';
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
             
             // Validate fields in post data for data type
-            if (!$this->validateData($this->dataObjects)) {
+            if (!$this->validateData($this->resourceData)) {
                 // Not valid? Respond with status message
                 // HTTP status would already be set by the validateData method inherited from DataResource
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
             
@@ -169,7 +169,7 @@ SQL;
                     u.is_admin = TRUE
             )
 SQL;
-            $blogID = $this->dataObjects['blogID'];
+            $blogID = $this->resourceData['blogID'];
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
             $result = $stmt->fetchall();
@@ -178,7 +178,7 @@ SQL;
                 // No access or ancestor doesn't exist? Return a 400 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'Ancestor page ID not found';
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
             
@@ -188,9 +188,9 @@ SQL;
             // Generate pathname from the title
             $sql = "SELECT GENERATE_PATHNAME(:title)";
             $stmt = $sqlConn->prepare($sql);
-            $stmt->execute(array('title' => $this->dataObjects['title']));
+            $stmt->execute(array('title' => $this->resourceData['title']));
             $result = $stmt->fetchall();
-            $this->dataObjects['pathName'] = $result[0][0];
+            $this->resourceData['pathName'] = $result[0][0];
             
             $sql = <<<SQL
             SELECT CREATE_BLOG_POST (
@@ -207,8 +207,8 @@ SQL;
             $sqlParams = array(
                 'blogPageID' => $blogPageID,
                 'userID' => $userID,
-                'title' => $this->dataObjects['title'],
-                'body' => $this->dataObjects['body'],
+                'title' => $this->resourceData['title'],
+                'body' => $this->resourceData['body'],
             );
             
 
@@ -221,7 +221,7 @@ SQL;
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 $this->statusMessage = 'Creation of blog in database failed, possibly due to duplicate blog post title or other database error. Try a different title.';
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
 
@@ -236,12 +236,12 @@ SQL;
             // Return the newly created blog post.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = strval($blogPostID);
-            $this->dataObjects = array();
-            $this->dataObjects = $this->getAction();
+            $this->resourceData = array();
+            $this->resourceData = $this->getAction();
             
         } while (false);
         
-        return $this->dataObjects;
+        return $this->resourceData;
     }
     
     function putAction() {
@@ -259,8 +259,8 @@ SQL;
         
         $sqlConn = $this->pageViewReference->getSQLConn();
         // Acquire the POST body (if not already set)
-        if (count($this->dataObjects) == 0)
-            $this->dataObjects = json_decode(file_get_contents("php://input"), true);
+        if (count($this->resourceData) == 0)
+            $this->resourceData = json_decode(file_get_contents("php://input"), true);
             
         do {
             // Authenticate the user.
@@ -269,7 +269,7 @@ SQL;
                 // Authentication failed.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                 $this->statusMessage = 'Access denied. Go away.';
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
 
@@ -281,10 +281,10 @@ SQL;
             }
 
             // Validate fields in post data for data type
-            if (!$this->validateData($this->dataObjects)) {
+            if (!$this->validateData($this->resourceData)) {
                 // Not valid? Respond with status message
                 // HTTP status would already be set by the validateData method inherited from DataResource
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
             
@@ -327,17 +327,17 @@ SQL;
             $resultPublished = $result[0][3];
 
             // If any of the fields was not included in the request body, add it from the existing record.
-            if (!array_key_exists('title', $this->dataObjects))
-                $this->dataObjects['title'] = $resultTitle;
+            if (!array_key_exists('title', $this->resourceData))
+                $this->resourceData['title'] = $resultTitle;
             
-            if (!array_key_exists('body', $this->dataObjects)) 
-                $this->dataObjects['body'] = $resultBody;
+            if (!array_key_exists('body', $this->resourceData)) 
+                $this->resourceData['body'] = $resultBody;
             
-            if (!array_key_exists('published', $this->dataObjects))
-                $this->dataObjects['published'] = $resultPublished;
+            if (!array_key_exists('published', $this->resourceData))
+                $this->resourceData['published'] = $resultPublished;
 
             // Add the BlogPostID to data objects.
-            $this->dataObjects['blogPostID'] = $blogPostID;
+            $this->resourceData['blogPostID'] = $blogPostID;
 
             // this requires 2 queries.
             // First: the blog post record.
@@ -351,9 +351,9 @@ SQL;
 SQL;
             $stmt = $sqlConn->prepare($sql);
             $sqlParams = array(
-                 'title' => $this->dataObjects['title']
-                ,'body' => $this->dataObjects['body']
-                ,'published' => intval($this->dataObjects['published'])
+                 'title' => $this->resourceData['title']
+                ,'body' => $this->resourceData['body']
+                ,'published' => intval($this->resourceData['published'])
                 ,'blogPostID' => $blogPostID
             );
             $stmt->execute($sqlParams);
@@ -362,8 +362,8 @@ SQL;
             $sql = "UPDATE pages SET page_title = :title, published = :published WHERE page_id = :pageID";
             $stmt = $sqlConn->prepare($sql);
             $sqlParams = array(
-                'title' => $this->dataObjects['title']
-                ,'published' => intval($this->dataObjects['published'])
+                'title' => $this->resourceData['title']
+                ,'published' => intval($this->resourceData['published'])
                 ,'pageID' => $resultPageID
             );
             $stmt->execute($sqlParams);
@@ -372,12 +372,12 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             
             // Clear the data array and serialize the updated record.
-            $this->dataObjects = array();
+            $this->resourceData = array();
             $this->getAction();
             
         } while (false);
         
-        return $this->dataObjects;
+        return $this->resourceData;
     }
 
     function deleteAction() {
@@ -399,7 +399,7 @@ SQL;
                 // Authentication failed.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                 $this->statusMessage = 'Access denied. Go away.';
-                $this->dataObjects = array('status' => $this->statusMessage);
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
             
@@ -448,11 +448,11 @@ SQL;
             
             // set up the response.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
-            $this->dataObjects = array();
+            $this->resourceData = array();
             
         } while (false);
         
-        return $this->dataObjects;
+        return $this->resourceData;
         
     }
 }

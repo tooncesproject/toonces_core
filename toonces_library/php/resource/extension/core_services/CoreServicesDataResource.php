@@ -12,10 +12,10 @@ require_once LIBPATH.'php/toonces.php';
 class CoreServicesDataResource extends DataResource implements iResource {
     
     function getAction() {
-        $this->dataObjects['status'] = 'I\'m a little teapot, short and stout!';
+        $this->resourceData['status'] = 'I\'m a little teapot, short and stout!';
         $subResourcesAvailable = $this->getSubResources();
         if ($subResourcesAvailable) {
-            $this->dataObjects['status'] = 'Welcome to the Toonces Core Services API v1.0.';
+            $this->resourceData['status'] = 'Welcome to the Toonces Core Services API v1.0.';
         }
         
     }

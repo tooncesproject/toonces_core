@@ -1,6 +1,5 @@
 <?php
-/*
- *  
+/**
  * @author paulanderson
  * SqlDependentTestCase
  * Initial commit: Paul Anderson, 4/20/2018
@@ -10,6 +9,7 @@
  * (which is why you should NEVER run this in production...)
  *
  */
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
 require_once __DIR__ . '/../setupTooncesDatabase.php';
@@ -104,6 +104,33 @@ SQL;
         $stmt->execute();
         $result = $stmt->fetchAll();
     
+        $newPageId = $result[0][0];
+        
+        return $newPageId;
+        
+    }
+
+
+    public function createPublishedPage() {
+        // Create an unpublished page; non-admin users don't have access.
+        $sqlConn = $this->getConnection();
+        $sql = <<<SQL
+        SELECT CREATE_PAGE  (
+             1                              -- parent_page_id BIGINT
+            ,'unpublished_page'             -- pathname VARCHAR(50)
+            ,'Unpublished Page'             -- page_title VARCHAR(50)
+            ,'Unpublished Page'             -- page_link_text VARCHAR(50)
+            ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
+            ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
+            ,FALSE                          -- redirect_on_error BOOL
+            ,TRUE                           -- published BOOL
+            ,0                              -- pagetype_id BIGINT
+)
+SQL;
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        
         $newPageId = $result[0][0];
         
         return $newPageId;

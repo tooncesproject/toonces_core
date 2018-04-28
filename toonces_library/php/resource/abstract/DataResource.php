@@ -8,39 +8,12 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-abstract class DataResource extends Resource implements iResource
+abstract class DataResource extends ApiResource implements iResource
 {
-    var $dataObjects = array();
+    var $resourceData = array();
     var $fields = array();
-    var $resourceID;
     var $statusMessage = '';
-    var $httpStatus;
-    var $httpMethod;
-    var $sessionManager;
-    var $resourceURL;
-    var $resourceURI;
 
-    function authenticateUser() {
-        // Toonces Core Services API uses Basic Auth for authentication, and the same
-        // user structure as Toonces Admin.
-        // Returns a user ID if login valid, null if not.
-        $userID = NULL;
-        
-        // If there is no SessionManager object, instantiate one now.
-        if (!$this->sessionManager)
-            $this->sessionManager = new SessionManager($this->pageViewReference->getSQLConn());
-            
-        if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
-            $email = $_SERVER['PHP_AUTH_USER'];
-            $pw = $_SERVER['PHP_AUTH_PW'];
-                
-            $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->pageId);
-            if ($loginSuccess)
-                $userID = $this->sessionManager->userId;
-        }
-            
-        return $userID;
-    }
 
     function validateHeaders() {
         // Confirms that the HTTP request has the required headers.
@@ -119,11 +92,11 @@ SQL;
             $subResources = array();
             foreach ($result as $row) {
                 $subResources[$row[0]] = array(
-                     'url' => $this->resourceURL . $row[1]
+                     'url' => $this->resourceUrl . $row[1]
                     ,'title' => $row[2]
                 );
             }
-            $this->dataObjects['resources'] = $subResources;
+            $this->resourceData['resources'] = $subResources;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             return true;
         } else {
@@ -195,92 +168,5 @@ SQL;
         
         return $postValid;
     }
-    
 
-    // execution method
-    public function getResource() {
-        // Validate headers. If valid, call the appropriate method depending on the request HTTP method.
-        if ($this->validateHeaders()) {
-            
-            // Get the resource URI if it hasn't already been set externally
-            if (!$this->resourceURI)
-                $this->resourceURI = $this->pageViewReference->getPageURI();
-
-            // Build the full URL path
-            $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
-            $this->resourceURL = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceURI;
-            
-            // Acquire the HTTP verb from the server if not set externally.
-            if (!$this->httpMethod)
-                $this->httpMethod = $_SERVER['REQUEST_METHOD'];
-
-            // Act depending on the HTTP verb.
-            // Note: Not using a switch statement here to preserve object state.
-            if ($this->httpMethod == 'GET')
-                $this->getAction();
-            elseif ($this->httpMethod == 'POST')
-                $this->postAction();
-            elseif ($this->httpMethod == 'HEAD')
-                $this->headAction();
-            elseif ($this->httpMethod == 'PUT')
-                $this->putAction();
-            elseif ($this->httpMethod == 'OPTIONS')
-                $this->optionsAction();
-            elseif ($this->httpMethod == 'DELETE')
-                $this->deleteAction();
-            elseif ($this->httpMethod == 'CONNECT')
-                $this->connectAction();
-            else
-                throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
-
-        } else {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-            $this->statusMessage = 'Missing required HTTP headers.';
-        }
-
-        return $this->dataObjects;
-    }
-    
-    public function getAction() {
-        // Override to define the resource's response to a GET request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-    
-    public function postAction() {
-        // Override to define the resource's response to a POST request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-
-    public function headAction() {
-        // Override to define the resource's response to a HEAD request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-    
-    public function putAction() {
-        // Override to define the resource's response to a PUT request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-    
-    public function deleteAction() {
-        // Override to define the resource's response to a DELETE request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-    
-    public function connectAction() {
-        // Override to define the resource's response to a CONNECT request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-
-    public function optionsAction() {
-        // Override to define the resource's response to a OPTIONS request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
-    }
-    
 }
