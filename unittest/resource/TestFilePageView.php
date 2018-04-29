@@ -3,9 +3,9 @@
  * @author paulanderson
  * TestFilePageView.php
  * Initial commit: Paul Anderson, 4/28/2018
- * 
+ *
  * Unit test for the FilePageView class.
- * 
+ *
  */
 
 use PHPUnit\Framework\TestCase;
@@ -36,7 +36,7 @@ class TestFilePageView extends TestCase {
      * @expectedException Exception
      */
     function testRenderPage() {
-        // Notes: Without a wrapper, PHPUnit doesn't include a way to test the 
+        // Notes: Without a wrapper, PHPUnit doesn't include a way to test the
         // readfile() output of this class.
         // We'll lean on integration testing and/or trust that the PHP-native functions
         // actually work.
@@ -46,26 +46,26 @@ class TestFilePageView extends TestCase {
         $badFileResource = new BadFileResource($jpv);
         $badOutput = null;
         $goodOutput = null;
-        
+
         // ACT
         // With invalid DataResource
         $jpv->dataObjects = array(0 => $badFileResource );
-        
+
         $errorState = false;
         try {
             $badOutput = $jpv->renderPage();
         } finally {
             $errorState = true;
         }
-        
+
         // with valid DataResource
         $jpv->dataObjects = array(0 => $goodFileResource );
         $goodOutput = $jpv->renderPage();
-        
+
         // ASSERT
         $this->assertNull($badOutput);
         $this->assertTrue($errorState);
         $this->assertSame('example.com/barf', $goodOutput);
-        
+
     }
 }

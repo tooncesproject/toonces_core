@@ -1,12 +1,12 @@
 <?php
 /**
  * @author paulanderson
- * 
+ *
  * TestExtHtmlPageBuilder.php
  * Initial commit: Paul Anderson, 4/25/2018
- * 
+ *
  * Unit test the ExtHtmlPageBuilder class
- * 
+ *
  */
 
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 class TestExtHtmlPageBuilder extends SqlDependentTestCase{
-    
+
     /**
      * @runInSeparateProcess
      */
@@ -33,7 +33,7 @@ class TestExtHtmlPageBuilder extends SqlDependentTestCase{
 
         // ASSERT
         $this->assertInstanceOf(ExtHtmlResource::class, $ehpb->contentElement);
-        
+
         // TEARDOWN
         $this->destroyTestDatabase();
     }
