@@ -15,21 +15,19 @@ require_once __DIR__ . '../../SqlDependentTestCase.php';
 include_once LIBPATH.'php/resource/abstract/DataResource.php';
 
 // testable data resource
-class TestableDataResource extends DataResource {
+class ConcreteDataResource extends DataResource {
     // No overrides or additional functionality.
 }
 
 class TestDataResource extends SqlDependentTestCase {
 
 
-
     public function testValidateHeaders() {
         // ARRANGE
         // Instantiate with a PageView object
         $jsonPageView = new JsonPageView(1);
-        $dr = new TestableDataResource($jsonPageView);
+        $dr = new ConcreteDataResource($jsonPageView);
         
-
         // ACT
         // Go without header
         $invalidResult = $dr->validateHeaders();
@@ -50,7 +48,7 @@ class TestDataResource extends SqlDependentTestCase {
         // ARRANGE
         // Instantiate with a PageView object
         $jsonPageView = new JsonPageView(1);
-        $dr = new TestableDataResource($jsonPageView);
+        $dr = new ConcreteDataResource($jsonPageView);
         
         $parameterArray = array(
              'valid' => '666'
@@ -77,7 +75,6 @@ class TestDataResource extends SqlDependentTestCase {
     
     public function testGetSubResources() {
         // ARRANGE
-
         // Set up SQL connection
         $sqlConn = $this->getConnection();
         
@@ -101,7 +98,7 @@ SQL;
         $pageId = $result[0][0];
         $jsonPageView = new JsonPageView($pageId);
         $jsonPageView->setSQLConn($sqlConn);
-        $dr = new TestableDataResource($jsonPageView);
+        $dr = new ConcreteDataResource($jsonPageView);
         
         // ACT
         $_SERVER['PHP_AUTH_USER'] = 'badhacker@asshole.com';
@@ -115,8 +112,6 @@ SQL;
         $resultAuthenticated = $dr->getSubResources();
         $dataAuthenticated = $dr->resourceData;
         $statusAuthenticated = $dr->httpStatus;
-        
-        $this->destroyTestDatabase();
 
         // ASSERT
         $this->assertFalse($resultUnauthenticated);
@@ -132,7 +127,7 @@ SQL;
         // ARRANGE
         // Instantiate base objects
         $jsonPageView = new JsonPageView(1);
-        $dr = new TestableDataResource($jsonPageView);
+        $dr = new ConcreteDataResource($jsonPageView);
         
         // Set up the DataResource object's field validators.
         $nullableField = new StringFieldValidator();
@@ -170,20 +165,58 @@ SQL;
 
         // ASSERT
         $this->assertFalse($nonArrayResult);
-        $this->assertEquals($nonArrayStatus, Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'));
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $nonArrayStatus);
         
         $this->assertTrue($validRequiredResult);
         $this->assertTrue($validRequiredResult);
         
         $this->assertFalse($missingFieldresult);
-        $this->assertEquals($missingFieldStatus, Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'));
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $missingFieldStatus);
         
         $this->assertFalse($badRequiredResult);
-        $this->assertEquals($badRequiredStatus, Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'));
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badRequiredStatus);
         
         $this->assertFalse($badNullableResult);
-        $this->assertEquals($badNullableStatus, Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'));
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badNullableStatus);
 
+    }
+    
+    /**
+     * @depends testGetSubResources
+     */
+    function testGetResource() {
+        // ARRANGE
+        // See testGetSubResources for fixture injection
+        $pageView = new JsonPageView(1);
+        $dr = new ConcreteDataResource($pageView);
+        $dr->httpMethod = 'GET';
+        $testData = array('foo' => 'bar');
+        $dr->resourceData = $testData;
+
+        // ACT
+        // Call the method without the default valid header
+        if (isset($_SERVER['CONTENT_TYPE']))
+            $_SERVER['CONTENT_TYPE'] = 'foo';
+            
+        $noHeaderResult = $dr->getResource();
+        $noHeaderStatus = $dr->httpStatus;
+        
+        // Call the method with the default valid heaer set - Expect parent class (ApiResource) operations
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $headerResult = $dr->getResource();
+        $headerStatus = $dr->httpStatus;
+        
+        // ASSERT
+        // Call the method without the default valid header
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noHeaderStatus);
+        $this->assertNull($noHeaderResult);
+        
+        // Call the method with the default valid heaer set - Expect parent class (ApiResource) operations
+        $this->assertSame($testData, $headerResult);
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $headerStatus);
+        
+        // tear down the fixture
+        $this->destroyTestDatabase();
     }
 
 

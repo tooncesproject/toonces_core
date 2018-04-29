@@ -81,98 +81,93 @@ class TestApiResource extends SqlDependentTestCase {
         $ar->resourceUri = 'path';
         
         // ACT
-        // Call the method without the default valid header
-        if (isset($_SERVER['CONTENT_TYPE']))
-            $_SERVER['CONTENT_TYPE'] = 'foo';
             
-            $noHeaderResult = $ar->getResource();
-            $noHeaderStatus = $ar->httpStatus;
-            
-            // Try it with valid content type header but no HTTP verb
-            $_SERVER['CONTENT_TYPE'] = 'application/json';
-            if (isset($_SERVER['REQUEST_METHOD']))
+        // Try it with no HTTP verb
+
+        if (isset($_SERVER['REQUEST_METHOD'])) {
                 unset($_SERVER['REQUEST_METHOD']);
-                $caughtException = false;
-                try {
-                    $ar->getResource;
-                } finally {
-                    $caughtException = true;
-                }
-                
-                // Call the method with each "supported" HTTP verb.
-                // Also, we include the required content-type header.
-                
-                // GET
-                $_SERVER['REQUEST_METHOD'] = 'GET';
-                $getResult = $ar->getResource();
-                $getStatus = $ar->httpStatus;
-                $httpURL = $ar->resourceUrl;
-                
-                // POST
-                $_SERVER['REQUEST_METHOD'] = 'POST';
-                $_SERVER['HTTPS'] = 'on';
-                $postResult = $ar->getResource();
-                $postStatus = $ar->httpStatus;
-                $httpsURL = $ar->resourceUrl;
-                
-                // HEAD
-                $_SERVER['REQUEST_METHOD'] = 'HEAD';
-                $headResult = $ar->getResource();
-                $headStatus = $ar->httpStatus;
-                
-                // PUT
-                $_SERVER['REQUEST_METHOD'] = 'PUT';
-                $putResult = $ar->getResource();
-                $putStatus = $ar->httpStatus;
-                
-                // OPTIONS
-                $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
-                $optionsResult = $ar->getResource();
-                $optionsStatus = $ar->httpStatus;
-                
-                // DELETE
-                $_SERVER['REQUEST_METHOD'] = 'DELETE';
-                $deleteResult = $ar->getResource();
-                $deleteStatus = $ar->httpStatus;
-                
-                // CONNECT
-                $_SERVER['REQUEST_METHOD'] = 'CONNECT';
-                $connectResult = $ar->getResource();
-                $connectStatus = $ar->httpStatus;
-                
-                // ASSERT
-                // No content-type header
-                $this->assertEquals($noHeaderStatus, Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'));
-                
-                // No HTTP verb
-                $this->assertTrue($caughtException);
-                
-                // GET
-                // Only one assertion for $testObjectArray - We just wanna know it will return something.
-                $this->assertSame($testObjectArray, $getResult);
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $getStatus);
-                // One assertion for 'http' URL scheme - We won't repeat this.
-                $this->assertSame($httpURL, 'http://example.com/path');
-                
-                // POST
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $postStatus);
-                // One assertion for 'https' URL scheme - We won't repeat this.
-                $this->assertSame($httpsURL, 'https://example.com/path');
-                
-                // HEAD
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $headStatus);
-                
-                // PUT
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $putStatus);
-                
-                // OPTIONS
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $optionsStatus);
-                
-                // DELETE
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $deleteStatus);
-                
-                // CONNECT
-                $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $connectStatus);
+        }
+
+        $caughtException = false;
+        try {
+            $ar->getResource;
+        } finally {
+            $caughtException = true;
+        }
+        
+        // Call the method with each "supported" HTTP verb.
+        // Also, we include the required content-type header.
+        
+        // GET
+        $ar->resourceData = $testObjectArray;
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $getResult = $ar->getResource();
+        $getStatus = $ar->httpStatus;
+        $httpURL = $ar->resourceUrl;
+        
+        // POST
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['HTTPS'] = 'on';
+        $postResult = $ar->getResource();
+        $postStatus = $ar->httpStatus;
+        $httpsURL = $ar->resourceUrl;
+        
+        // HEAD
+        $_SERVER['REQUEST_METHOD'] = 'HEAD';
+        $headResult = $ar->getResource();
+        $headStatus = $ar->httpStatus;
+        
+        // PUT
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        $putResult = $ar->getResource();
+        $putStatus = $ar->httpStatus;
+        
+        // OPTIONS
+        $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
+        $optionsResult = $ar->getResource();
+        $optionsStatus = $ar->httpStatus;
+        
+        // DELETE
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+        $deleteResult = $ar->getResource();
+        $deleteStatus = $ar->httpStatus;
+        
+        // CONNECT
+        $_SERVER['REQUEST_METHOD'] = 'CONNECT';
+        $connectResult = $ar->getResource();
+        $connectStatus = $ar->httpStatus;
+        
+        // ASSERT
+        
+        // No HTTP verb
+        $this->assertTrue($caughtException);
+        
+        // GET
+        // Only one assertion for $testObjectArray - We just wanna know it will return something.
+        $this->assertSame($testObjectArray, $getResult);
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $getStatus);
+        // One assertion for 'http' URL scheme - We won't repeat this.
+        $this->assertSame($httpURL, 'http://example.com/path');
+        
+        // POST
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $postStatus);
+        // One assertion for 'https' URL scheme - We won't repeat this.
+        $this->assertSame($httpsURL, 'https://example.com/path');
+        
+        // HEAD
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $headStatus);
+        
+        // PUT
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $putStatus);
+        
+        // OPTIONS
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $optionsStatus);
+        
+        // DELETE
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $deleteStatus);
+        
+        // CONNECT
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $connectStatus);
     }
 
 }

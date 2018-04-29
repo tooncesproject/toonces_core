@@ -29,58 +29,51 @@ abstract class ApiResource extends Resource implements iResource {
         if (!$this->sessionManager)
             $this->sessionManager = new SessionManager($this->pageViewReference->getSQLConn());
             
-            if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
-                $email = $_SERVER['PHP_AUTH_USER'];
-                $pw = $_SERVER['PHP_AUTH_PW'];
-                $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->pageId);
-                if ($loginSuccess)
-                    $userID = $this->sessionManager->userId;
-            }
+        if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
+            $email = $_SERVER['PHP_AUTH_USER'];
+            $pw = $_SERVER['PHP_AUTH_PW'];
+            $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->pageId);
+            if ($loginSuccess)
+                $userID = $this->sessionManager->userId;
+        }
             
-            return $userID;
+        return $userID;
     }
     
     // execution method
     public function getResource() {
-        // Validate headers. If valid, call the appropriate method depending on the request HTTP method.
-        if ($this->validateHeaders()) {
             
-            // Get the resource URI if it hasn't already been set externally
-            if (!$this->resourceUri)
-                $this->resourceUri = $this->pageViewReference->getPageURI();
-                
-                // Build the full URL path
-                $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
-                $this->resourceUrl = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceUri;
-                
-                // Acquire the HTTP verb from the server if not set externally.
-                if (!$this->httpMethod)
-                    $this->httpMethod = $_SERVER['REQUEST_METHOD'];
-                    
-                    // Act depending on the HTTP verb.
-                    // Note: Not using a switch statement here to preserve object state.
-                    if ($this->httpMethod == 'GET')
-                        $this->getAction();
-                        elseif ($this->httpMethod == 'POST')
-                        $this->postAction();
-                        elseif ($this->httpMethod == 'HEAD')
-                        $this->headAction();
-                        elseif ($this->httpMethod == 'PUT')
-                        $this->putAction();
-                        elseif ($this->httpMethod == 'OPTIONS')
-                        $this->optionsAction();
-                        elseif ($this->httpMethod == 'DELETE')
-                        $this->deleteAction();
-                        elseif ($this->httpMethod == 'CONNECT')
-                        $this->connectAction();
-                        else
-                            throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
-                            
-        } else {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-            $this->statusMessage = 'Missing required HTTP headers.';
-        }
+        // Get the resource URI if it hasn't already been set externally
+        if (!$this->resourceUri)
+            $this->resourceUri = $this->pageViewReference->getPageURI();
+
+        // Build the full URL path
+        $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
+        $this->resourceUrl = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceUri;
         
+        // Acquire the HTTP verb from the server if not set externally.
+        if (!$this->httpMethod)
+            $this->httpMethod = $_SERVER['REQUEST_METHOD'];
+
+        // Act depending on the HTTP verb.
+        // Note: Not using a switch statement here to preserve object state.
+        if ($this->httpMethod == 'GET')
+            $this->getAction();
+            elseif ($this->httpMethod == 'POST')
+                $this->postAction();
+            elseif ($this->httpMethod == 'HEAD')
+                $this->headAction();
+            elseif ($this->httpMethod == 'PUT')
+                $this->putAction();
+            elseif ($this->httpMethod == 'OPTIONS')
+                $this->optionsAction();
+            elseif ($this->httpMethod == 'DELETE')
+                $this->deleteAction();
+            elseif ($this->httpMethod == 'CONNECT')
+                $this->connectAction();
+            else
+                throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
+
         return $this->resourceData;
     }
     

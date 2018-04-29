@@ -169,4 +169,18 @@ SQL;
         return $postValid;
     }
 
+    
+    public function getResource() {
+        // Override APIResource::getResource
+        $returnData = null;
+        if ($this->validateHeaders()) {
+            // Headers valid; call superclass
+            $returnData = parent::getResource();
+        } else {
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+            $this->statusMessage = 'Missing required HTTP headers.';
+        }
+        
+        return $returnData;
+    }
 }

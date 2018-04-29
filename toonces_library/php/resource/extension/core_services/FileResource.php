@@ -231,7 +231,7 @@ class FileResource extends ApiResource implements iResource {
         if (!file_exists($this->resourcePath)) 
             throw new Exception('Error: getResource() was called without a valid resourcePath variable set.');
 
-        parent::getResource();
+        return parent::getResource();
     }
 
 }

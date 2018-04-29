@@ -22,6 +22,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/resource/TestApiPageView.php</file>
 			<file>unittest/resource/TestJsonPageView.php</file>
 			<file>unittest/resource/TestFilePageView.php</file>
+			<file>unittest/resource/TestApiResource</file>
 			<file>unittest/resource/TestDataResource.php</file>
 			<file>unittest/resource/TestBlogDataResource.php</file>
 			<file>unittest/resource/TestHTMLPageView.php</file>

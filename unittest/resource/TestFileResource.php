@@ -31,7 +31,9 @@ class TestFileResource extends FileDependentTestCase {
         $pv = new FilePageview(1);
         $pv->setSQLConn($this->getConnection());
         $fr = new FileResource($pageView);
-        $fr->httpMethod = 'GET';
+        $testData = 'look here is some data' .PHP_EOL;
+        $fr->resourceData = $testData;
+        $fr->httpMethod = 'OPTIONS';
 
         // ACT
         // Call without resourcePath - Expect exception.
@@ -53,7 +55,7 @@ class TestFileResource extends FileDependentTestCase {
         
         // Call with OK resource path - Expect parent class (ApiResource) operations
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
-        $fr->getResource();
+        $validResponse = $fr->getResource();
         $resourceUri = $fr->resourceUri;
         
         // ASSERT
@@ -64,7 +66,8 @@ class TestFileResource extends FileDependentTestCase {
         $this->assertTrue($bogusPathErrorState);
         
         // Call with OK resource path - Expect parent class (ApiResource) operations
-        $this->assertNotNul($resourceUri);
+        $this->assertSame($testData, $validResponse);
+        
     }
 
     /**
