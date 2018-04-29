@@ -14,23 +14,81 @@ require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../FileDependentTestCase.php';
 
 class TestFileResource extends FileDependentTestCase {
-
-    function testPutAction() {
+    
+    /**
+     * @expectedException Exception
+     */
+    function testGetResource() {
         // ARRANGE
+        // Check the file fixture per FileDependentTestCase.
+        $this->checkFileFixture();
+        
         // Tear down (if exists) and rebuild the database fixture,.
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
 
+        // Proceed
+        $pv = new FilePageview(1);
+        $pv->setSQLConn($this->getConnection());
+        $fr = new FileResource($pageView);
+        $fr->httpMethod = 'GET';
+
+        // ACT
+        // Call without resourcePath - Expect exception.
+        $noPathErrorState = false;
+        try {
+            $fr->getResource();
+        } finally {
+            $noPathErrorState = true;
+        }
+
+        // Call with bogus resource path - Except exception.
+        $bogusPathErrorState = false;
+        $fr->resourcePath = '/foo/foo/foo';
+        try {
+            $fr->getResource();
+        } finally {
+            $bogusPathErrorState = true;
+        }
+        
+        // Call with OK resource path - Expect parent class (ApiResource) operations
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fr->getResource();
+        $resourceUri = $fr->resourceUri;
+        
+        // ASSERT
+        // Call without resourcePath - Expect exception.
+        $this->assertTrue($noPathErrorState);        
+
+        // Call with bogus resource path - Except exception.
+        $this->assertTrue($bogusPathErrorState);
+        
+        // Call with OK resource path - Expect parent class (ApiResource) operations
+        $this->assertNotNul($resourceUri);
+    }
+
+    /**
+     * @depends testGetResource
+     */
+    function testPutAction() {
+        // ARRANGE
+        // See testGetResource for fixture injection.
+        // Create a non-admin user.
+        $this->createNonAdminUser();
+
         // Create an unpublished page
         $pageId = $this->createUnpublishedPage();
         
-        // Instantiate a PageView object
+        // Instantiate a PageView object and dependencies
         $pageView = new FilePageview($pageId);
+        $conn = $this->getConnection();
+        $pageView->setSQLConn($conn);
         
         // Instantiate a FileResource object
         $filename = 'test.txt';
         $fr = new FileResource($pageView);
-        $fileData - 'Hello, I\'m a text file' . PHP_EOL;
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fileData = 'Hello, I\'m a text file' . PHP_EOL;
         
         // Concatenate the file path
         $testFileVector = $GLOBALS['TEST_FILE_PATH'] . $filename;
@@ -38,77 +96,87 @@ class TestFileResource extends FileDependentTestCase {
         // Delete the test file, if it exists
         if (file_exists($testFileVector))
             unlink($testFileVector);
-            
-            // ACT
-            // Attempt a PUT without authentication
-            $this->unsetBasicAuth();
-            $fr->requestPath = 'http://example.com/'. $filename;
-            $fr->resourceData = $fileData;
-            $fr->putAction();
-            $noAuthStatus = $fr->httpStatus;
-            $noAuthFileExists = file_exists($testFileVector);
-            
-            // Attempt a PUT with authentication but filename is missing
-            $this->setAdminAuth();
-            $fr->requestPath = 'http://example.com/';
-            $fr->putAction();
-            $noFilenameStatus = $fr->httpStatus;
-            
-            // Attempt a PUT with no file data
-            $fr->requestPath = 'http://example.com/'. $filename;
-            $fr->resourceData = '';
-            $fr->putAction();
-            $noDataStatus = $fr->httpStatus;
-            $noDataFileExists = file_exists($testFileVector);
-            
-            // Attempt a PUT where user does not explicity have access
-            $this->setNonAdminAuth();
-            $fr->resourceData = $fileData;
-            $fr->putAction();
-            $nonAdminStatus = $fr->httpStatus;
-            $nonAdminFileExists = file_exists($testFileVector);
-            
-            // Attempt a valid PUT for a new file
-            $this->setAdminAuth();
-            $fr->putAction();
-            $newFileStatus = $fr->httpStatus;
-            $newFileExists = file_exists($testFileVector);
-            $newFileData = file_get_contents($testFileVector);
-            
-            // Attepmpt a valid PUT for an existing file
-            $changedFileData = 'hello, i\'m a different text file now.' . PHP_EOL;
-            $fr->resourceData = $changedFileData;
-            $fr->putAction;
-            $existingFileStatus = $fr->httpStatus;
-            $existingFileExists = file_exists($testFileVector);
-            $existingFileData = file_get_contents($testFileVector);
-            
-            // ASSERT
-            // Attempt a PUT without authentication
-            $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthStatus);
-            $this->assertFalse($noAuthFileExists);
-            
-            // Attempt a PUT with authentication but filename is missing
-            $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noFilenameStatus);
-            
-            // Attempt a PUT with no file data
-            $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noDataStatus);
-            $this->assertFalse($noDataFileExists);
-            
-            // Attempt a PUT where user does not explicity have access
-            $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthStatus);
-            $this->assertFalse($nonAdminFileExists);
-            
-            // Attempt a valid PUT for a new file
-            $this->assertEquals(Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse'), $newFileStatus);
-            $this->assertTrue($newFileExists);
-            $this->assertSame($fileData, $newFileData);
-            
-            // Attepmpt a valid PUT for an existing file
-            $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $existingFileStatus);
-            $this->assertTrue($existingFileExists);
-            $this->assertSame($changedFileData, $existingFileData);
-            
+   
+        // ACT
+
+        // Attempt a PUT without authentication
+        $this->unsetBasicAuth();
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fr->requestPath = 'http://example.com/'. $filename;
+        $fr->resourceData = $fileData;
+        $fr->putAction();
+        $noAuthStatus = $fr->httpStatus;
+        $noAuthFileExists = file_exists($testFileVector);
+
+        // Attempt a PUT with authentication but filename is missing
+        $this->setAdminAuth();
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fr->requestPath = 'http://example.com/';
+        $fr->putAction();
+        $noFilenameStatus = $fr->httpStatus;
+
+        // Attempt a PUT with no file data
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fr->requestPath = 'http://example.com/'. $filename;
+        $fr->resourceData = '';
+        $fr->putAction();
+        $noDataStatus = $fr->httpStatus;
+        $noDataFileExists = file_exists($testFileVector);
+
+        // Attempt a PUT where user does not explicity have access
+        $this->setNonAdminAuth();
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fr->resourceData = $fileData;
+        $fr->putAction();
+        $nonAdminStatus = $fr->httpStatus;
+        $nonAdminFileExists = file_exists($testFileVector);
+        
+        // Attempt a valid PUT for a new file
+        $this->setAdminAuth();
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $fr->requestPath = 'http://example.com/'. $filename;
+        $fr->resourceData = $fileData;
+        $fr->putAction();
+        $newFileStatus = $fr->httpStatus;
+        $newFileExists = file_exists($testFileVector);
+        $newFileData = file_get_contents($testFileVector);
+        
+        // Attepmpt a valid PUT for an existing file
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $changedFileData = 'hello, i\'m a different text file now.' . PHP_EOL;
+        $fr->resourceData = $changedFileData;
+        $fr->putAction();
+        $existingFileStatus = $fr->httpStatus;
+        $existingFileExists = file_exists($testFileVector);
+        $existingFileData = file_get_contents($testFileVector);
+        
+        // ASSERT
+
+        // Attempt a PUT without authentication
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthStatus);
+        $this->assertFalse($noAuthFileExists);
+
+        // Attempt a PUT with authentication but filename is missing
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noFilenameStatus);
+
+        // Attempt a PUT with no file data
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noDataStatus);
+        $this->assertFalse($noDataFileExists);
+
+        // Attempt a PUT where user does not explicity have access
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminStatus);
+        $this->assertFalse($nonAdminFileExists);
+        
+        // Attempt a valid PUT for a new file
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse'), $newFileStatus);
+        $this->assertTrue($newFileExists);
+        $this->assertSame($fileData, $newFileData);
+        
+        // Attepmpt a valid PUT for an existing file
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $existingFileStatus);
+        $this->assertTrue($existingFileExists);
+        $this->assertSame($changedFileData, $existingFileData);
+        
     }
 
 
@@ -120,8 +188,10 @@ class TestFileResource extends FileDependentTestCase {
         // Create an unpublished page
         $pageId = $this->createUnpublishedPage();
 
-        // Instantiate a PageView object
+        // Instantiate a PageView object and dependencies
         $pageView = new FilePageview($pageId);
+        $conn = $this->getConnection();
+        $pageView->setSQLConn($conn);
         
         // Instantiate a FileResource object and dependencies
         $fr = new FileResource($pageView);
@@ -130,8 +200,10 @@ class TestFileResource extends FileDependentTestCase {
         $requestHost = 'http://example.com/';
         $requestPath = $requestHost . $filename;
         $expectedFileVector = $GLOBALS['TEST_FILE_PATH'] . $filename;
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         
         // ACT
+
         // Attempt a GET without authentication where authentication is required
         $this->unsetBasicAuth();
         $fr->requreAuthentication = true;
@@ -152,16 +224,18 @@ class TestFileResource extends FileDependentTestCase {
         $adminAccessContent = file_get_contents($adminAccessResult);
         
         // Attempt a GET without authentication where authentication is not required
+        $fr->resourceData = null;
         $this->unsetBasicAuth();
         $fr->requreAuthentication = false;
         $publicAccessResult = $fr->getAction();
         $publicAccessStatus = $fr->httpStatus;
         $publicAccessContent = file_get_contents($publicAccessResult);
-        
+
         // Attempt a GET on a file that doesn't exist
+        $fr->resourceData = null;
         $bogusFileName = 'bogus_file.txt';
         $bogusFileRequest = $requestHost . $bogusFileName;
-        $bogusFileVector = $GLOBALS['TEST_FILE_PATH'].$filename;
+        $bogusFileVector = $GLOBALS['TEST_FILE_PATH'].$bogusFileName;
         
         // (Make sure the file doesn't actually exist from outside the test).
         if (file_exists($bogusFileVector))
@@ -173,6 +247,7 @@ class TestFileResource extends FileDependentTestCase {
         
         
         // ASSERT
+
         // Attempt a GET without authentication where authentication is required
         $this->assertEmpty($noAuthResult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthStatus);
@@ -190,7 +265,7 @@ class TestFileResource extends FileDependentTestCase {
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $publicAccessStatus);
         $this->assertSame($expectedFileVector, $publicAccessResult);
         $this->assertsame($expectedFileData, $publicAccessContent);
-        
+
         // Attempt a GET on a file that doesn't exist
         $this->assertEmpty($bogusFileResult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusFileStatus);
@@ -206,11 +281,14 @@ class TestFileResource extends FileDependentTestCase {
         // Create an unpublished page
         $pageId = $this->createUnpublishedPage();
         
-        // Instantiate a PageView object
+        // Instantiate a PageView object and dependencies
         $pageView = new FilePageview($pageId);
-        
+        $conn = $this->getConnection();
+        $pageView->setSQLConn($conn);
+
         // Instantiate a FileResource object and dependencies
         $fr = new FileResource($pageView);
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $filename = 'test.txt';
         $requestHost = 'http://example.com/';
         $requestPath = $requestHost . $filename;
@@ -243,6 +321,7 @@ class TestFileResource extends FileDependentTestCase {
         $nonExistentFileStatus = $fr->httpStatus;
         
         // Attempt a valid DELETE
+        $this->setAdminAuth();
         $fr->requestPath = $requestPath;
         $fr->deleteAction();
         $validStatus = $fr->httpStatus;
@@ -266,6 +345,7 @@ class TestFileResource extends FileDependentTestCase {
         
         // Tear Down
         $this->destroyTestDatabase();
+        $this->destroyFileFixture();
 
     }
 }

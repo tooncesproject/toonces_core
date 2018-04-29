@@ -19,12 +19,14 @@ class TestCheckUserAccess extends SqlDependentTestCase {
         // ARRANGE
         // This requires a database fixture with an admin and non-admin user.
         $conn = $this->getConnection();
+        $this->destroyTestDatabase();
         $this->buildTestDatabase();
         $nonAdminUserId = $this->createNonAdminUser();
 
-        $sql = "SELECT user_id FROM users WHERE email = ':email'";
+        $sql = "SELECT user_id FROM users WHERE email = :email";
         $stmt = $conn->prepare($sql);
-        $result = $stmt->execute(array('email' => $GLOBALS['TOONCES_USERNAME']));
+        $stmt->execute(array('email' => $GLOBALS['TOONCES_USERNAME']));
+        $result = $stmt->fetchAll();
         $adminUserId = $result[0][0];
         
         // Create some pages

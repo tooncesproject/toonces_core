@@ -21,13 +21,14 @@ class CheckPageUserAccess {
                     ELSE FALSE END
                 FROM users u
                 JOIN pages p ON p.page_id = :pageId
-                LEFT JOIN page_user_access pua ON pua.user_id = u.user_id AND page_id = :pageId
+                LEFT JOIN page_user_access pua ON pua.user_id = u.user_id AND pua.page_id = :pageId
                 WHERE u.user_id = :userId
 SQL;
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute(array('userId' => $userId, 'pageId' => $pageId));
         $result = $stmt->fetchAll();
-        $userHasAccess = $result[0][0];
+        $resultStr = $result[0][0];
+        $userHasAccess = !empty($resultStr);
         
         return $userHasAccess;
     }

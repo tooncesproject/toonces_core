@@ -139,7 +139,7 @@ SQL;
         $this->assertSame($unpublishedPostData['blogName'], $blogName);
 
         // duplicate post
-        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $dupeStatus);
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse'), $dupeStatus);
 
     }
 

@@ -80,17 +80,38 @@ SQL;
             ,'Non Admin User'
             , false
             );
-        return $response;
+        
+        // Look up the user ID
+        $sql = <<<SQL
+        SELECT user_id
+        FROM users
+        WHERE email = :nonAdminUsername
+SQL;
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute(['nonAdminUsername' => $GLOBALS['NON_ADMIN_USERNAME']]);
+        $result = $stmt->fetchAll();
+        $userId = intval($result[0][0]);
+        
+        return $userId;
     }
 
 
     public function createUnpublishedPage() {
         // Create an unpublished page; non-admin users don't have access.
         $sqlConn = $this->getConnection();
+
+        // In case this is called twice in the same fixture,
+        // we need to make the pathame unique. We'll use the expected page_id
+        $sql = "SELECT MAX(page_id) + 1 FROM pages";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchall();
+        $identifier = strval($result[0][0]);
+
         $sql = <<<SQL
         SELECT CREATE_PAGE  (
              1                              -- parent_page_id BIGINT
-            ,'unpublished_page'             -- pathname VARCHAR(50)
+            ,:pathname                      -- pathname VARCHAR(50)
             ,'Unpublished Page'             -- page_title VARCHAR(50)
             ,'Unpublished Page'             -- page_link_text VARCHAR(50)
             ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
@@ -101,10 +122,11 @@ SQL;
 )
 SQL;
         $stmt = $sqlConn->prepare($sql);
-        $stmt->execute();
+        $pathname = 'unpublished_page_' . $identifier;        
+        $stmt->execute(['pathname' => $pathname]);
         $result = $stmt->fetchAll();
     
-        $newPageId = $result[0][0];
+        $newPageId = intval($result[0][0]);
         
         return $newPageId;
         
@@ -114,12 +136,20 @@ SQL;
     public function createPublishedPage() {
         // Create an unpublished page; non-admin users don't have access.
         $sqlConn = $this->getConnection();
+
+        // In case this is called twice in the same fixture,
+        // we need to make the pathame unique. We'll use the expected page_id
+        $sql = "SELECT MAX(page_id) + 1 FROM pages";
+        $stmt = $sqlConn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchall();
+        $identifier = strval($result[0][0]);
         $sql = <<<SQL
         SELECT CREATE_PAGE  (
              1                              -- parent_page_id BIGINT
-            ,'unpublished_page'             -- pathname VARCHAR(50)
-            ,'Unpublished Page'             -- page_title VARCHAR(50)
-            ,'Unpublished Page'             -- page_link_text VARCHAR(50)
+            ,:pathname                   -- pathname VARCHAR(50)
+            ,'Published Page'             -- page_title VARCHAR(50)
+            ,'Published Page'             -- page_link_text VARCHAR(50)
             ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
             ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
             ,FALSE                          -- redirect_on_error BOOL
@@ -128,10 +158,11 @@ SQL;
 )
 SQL;
         $stmt = $sqlConn->prepare($sql);
-        $stmt->execute();
+        $pathname = 'published_page_' . $identifier;
+        $stmt->execute(['pathname' => $pathname]);
         $result = $stmt->fetchAll();
         
-        $newPageId = $result[0][0];
+        $newPageId = intval($result[0][0]);
         
         return $newPageId;
         

@@ -13,7 +13,7 @@ include_once LIBPATH.'php/resource/HTMLPageView.php';
 include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
 include_once LIBPATH.'php/utility/SessionManager.php';
-include_once LIBPATH.'php/utility/CheckPageUserAccess.php';
+include_once LIBPATH.'php/utility/static/CheckPageUserAccess.php';
 include_once LIBPATH.'php/resource/formelement/abstract/FormElement.php';
 include_once LIBPATH.'php/utility/DynamicNavigationLink.php';
 include_once LIBPATH.'php/resource/toolbar/abstract/ToolbarElement.php';

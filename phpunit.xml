@@ -21,16 +21,19 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<testsuite name="resources">
 			<file>unittest/resource/TestApiPageView.php</file>
 			<file>unittest/resource/TestJsonPageView.php</file>
+			<file>unittest/resource/TestFilePageView.php</file>
 			<file>unittest/resource/TestDataResource.php</file>
 			<file>unittest/resource/TestBlogDataResource.php</file>
 			<file>unittest/resource/TestHTMLPageView.php</file>
 			<file>unittest/resource/TestHTMLResource.php</file>
 			<file>unittest/resource/TestHTMLViewResource.php</file>
+			<file>unittest/resource/TestFileResource.php</file>
 		</testsuite>
 		<testsuite name="pagebuilders">
 			<file>unittest/pagebuilder/TestExtHtmlPageBuilder.php</file>
 		</testsuite>
 		<testsuite name="utility_classes">
 			<file>unittest/utility/static/TestCheckUserAccess.php</file>
+		</testsuite>
 	</testsuites>
 </phpunit>

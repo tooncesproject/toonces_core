@@ -38,74 +38,78 @@ class FileResource extends ApiResource implements iResource {
     public function putAction() {
         // Acquire the file name
         if (!isset($this->requestPath))
-            $requestUri = $_SERVER['REQUEST_URI'];
-            $this->requestPath = parse_url($requestUri, PHP_URL_PATH);
+            $this->requestPath = $_SERVER['REQUEST_URI'];
+
+        // Sanitize path    
+        $this->requestPath = parse_url($this->requestPath, PHP_URL_PATH);
+
+        $sqlConn = $this->pageViewReference->sqlConn;
+
+        $filename = preg_replace('~^.+/~', '', $this->requestPath);
+        $fileVector = $this->resourcePath . $filename;
+        
+        // Acquire the PUT body (if not already set)
+        if (!isset($this->resourceData))
+            $this->resourceData = file_get_contents("php://input");
+        
+        do {
+            // Go through the validation sequcence.
+            // Authenticate user.
+            $userId = $this->authenticateUser();
+            if ($userId == 0) {
+                // Security through obscurity; 404 status if authentication failed.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
             
+            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
+            if (!$userHasAccess) {  
+                // Security through obscurity; 404 status if user not authorized.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
             
-            $filename = preg_replace('~^.+/~', '', $this->requestPath);
-            $fileVector = $this->resourcePath . $filename;
+            // Validate headers.
+            if (!$this->validatePutHeaders()) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                break;
+            }
             
-            // Acquire the PUT body (if not already set)
-            if (count($this->dataObjects) == 0)
-                $this->resourceData = file_get_contents("php://input");
+            // Filename length
+            if (strlen($filename) == 0 or $filename =='/') {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                break;
+            }
+            
+            // Data length.
+            if (empty($this->resourceData)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                break;
+            }
+            
+            // default successful HTTP status is 201 (created), but it will respond with 200 if the file
+            // already exists.
+            $successHttpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
+            if (file_exists($fileVector))
+                $successHttpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
                 
-                do {
-                    // Go through the validation sequcence.
-                    // Authenticate user.
-                    $userId = $this->authenticateUser();
-                    if ($userId == 0) {
-                        // Security through obscurity; 404 status if authentication failed.
-                        $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                        break;
-                    }
-                    
-                    $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
-                    if (!$userHasAccess) {
-                        // Security through obscurity; 404 status if user not authorized.
-                        $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                        break;
-                    }
-                    
-                    // Validate headers.
-                    if (!$this->validatePutHeaders()) {
-                        $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                        break;
-                    }
-                    
-                    // Filename length
-                    if (strlen($filename) == 0) {
-                        $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                        break;
-                    }
-                    
-                    // Data length.
-                    if (empty($this->resourceData)) {
-                        $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                        break;
-                    }
-                    
-                    // default successful HTTP status is 201 (created), but it will respond with 200 if the file
-                    // already exists.
-                    $successHttpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
-                    if (file_exists($fileVector))
-                        $successHttpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-                        
-                        // Attempt to copy the file.
-                        $bytesWritten = null;
-                        try {
-                            $bytesWritten = file_put_contents($fileVector, $this->resourceData);
-                            $this->httpStatus = $successHttpStatus;
-                        } catch (Exception $e) {
-                            $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                            break;
-                        }
-                        
-                        if ($bytesWritten === false) {
-                            // If file write operation failed silently, return an ISE.
-                            $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                        }
-                        
-                } while (false);
+            // Attempt to copy the file.
+            $bytesWritten = null;
+            try {
+                $bytesWritten = file_put_contents($fileVector, $this->resourceData);
+                $this->httpStatus = $successHttpStatus;
+            } catch (Exception $e) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+                break;
+            }
+                
+            if ($bytesWritten === false) {
+                // If file write operation failed silently, return an ISE.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+            }
+                
+        } while (false);
+
                 
     }
 
@@ -119,7 +123,6 @@ class FileResource extends ApiResource implements iResource {
         $fileVector = $this->resourcePath . $filename;
         
         $sqlConn = $this->pageViewReference->getSQLConn();
-        
         do {
             // Authenticate, if required.
             if ($this->requreAuthentication) {
@@ -166,57 +169,69 @@ class FileResource extends ApiResource implements iResource {
 
     public function deleteAction() {
         // Deletes the file resource.
-        if (!isset($this->requestPath))
+        if (!isset($this->requestPath)) 
             $this->requestPath = $_SERVER['REQUEST_URI'];
+
+        $filename = preg_replace('~^.+/~', '', $this->requestPath);
+        $fileVector = $this->resourcePath . $filename;
+        $sqlConn = $this->pageViewReference->getSQLConn();
+        
+        do {
+            // Go through the validation sequcence.
+            // Authenticate user.
+            $userId = $this->authenticateUser();
+            if ($userId == 0) {
+                // Security through obscurity; 404 status if authentication failed.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
             
-            $filename = preg_replace('~^.+/~', '', $this->requestPath);
-            $fileVector = $this->resourcePath . $filename;
+            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
+            if (!$userHasAccess) {
+                // Security through obscurity; 404 status if user not authorized.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
             
-            do {
-                // Go through the validation sequcence.
-                // Authenticate user.
-                $userId = $this->authenticateUser();
-                if ($userId == 0) {
-                    // Security through obscurity; 404 status if authentication failed.
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                    break;
-                }
-                
-                $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
-                if (!$userHasAccess) {
-                    // Security through obscurity; 404 status if user not authorized.
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                    break;
-                }
+            // Validate headers.
+            if (!$this->validateDeleteHeaders()) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                break;
+            }
+            
+            // Check file existence
+            if (!file_exists($fileVector)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
+            
+            // Attempt delete operation.
+            $deleteSuccess = null;
+            try {
+                $deleteSuccess = unlink($fileVector);
+            } catch (Exception $e) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+                break;
+            }
+            
+            if ($deleteSuccess) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
+            } else {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+            }
+            
+        } while (false);
+    }
 
-                // Validate headers.
-                if (!$this->validateDeleteHeaders()) {
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                    break;
-                }
+    public function getResource() {
+        // Add functionality to ApiResource::getResource - Validate the resourcePath
+        if (!isset($this->resourcePath))
+            throw new Exception('Error: getResource() was called without the resourcePath variable set.');
+        
+        if (!file_exists($this->resourcePath)) 
+            throw new Exception('Error: getResource() was called without a valid resourcePath variable set.');
 
-                // Check file existence
-                if (!file_exists($fileVector)) {
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                    break;
-                }
-                
-                // Attempt delete operation.
-                $deleteSuccess = null;
-                try {
-                    $deleteSuccess = unlink($fileVector);
-                } catch (Exception $e) {
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                    break;
-                }
-                
-                if ($deleteSuccess) {
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
-                } else {
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                }
-
-            } while (false);
+        parent::getResource();
     }
 
 }

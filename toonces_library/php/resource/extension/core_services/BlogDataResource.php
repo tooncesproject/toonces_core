@@ -113,7 +113,8 @@ SQL;
 
         return $this->resourceData;
     }
-    
+
+
     function postAction() {
         // Validates as POST request and responds.
 
@@ -237,7 +238,8 @@ SQL;
         
         return $this->resourceData;
     }
-    
+
+
     function putAction() {
         // Responds to a PUT request to update an existing blog resource.
         // Validate fields in PUT data for data type

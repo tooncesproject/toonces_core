@@ -44,7 +44,8 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
             header($httpStatusString, true, $httpStatus);
 
         }
-
+        // For testing purposes, we return the resource path supplied by the resource.
+        return $resourcePath;
         
     }
 }
