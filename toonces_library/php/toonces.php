@@ -8,7 +8,7 @@ include_once LIBPATH.'php/resource/abstract/Resource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';
 include_once LIBPATH.'php/resource/HTMLViewResource.php';
 include_once LIBPATH.'php/resource/interface/iPageView.php';
-include_once LIBPATH.'php/resource/interface/iHTMLView.php';    
+include_once LIBPATH.'php/resource/interface/iHTMLView.php';
 include_once LIBPATH.'php/resource/HTMLPageView.php';
 include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
@@ -53,7 +53,7 @@ include_once LIBPATH.'php/pagebuilders/blog/BlogPostSinglePageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/APIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/CoreServicesAPIPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/core_services/HtmlFilePageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/core_services/DocumentEndpointPageBuilder.php';
 
 include_once LIBPATH.'php/pagebuilders/core_services/BlogPostAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/BlogsAPIPageBuilder.php';

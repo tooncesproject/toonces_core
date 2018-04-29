@@ -315,7 +315,7 @@ SQL;
             ,'htmlresources'                        -- ,pathname VARCHAR(50)
             ,'Toonces Core Services - HTML Files'   -- ,page_title VARCHAR(50)
             ,'Toonces Core Services - HTML Files'   -- ,page_link_text VARCHAR(50)
-            ,'HtmlFilePageBuilder'                  -- ,pagebuilder_class VARCHAR(50)
+            ,'DocumentEndpointPageBuilder'          -- ,pagebuilder_class VARCHAR(50)
             ,'FilePageView'                         -- ,pageview_class VARCHAR(50)
             ,TRUE                                   -- ,redirect_on_error BOOL
             ,FALSE                                  -- ,published BOOL
