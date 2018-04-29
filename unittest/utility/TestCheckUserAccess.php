@@ -3,9 +3,9 @@
  * @author paulanderson
  * TestCheckUserAccess.php
  * Initial Commit: Paul Anderson, 4/27/2018
- * 
+ *
  * Unit test for the CheckUserAccess static utility.
- * 
+ *
  */
 
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,7 @@ class TestCheckUserAccess extends SqlDependentTestCase {
         $stmt->execute(array('email' => $GLOBALS['TOONCES_USERNAME']));
         $result = $stmt->fetchAll();
         $adminUserId = $result[0][0];
-        
+
         // Create some pages
         $unpublishedPageId = $this->createUnpublishedPage();
         $publishedPageId = $this->createPublishedPage();
@@ -42,7 +42,7 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(array('pageId' => $accessGrantedPageId, 'userId' => $nonAdminUserId));
         $stmt->execute(array('pageId' => $accessGrantedPageId, 'userId' => $adminUserId));
-        
+
         // ACT
         // Non-admin user access to unpublished page without explicit whitelisting
         $nonAdminUnpubResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $unpublishedPageId, $conn);
@@ -52,13 +52,13 @@ SQL;
 
         // Non-admin user access to unpublished page where user is whitelisted
         $nonAdminWhitelistedResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $unpublishedPageId, $conn);
-        
+
         // Admin user access to unpublished page
         $adminUnpublishedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $unpublishedPageId, $conn);
-        
+
         // Admin user access to published page
         $adminPublishedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $publishedPageId, $conn);
-        
+
         // Admin access to unpublished page when whitelisted
         $adminWhitelistedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $unpublishedPageId, $conn);
 
@@ -74,7 +74,7 @@ SQL;
 
         // Non-admin user access to published page
         $this->assertTrue($nonAdminPubResult);
-        
+
         // Non-admin user access to unpublished page where user is whitelisted
         $this->assertTrue($nonAdminWhitelistedResult);
 
@@ -89,9 +89,9 @@ SQL;
 
         // Access to unpublished page ID with bogus user ID
         $this->assertFalse($bogusUserResult);
-        
+
         // Access to bogus page ID
         $this->assertFalse($bogusPageResult);
-        
+
     }
 }

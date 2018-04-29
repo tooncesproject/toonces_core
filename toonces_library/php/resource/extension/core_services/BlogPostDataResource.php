@@ -2,51 +2,51 @@
 /*
  * BlogPostDataResource.php
  * Initial commit: Paul Anderson, 4/12/2018
- * 
+ *
  * A DataResource class definining the inputs and outputs for a Blog Posts endpoint.
- * 
+ *
 */
 
 require_once LIBPATH.'php/toonces.php';
 
 class BlogPostDataResource extends DataResource implements iResource {
-    
+
     function buildFields() {
         // Define the sub-resources of this resource.
-        
+
         $pathName = new StringFieldValidator();
         $pathName->maxLength = 50;
         $pathName->allowNull=true;
         $this->fields['pathName'] = $pathName;
-        
+
         $title = new StringFieldValidator();
         $title->maxLength = 50;
         $this->fields['title'] = $title;
-        
+
         $body = new StringFieldValidator();
         $this->fields['body'] = $body;
-        
+
         $blogID = new IntegerFieldValidator();
         $this->fields['blogID'] = $blogID;
 
         $published = new BooleanFieldValidator();
         $published->allowNull = true;
         $this->fields['published'] = $published;
-        
+
     }
 
     function getAction() {
         // Implementation lives here!
         // We will query the database for the resource, depending upon parameters
         $sqlConn = $this->pageViewReference->getSQLConn();
-       
+
         // First - Validate GET parameters
         $blogPostID = $this->validateIntParameter('id');
         $blogID = $this->validateIntParameter('blog_id');
-        
+
         // Acquire the user id if this is an authenticated request.
         $userID = $this->authenticateUser() ?? 0;
-        
+
         // Build the query
         $sql = <<<SQL
             SELECT
@@ -68,7 +68,7 @@ class BlogPostDataResource extends DataResource implements iResource {
             WHERE
                 (bp.blog_id = :blogID OR :blogID IS NULL)
                 AND
-                (bp.blog_post_id = :blogPostID OR :blogPostID IS NULL) 
+                (bp.blog_post_id = :blogPostID OR :blogPostID IS NULL)
                 AND
                 (
                     (p.published = 1 AND p.deleted IS NULL)
@@ -89,9 +89,9 @@ SQL;
 
         // Serialize the output as an array.
         $responseArray = NULL;
-        
+
         if (count($result) > 0) {
-            // 
+            //
             foreach ($result as $row) {
                 $blogPost = array(
                      'url' => $this->resourceUrl . '?id=' . strval($row[0])
@@ -116,21 +116,21 @@ SQL;
             // This is intentional as it obfuscates resources that the user isn't explicity authorized to access.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
         }
-        
+
         return $this->resourceData;
     }
-    
+
     function postAction() {
         // Responds to POST requests creating a new blog post.
 
         // Set up field validators
         $this->buildFields();
-        
+
         $sqlConn = $this->pageViewReference->getSQLConn();
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
-            
+
         do {
             // Authenticate the user.
             $userID = $this->authenticateUser();
@@ -141,7 +141,7 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Validate fields in post data for data type
             if (!$this->validateData($this->resourceData)) {
                 // Not valid? Respond with status message
@@ -149,7 +149,7 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Check that the user has access to the ancestor page (and that it exists).
             $sql = <<<SQL
             SELECT
@@ -173,7 +173,7 @@ SQL;
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogID' => $blogID));
             $result = $stmt->fetchall();
-            
+
             if (!$result) {
                 // No access or ancestor doesn't exist? Return a 400 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
@@ -181,17 +181,17 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Acquire the page ID of the blog
             $blogPageID = $result[0][0];
-            
+
             // Generate pathname from the title
             $sql = "SELECT GENERATE_PATHNAME(:title)";
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('title' => $this->resourceData['title']));
             $result = $stmt->fetchall();
             $this->resourceData['pathName'] = $result[0][0];
-            
+
             $sql = <<<SQL
             SELECT CREATE_BLOG_POST (
                  :blogPageID            -- param_page_id BIGINT
@@ -210,7 +210,7 @@ SQL;
                 'title' => $this->resourceData['title'],
                 'body' => $this->resourceData['body'],
             );
-            
+
 
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute($sqlParams);
@@ -225,43 +225,43 @@ SQL;
                 break;
             }
 
-            
+
             // Query the database for the BlogPostID, because goddammit
             $sql = "SELECT blog_post_id FROM blog_posts WHERE page_id = :pageID";
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('pageID' => $blogPostPageID));
             $result = $stmt->fetchAll();
             $blogPostID = $result[0][0];
-            
+
             // Return the newly created blog post.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->parameters['id'] = strval($blogPostID);
             $this->resourceData = array();
             $this->resourceData = $this->getAction();
-            
+
         } while (false);
-        
+
         return $this->resourceData;
     }
-    
+
     function putAction() {
         // Responds to PUT requests to update blog posts.
-        
+
         // Build and modify the fields array
         $this->buildFields();
         $this->fields['blogID']->allowNull = true;
         $this->fields['title']->allowNull = true;
         $this->fields['body']->allowNull = true;
         $this->fields['published']->allowNull = true;
-        
+
         // The id parameter is required - Validate it.
         $blogPostID = $this->validateIntParameter('id');
-        
+
         $sqlConn = $this->pageViewReference->getSQLConn();
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
-            
+
         do {
             // Authenticate the user.
             $userID = $this->authenticateUser();
@@ -287,7 +287,7 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Verify that the blog post exists, and that the user has access.
             $sql = <<<SQL
             SELECT
@@ -313,7 +313,7 @@ SQL;
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogPostID' => $blogPostID));
             $result = $stmt->fetchall();
-            
+
             if (!$result) {
                 // No access or blog doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -329,10 +329,10 @@ SQL;
             // If any of the fields was not included in the request body, add it from the existing record.
             if (!array_key_exists('title', $this->resourceData))
                 $this->resourceData['title'] = $resultTitle;
-            
-            if (!array_key_exists('body', $this->resourceData)) 
+
+            if (!array_key_exists('body', $this->resourceData))
                 $this->resourceData['body'] = $resultBody;
-            
+
             if (!array_key_exists('published', $this->resourceData))
                 $this->resourceData['published'] = $resultPublished;
 
@@ -367,30 +367,30 @@ SQL;
                 ,'pageID' => $resultPageID
             );
             $stmt->execute($sqlParams);
-            
+
             // woot!
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-            
+
             // Clear the data array and serialize the updated record.
             $this->resourceData = array();
             $this->getAction();
-            
+
         } while (false);
-        
+
         return $this->resourceData;
     }
 
     function deleteAction() {
         // Responds to a DELETE request to delete a resouce.
         // Performs a "hard delete" of the page specified in request parameters.
-        
+
         // Connect to SQL
         $sqlConn = $this->pageViewReference->getSQLConn();
-        
+
         // The blogID should be set in the URL parameters.
         $blogPostID = $this->validateIntParameter('id');
-        
-        
+
+
         // Go through authentication/validation sequence
         do {
             // Authenticate the user.
@@ -402,7 +402,7 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Reject the request if the 'id' parameter is not set.
             if (!isset($blogPostID)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
@@ -432,27 +432,27 @@ SQL;
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('userID' => $userID, 'blogPostID' => $blogPostID));
             $result = $stmt->fetchall();
-            
+
             if (!$result) {
                 // No access or blog doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // So far so good - delete the page
             $pageID = $result[0][0];
             // Note: sp_delete_page is recursive; it also deletes any children the page has.
             $sql = "CALL sp_delete_page(:pageID)";
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('pageID' => $pageID));
-            
+
             // set up the response.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
             $this->resourceData = array();
-            
+
         } while (false);
-        
+
         return $this->resourceData;
-        
+
     }
 }

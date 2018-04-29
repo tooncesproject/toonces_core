@@ -22,7 +22,7 @@ abstract class DataResource extends ApiResource implements iResource
         if (array_key_exists('CONTENT_TYPE', $_SERVER))
             if ($_SERVER['CONTENT_TYPE'] == 'application/json')
                 $headersValid = true;
-                
+
             return $headersValid;
     }
 
@@ -39,16 +39,16 @@ abstract class DataResource extends ApiResource implements iResource
         do {
             if (!array_key_exists($parameterKey, $getParams)) // Parameter exists?
                 break;
-            
+
             if (is_int(intval($getParams[$parameterKey]))) {          // it's an integer?
                 $id = intval($getParams[$parameterKey]);
             } else {
                 $id = 0;
             }
-                    
+
         } while (false);
 
-        return $id;        
+        return $id;
     }
 
     function getSubResources() {
@@ -58,10 +58,10 @@ abstract class DataResource extends ApiResource implements iResource
         //      false if no resources are available. $httpStatus set to 418 (haha)
 
         $sqlConn = $this->pageViewReference->getSQLConn();
-        
+
         // Acquire the user id if this is an authenticated request.
         $userID = $this->authenticateUser() ?? 0;
-        
+
         // Query the database for any children of the current page.
         $sql = <<<SQL
             SELECT
@@ -73,7 +73,7 @@ abstract class DataResource extends ApiResource implements iResource
             LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
             LEFT JOIN users u ON u.user_id = :userID
             WHERE
-                (phb.page_id = :pageID) 
+                (phb.page_id = :pageID)
                 AND
                 (
                     (p.published = 1 AND p.deleted IS NULL)
@@ -104,16 +104,16 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_418_IM_A_TEAPOT', 'EnumHTTPResponse');
             return false;
         }
-        
+
 
     }
-    
+
     public function validateData($data) {
         // Iterate through keys in dataObjects array
         $postValid = false;
         $missingFields = array();
         $invalidFields = array();
-        
+
         // Check validation.
         do {
             // We go through each requirement in order of priority
@@ -124,17 +124,17 @@ SQL;
                 $this->statusMessage = 'The API only accepts well-formed JSON.  ';
                 break;
             }
-            
+
             // Iterate through each field and check for validity.
             foreach ($this->fields as $key => $field) {
-                
+
                 // Is the POST/PUT data missing any required fields?
                 $fieldExists = array_key_exists($key, $data);
                 if (!$field->allowNull && !$fieldExists) {
                     // Required key missing
                     array_push($missingFields, $key);
                 }
-                
+
                 // Is the input data valid, per the data object's requirements?
                 if ($fieldExists) {
                     if (!$field->validateData($data[$key])) {
@@ -163,13 +163,13 @@ SQL;
             }
             // If we've made it this far, we're OK.
             $postValid = true;
-            
+
         } while (false);
-        
+
         return $postValid;
     }
 
-    
+
     public function getResource() {
         // Override APIResource::getResource
         $returnData = null;
@@ -180,7 +180,7 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Missing required HTTP headers.';
         }
-        
+
         return $returnData;
     }
 }

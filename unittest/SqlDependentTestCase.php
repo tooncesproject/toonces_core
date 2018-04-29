@@ -200,4 +200,3 @@ SQL;
         $_SERVER['PHP_AUTH_PW'] = $GLOBALS['NON_ADMIN_PASSWORD'];
     }
 }
-

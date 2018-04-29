@@ -3,32 +3,32 @@
  * @author paulanderson
  * ApiResource.php
  * Initial commit: Paul Anderson, 4/27/2018
- * 
+ *
  * Abstract class providing common functionality for API resource classes.
- * 
+ *
  */
 
 include_once LIBPATH.'php/toonces.php';
 
 abstract class ApiResource extends Resource implements iResource {
-    
+
     var $resourceData;
     var $httpStatus;
     var $httpMethod;
     var $resourceUrl;
     var $resourceUri;
     var $sessionManager;
-    
+
     function authenticateUser() {
         // Toonces Core Services API uses Basic Auth for authentication, and the same
         // user structure as Toonces Admin.
         // Returns a user ID if login valid, null if not.
         $userID = NULL;
-        
+
         // If there is no SessionManager object, instantiate one now.
         if (!$this->sessionManager)
             $this->sessionManager = new SessionManager($this->pageViewReference->getSQLConn());
-            
+
         if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
             $email = $_SERVER['PHP_AUTH_USER'];
             $pw = $_SERVER['PHP_AUTH_PW'];
@@ -36,13 +36,13 @@ abstract class ApiResource extends Resource implements iResource {
             if ($loginSuccess)
                 $userID = $this->sessionManager->userId;
         }
-            
+
         return $userID;
     }
-    
+
     // execution method
     public function getResource() {
-            
+
         // Get the resource URI if it hasn't already been set externally
         if (!$this->resourceUri)
             $this->resourceUri = $this->pageViewReference->getPageURI();
@@ -50,7 +50,7 @@ abstract class ApiResource extends Resource implements iResource {
         // Build the full URL path
         $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
         $this->resourceUrl = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceUri;
-        
+
         // Acquire the HTTP verb from the server if not set externally.
         if (!$this->httpMethod)
             $this->httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -76,47 +76,47 @@ abstract class ApiResource extends Resource implements iResource {
 
         return $this->resourceData;
     }
-    
+
     public function getAction() {
         // Override to define the resource's response to a GET request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function postAction() {
         // Override to define the resource's response to a POST request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function headAction() {
         // Override to define the resource's response to a HEAD request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function putAction() {
         // Override to define the resource's response to a PUT request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function deleteAction() {
         // Override to define the resource's response to a DELETE request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function connectAction() {
         // Override to define the resource's response to a CONNECT request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
     public function optionsAction() {
         // Override to define the resource's response to a OPTIONS request.
         // Default behavior is a 'method not allowed' error (if it isn't implemented).
         $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
     }
-    
+
 }

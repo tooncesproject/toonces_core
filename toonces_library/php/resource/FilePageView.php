@@ -3,9 +3,9 @@
  * @author paulanderson
  * FilePageView.php
  * Initial commit: Paul Anderson, 4/26/2018
- * 
+ *
  * PageView extension for handling transfers of files from a vector.
- * 
+ *
 */
 
 require_once LIBPATH.'php/toonces.php';
@@ -14,7 +14,7 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
 
     public function renderPage() {
         // Called by index.php - Serves a file download, if applicable.
-        
+
         // $dataObject will be a FileResource or similar Resource subclass instance.
         $dataObject = $this->getResource();
 
@@ -37,7 +37,7 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
             if (ob_get_level()) {
                 ob_end_flush();
             }
-            
+
             flush();
             readfile($resourcePath);
         } else {
@@ -46,7 +46,6 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         }
         // For testing purposes, we return the resource path supplied by the resource.
         return $resourcePath;
-        
+
     }
 }
-;

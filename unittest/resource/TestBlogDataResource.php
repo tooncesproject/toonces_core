@@ -194,7 +194,6 @@ SQL;
         $this->setNonAdminAuth();
         $nonAdminAuth = $bdr->putAction();
         $nonAdminStatus = $bdr->httpStatus;
-        //die(var_dump($nonAdminAuth));
 
         // Bogus id parameter
         $bdr->parameters['id'] = '666';

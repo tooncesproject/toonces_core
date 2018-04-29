@@ -3,22 +3,22 @@
  * @author paulanderson
  * FileResource.php
  * Initial commit: Paul Anderson, 4/27/2018
- * 
- * A Resource subclass providing and regulating access to supporting files. 
  *
- * 
+ * A Resource subclass providing and regulating access to supporting files.
+ *
+ *
  * */
 
 include_once LIBPATH.'php/toonces.php';
 
 class FileResource extends ApiResource implements iResource {
-    
+
     var $resourcePath;
     var $requestPath;
     var $requreAuthentication;
-    
+
     public function validateGetHeaders() {
-        // Override if the implementation requires any specific HTTP headers for GET requests. 
+        // Override if the implementation requires any specific HTTP headers for GET requests.
         return true;
     }
 
@@ -27,31 +27,31 @@ class FileResource extends ApiResource implements iResource {
         // Override if the implementation requires any specific HTTP headers for PUT requests.
         return true;
     }
-    
+
 
     public function validateDeleteHeaders() {
         // Override if the implementation requires any specific HTTP headers for DELETE requests.
         return true;
     }
-    
-    
+
+
     public function putAction() {
         // Acquire the file name
         if (!isset($this->requestPath))
             $this->requestPath = $_SERVER['REQUEST_URI'];
 
-        // Sanitize path    
+        // Sanitize path
         $this->requestPath = parse_url($this->requestPath, PHP_URL_PATH);
 
         $sqlConn = $this->pageViewReference->sqlConn;
 
         $filename = preg_replace('~^.+/~', '', $this->requestPath);
         $fileVector = $this->resourcePath . $filename;
-        
+
         // Acquire the PUT body (if not already set)
         if (!isset($this->resourceData))
             $this->resourceData = file_get_contents("php://input");
-        
+
         do {
             // Go through the validation sequcence.
             // Authenticate user.
@@ -61,38 +61,38 @@ class FileResource extends ApiResource implements iResource {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
-            if (!$userHasAccess) {  
+            if (!$userHasAccess) {
                 // Security through obscurity; 404 status if user not authorized.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Validate headers.
             if (!$this->validatePutHeaders()) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Filename length
             if (strlen($filename) == 0 or $filename =='/') {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Data length.
             if (empty($this->resourceData)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // default successful HTTP status is 201 (created), but it will respond with 200 if the file
             // already exists.
             $successHttpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
             if (file_exists($fileVector))
                 $successHttpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-                
+
             // Attempt to copy the file.
             $bytesWritten = null;
             try {
@@ -102,15 +102,15 @@ class FileResource extends ApiResource implements iResource {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 break;
             }
-                
+
             if ($bytesWritten === false) {
                 // If file write operation failed silently, return an ISE.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
             }
-                
+
         } while (false);
 
-                
+
     }
 
 
@@ -118,10 +118,10 @@ class FileResource extends ApiResource implements iResource {
         // Acquire the file name
         if (!isset($this->requestPath))
             $this->requestPath = $_SERVER['REQUEST_URI'];
-        
+
         $filename = preg_replace('~^.+/~', '', $this->requestPath);
         $fileVector = $this->resourcePath . $filename;
-        
+
         $sqlConn = $this->pageViewReference->getSQLConn();
         do {
             // Authenticate, if required.
@@ -132,7 +132,7 @@ class FileResource extends ApiResource implements iResource {
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                     break;
                 }
-                
+
                 $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
                 if (!$userHasAccess) {
                     // Security through obscurity; 404 status if authentication failed.
@@ -156,26 +156,26 @@ class FileResource extends ApiResource implements iResource {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Okie dokie? Add the vector to the output data.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->resourceData = $fileVector;
         } while (false);
-        
+
         return $this->resourceData;
-        
+
     }
 
 
     public function deleteAction() {
         // Deletes the file resource.
-        if (!isset($this->requestPath)) 
+        if (!isset($this->requestPath))
             $this->requestPath = $_SERVER['REQUEST_URI'];
 
         $filename = preg_replace('~^.+/~', '', $this->requestPath);
         $fileVector = $this->resourcePath . $filename;
         $sqlConn = $this->pageViewReference->getSQLConn();
-        
+
         do {
             // Go through the validation sequcence.
             // Authenticate user.
@@ -185,26 +185,26 @@ class FileResource extends ApiResource implements iResource {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageViewReference->pageId, $sqlConn);
             if (!$userHasAccess) {
                 // Security through obscurity; 404 status if user not authorized.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Validate headers.
             if (!$this->validateDeleteHeaders()) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Check file existence
             if (!file_exists($fileVector)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Attempt delete operation.
             $deleteSuccess = null;
             try {
@@ -213,13 +213,13 @@ class FileResource extends ApiResource implements iResource {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 break;
             }
-            
+
             if ($deleteSuccess) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
             } else {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
             }
-            
+
         } while (false);
     }
 
@@ -227,8 +227,8 @@ class FileResource extends ApiResource implements iResource {
         // Add functionality to ApiResource::getResource - Validate the resourcePath
         if (!isset($this->resourcePath))
             throw new Exception('Error: getResource() was called without the resourcePath variable set.');
-        
-        if (!file_exists($this->resourcePath)) 
+
+        if (!file_exists($this->resourcePath))
             throw new Exception('Error: getResource() was called without a valid resourcePath variable set.');
 
         return parent::getResource();
