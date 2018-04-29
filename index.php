@@ -83,7 +83,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 	}
 }
 
-// ******************** Begin procedural code ******************** 
+// ******************** Begin procedural code ********************
 
 // establish SQL connection
 $conn = UniversalConnect::doConnect();
@@ -161,7 +161,7 @@ if (count($pageRecord)) {
     $loadedPageViewClass = $pageRecord[0]['pageview_class'];
     $loadedPageTypeId = $pageRecord[0]['pagetype_id'];
     $loadedPageIsDeleted = empty($pageRecord[0]['deleted']) ? false : true;
-} 
+}
 
 // Check page deletion state and access.
 // Note: APIPageView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
@@ -180,10 +180,12 @@ if ($allowAccess) {
     $pageTitle = $loadedPagePageTitle;
     $pageLinkText = $loadedPageLinkText;
 } else {
-    // If no access, reset PageView class to default
+    // If no access, reset PageView class to default and send a 404 header.
     $pageView = new $defaultPageViewClass($pageId);
     $pageView->setPageURI($path);
     $pageView->setSQLConn($conn);
+    $httpStatusString = Enumeration::getString(404, 'EnumHTTPResponse');
+    header($httpStatusString, true, 404);
 }
 
 // set PageView class variables

@@ -12,6 +12,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<var name="TOONCES_PASSWORD" value="correcthorsebatterystaple" />
 		<var name="NON_ADMIN_USERNAME" value="user@example.com" />
 		<var name="NON_ADMIN_PASSWORD" value="reallySecurePassword" />
+		<var name="TEST_FILE_PATH" value="~/temp" />
 	</php>
 	<testsuites>
 		<testsuite name="installers">
@@ -20,14 +21,21 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<testsuite name="resources">
 			<file>unittest/resource/TestApiPageView.php</file>
 			<file>unittest/resource/TestJsonPageView.php</file>
+			<file>unittest/resource/TestFilePageView.php</file>
+			<file>unittest/resource/TestApiResource</file>
 			<file>unittest/resource/TestDataResource.php</file>
 			<file>unittest/resource/TestBlogDataResource.php</file>
 			<file>unittest/resource/TestHTMLPageView.php</file>
 			<file>unittest/resource/TestHTMLResource.php</file>
 			<file>unittest/resource/TestHTMLViewResource.php</file>
+			<file>unittest/resource/TestFileResource.php</file>
 		</testsuite>
 		<testsuite name="pagebuilders">
 			<file>unittest/pagebuilder/TestExtHtmlPageBuilder.php</file>
+			<file>unittest/pagebuilder/TestDocumentEndpointPageBuilder.php</file>
+		</testsuite>
+		<testsuite name="utility_classes">
+			<file>unittest/utility/static/TestCheckUserAccess.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
