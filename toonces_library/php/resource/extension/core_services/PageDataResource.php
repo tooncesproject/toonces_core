@@ -13,6 +13,10 @@ require_once LIBPATH.'php/toonces.php';
 class PageDataResource extends DataResource implements iResource {
     
     function buildFields() {
+        /**
+         * Instantiates FieldValidator objects that validate the PUT or POST body.
+         * 
+         */
         $ancestorPageId = new IntegerFieldValidator();
         $this->fields['ancestorPageId'] = $parentPageId;
         
@@ -53,123 +57,7 @@ class PageDataResource extends DataResource implements iResource {
         $this->fields['pageTypeId'] = $pageTypeId;
 
     }
-
     
-    function validatePageInput($ancestorPageId = null, $pageId = null, $userId = null) {
-        // Run through the page validation sequence.
-        // RETURN: t/f, request is valid.
-        
-        $conn = $this->pageViewReference->getSQLConn();
-        $requestValid = false;
-        // Begin the validation sequence
-        do {            
-            // Validate fields in post data for data type
-            if (!$this->validateData($this->resourceData)) {
-                // Not valid? Respond with status message
-                // HTTP status would already be set by the validateData method inherited from DataResource
-                $this->resourceData = array('status' => $this->statusMessage);
-                break;
-            }
-            
-            // If required, check that the user has access to the ancestor page (and that it exists).
-            // Note: A user must be an admin or explicitly given acces to the ancestor page in order to create a page.
-            if($ancestorPageId) {
-                $sql = <<<SQL
-                SELECT
-                     p.page_id
-                FROM pages p
-                LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userId)
-                LEFT JOIN users u ON u.user_id = :userId
-                WHERE
-                    p.page_id = :pageId
-                    AND
-                    (
-                        pua.user_id IS NOT NULL
-                        OR
-                        u.is_admin = TRUE
-                    )
-SQL;
-                
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(array('userId' => $userId, 'pageId' => $ancestorPageId));
-                $result = $stmt->fetchall();
-                if (!$result) {
-                    // No access or ancestor doesn't exist? Return a 400 error.
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                    $this->statusMessage = 'Ancestor page ID not found';
-                    $this->resourceData = array('status' => $this->statusMessage);
-                    break;
-                }
-            }
-            
-            // If pageId parameter was set, check that the page ID is valid and user has access.
-            if ($pageId) {
-
-                $sql = <<<SQL
-                SELECT
-                     p.page_id
-                FROM pages p
-                LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-                LEFT JOIN users u ON u.user_id = :userID
-                WHERE
-                    b.page_id = :pageId
-                    AND
-                    (
-                        pua.user_id IS NOT NULL
-                        OR
-                        u.is_admin = TRUE
-                    )
-SQL;
-                $stmt = $sqlConn->prepare($sql);
-                $stmt->execute(array('userID' => $userId, 'pageId' => $pageId));
-                $result = $stmt->fetchall();
-                if (!$result) {
-                    // No access or blog doesn't exist? Return a 404 error.
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                    break;
-                }
-                
-            } else {
-                // Was a pathName not explicitly supplied?
-                // Only generate a pathname if this is a POST request (i.e., pageId is not set)
-                if (!array_key_exists('pathName', $this->resourceData)) {
-                    // If it's not supplied, generate one from the title.
-                    $sql = "SELECT GENERATE_PATHNAME(:pageTitle)";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute(array('pageTitle' => $this->resourceData['pageTitle']));
-                    $result = $stmt->fetchall();
-                    $this->resourceData['pathName'] = $result[0][0];
-                }
-            }
-
-            // Validate the pathname if set.
-            if (isset($this->resourceData['pathName'])) {
-                if (!ctype_alnum(str_replace('_', '', $this->resourceData['pathName']))) {
-                    // if the supplied path name contains non-alphanumeric chars other than underscore,
-                    // invalidate the request.
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                    $this->statusMessage = 'pathName may only contain alphanumeric characters or underscores.';
-                    $this->resourceData = array('status' => $this->statusMessage);
-                    break;
-                }
-            }
-            
-            // Validate page type ID if set.
-            if (isset($this->resourceData['pageTypeId'])) {
-                $sql = "SELECT page_type_id FROM pagetypes WHERE page_type_id = :pageTypeId";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(['pageTypeId' => $this->resourceData['pageTypeId']]);
-                $result = $stmt->fetchAll();
-                if (!$result) {
-                    $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                    $this->statusMessage = 'Invalid page type ID.';
-                    break;
-                }
-            }
-            
-            $requestValid = true;
-        } while (false);
-    }
     
     function validatePathName($ancestorPageId, $pageId = null) {
         /**
@@ -309,6 +197,11 @@ SQL;
     }
 
     function postAction() {
+        /**
+         * Called by abstract ApiResource::getResource. 
+         * Performs authentication, validation and execution of a POST request.
+         * @return object (array), $this->resourceData
+         */
 
         $conn = $this->pageViewReference->getSQLConn();
         // Set up field validators
@@ -444,6 +337,12 @@ SQL;
     
     
     function putAction() {
+        /**
+         * Called by abstract ApiResource::getResource. 
+         * Performs authentication, validation and execution of a PUT request.
+         * @return object (array), $this->resourceData
+         */
+        
         // Build fields
         $this->buildFields();
         $conn = $this->pageViewReference->getSqlConn();
@@ -597,6 +496,12 @@ SQL;
     
     
     function getAction() {
+        /**
+         * Called by abstract ApiResource::getResource. 
+         * Performs authentication, validation and execution of a GET request.
+         * @return object (array), $this->resourceData
+         */
+
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');
@@ -677,7 +582,13 @@ SQL;
 
     
     function deleteAction() {
-        // hard-deletes the page and any of its children.
+        /**
+         * Called by abstract ApiResource::getResource.
+         * Performs authentication, validation and execution of a DELETE request.
+         * hard-deletes the page and any of its children. 
+         * @return object (array), $this->resourceData
+         */
+
         $pageId = $this->validateIntParameter('id');
         $sqlConn = $this->pageViewReference->getSQLConn();
         $this->resourceData = array();
@@ -701,6 +612,7 @@ SQL;
             }
             
             // Make all input fields optional.
+            $this->buildFields();
             foreach($this->fields as $field)
                 $field->allowNull = true;
             
