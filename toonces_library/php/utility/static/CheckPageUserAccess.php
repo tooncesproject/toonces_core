@@ -10,26 +10,40 @@
 
 class CheckPageUserAccess {
 
-    public static function checkUserAccess($userId, $pageId, $sqlConn) {
+    public static function checkUserAccess($userId, $pageId, $sqlConn, $checkWriteAccess = false ) {
         // Tests whether an authenticated user has access to the resource's pageId.
         $sql = <<<SQL
                 SELECT
                     CASE WHEN
                         u.is_admin = TRUE
                         OR pua.user_id IS NOT NULL
-                        OR p.published = TRUE THEN TRUE
-                    ELSE FALSE END
+                        OR p.published = TRUE
+                        THEN TRUE
+                    ELSE FALSE END AS read_access
+                   ,CASE WHEN
+                        u.is_admin = TRUE
+                        OR pua.can_edit = TRUE
+                        THEN TRUE
+                     ELSE FALSE END AS write_access
                 FROM users u
                 JOIN pages p ON p.page_id = :pageId
                 LEFT JOIN page_user_access pua ON pua.user_id = u.user_id AND pua.page_id = :pageId
                 WHERE u.user_id = :userId
 SQL;
         $stmt = $sqlConn->prepare($sql);
-        $stmt->execute(array('userId' => $userId, 'pageId' => $pageId));
+        $sqlParams = array('userId' => $userId, 'pageId' => $pageId);
+        $stmt->execute($sqlParams);
         $result = $stmt->fetchAll();
-        $resultStr = $result[0][0];
-        $userHasAccess = !empty($resultStr);
-
-        return $userHasAccess;
+        $readAccessStr = $result[0][0];
+        $writeAccessStr = $result[0][1];
+        $userHasReadAccess = !empty($readAccessStr);
+        $userHasWriteAccess = !empty($writeAccessStr);
+        
+        if ($checkWriteAccess === true) {
+            return $userHasWriteAccess;
+        } else {
+            return $userHasReadAccess;
+        }
+            
     }
 }

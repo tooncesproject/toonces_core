@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestCheckUserAccess.php
+ * TestCheckPageUserAccess.php
  * Initial Commit: Paul Anderson, 4/27/2018
  *
  * Unit test for the CheckUserAccess static utility.
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestCheckUserAccess extends SqlDependentTestCase {
+class TestCheckPageUserAccess extends SqlDependentTestCase {
 
     public function testCheckUserAccess() {
         // ARRANGE
@@ -33,40 +33,55 @@ class TestCheckUserAccess extends SqlDependentTestCase {
         $unpublishedPageId = $this->createUnpublishedPage();
         $publishedPageId = $this->createPublishedPage();
         $accessGrantedPageId = $this->createUnpublishedPage();
+        $writeGrantedPageId = $this->createUnpublishedPage();
+
+        // Create explicit PUA records
         $sql = <<<SQL
         INSERT INTO page_user_access
             (page_id, user_id, can_edit)
         VALUES
-            (:pageId, :userId, TRUE)
+            (:pageId, :userId, :canEdit)
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(array('pageId' => $accessGrantedPageId, 'userId' => $nonAdminUserId));
-        $stmt->execute(array('pageId' => $accessGrantedPageId, 'userId' => $adminUserId));
+        $stmt->execute(array('pageId' => $accessGrantedPageId, 'userId' => $nonAdminUserId, 'canEdit' => 0));
+        $stmt->execute(array('pageId' => $accessGrantedPageId, 'userId' => $adminUserId, 'canEdit' => 1));
+        $stmt->execute(array('pageId' => $writeGrantedPageId, 'userId' => $nonAdminUserId, 'canEdit' => 1));
+
+
 
         // ACT
         // Non-admin user access to unpublished page without explicit whitelisting
-        $nonAdminUnpubResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $unpublishedPageId, $conn);
+        $nonAdminUnpubResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $unpublishedPageId, $conn, false);
 
         // Non-admin user access to published page
-        $nonAdminPubResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $publishedPageId, $conn);
+        $nonAdminPubResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $publishedPageId, $conn, false);
 
         // Non-admin user access to unpublished page where user is whitelisted
-        $nonAdminWhitelistedResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $unpublishedPageId, $conn);
+        $nonAdminWhitelistedResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $accessGrantedPageId, $conn, false);
 
         // Admin user access to unpublished page
-        $adminUnpublishedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $unpublishedPageId, $conn);
+        $adminUnpublishedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $unpublishedPageId, $conn, false);
 
         // Admin user access to published page
-        $adminPublishedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $publishedPageId, $conn);
+        $adminPublishedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $publishedPageId, $conn, false);
 
         // Admin access to unpublished page when whitelisted
-        $adminWhitelistedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $unpublishedPageId, $conn);
+        $adminWhitelistedResult = CheckPageUserAccess::checkUserAccess($adminUserId, $unpublishedPageId, $conn, false);
 
         // Access to unpublished page ID with bogus user ID
-        $bogusUserResult = CheckPageUserAccess::checkUserAccess(666, $unpublishedPageId, $conn);
+        $bogusUserResult = CheckPageUserAccess::checkUserAccess(666, $unpublishedPageId, $conn, false);
 
         // Access to bogus page ID
-        $bogusPageResult = CheckPageUserAccess::checkUserAccess($adminUserId, 999, $conn);
+        $bogusPageResult = CheckPageUserAccess::checkUserAccess($adminUserId, 999, $conn, false);
+
+        // Non-admin write access to write-granted page ID
+        $writeAccessResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $writeGrantedPageId, $conn, true);
+
+        // Non-admin write access to published page without permissions
+        $nonAdminWriteResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $publishedPageId, $conn, true);
+
+        // Non-admin write access to unpublished page without permissions
+        $noPermissionWriteResult = CheckPageUserAccess::checkUserAccess($nonAdminUserId, $unpublishedPageId, $conn, true);
 
         // ASSERT
         // Non-admin user access to unpublished page without explicit whitelisting
@@ -92,6 +107,15 @@ SQL;
 
         // Access to bogus page ID
         $this->assertFalse($bogusPageResult);
+
+        // Non-admin write access to write-granted page ID
+        $this->assertTrue($writeAccessResult);
+
+        // Non-admin write access to published page without permissions
+        $this->assertFalse($nonAdminWriteResult);
+
+        // Non-admin write access to unpublished page without permissions
+        $this->assertFalse($noPermissionWriteResult);
 
     }
 }
