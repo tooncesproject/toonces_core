@@ -171,7 +171,143 @@ SQL;
         } while (false);
     }
     
+    function validatePathName($ancestorPageId, $pageId = null) {
+        /**
+         * Validates path name as set in resourceData.
+         * @param int $ancestorPageId: ID of the page to potentially add a child with the pathname.
+         * @param int $pageId: Optional. If set, disregard a page with the same pathname; assume we are operating on that existing page.
+         * @return bool t/f path name is valid and doesn't conflict with an existing one.
+         */
+        $pathNameValid = false;
+        do {
+            $conn = $this->pageViewReference->getSqlConn();
+            // Pathname contains disallowed characters?
+            if (!ctype_alnum(str_replace('_', '', $this->resourceData['pathName']))) {
+                // if the supplied path name contains non-alphanumeric chars other than underscore,
+                // invalidate the request.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'pathName may only contain alphanumeric characters or underscores.';
+            } 
+            // Pathname is empty?
+            if (empty($this->resourceData['pathName'])) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'pathName must not be empty.';
+            }
+            
+            // Pathname already exists for ancestor page?
+            $sql = <<<SQL
+            SELECT p.pathname
+            FROM page_hierarchy_bridge phb
+            JOIN pages p ON phb.descendant_page_id = p.page_id
+            WHERE phb.page_id = :ancestorPageId
+            AND (phb.descendant_page_id != :pageId OR :pageId IS NULL)
+SQL;
+            $sqlParams = array('ancestorPageId' => $ancestorPageId, 'pageId' => $pageId);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($sqlParams);
+            $result = $stmt->fetchAll();
+            foreach ($result as $row) {
+                if ($result[0] === $this->resourceData['pathName'])
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                    $this->statusMessage = 'pathName already exists. Choose a different page title, or try supplying the pathName explicitly.';
+                    break;
+            }
+            
+            // Validation OK
+            $pathNameValid = true;
+        } while (false);
+        
+        return $pathNameValid;
+    }
     
+    function generatePathName() {
+        /**
+         * Generates a path name from the page title specified in resourceData.
+         * @return string a valid pathname.
+         */
+        // If it's not supplied, generate one from the title.
+        $sql = "SELECT GENERATE_PATHNAME(:pageTitle)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(array('pageTitle' => $this->resourceData['pageTitle']));
+        $result = $stmt->fetchall();
+        $this->resourceData['pathName'] = $result[0][0];
+        return $this->resourceData['pathName'];
+    }
+    
+
+    function validatePageBuilderClass() {
+        /**
+         * Attempts to instantiate the PageBuilder class specified in resourceData.
+         * @var string $pageBuilderClass
+         * @return bool t/f, the named class can be instantiated.
+         */
+        $pageBuilderClass = $this->resourceData['pageBuilderClass'];
+        // Attempt insantiation
+        $instantiationSuccess = false;
+        try {
+            $pb = new $pageBuilderClass;
+            $instantiationSuccess = true;
+        } catch (Exception $e) {
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+            $this->statusMessage = 'Error: Invalid Page builder class: ' . $pageBuilderClass;
+        }
+        return $instantiationSuccess;
+    }
+
+    
+    function validatePageViewClass() {
+        /**
+         * Attempts to instantiate the PageView class specified in resourceData.
+         * @var string $pageViewClass
+         * @return bool t/f, the named class can be instantiated. 
+         */
+        // Return true/false, class is valid.
+        // If invalid, update HTTP status and message.
+        $pageViewClass = $this->resourceData['pageViewClass'];
+        // Attempt insantiation
+        $instantiationSuccess = false;
+        try {
+            $pb = new $pageViewClass;
+            $instantiationSuccess = true;
+        } catch (Exception $e) {
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+            $this->statusMessage = 'Error: Invalid PageView class: ' . $pageViewClass;
+        }
+        return $instantiationSuccess;
+    }
+
+
+    function recursiveCheckWriteAccess($userId, $pageId) {
+        /**
+         * Recursively tests whether a user ID has write access to a page and all of its children,
+         * @param int $userId - User ID to be tested.
+         * @param int $pageId - The page ID where we start.
+         * @return bool $userHasAccess - t/f, user has write access to this page and all its children. 
+         */
+        $conn = $this->pageViewReference->getSqlConn();
+        // Can the user access the current page?
+        $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $pageId, $conn, true);
+        // If yes, recurse, checking any children of the page.
+        if ($userHasAccess) {
+            $sql = "SELECT descendant_page_id FROM page_user_access WHERE page_id = :pageId";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute(['pageId' => $pageId]);
+            $result = $stmt->fetchAll();
+            // If the page has children, recurse.
+            foreach ($result as $row) {
+                $childPageId = $row[0];
+                // Recurse here to test each child page.
+                $userHasAccess = $this->recursiveCheckWriteAccess($userId, $childPageId);
+                if (!$userHasAccess) {
+                    // If we find a page where user doesn't have write access, break the loop and stop recursion.
+                    break;
+                }
+            }
+        }
+        
+        return $userHasAccess;
+    }
+
     function postAction() {
 
         $conn = $this->pageViewReference->getSQLConn();
@@ -181,6 +317,7 @@ SQL;
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
         
+        // begin validation sequence
         do {
             $userId = $this->authenticateUser();
             if (empty($userId)) {
@@ -191,11 +328,44 @@ SQL;
                 break;
             }
 
-            // Call the validation function
-            if (!$this->validatePageInput($this->resourceData['ancestorPageId'], null, $userId))
+            // Validate input.
+            if (!$this->validateData($this->resourceData)) {
+                // Not valid? Respond with status message
+                // HTTP status would already be set by the validateData method inherited from DataResource
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
+            }
+
+            // Is the ancestor page valid, and does the user have write access?
+            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->resourceData['ancestorPageId'], $conn, true);
+            if (!$userHasAccess) {
+                // No access or page doesn't exist? Return a 404 error.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
             
-            // So far so good
+            // Generate the path name if not supplied explicitly
+            if (!isset($this->resourceData['pathName']))
+                $this->generatePathName();
+            
+            // Now validate the path name
+            if (!$this->validatePathName()) {
+                $this->resourceData = array('status' => $this->statusMessage);
+                break;
+            }
+            
+            // Validate PageBuilder class
+            if (!$this->validatePageBuilderClass()) {
+                $this->resourceData = array('status' => $this->statusMessage);
+                break;
+            }
+
+            // Validate PageView class
+            if (!$this->validatePageViewClass()) {
+                $this->resourceData = array('status' => $this->statusMessage);
+                break;
+            }
+            
             // Attempt the page insert
             $sql = <<<SQL
             SELECT CREATE_PAGE(
@@ -231,17 +401,34 @@ SQL;
             } catch (PDOException $e) {
                 // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                $this->statusMessage = 'Creation of page in database failed, possibly due to duplicate pathname or other database error. Try changing the title or supplying the pathName explicitly.';
+                $this->statusMessage = 'Creation of page in database failed due to database error: ' . $e->getMessage();
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
+
             
             // Check to ensure page ID was actually created
             if (!$pageId) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                $this->statusMessage = 'Blog creation failed, possibly due to a dupliate pathName. Try changing the or supplying the pathName explicitly.';
+                $this->statusMessage = 'Page creation failed, possible due to a silent database error. Debug the data supplied to PageDataResource.';
                 break;
             }
+            
+            // If the user is a non-admin user, create a record in page_user_access.
+            $sql = <<<SQL
+            INSERT INTO page_user_access
+                (page_id, user_id, can_edit)
+            VALUES (
+                SELECT 
+                     :pageId
+                    ,:userId
+                    ,1 -- can_edit
+                FROM users u
+                WHERE u.user_id = :userId AND u.is_admin = 0
+            )
+SQL;
+            $sqlParams = array('pageId' => $pageId, 'userId' => $userId);
+            $stmt->execute($sqlParams);
             
             // Success. Clear resource data and call getAction().
             $this->resourceData = array();
@@ -270,7 +457,7 @@ SQL;
         $this->fields['published']->allowNull = true;
 
         // Connect to SQL
-        $sqlConn = $this->pageViewReference->getSQLConn();
+        $conn = $this->pageViewReference->getSQLConn();
         // The blogID should be set in the URL parameters.
         $pageId = $this->validateIntParameter('id');
 
@@ -297,9 +484,30 @@ SQL;
                 break;
             }
             
-            // Call the input validator
-            if (!$this->validatePageInput(null, $pageId, $userId))
+            // Validate input.
+            if (!$this->validateData($this->resourceData)) {
+                // Not valid? Respond with status message
+                // HTTP status would already be set by the validateData method inherited from DataResource
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
+            }
+            
+            // Is the page valid, and does the user have write access?
+            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $pageId, $conn, true);
+            if (!$userHasAccess) {
+                // No access or page doesn't exist? Return a 404 error.
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
+            
+            // If supplied, is the path name valid?
+            if (isset($this->resourceData['pathName'])) {
+                $parentPageId = GrabParentPageId::getParentId($pageId, $conn);
+                if (!$this->validatePathName($parentPageId, $pageId)) {
+                    $this->resourceData = array('status' => $this->statusMessage);
+                    break;
+                }
+            }
             
             // If all validation so far has passed, update the page and its associated records.
             // Build the SQL depending on the fields to be updated
@@ -496,12 +704,15 @@ SQL;
             foreach($this->fields as $field)
                 $field->allowNull = true;
             
-            // Call validatePageInput to check whether the page exists and user has access.
-            if (!$this->validatePageInput(null, $pageId, $userId)) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+            // Check whether user has write access to this page and ALL its children (since deletion is also recursive).
+            $userHasAccess = $this->recursiveCheckWriteAccess($userId, $pageId);
+            if (!$userHasAccess) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                $this->statusMessage = 'DELETE access denied; you do not have write access to this page or one of its children.';
+                $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Validation has passed; delete the page.
             // Note: sp_delete_page is recursive; it also deletes any children the page has.
             $sql = "CALL sp_delete_page(:pageId)";
