@@ -35,7 +35,8 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/pagebuilder/TestDocumentEndpointPageBuilder.php</file>
 		</testsuite>
 		<testsuite name="utility_classes">
-			<file>unittest/utility/static/TestCheckUserAccess.php</file>
+			<file>unittest/utility/TestCheckUserAccess.php</file>
+			<file>unittest/utility/TestGrabParentPageId.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

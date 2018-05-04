@@ -96,72 +96,39 @@ SQL;
     }
 
 
-    public function createUnpublishedPage() {
+    public function createPage($published = true, $parentPageId = 1, $pathName = null) {
         // Create an unpublished page; non-admin users don't have access.
         $sqlConn = $this->getConnection();
-
-        // In case this is called twice in the same fixture,
+        
+        // In some cases, in case this is called twice in the same fixture,
         // we need to make the pathame unique. We'll use the expected page_id
-        $sql = "SELECT MAX(page_id) + 1 FROM pages";
-        $stmt = $sqlConn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchall();
-        $identifier = strval($result[0][0]);
-
+        if (!$pathName) {
+            $sql = "SELECT MAX(page_id) + 1 FROM pages";
+            $stmt = $sqlConn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchall();
+            $identifier = strval($result[0][0]);
+            $pathName = 'unpublished_page_' . $identifier;
+        }
+        
         $sql = <<<SQL
         SELECT CREATE_PAGE  (
-             1                              -- parent_page_id BIGINT
-            ,:pathname                      -- pathname VARCHAR(50)
+             :parentPageId                  -- parent_page_id BIGINT
+            ,:pathName                      -- pathname VARCHAR(50)
             ,'Unpublished Page'             -- page_title VARCHAR(50)
             ,'Unpublished Page'             -- page_link_text VARCHAR(50)
             ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
             ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
             ,FALSE                          -- redirect_on_error BOOL
-            ,FALSE                          -- published BOOL
+            ,:published                     -- published BOOL
             ,0                              -- pagetype_id BIGINT
 )
 SQL;
         $stmt = $sqlConn->prepare($sql);
-        $pathname = 'unpublished_page_' . $identifier;        
-        $stmt->execute(['pathname' => $pathname]);
+
+        $stmt->execute(['parentPageId' => $parentPageId, 'pathName' => $pathName, 'published' => $published]);
         $result = $stmt->fetchAll();
     
-        $newPageId = intval($result[0][0]);
-        
-        return $newPageId;
-        
-    }
-
-
-    public function createPublishedPage() {
-        // Create an unpublished page; non-admin users don't have access.
-        $sqlConn = $this->getConnection();
-
-        // In case this is called twice in the same fixture,
-        // we need to make the pathame unique. We'll use the expected page_id
-        $sql = "SELECT MAX(page_id) + 1 FROM pages";
-        $stmt = $sqlConn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchall();
-        $identifier = strval($result[0][0]);
-        $sql = <<<SQL
-        SELECT CREATE_PAGE  (
-             1                              -- parent_page_id BIGINT
-            ,:pathname                   -- pathname VARCHAR(50)
-            ,'Published Page'             -- page_title VARCHAR(50)
-            ,'Published Page'             -- page_link_text VARCHAR(50)
-            ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
-            ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
-            ,FALSE                          -- redirect_on_error BOOL
-            ,TRUE                           -- published BOOL
-            ,0                              -- pagetype_id BIGINT
-)
-SQL;
-        $stmt = $sqlConn->prepare($sql);
-        $pathname = 'published_page_' . $identifier;
-        $stmt->execute(['pathname' => $pathname]);
-        $result = $stmt->fetchAll();
-        
         $newPageId = intval($result[0][0]);
         
         return $newPageId;

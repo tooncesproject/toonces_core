@@ -30,10 +30,10 @@ class TestCheckPageUserAccess extends SqlDependentTestCase {
         $adminUserId = $result[0][0];
 
         // Create some pages
-        $unpublishedPageId = $this->createUnpublishedPage();
-        $publishedPageId = $this->createPublishedPage();
-        $accessGrantedPageId = $this->createUnpublishedPage();
-        $writeGrantedPageId = $this->createUnpublishedPage();
+        $unpublishedPageId = $this-> createPage(false);
+        $publishedPageId = $this-> createPage(true)();
+        $accessGrantedPageId = $this-> createPage(false);
+        $writeGrantedPageId = $this-> createPage(false);
 
         // Create explicit PUA records
         $sql = <<<SQL

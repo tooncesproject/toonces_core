@@ -49,6 +49,8 @@ class PageDataResource extends DataResource implements iResource {
         $this->fields['redirectOnError'] = $redirectOnError;
         
         $published = new BooleanFieldValidator();
+        // defaults to FALSE
+        $published->allowNull = true;
         $this->fields['published'] = $published;
         
         $pageTypeId = new IntegerFieldValidator();
@@ -165,6 +167,29 @@ SQL;
     }
 
 
+    function validatePageTypeId() {
+        /**
+         * Performs a database lookup to check whether the page type of the request is valid.
+         * @return bool $pageTypeValid - T/F page type exists.
+         */
+        
+        $pageTypeValid = false;
+        $conn = $this->pageViewReference->getSqlConn();
+        $sql = "SELECT page_type_id FROM pagetypes WHERE page_type_id = :pageTypeId";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageTypeId' => $this->resourceData['pageTypeId']]);
+        $result = $stmt->fetchAll();
+        if ($result) {
+            $pageTypeValid = true;
+        } else {
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+            $this->statusMessage = 'Error: Invalid pageTypeId: ' . strval($this->resourceData['pageTypeId']);
+        }
+        
+        return $pageTypeValid;
+    }
+
+
     function recursiveCheckWriteAccess($userId, $pageId) {
         /**
          * Recursively tests whether a user ID has write access to a page and all of its children,
@@ -209,7 +234,20 @@ SQL;
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
+       
+        // Set defaults.            
+        if (!isset($this->resourceData['pageLinkText']))
+            $this->resourceData['pageLinkText'] = $this->resourceData['pageTitle'];
+
+        if (!isset($this->resourceData['redirectOnError']))
+            $this->resourceData['redirectOnError'] = false;
         
+        if (!isset($this->resourceData['published']))
+            $this->resourceData['published'] = false;
+        
+        if (!isset($this->resourceData['pageTypeId']))
+            $this->resourceData['pageTypeId'] = 0;
+                
         // begin validation sequence
         do {
             $userId = $this->authenticateUser();
@@ -255,6 +293,12 @@ SQL;
 
             // Validate PageView class
             if (!$this->validatePageViewClass()) {
+                $this->resourceData = array('status' => $this->statusMessage);
+                break;
+            }
+            
+            // Validate pageTypeId
+            if (!$this->validatePageTypeId()) {
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
@@ -377,7 +421,7 @@ SQL;
             }
 
             // Reject the PUT if the 'id' parameter is not set.
-            if (!isset($pageId)) {
+            if (empty($pageId)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
                 $this->statusMessage = 'PUT requests require the parameter "id" in the query string to specify a resource to be updated.';
                 break;
@@ -407,6 +451,14 @@ SQL;
                     break;
                 }
             }
+            
+            // If supplied, is the page type ID valid?
+            if (isset($this->resourceData['pageTypeId'])) {
+                if (!$this->validatePageTypeId())
+                    $this->resourceData = array('status' => $this->statusMessage);
+                    break;
+            }
+                
             
             // If all validation so far has passed, update the page and its associated records.
             // Build the SQL depending on the fields to be updated
@@ -616,13 +668,16 @@ SQL;
             foreach($this->fields as $field)
                 $field->allowNull = true;
             
-            // Check whether user has write access to this page and ALL its children (since deletion is also recursive).
-            $userHasAccess = $this->recursiveCheckWriteAccess($userId, $pageId);
-            if (!$userHasAccess) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
-                $this->statusMessage = 'DELETE access denied; you do not have write access to this page or one of its children.';
-                $this->resourceData = array('status' => $this->statusMessage);
-                break;
+            // if user is not an admin...
+            if (!$this->sessionManager->userIsAdmin) {
+                // Check whether user has write access to this page and ALL its children (since deletion is also recursive).
+                $userHasAccess = $this->recursiveCheckWriteAccess($userId, $pageId);
+                if (!$userHasAccess) {
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                    $this->statusMessage = 'DELETE access denied; you do not have write access to this page or one of its children.';
+                    $this->resourceData = array('status' => $this->statusMessage);
+                    break;
+                }
             }
 
             // Validation has passed; delete the page.

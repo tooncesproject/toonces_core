@@ -49,7 +49,7 @@ class TestBlogDataResource extends SqlDependentTestCase {
         $bdr = new BlogDataResource($jsonPageView);
 
         // Create an unpublished page
-        $unpublishedPageId = intval($this->createUnpublishedPage());
+        $unpublishedPageId = intval($this-> createPage(false));
 
         // Create a non-admin user
         $this->createNonAdminUser();
