@@ -171,9 +171,9 @@ class TestPageDataResource extends SqlDependentTestCase {
         $parentPageId = $this->createPage(true);
         $childPageOneId = $this->createPage(true, $parentPageId);
         $childPageTwoId = $this->createPage(true, $parentPageId);
-        $grandchildPageOneId = createPage(true, $childPageOneId);
-        $grandchildPageTwoId = createPage(true, $childPageOneId);
-        $grandchildPageThreeId = createPage(true, $childPageTwoId);
+        $grandchildPageOneId = $this->createPage(true, $childPageOneId);
+        $grandchildPageTwoId = $this->createPage(true, $childPageOneId);
+        $grandchildPageThreeId = $this->createPage(true, $childPageTwoId);
         
         // Grant write access to some of the pages.
         // (not going to worry about read-only access; 
@@ -421,10 +421,7 @@ SQL;
         
     }
    
-    
-    /**
-     * @depends testValidatePathName
-     */
+
     function testPutAction() {
         // ARRANGE
         // get SQL connection
@@ -602,22 +599,309 @@ SQL;
         $this->assertSame($validResult['redirectOnError'], $insertedRedirectOnError);
         $this->assertSame($validResult['published'], $insertedPublished);
         $this->assertSame($validResult['pageTypeId'], $insertedPageTypeId);
-        
-        
+            
     }
     
     
     function testGetAction() {
         // ARRANGE
+        // get SQL connection
+        $conn = $this->getConnection();
+        
+        // Instantiate a PageDataResource and dependencies
+        $conn = $this->getConnection();
+        $pageView = new JsonPageView(1);
+        $pageView->setSQLConn($conn);
+        $pdr = new PageDataResource($pageView);
+        
+        // Create a non-admin user
+        $nonAdminUserId = $this->createNonAdminUser();
+        
+        // Create some pages:
+        // This one is public
+        $publicPageId = $this->createPage(true);
+        // This one is not
+        $unpublishedPageId = $this->createPage(false);
+        // This one is not published, but we will grant non-admin read access
+        $grantedPageId = $this->createPage(false);
+        $sql = <<<SQL
+        INSERT INTO page_user_access
+            (page_id, user_id, can_edit)
+        VALUES
+            (:grantedPageId, :nonAdminUserId, TRUE)
+SQL;
+        $sqlParams = array(
+             'grantedPageId' => $grantedPageId
+            ,'nonAdminUserId' => $nonAdminUserId
+        );
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($sqlParams);
+        
+        // Now that we've created pages, query the database for its current state
+        $sql = <<<SQL
+        SELECT
+             p.page_id
+            ,p.page_title
+            ,p.pathname
+            ,p.pagebuilder_class
+            ,p.pageview_class
+            ,p.redirect_on_error
+            ,p.published
+            ,p.page_type_id
+            ,CASE WHEN pua.page_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
+        FROM pages p
+        LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND pua.userid = :userId
+SQL;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['userId' => $nonAdminUserId]);
+        $pagesState = $stmt->fetchAll();
+
+        $sql = <<<SQL
+        SELECT
+             p.page_id
+            ,p.page_title
+            ,p.pathname
+            ,p.pagebuilder_class
+            ,p.pageview_class
+            ,p.redirect_on_error
+            ,p.published
+            ,p.page_type_id
+        FROM pages p
+        WHERE page_id = :pageId
+SQL;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageId' => $publicPageId]);
+        $publicPageState = $stmt->fetchAll();
+        
+        
         // ACT
+        // GET with admin login returns all pages and 200
+        $this->setAdminAuth();
+        $adminResult = $pdr->getAction();
+        $adminStatus = $pdr->httpStatus;
+
+        // GET with bogus ID parameter returns 404 and empty result
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = '69420';
+        $bogusParamResult = $pdr->getAction();
+        $bogusParamStatus = $pdr->httpStatus;
+        
+        // GET with valid ID parameter returns single record and 200, with data matching database.
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = strval($publicPageId);
+        $singleParamResult = $pdr->getAction();
+        $singleParamStatus = $pdr->httpStatus;
+        $singleParamRecord = $singleParamResult[$publicPageId];
+        
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        $this->setNonAdminAuth();
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $unpublishedResult = $pdr->getAction();
+        $unpublishedStatus = $pdr->httpStatus;
+        
+        // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
+        $pdr->resourceData = array();
+        $pdr->parameters = array();
+        $noParamResult = $pdr->getAction();
+        $noParamStatus = $pdr->httpStatus;
+        
+        // Non-authenticated GET returns all and only published pages
+        $this->unsetBasicAuth();
+        $pdr->resourceData = array();
+        $nonAuthResult = $pdr->getAction();
+        $nonAuthStatus = $pdr->httpStatus;
+        
+        // Non-authenticated GET on unpublished page parameter returns 404
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = strval($grantedPageId);
+        $noAuthUnpublishedResult = $pdr->getAction();
+        $noAuthUnpublishedStatus = $pdr->httpStatus;
+        
+        
         // ASSERT
+        // GET with admin login returns all pages and 200
+        foreach ($adminResult as $pageRecord)
+            $this->assertArrayHasKey(key($pageRecord), $pagesState);
+
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $adminStatus);
+        
+        // GET with bogus ID parameter returns 404 and empty result
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusParamStatus);
+        $this->assertEmpty($bogusParamResult);
+        
+        // GET with valid ID parameter returns single record and 200
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $singleParamStatus);
+        $this->assertEquals(1, count($singleParamResult));
+        
+        // ... with data matching database.
+        $this->assertSame($publicPageState[0][0], $singleParamRecord['pageId']);
+        $this->assertSame($publicPageState[0][1], $singleParamRecord['pageTitle']);
+        $this->assertSame($publicPageState[0][2], $singleParamRecord['pathName']);
+        $this->assertSame($publicPageState[0][3], $singleParamRecord['pageBuilderClass']);
+        $this->assertSame($publicPageState[0][4], $singleParamRecord['pageViewClass']);
+        $this->assertSame($publicPageState[0][5], $singleParamRecord['redirectOnError']);
+        $this->assertSame($publicPageState[0][6], $singleParamRecord['published']);
+        $this->assertSame($publicPageState[0][7], $singleParamRecord['pageTypeId']);
+        
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
+        $this->assertEmpty($unpublishedResult);
+        
+        // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $noParamStatus);
+        foreach ($pagesState as $pageRecord) {
+            $id = $pageRecord[0];
+            $published = $pageRecord[6];
+            $userAccess = $pageRecord[8];
+            if ($published == true or $userAccess = true) {
+                $this->assertArrayHasKey($id, $noParamResult);
+            } else {
+                $this->assertArrayNotHasKey($id, $noParamResult);
+            }
+            
+        }
+        
+        // Non-authenticated GET returns all and only published pages
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $nonAuthStatus);
+        foreach ($pagesState as $pageRecord) {
+            $id = $pageRecord[0];
+            $published = $pageRecord[6];
+            if ($published == true) {
+                $this->assertArrayHasKey($id, $noParamResult);
+            } else {
+                $this->assertArrayNotHasKey($id, $noParamResult);
+            }
+        }
+        
+        
+        // Non-authenticated GET on unpublished page parameter returns 404
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthUnpublishedStatus);
+        $this->assertEmpty($noAuthUnpublishedResult);
+        
     }
     
     
     function testDeleteAction() {
         // ARRANGE
+        // Instantiate a PageDataResource and dependencies
+        $conn = $this->getConnection();
+        $pageView = new JsonPageView(1);
+        $pageView->setSQLConn($conn);
+        $pdr = new PageDataResource($pageView);
+        
+        // Create users.
+        $nonAdminUserId = $this->createNonAdminUser();
+        $adminUserId = $this->createAdminUser();
+        
+        // Create a hierarchy of pages.
+        $parentPageId = $this->createPage(true);
+        $childPageOneId = $this->createPage(true, $parentPageId);
+        $childPageTwoId = $this->createPage(true, $parentPageId);
+        $grandchildPageOneId = $this->createPage(true, $childPageOneId);
+        $grandchildPageTwoId = $this->createPage(true, $childPageOneId);
+        $grandchildPageThreeId = $this->createPage(true, $childPageTwoId);
+        
+        // Grant write access to some of the pages.
+        // (not going to worry about read-only access;
+        // That is covered by TestCheckPageUserAccess).
+        $sql = <<<SQL
+        INSERT INTO page_user_access
+            (page_id, user_id, can_edit)
+        VALUES
+             (:childPageOneId, :userId, 1)
+            ,(:grandchildPageOneId, :userId, 1)
+            ,(:childPageTwoId, :userId, 1)
+            ,(:grandchildPageThreeId, :userId, 1)
+SQL;
+        $sqlParams = array(
+             'childPageOneId' => $childPageOneId
+            ,'grandchildPageOneId' => $grandchildPageOneId
+            ,'childPageTwoId' => $childPageTwoId
+            ,'grandchildPageThreeId' => $grandchildPageThreeId
+            ,'userId' => $nonAdminUserId
+        );
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($sqlParams);
+        
+        // Capture the count of pages before any operations
+        $sql = "SELECT COUNT(*) FROM PAGES";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $pageCountBefore = $result[0][0];
+
+
         // ACT
+        // Unauthenticated attempt returns 401
+        $this->unsetBasicAuth();
+        $pdr->parameters['id'] = strval($grandchildPageThreeId);
+        $pdr->deleteAction();
+        $unauthenticatedStatus = $pdr->httpStatus;
+        
+        // Authenticated attempt without parameter returns 405
+        $this->setAdminAuth();
+        $pdr->deleteAction();
+        $noParameterStatus = $pdr->httpStatus;
+        
+        // Authenticated attempt where user has no write access to an affected page returns 401
+        $this->setNonAdminAuth();
+        $pdr->parameters['id'] = strval($childPageOneId);
+        $pdr->deleteAction();
+        $noAccessStatus = $pdr->httpStatus;
+        
+        // Invalid attempts so far have not deleted any pages
+        $sql = "SELECT COUNT(*) FROM PAGES";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $pageCountAfter = $result[0][0];
+        
+        // Authenticated non-admin user successfully deletes page with write access, returns 204
+        $pdr->parameters['id'] = strval($grandchildPageThreeId);
+        $pdr->deleteAction();
+        $nonAdminValidStatus = $pdr->httpStatus;
+        $sql = "SELECT page_id FROM pages WHERE page_id = :pageId";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageId' => $grandchildPageThreeId]);
+        $resultAfterDelete = $stmt->fetchAll();
+
+        // Authenticated admin user successfully deletes page and all its children, returns 204
+        $this->setAdminAuth();
+        $pdr->parameters['id'] = strval($parentPageId);
+        $pdr->deleteAction();
+        $adminDeleteStatus = $pdr-httpStatus;
+        // ... query for the current count of pages
+        $sql = "SELECT COUNT(*) FROM PAGES";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $pageCountFinal = $result[0][0];
+        
+        
         // ASSERT
+        // Unauthenticated attempt returns 401
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $unauthenticatedStatus);
+        
+        // Authenticated attempt without parameter returns 405
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $noParameterStatus);
+        
+        // Authenticated attempt where user has no write access to an affected page returns 401
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $noAccessStatus);
+        
+        // Invalid attempts so far have not deleted any pages
+        $this->assertEquals($pageCountBefore, $pageCountAfter);
+        
+        // Authenticated non-admin user successfully deletes page with write access, returns 204
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $nonAdminValidStatus);
+        $this->assertEmpty($resultAfterDelete);
+        
+        // Authenticated admin user successfully deletes page and all its children, returns 204
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $adminDeleteStatus);
+        // ... All 6 pages created by the unit test should be deleted.
+        $this->assertEquals($pageCountBefore - 6, $pageCountFinal);
+        
+        
     }
 
 }
