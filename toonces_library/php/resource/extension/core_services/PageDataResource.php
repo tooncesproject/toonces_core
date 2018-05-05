@@ -154,16 +154,16 @@ SQL;
          * @return bool t/f, the named class can be instantiated.
          */
         $pageBuilderClass = $this->resourceData['pageBuilderClass'];
-        // Attempt insantiation
-        $instantiationSuccess = false;
-        try {
-            $pb = new $pageBuilderClass;
-            $instantiationSuccess = true;
-        } catch (Exception $e) {
+
+        if (!class_exists($pageBuilderClass)) {
+            
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Error: Invalid Page builder class: ' . $pageBuilderClass;
+            return false; 
+        } else {
+            return true;
         }
-        return $instantiationSuccess;
+        
     }
 
     
@@ -176,16 +176,15 @@ SQL;
         // Return true/false, class is valid.
         // If invalid, update HTTP status and message.
         $pageViewClass = $this->resourceData['pageViewClass'];
-        // Attempt insantiation
-        $instantiationSuccess = false;
-        try {
-            $pb = new $pageViewClass;
-            $instantiationSuccess = true;
-        } catch (Exception $e) {
+        
+        if (!class_exists($pageViewClass)) {
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Error: Invalid PageView class: ' . $pageViewClass;
+            return false;
+        } else {
+            return true;
         }
-        return $instantiationSuccess;
+
     }
 
 
@@ -287,8 +286,9 @@ SQL;
                 // HTTP status would already be set by the validateData method inherited from DataResource
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
+                
             }
-
+            
             // Is the ancestor page valid, and does the user have write access?
             $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->resourceData['ancestorPageId'], $conn, true);
             if (!$userHasAccess) {
@@ -328,43 +328,42 @@ SQL;
             // Attempt the page insert
             $sql = <<<SQL
             SELECT CREATE_PAGE(
-                 :parentPageId          -- parent_page_id BIGINT
-                ,:pathname              -- pathname VARCHAR(50)
-                ,:pageTitle             -- page_title VARCHAR(50)
-                ,:pageLinkText          -- page_link_text VARCHAR(50)
-                ,:pageBuilderClass      -- pagebuilder_class VARCHAR(50)
-                ,:pageViewClass         -- pageview_class VARCHAR(50)
-                ,:redirectOnError       -- redirect_on_error BOOL
-                ,:published             -- published BOOL
-                ,:pagetypeId            -- pagetype_id BIGINT
+                 :parentPageId
+                ,:pathName
+                ,:pageTitle
+                ,:pageLinkText
+                ,:pageBuilderClass
+                ,:pageViewClass
+                ,:redirectOnError
+                ,:published
+                ,:pageTypeId
             )
 SQL;
             $sqlParams = array(
                  'parentPageId' => $this->resourceData['ancestorPageId']
-                ,'pathname' => $this->resourceData['pathname']
+                ,'pathName' => $this->resourceData['pathName']
                 ,'pageTitle' => $this->resourceData['pageTitle']
                 ,'pageLinkText' => $this->resourceData['pageLinkText']
                 ,'pageBuilderClass' => $this->resourceData['pageBuilderClass']
                 ,'pageViewClass' => $this->resourceData['pageViewClass']
-                ,'redirectOnError' => $this->resourceData['redirectOnError']
-                ,'published' => $this->resourceData['published']
-                ,'pagetypeId' => $this->resourceData['pagetypeId']
+                ,'redirectOnError' => intval($this->resourceData['redirectOnError'])
+                ,'published' => intval($this->resourceData['published'])
+                ,'pageTypeId' => $this->resourceData['pageTypeId']
             );
-            
+
             $pageId = null;
+            $stmt = $conn->prepare($sql);
+
             try {
-                $stmt = $conn->prepare($sql);
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchall();
                 $pageId = $result[0][0];
             } catch (PDOException $e) {
-                // If this failed, it's probably because a child with that pathname already exists.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 $this->statusMessage = 'Creation of page in database failed due to database error: ' . $e->getMessage();
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-
             
             // Check to ensure page ID was actually created
             if (!$pageId) {
@@ -372,31 +371,30 @@ SQL;
                 $this->statusMessage = 'Page creation failed, possible due to a silent database error. Debug the data supplied to PageDataResource.';
                 break;
             }
-            
+
             // If the user is a non-admin user, create a record in page_user_access.
             $sql = <<<SQL
             INSERT INTO page_user_access
                 (page_id, user_id, can_edit)
-            VALUES (
                 SELECT 
                      :pageId
                     ,:userId
-                    ,1 -- can_edit
+                    ,1
                 FROM users u
                 WHERE u.user_id = :userId AND u.is_admin = 0
-            )
+            
 SQL;
+            $stmt = $conn->prepare($sql);
             $sqlParams = array('pageId' => $pageId, 'userId' => $userId);
             $stmt->execute($sqlParams);
             
             // Success. Clear resource data and call getAction().
             $this->resourceData = array();
             $this->parameters['id'] = strval($pageId);
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->getAction();
-                
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
         } while(false);
-        
+
         return $this->resourceData;
         
     }
@@ -632,7 +630,7 @@ SQL;
                 $this->resourceData[$row[0]] = array(
                      'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
                     ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
-                    ,'ancestorPageId' => $row['ancestor_page_id']
+                    ,'ancestorPageId' => intval($row['ancestor_page_id'])
                     ,'pathname' => $row['pathname']
                     ,'pageTitle' => $row['page_title']
                     ,'pageLinkText' => $row['page_link_text']
@@ -640,9 +638,9 @@ SQL;
                     ,'pageViewClass' => $row['pageview_class']
                     ,'createdDate' => $row['created_dt']
                     ,'modifiedDate' => $row['modified_dt']
-                    ,'redirectOnError' => $row['redirect_on_error']
-                    ,'published' => $row['published']
-                    ,'pageTypeId' => $row['pagetype_id']
+                    ,'redirectOnError' => boolval($row['redirect_on_error'])
+                    ,'published' => boolval($row['published'])
+                    ,'pageTypeId' => intval($row['pagetype_id'])
                 );
         
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');

@@ -111,10 +111,8 @@ class TestPageDataResource extends SqlDependentTestCase {
     }
     
     
-    /**
-     * @expectedException Error
-     */
     function testValidatePageBuilderClass() {
+        
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
         $pageView = new JsonPageView(1);
@@ -127,18 +125,16 @@ class TestPageDataResource extends SqlDependentTestCase {
         $bogusResult = $pdr->validatePageBuilderClass();
         
         // legit pagebuilder class validated
-        $pdr->resourceData['pageBuilderClass'] = 'Toonces404PageBuilder';
+        $pdr->resourceData['pageBuilderClass'] = 'PageBuilder';
         $goodResult = $pdr->validatePageBuilderClass();
         
         // ASSERT
         $this->assertFalse($bogusResult);
         $this->assertTrue($goodResult);
+
     }
     
     
-    /**
-     * @expectedException Error
-     */
     function testValidatePageViewClass() {
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
@@ -246,7 +242,7 @@ SQL;
     
     /**
      * @depends testValidatePathName
-     * @expectedException Error
+     * 
      */
     function testPostAction() {
         // ARRANGE
@@ -321,14 +317,15 @@ SQL;
         
         // POST with invalid or missing data returns 400 error
         $this->setAdminAuth();
-        $pdr->resourceData = $validPost;
-        $pdr->postAction;
+        $pdr->resourceData = $invalidPost;
+        $pdr->postAction();
         $invalidPostStatus = $pdr->httpStatus;
-
+        
         // POST with non-existent parent page ID returns 400
         $pdr->resourceData = $badPageIdPost;
         $pdr->postAction();
         $badPidStatus = $pdr->httpStatus;
+        
         
         // POST with invalid pathName returns 400 error
         $pdr->resourceData = $badPathnamePost;
@@ -371,7 +368,7 @@ SQL;
             ,pathname
             ,pagebuilder_class
             ,pageview_class
-            ,redirect_on_error,
+            ,redirect_on_error
             ,published
             ,pagetype_id
         FROM pages
@@ -395,7 +392,7 @@ SQL;
         
         // POST with parent page to which non-admin user doesn't have access returns 404
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminStatus);
-
+        
         // POST with invalid or missing data returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $invalidPostStatus);
         
@@ -761,9 +758,9 @@ SQL;
         $this->assertSame($publicPageState[0]['path_name'], $singleParamRecord['pathName']);
         $this->assertSame($publicPageState[0]['pagebuilder_class'], $singleParamRecord['pageBuilderClass']);
         $this->assertSame($publicPageState[0]['pageview_class'], $singleParamRecord['pageViewClass']);
-        $this->assertSame($publicPageState[0]['redirect_on_error'], $singleParamRecord['redirectOnError']);
-        $this->assertSame($publicPageState[0]['published'], $singleParamRecord['published']);
-        $this->assertSame($publicPageState[0]['pagetype_id'], $singleParamRecord['pageTypeId']);
+        $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);
+        $this->assertSame(boolval($publicPageState[0]['published']), $singleParamRecord['published']);
+        $this->assertSame(intval($publicPageState[0]['pagetype_id']), $singleParamRecord['pageTypeId']);
         
         // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
