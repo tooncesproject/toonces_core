@@ -126,7 +126,7 @@ SQL;
 SQL;
         $stmt = $sqlConn->prepare($sql);
 
-        $stmt->execute(['parentPageId' => $parentPageId, 'pathName' => $pathName, 'published' => $published]);
+        $stmt->execute(['parentPageId' => $parentPageId, 'pathName' => $pathName, 'published' => intval($published)]);
         $result = $stmt->fetchAll();
     
         $newPageId = intval($result[0][0]);

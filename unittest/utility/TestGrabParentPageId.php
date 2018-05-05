@@ -12,22 +12,24 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestGrabParentPageId extends SqlDependentTestCase {
+class TestGrabParentPageIdTest extends SqlDependentTestCase {
     
     function testGrabParentPageId() {
         // ARRANGE
         $conn = $this->getConnection();
+        $this->destroyTestDatabase();
         $this->buildTestDatabase();
         // Create a page. the createUnpublishedPage method creates a page with
         // a parent ID of 1.
-        $pageId = $this-> createPage(false);
+        $parentPageId = $this->createPage(true,1);
+        $childPageId = $this->createPage(true, $parentPageId);
 
         // ACT
-        $parentPageId = GrabParentPageId::getParentId($pageId, $conn);
-
-        // ASSERT
-        $this->assertEqual(1, $parentPageId);
+        $expectedPageId = GrabParentPageId::getParentId($childPageId, $conn);
         
+        // ASSERT
+        $this->assertEquals($parentPageId, $expectedPageId);
+
         // Tear down
         $this->destroyTestDatabase();
     }

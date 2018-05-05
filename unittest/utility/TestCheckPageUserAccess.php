@@ -31,7 +31,7 @@ class TestCheckPageUserAccess extends SqlDependentTestCase {
 
         // Create some pages
         $unpublishedPageId = $this-> createPage(false);
-        $publishedPageId = $this-> createPage(true)();
+        $publishedPageId = $this->createPage(true);
         $accessGrantedPageId = $this-> createPage(false);
         $writeGrantedPageId = $this-> createPage(false);
 

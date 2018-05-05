@@ -29,6 +29,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/resource/TestHTMLResource.php</file>
 			<file>unittest/resource/TestHTMLViewResource.php</file>
 			<file>unittest/resource/TestFileResource.php</file>
+			<file>unittest/resource/TestPageDataResource.php</file>
 		</testsuite>
 		<testsuite name="pagebuilders">
 			<file>unittest/pagebuilder/TestExtHtmlPageBuilder.php</file>
