@@ -20,7 +20,7 @@ class TestPageBuilder extends StandardPageBuilder {
         <div class="copy_block">
             <h1>Toonces Test Page!</h1>
             <p>Yup, it's a page. Enjoy.</p>
-            <iframe width="500" height="315" src="https://www.youtube.com/embed/xB9MLUAWkAw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe width="500" height="315" src="https://www.youtube.com/embed/NjVugzSR7HA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
 HTML;
         $element->html = $html;
