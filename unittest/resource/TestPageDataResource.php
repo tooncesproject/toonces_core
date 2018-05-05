@@ -755,7 +755,7 @@ SQL;
         // ... with data matching database.
         $this->assertSame(intval($publicPageState[0]['page_id']), key($singleParamResult));
         $this->assertSame($publicPageState[0]['page_title'], $singleParamRecord['pageTitle']);
-        $this->assertSame($publicPageState[0]['path_name'], $singleParamRecord['pathName']);
+        $this->assertSame($publicPageState[0]['pathname'], $singleParamRecord['pathName']);
         $this->assertSame($publicPageState[0]['pagebuilder_class'], $singleParamRecord['pageBuilderClass']);
         $this->assertSame($publicPageState[0]['pageview_class'], $singleParamRecord['pageViewClass']);
         $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);

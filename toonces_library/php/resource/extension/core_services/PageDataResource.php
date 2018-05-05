@@ -511,7 +511,7 @@ SQL;
             // redirect on error
             if(isset($this->resourceData['redirectOnError'])) {
                 array_push($updateFields, 'redirect_on_error = :redirectOnError');
-                $sqlParams['redirectOnError'] = $this->resourceData['redirectOnError'];
+                $sqlParams['redirectOnError'] = intval($this->resourceData['redirectOnError']);
             }
             // published
             if(isset($this->resourceData['published'])) {
@@ -631,7 +631,7 @@ SQL;
                      'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
                     ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
                     ,'ancestorPageId' => intval($row['ancestor_page_id'])
-                    ,'pathname' => $row['pathname']
+                    ,'pathName' => $row['pathname']
                     ,'pageTitle' => $row['page_title']
                     ,'pageLinkText' => $row['page_link_text']
                     ,'pageBuilderClass' => $row['pagebuilder_class']
