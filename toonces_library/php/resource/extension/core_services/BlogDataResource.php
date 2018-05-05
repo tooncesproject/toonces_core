@@ -222,7 +222,8 @@ SQL;
                 break;
             }
 
-            // Check to ensure blog ID was actually created'
+
+            // Check to ensure blog ID was actually created
             if (!$blogID) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'Blog creation failed, possibly due to a dupliate pathName. Try changing the or supplying the pathName explicitly.';
@@ -388,7 +389,7 @@ SQL;
 
             // So far so good - delete the page
             $pageID = $result[0][0];
-            // Note: sp_delete_page is recursive; it also soft-deletes any children the page has.
+            // Note: sp_delete_page is recursive; it also deletes any children the page has.
             $sql = "CALL sp_delete_page(:pageID)";
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute(array('pageID' => $pageID));

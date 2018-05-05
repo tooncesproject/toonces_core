@@ -80,7 +80,7 @@ class TestFileResource extends FileDependentTestCase {
         $this->createNonAdminUser();
 
         // Create an unpublished page
-        $pageId = $this->createUnpublishedPage();
+        $pageId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
         $pageView = new FilePageview($pageId);
@@ -189,7 +189,7 @@ class TestFileResource extends FileDependentTestCase {
     function testGetAction() {
         // ARRANGE
         // Create an unpublished page
-        $pageId = $this->createUnpublishedPage();
+        $pageId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
         $pageView = new FilePageview($pageId);
@@ -282,7 +282,7 @@ class TestFileResource extends FileDependentTestCase {
     function testDeleteAction() {
         // ARRANGE
         // Create an unpublished page
-        $pageId = $this->createUnpublishedPage();
+        $pageId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
         $pageView = new FilePageview($pageId);
