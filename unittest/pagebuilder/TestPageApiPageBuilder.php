@@ -18,14 +18,14 @@ class TestPageApiPageBuilder extends TestCase {
         // ARRANGE
         $pageView = new FilePageview(1);
         $builder = new PageApiPageBuilder($pageView);
-        
+
         // ACT
         $array = $builder->buildPage();
         $resource = $array[0];
-        
+
         // ASSERT
         // Builder creates resource
         $this->assertInstanceOf(PageDataResource::class, $resource);
-        
+
     }
 }

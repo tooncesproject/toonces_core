@@ -3,7 +3,7 @@
  * @author paulanderson
  * SqlDependentTestCase
  * Initial commit: Paul Anderson, 4/20/2018
- * 
+ *
  * Provides a static PDO object factory for unit testing.
  * Also includes methods to build and tear down test fixtures in the test database.
  * (which is why you should NEVER run this in production...)
@@ -19,7 +19,7 @@ abstract class SqlDependentTestCase extends TestCase
     // only instantiate pdo once for test clean-up/fixture load
     static private $pdo = null;
     private $conn;
-    
+
     final public function getConnection() {
         if ($this->conn === null) {
             if (self::$pdo == null) {
@@ -33,7 +33,7 @@ abstract class SqlDependentTestCase extends TestCase
             }
             $this->conn = self::$pdo;
         }
-        
+
         return $this->conn;
     }
 
@@ -46,7 +46,7 @@ abstract class SqlDependentTestCase extends TestCase
         DROP USER IF EXISTS toonces;
 SQL;
         $sqlConn->exec($sql);
-            
+
     }
 
 
@@ -80,7 +80,7 @@ SQL;
             ,'Non Admin User'
             , false
             );
-        
+
         // Look up the user ID
         $sql = <<<SQL
         SELECT user_id
@@ -91,7 +91,7 @@ SQL;
         $stmt->execute(['nonAdminUsername' => $GLOBALS['NON_ADMIN_USERNAME']]);
         $result = $stmt->fetchAll();
         $userId = intval($result[0][0]);
-        
+
         return $userId;
     }
 
@@ -99,7 +99,7 @@ SQL;
     public function createPage($published = true, $parentPageId = 1, $pathName = null) {
         // Create an unpublished page; non-admin users don't have access.
         $sqlConn = $this->getConnection();
-        
+
         // In some cases, in case this is called twice in the same fixture,
         // we need to make the pathame unique. We'll use the expected page_id
         if (!$pathName) {
@@ -110,7 +110,7 @@ SQL;
             $identifier = strval($result[0][0]);
             $pathName = 'unpublished_page_' . $identifier;
         }
-        
+
         $sql = <<<SQL
         SELECT CREATE_PAGE  (
              :parentPageId                  -- parent_page_id BIGINT
@@ -128,11 +128,11 @@ SQL;
 
         $stmt->execute(['parentPageId' => $parentPageId, 'pathName' => $pathName, 'published' => intval($published)]);
         $result = $stmt->fetchAll();
-    
+
         $newPageId = intval($result[0][0]);
-        
+
         return $newPageId;
-        
+
     }
 
 
@@ -141,7 +141,7 @@ SQL;
 
         if (isset($_SERVER['PHP_AUTH_USER']))
             unset($_SERVER['PHP_AUTH_USER']);
-        
+
         if(isset($_SERVER['PHP_AUTH_PW']))
             unset($_SERVER['PHP_AUTH_PW']);
     }

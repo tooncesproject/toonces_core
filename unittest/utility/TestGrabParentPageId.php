@@ -3,7 +3,7 @@
  * @author paulanderson
  * TestGrabParentPageId.php
  * Initial commit: Paul Anderson, 4/2/2018
- * 
+ *
  * Unit test for the static utility GrabParentPageId
  */
 
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 class TestGrabParentPageIdTest extends SqlDependentTestCase {
-    
+
     function testGrabParentPageId() {
         // ARRANGE
         $conn = $this->getConnection();
@@ -26,7 +26,7 @@ class TestGrabParentPageIdTest extends SqlDependentTestCase {
 
         // ACT
         $expectedPageId = GrabParentPageId::getParentId($childPageId, $conn);
-        
+
         // ASSERT
         $this->assertEquals($parentPageId, $expectedPageId);
 

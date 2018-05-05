@@ -38,12 +38,12 @@ SQL;
         $writeAccessStr = $result[0][1];
         $userHasReadAccess = !empty($readAccessStr);
         $userHasWriteAccess = !empty($writeAccessStr);
-        
+
         if ($checkWriteAccess === true) {
             return $userHasWriteAccess;
         } else {
             return $userHasReadAccess;
         }
-            
+
     }
 }

@@ -3,17 +3,17 @@
  * @author paulanderson
  * TestPageBuilder.php
  * Initial Commit: 5/4/2018
- * 
+ *
  * A generic, independent StandardPageBuilder subclass for testing purposes.
- * 
+ *
  */
 
 include_once LIBPATH.'php/toonces.php';
 
 class TestPageBuilder extends StandardPageBuilder {
-    
+
     function createContentElement() {
-        
+
         $element = new HTMLResource($this->pageViewReference);
         // just a little HTML for your dome
         $html = <<<HTML
@@ -25,6 +25,6 @@ class TestPageBuilder extends StandardPageBuilder {
 HTML;
         $element->html = $html;
         $this->contentElement = $element;
-        
+
     }
 }

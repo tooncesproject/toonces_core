@@ -3,42 +3,42 @@
  * @author paulanderson
  * PageDataResource.php
  * Initial commit: Paul Anderson, 5/2/2018
- * 
+ *
  * DataResource subclass creating an API endpoint for managing pages.
- * 
+ *
  */
 
 require_once LIBPATH.'php/toonces.php';
 
 class PageDataResource extends DataResource implements iResource {
-    
+
     function buildFields() {
         /**
          * Instantiates FieldValidator objects that validate the PUT or POST body.
-         * 
+         *
          */
         $ancestorPageId = new IntegerFieldValidator();
         $this->fields['ancestorPageId'] = $ancestorPageId;
-        
+
         $pathName = new StringFieldValidator();
         $pathName->maxLength = 50;
         $pathName->allowNull = true;
         $this->fields['pathName'] = $pathName;
-        
+
         $pageTitle = new StringFieldValidator();
         $pageTitle->maxLength = 50;
         $this->fields['pageTitle'] = $pageTitle;
-        
+
         $pageLinkText = new StringFieldValidator();
         $pageLinkText->maxLength = 50;
         // Defaults to title if not included
         $pageLinkText->allowNull = true;
         $this->fields['pageLinkText'] = $pageLinkText;
-        
+
         $pageBuilderClass= new StringFieldValidator();
         $pageBuilderClass->maxLength = 50;
-        $this->fields['pageBuilderClass'] = $pageBuilderClass;      
-        
+        $this->fields['pageBuilderClass'] = $pageBuilderClass;
+
         $pageViewClass = new StringFieldValidator();
         $pageViewClass->maxLength = 50;
         $this->fields['pageViewClass'] = $pageViewClass;
@@ -47,20 +47,20 @@ class PageDataResource extends DataResource implements iResource {
         // Defaults to FALSE
         $redirectOnError->allowNull = true;
         $this->fields['redirectOnError'] = $redirectOnError;
-        
+
         $published = new BooleanFieldValidator();
         // defaults to FALSE
         $published->allowNull = true;
         $this->fields['published'] = $published;
-        
+
         $pageTypeId = new IntegerFieldValidator();
         // Defaults to "general"
         $pageTypeId->allowNull = true;
         $this->fields['pageTypeId'] = $pageTypeId;
 
     }
-    
-    
+
+
     function validatePathName($ancestorPageId, $pageId = null) {
         /**
          * Validates path name as set in resourceData.
@@ -78,14 +78,14 @@ class PageDataResource extends DataResource implements iResource {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'pathName may only contain alphanumeric characters or underscores.';
                 break;
-            } 
+            }
             // Pathname is empty?
             if (empty($this->resourceData['pathName'])) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'pathName must not be empty.';
                 break;
             }
-            
+
             // Pathname already exists for ancestor page?
             $sql = <<<SQL
             SELECT p.pathname
@@ -112,7 +112,7 @@ SQL;
             // Ancestor page doesn't exist?
             $sql = <<<SQL
             SELECT page_id
-            FROM pages 
+            FROM pages
             WHERE page_id = :ancestorPageId;
 SQL;
             $stmt = $conn->prepare($sql);
@@ -123,14 +123,14 @@ SQL;
                 $this->statusMessage = 'ancestorPageId refers to a page that does not exist.';
                 break;
             }
-            
+
             // Validation OK
             $pathNameValid = true;
         } while (false);
-        
+
         return $pathNameValid;
     }
-    
+
     function generatePathName() {
         /**
          * Generates a path name from the page title specified in resourceData.
@@ -145,7 +145,7 @@ SQL;
         $this->resourceData['pathName'] = $result[0][0];
         return $this->resourceData['pathName'];
     }
-    
+
 
     function validatePageBuilderClass() {
         /**
@@ -156,27 +156,27 @@ SQL;
         $pageBuilderClass = $this->resourceData['pageBuilderClass'];
 
         if (!class_exists($pageBuilderClass)) {
-            
+
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Error: Invalid Page builder class: ' . $pageBuilderClass;
-            return false; 
+            return false;
         } else {
             return true;
         }
-        
+
     }
 
-    
+
     function validatePageViewClass() {
         /**
          * Attempts to instantiate the PageView class specified in resourceData.
          * @var string $pageViewClass
-         * @return bool t/f, the named class can be instantiated. 
+         * @return bool t/f, the named class can be instantiated.
          */
         // Return true/false, class is valid.
         // If invalid, update HTTP status and message.
         $pageViewClass = $this->resourceData['pageViewClass'];
-        
+
         if (!class_exists($pageViewClass)) {
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Error: Invalid PageView class: ' . $pageViewClass;
@@ -193,7 +193,7 @@ SQL;
          * Performs a database lookup to check whether the page type of the request is valid.
          * @return bool $pageTypeValid - T/F page type exists.
          */
-        
+
         $pageTypeValid = false;
         $conn = $this->pageViewReference->getSqlConn();
         $sql = "SELECT pagetype_id FROM pagetypes WHERE pagetype_id = :pageTypeId";
@@ -206,7 +206,7 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Error: Invalid pageTypeId: ' . strval($this->resourceData['pageTypeId']);
         }
-        
+
         return $pageTypeValid;
     }
 
@@ -216,7 +216,7 @@ SQL;
          * Recursively tests whether a user ID has write access to a page and all of its children,
          * @param int $userId - User ID to be tested.
          * @param int $pageId - The page ID where we start.
-         * @return bool $userHasAccess - t/f, user has write access to this page and all its children. 
+         * @return bool $userHasAccess - t/f, user has write access to this page and all its children.
          */
         $conn = $this->pageViewReference->getSqlConn();
         // Can the user access the current page?
@@ -238,13 +238,13 @@ SQL;
                 }
             }
         }
-        
+
         return $userHasAccess;
     }
 
     function postAction() {
         /**
-         * Called by abstract ApiResource::getResource. 
+         * Called by abstract ApiResource::getResource.
          * Performs authentication, validation and execution of a POST request.
          * @return object (array), $this->resourceData
          */
@@ -255,20 +255,20 @@ SQL;
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
-       
-        // Set defaults.            
+
+        // Set defaults.
         if (!isset($this->resourceData['pageLinkText']))
             $this->resourceData['pageLinkText'] = $this->resourceData['pageTitle'];
 
         if (!isset($this->resourceData['redirectOnError']))
             $this->resourceData['redirectOnError'] = false;
-        
+
         if (!isset($this->resourceData['published']))
             $this->resourceData['published'] = false;
-        
+
         if (!isset($this->resourceData['pageTypeId']))
             $this->resourceData['pageTypeId'] = 0;
-                
+
         // begin validation sequence
         do {
             $userId = $this->authenticateUser();
@@ -286,9 +286,9 @@ SQL;
                 // HTTP status would already be set by the validateData method inherited from DataResource
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
-                
+
             }
-            
+
             // Is the ancestor page valid, and does the user have write access?
             $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->resourceData['ancestorPageId'], $conn, true);
             if (!$userHasAccess) {
@@ -296,17 +296,17 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Generate the path name if not supplied explicitly
             if (!isset($this->resourceData['pathName']))
                 $this->generatePathName();
-            
+
             // Now validate the path name
             if (!$this->validatePathName($this->resourceData['ancestorPageId'])) {
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Validate PageBuilder class
             if (!$this->validatePageBuilderClass()) {
                 $this->resourceData = array('status' => $this->statusMessage);
@@ -318,13 +318,13 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Validate pageTypeId
             if (!$this->validatePageTypeId()) {
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Attempt the page insert
             $sql = <<<SQL
             SELECT CREATE_PAGE(
@@ -364,7 +364,7 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Check to ensure page ID was actually created
             if (!$pageId) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
@@ -376,18 +376,18 @@ SQL;
             $sql = <<<SQL
             INSERT INTO page_user_access
                 (page_id, user_id, can_edit)
-                SELECT 
+                SELECT
                      :pageId
                     ,:userId
                     ,1
                 FROM users u
                 WHERE u.user_id = :userId AND u.is_admin = 0
-            
+
 SQL;
             $stmt = $conn->prepare($sql);
             $sqlParams = array('pageId' => $pageId, 'userId' => $userId);
             $stmt->execute($sqlParams);
-            
+
             // Success. Clear resource data and call getAction().
             $this->resourceData = array();
             $this->parameters['id'] = strval($pageId);
@@ -396,21 +396,21 @@ SQL;
         } while(false);
 
         return $this->resourceData;
-        
+
     }
-    
-    
+
+
     function putAction() {
         /**
-         * Called by abstract ApiResource::getResource. 
+         * Called by abstract ApiResource::getResource.
          * Performs authentication, validation and execution of a PUT request.
          * @return object (array), $this->resourceData
          */
-        
+
         // Build fields
         $this->buildFields();
         $conn = $this->pageViewReference->getSqlConn();
-        
+
         // Allow nulls on certain fields
         $this->fields['ancestorPageId']->allowNull = true;
         $this->fields['pageTitle']->allowNull = true;
@@ -426,7 +426,7 @@ SQL;
         // Acquire the PUT body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
-            
+
         // Go through authentication/validation sequence
         do {
             // Authenticate the user.
@@ -438,14 +438,14 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Reject the PUT if the 'id' parameter is not set.
             if (empty($pageId)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
                 $this->statusMessage = 'PUT requests require the parameter "id" in the query string to specify a resource to be updated.';
                 break;
             }
-            
+
             // Validate input.
             if (!$this->validateData($this->resourceData)) {
                 // Not valid? Respond with status message
@@ -461,7 +461,7 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // If supplied, is the path name valid?
             if (isset($this->resourceData['pathName'])) {
                 $parentPageId = GrabParentPageId::getParentId($pageId, $conn);
@@ -470,9 +470,9 @@ SQL;
                     break;
                 }
             }
-            
+
             // If supplied, is the page type ID valid?
-            if (isset($this->resourceData['pageTypeId'])) {               
+            if (isset($this->resourceData['pageTypeId'])) {
                 if (!$this->validatePageTypeId()) {
                     $this->resourceData = array('status' => $this->statusMessage);
                     break;
@@ -491,7 +491,7 @@ SQL;
             // page title
             if (isset($this->resourceData['pageTitle'])) {
                 array_push($updateFields, 'page_title = :pageTitle');
-                $sqlParams['pageTitle'] = $this->resourceData['pageTitle'];                
+                $sqlParams['pageTitle'] = $this->resourceData['pageTitle'];
             }
             // page link text
             if (isset($this->resourceData['pageLinkText'])) {
@@ -523,18 +523,18 @@ SQL;
                 array_push($updateFields, 'pagetype_id = :pageTypeId');
                 $sqlParams['pageTypeId'] = $this->resourceData['pageTypeId'];
             }
-            
+
             // Invalidate the request if no fields are set.
             if (empty($updateFields)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'At least one field must be specified in a PUT request.';
                 break;
             }
-            
+
             // Add page ID parameter
             $sqlParams['pageId'] = $pageId;
             $updateFieldsStr = implode(PHP_EOL . ',', $updateFields);
-            
+
             $sql = <<<SQL
             UPDATE pages p
             SET
@@ -543,7 +543,7 @@ SQL;
                 page_id = :pageId
 
 SQL;
-            
+
             $sql = sprintf($sql, $updateFieldsStr);
 
             try {
@@ -554,23 +554,23 @@ SQL;
                 $this->statusMessage = $e->getMessage();
                 break;
             }
-            
+
             // Success. Clear resourceData and call getAction().
             $this->resourceData = array();
             $this->parameters['id'] = strval($pageId);
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->getAction();
-            
+
         } while (false);
-        
+
         return $this->resourceData;
-        
+
     }
-    
-    
+
+
     function getAction() {
         /**
-         * Called by abstract ApiResource::getResource. 
+         * Called by abstract ApiResource::getResource.
          * Performs authentication, validation and execution of a GET request.
          * @return object (array), $this->resourceData
          */
@@ -579,7 +579,7 @@ SQL;
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
-        
+
         // Acquire the user id if this is an authenticated request.
         $userId = $this->authenticateUser() ?? 0;
         // Build the query
@@ -613,7 +613,7 @@ SQL;
                     u.is_admin = TRUE
                 )
             ORDER BY p.page_id ASC
-            
+
 SQL;
         // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
         $result = null;
@@ -642,7 +642,7 @@ SQL;
                     ,'published' => boolval($row['published'])
                     ,'pageTypeId' => intval($row['pagetype_id'])
                 );
-        
+
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
         } else {
             // If no result, status is 404.
@@ -650,23 +650,23 @@ SQL;
             // This is intentional as it obfuscates resources that the user isn't explicity authorized to access.
             $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
         }
-        
+
         return $this->resourceData;
     }
 
-    
+
     function deleteAction() {
         /**
          * Called by abstract ApiResource::getResource.
          * Performs authentication, validation and execution of a DELETE request.
-         * hard-deletes the page and any of its children. 
+         * hard-deletes the page and any of its children.
          * @return object (array), $this->resourceData
          */
 
         $pageId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
         $this->resourceData = array();
-        
+
         do {
             // Authenticate the user.
             $userId = $this->authenticateUser();
@@ -677,21 +677,21 @@ SQL;
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
-            
+
             // Reject the DELETE if the 'id' parameter is not set.
             if (!isset($pageId)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
                 $this->statusMessage = 'DELETE requests require the parameter "id" in the query string to specify a resource to be deleted.';
                 break;
             }
-            
+
             /*
             // Make all input fields optional.
             $this->buildFields();
             foreach($this->fields as $field)
                 $field->allowNull = true;
             */
-            
+
             // if user is not an admin...
             if (!$this->sessionManager->userIsAdmin) {
                 // Check whether user has write access to this page and ALL its children (since deletion is also recursive).
@@ -710,10 +710,9 @@ SQL;
             $stmt = $conn->prepare($sql);
             $stmt->execute(array('pageId' => $pageId));
             $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
-            
+
         } while(false);
-        
+
         return $this->resourceData;
     }
 }
- 
