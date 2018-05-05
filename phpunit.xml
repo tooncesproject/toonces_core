@@ -34,6 +34,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<testsuite name="pagebuilders">
 			<file>unittest/pagebuilder/TestExtHtmlPageBuilder.php</file>
 			<file>unittest/pagebuilder/TestDocumentEndpointPageBuilder.php</file>
+			<file>unittest/pagebuilder/TestPageApiPageBuilder.php</file>
 		</testsuite>
 		<testsuite name="utility_classes">
 			<file>unittest/utility/TestCheckUserAccess.php</file>

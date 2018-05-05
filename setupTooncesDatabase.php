@@ -262,6 +262,30 @@ SQL;
         throw $e;
     }
 
+    // Pages endpoint
+    $sql = <<<SQL
+        SELECT CREATE_PAGE (
+             :csPageId                          -- parent_page_id BIGINT
+            ,'pages'                            -- ,pathname VARCHAR(50)
+            ,'Toonces Core Services - Pages'    -- ,page_title VARCHAR(50)
+            ,'Toonces Core Services - Pages'    -- ,page_link_text VARCHAR(50)
+            ,'PageApiPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
+            ,'JsonPageView'                      -- ,pageview_class VARCHAR(50)
+            ,FALSE                              -- ,redirect_on_error BOOL
+            ,FALSE                              -- ,published BOOL
+            ,6                                  -- ,pagetype_id BIGINT
+        )
+SQL;
+    $stmt = $conn->prepare($sql);
+    try {
+        $stmt->execute(array('csPageId' => $csPageId));
+        $result = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        echo('Failed to create Core Services API (pages): ' . $e->getMessage());
+        throw $e;
+    }
+    
+    
     // Blogs endpoint
     $sql = <<<SQL
         SELECT CREATE_PAGE (
