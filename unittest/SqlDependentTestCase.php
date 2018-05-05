@@ -81,6 +81,7 @@ SQL;
             , false
             );
 
+
         // Look up the user ID
         $sql = <<<SQL
         SELECT user_id
@@ -91,6 +92,7 @@ SQL;
         $stmt->execute(['nonAdminUsername' => $GLOBALS['NON_ADMIN_USERNAME']]);
         $result = $stmt->fetchAll();
         $userId = intval($result[0][0]);
+
 
         return $userId;
     }

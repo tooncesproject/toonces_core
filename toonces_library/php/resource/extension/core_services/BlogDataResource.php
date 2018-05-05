@@ -222,6 +222,7 @@ SQL;
                 break;
             }
 
+
             // Check to ensure blog ID was actually created
             if (!$blogID) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');

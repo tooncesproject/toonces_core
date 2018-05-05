@@ -10,6 +10,7 @@
 
 class CheckPageUserAccess {
 
+
     public static function checkUserAccess($userId, $pageId, $sqlConn, $checkWriteAccess = false ) {
         // Tests whether an authenticated user has access to the resource's pageId.
         $sql = <<<SQL
