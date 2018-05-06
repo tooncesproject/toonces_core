@@ -199,6 +199,7 @@ CREATE TABLE IF NOT EXISTS ext_html_page (
      ext_html_page_id       BIGINT          NOT NULL AUTO_INCREMENT
     ,page_id                BIGINT          NOT NULL
     ,html_path              VARCHAR(200)    NOT NULL
+    ,client_class           VARCHAR(50)     NOT NULL
     ,created_by             VARCHAR(50)     NULL
     ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
     ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP

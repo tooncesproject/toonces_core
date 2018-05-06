@@ -1,8 +1,10 @@
 <?php
 
+include_once LIBPATH.'php/utility/static/SearchPathString.php';
 include_once LIBPATH.'php/utility/static/Enumeration.php';
 include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
 include_once LIBPATH.'php/utility/static/EnumHTTPResponse.php';
+include_once LIBPATH.'php/utility/interface/iResourceClient.php';
 include_once LIBPATH.'php/resource/interface/iResource.php';
 include_once LIBPATH.'php/resource/abstract/Resource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';
@@ -30,6 +32,7 @@ include_once LIBPATH.'php/resource/ExtHtmlResource.php';
 include_once LIBPATH.'php/utility/abstract/FieldValidator.php';
 include_once LIBPATH.'php/utility/interface/iFieldValidator.php';
 include_once LIBPATH.'php/utility/StringFieldValidator.php';
+include_once LIBPATH.'php/utility/HtmlFieldValidator.php';
 include_once LIBPATH.'php/utility/IntegerFieldValidator.php';
 include_once LIBPATH.'php/utility/BooleanFieldValidator.php';
 include_once LIBPATH.'php/resource/extension/core_services/CoreServicesDataResource.php';

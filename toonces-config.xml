@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+N<?xml version="1.0" encoding="UTF-8"?>
 <toonces_settings>
 	<!-- Standard page settings: File locations from document root -->
 	<standard_page
@@ -17,5 +17,6 @@
 	<sql_user_name>toonces</sql_user_name>
 	<sql_password>kittycat</sql_password>
 	<html_resource_path>/opt/toonces/toonces_library/html/</html_resource_path>
+	<html_resource_url>/coreservices/htmlresources/</html_resource_url>
 
 </toonces_settings>

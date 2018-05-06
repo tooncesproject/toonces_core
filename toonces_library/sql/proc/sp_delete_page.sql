@@ -92,6 +92,12 @@ BEGIN
         page_id = param_page_id
     ;
 
+    -- Hard-delete the record in ext_html_page, if it exists.
+    DELETE FROM
+        toonces.ext_html_page
+    WHERE
+        page_id = param_page_id;
+
     -- Finally, hard-delete the page.
     DELETE FROM
         toonces.pages
