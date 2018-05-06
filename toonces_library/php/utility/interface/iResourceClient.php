@@ -11,11 +11,11 @@
 include_once LIBPATH.'php/toonces.php';
 
 interface iResourceClient {
-    
-    function getResourceStatus();
+
+    function getHttpStatus();
     function get($url);
     function put($url, $data);
     function delete($url);
-    function __construct($pageView);
+
     
 }

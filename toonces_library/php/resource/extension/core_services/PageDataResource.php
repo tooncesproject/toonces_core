@@ -35,13 +35,19 @@ class PageDataResource extends DataResource implements iResource {
         $pageLinkText->allowNull = true;
         $this->fields['pageLinkText'] = $pageLinkText;
 
-        $pageBuilderClass= new StringFieldValidator();
-        $pageBuilderClass->maxLength = 50;
-        $this->fields['pageBuilderClass'] = $pageBuilderClass;
+        // Pagebuilder can be overriden by child classes
+        if (!isset($this->fields['pageBuilderClass'])) {
+            $pageBuilderClass= new StringFieldValidator();
+            $pageBuilderClass->maxLength = 50;
+            $this->fields['pageBuilderClass'] = $pageBuilderClass;
+        }
 
-        $pageViewClass = new StringFieldValidator();
-        $pageViewClass->maxLength = 50;
-        $this->fields['pageViewClass'] = $pageViewClass;
+        // PageViewClass can be overridden by child classes
+        if (!isset($this->fields['pageViewClass'])) {
+            $pageViewClass = new StringFieldValidator();
+            $pageViewClass->maxLength = 50;
+            $this->fields['pageViewClass'] = $pageViewClass;
+        }
 
         $redirectOnError = new BooleanFieldValidator();
         // Defaults to FALSE
@@ -684,13 +690,6 @@ SQL;
                 $this->statusMessage = 'DELETE requests require the parameter "id" in the query string to specify a resource to be deleted.';
                 break;
             }
-
-            /*
-            // Make all input fields optional.
-            $this->buildFields();
-            foreach($this->fields as $field)
-                $field->allowNull = true;
-            */
 
             // if user is not an admin...
             if (!$this->sessionManager->userIsAdmin) {
