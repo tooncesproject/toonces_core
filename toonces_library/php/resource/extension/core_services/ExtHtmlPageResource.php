@@ -13,6 +13,7 @@ require_once LIBPATH.'php/toonces.php';
 class ExtHtmlPageResource extends PageDataResource implements iResource {
     
     var $client;
+    var $urlPath;
     
     function setupClient($pageId = null) {        
         $conn = $this->pageViewReference->getSQLConn();
@@ -122,14 +123,17 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
                 $fileNameDate = preg_replace('[ ]', '_', $date);
                 $fileNameDate = preg_replace('[:]','',$fileNameDate);
                 
-                // Get the resource URL from toonces_config.xml
-                $xml = new DOMDocument();
-                $xml->load(ROOTPATH.'toonces-config.xml');
-                $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
-                $urlPath = $pathNode->nodeValue;
+                // Get the resource URL from toonces_config.xml,
+                // if not already set.
+                if (!isset($this->urlPath)) {
+                    $xml = new DOMDocument();
+                    $xml->load(ROOTPATH.'toonces-config.xml');
+                    $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
+                    $this->urlPath = $pathNode->nodeValue;
+                }
                 
                 // Generate a file URL
-                $fileUrl = $urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
+                $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
                 
                 // Create the file
                 $email = $_SERVER['PHP_AUTH_USER'];
@@ -172,8 +176,12 @@ SQL;
             }
           
             // Success?
+            $this->parameters['id'] = strval($pageId);
             $this->getAction();
             $this->httpStatus = $client->getHttpStatus();
+            
+            // Append the file URL to the output
+            $this->resourceData['fileUrl'] = $fileUrl;
              
         } while (false);
         
@@ -225,13 +233,15 @@ SQL;
                 $fileNameDate = preg_replace('[:]','',$fileNameDate);
                 
                 // Get the resource URL from toonces_config.xml
-                $xml = new DOMDocument();
-                $xml->load(ROOTPATH.'toonces-config.xml');
-                $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
-                $urlPath = $pathNode->nodeValue;
-                    
+                if (!isset($this->urlPath)) {
+                    $xml = new DOMDocument();
+                    $xml->load(ROOTPATH.'toonces-config.xml');
+                    $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
+                    $this->urlPath = $pathNode->nodeValue;
+                }
+                
                 // Generate a file URL
-                $fileUrl = $urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
+                $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
                     
                 // Create the file
                 $email = $_SERVER['PHP_AUTH_USER'];
@@ -277,14 +287,16 @@ SQL;
             
             // Success
             $this->getAction();
-            $this->httpStatus = $client->getHttpStatus();
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+            
+            // Append the file URL to the output
+            $this->resourceData['fileUrl'] = $fileUrl;
             
         } while (false);
         
         return $this->resourceData;
   
     }
-    
     
     
     public function getAction() {
@@ -303,7 +315,7 @@ SQL;
                 $stmt->execute(['pageId' => $pageId]);
                 $result = $stmt->fetchAll();
                 $pathUrl = $result[0]['html_path'];
-                $record['htmlPath'] = $pathUrl;
+                $record['fileUrl'] = $pathUrl;
             }
         } else {
             // Authentication failed.
