@@ -250,7 +250,7 @@ SQL;
         LIMIT 1
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute;
+        $stmt->execute();
         $result = $stmt->fetchAll();
         $pageId = $result[0]['page_id'];
         $dbHtmlPathBefore = $result[0]['html_path'];
@@ -321,42 +321,272 @@ SQL;
     }
     
     /**
-     * @depends testPutAction
+     * @depends testPostAction
      */
     function testGetAction() {
-        // ARRANGE// Query the database for the file/page created by testPostAction
+        // ARRANGE
+        // get SQL connection
+        $conn = $this->getConnection();
+        
+        // Instantiate a PageDataResource and dependencies
+        $conn = $this->getConnection();
+        $pageView = new JsonPageView(1);
+        $pageView->setSQLConn($conn);
+        $pdr = new PageDataResource($pageView);
+        
+        // Create a non-admin user
+        $nonAdminUserId = $this->createNonAdminUser();
+        
+        // Create some pages:
+        // This one is public
+        $publicPageId = $this->createPage(true);
+        // This one is not
+        $unpublishedPageId = $this->createPage(false);
+        // This one is not published, but we will grant non-admin read access
+        $grantedPageId = $this->createPage(false);
+        $sql = <<<SQL
+        INSERT INTO page_user_access
+            (page_id, user_id, can_edit)
+        VALUES
+            (:grantedPageId, :nonAdminUserId, TRUE)
+SQL;
+        $sqlParams = array(
+            'grantedPageId' => $grantedPageId
+            ,'nonAdminUserId' => $nonAdminUserId
+        );
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($sqlParams);
+        
+        // For each page, insert a record into ext_html_page
+        $sql = <<<SQL
+        INSERT INTO ext_html_page
+            (page_id, html_path, client_class)
+        VALUES
+             (:publicPageId, 'path', 'Class')
+            ,(:unpublishedPageId, 'path2', 'Class2')
+            ,(:grantedPageId, 'path3', 'Class3')
+SQL;
+        $stmt = $conn->prepare($sql);
+        $sqlParams = array(
+             'publicPageId' => $publicPageId
+            ,'unpublishedPageId' => $unpublishedPageId
+            ,'grantedPageId' => $grantedPageId
+        );
+        $stmt->execute($sqlParams);
+        
+        // Now that we've created pages, query the database for its current state
+        $sql = <<<SQL
+        SELECT
+             p.page_id
+            ,p.page_title
+            ,p.pathname
+            ,p.pagebuilder_class
+            ,p.pageview_class
+            ,p.redirect_on_error
+            ,p.published
+            ,p.pagetype_id
+            ,CASE WHEN pua.page_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
+            ,ehp.html_path
+            ,ehp.client_class
+        FROM pages p
+        JOIN ext_html_page ehp ON p.page_id = ehp.page_id
+        LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND pua.user_id = :userId
+SQL;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['userId' => $nonAdminUserId]);
+        $pagesState = $stmt->fetchAll();
+        
+        $sql = <<<SQL
+        SELECT
+             p.page_id
+            ,p.page_title
+            ,p.pathname
+            ,p.pagebuilder_class
+            ,p.pageview_class
+            ,p.redirect_on_error
+            ,p.published
+            ,p.pagetype_id
+            ,ehp.html_path
+            ,ehp.client_class
+        FROM pages p
+        JOIN ext_html_page ehp ON p.page_id = ehp.page_id
+        WHERE page_id = :pageId
+SQL;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageId' => $publicPageId]);
+        $publicPageState = $stmt->fetchAll();
+        
+        
+        // ACT
+        // GET with admin login returns all pages and 200
+        $this->setAdminAuth();
+        $adminResult = $pdr->getAction();
+        $adminStatus = $pdr->httpStatus;
+        
+        // GET with bogus ID parameter returns 404 and empty result
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = '69420';
+        $bogusParamResult = $pdr->getAction();
+        $bogusParamStatus = $pdr->httpStatus;
+        
+        // GET with valid ID parameter returns single record and 200, with data matching database.
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = strval($publicPageId);
+        $singleParamResult = $pdr->getAction();
+        $singleParamStatus = $pdr->httpStatus;
+        $singleParamRecord = $singleParamResult[$publicPageId];
+        
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        $this->setNonAdminAuth();
+        $pdr->resourceData = array();
+        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $unpublishedResult = $pdr->getAction();
+        $unpublishedStatus = $pdr->httpStatus;
+        
+        // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
+        $pdr->resourceData = array();
+        $pdr->parameters = array();
+        $noParamResult = $pdr->getAction();
+        $noParamStatus = $pdr->httpStatus;
+        
+        // Non-authenticated GET returns 401 error.
+        $this->unsetBasicAuth();
+        $pdr->resourceData = array();
+        $nonAuthResult = $pdr->getAction();
+        $nonAuthStatus = $pdr->httpStatus;
+
+       
+        // ASSERT
+        // GET with admin login returns all pages and 200
+        foreach ($pagesState as $pageRecord)
+            $this->assertArrayHasKey($pageRecord[0], $adminResult);
+            
+            $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $adminStatus);
+            
+            // GET with bogus ID parameter returns 404 and empty result
+            $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusParamStatus);
+            $this->assertEmpty($bogusParamResult);
+            
+            // GET with valid ID parameter returns single record and 200
+            $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $singleParamStatus);
+            $this->assertEquals(1, count($singleParamResult));
+            
+            // ... with data matching database.
+            $this->assertSame(intval($publicPageState[0]['page_id']), key($singleParamResult));
+            $this->assertSame($publicPageState[0]['page_title'], $singleParamRecord['pageTitle']);
+            $this->assertSame($publicPageState[0]['pathname'], $singleParamRecord['pathName']);
+            $this->assertSame($publicPageState[0]['pagebuilder_class'], $singleParamRecord['pageBuilderClass']);
+            $this->assertSame($publicPageState[0]['pageview_class'], $singleParamRecord['pageViewClass']);
+            $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);
+            $this->assertSame(boolval($publicPageState[0]['published']), $singleParamRecord['published']);
+            $this->assertSame(intval($publicPageState[0]['pagetype_id']), $singleParamRecord['pageTypeId']);
+            $this->assertSame($publicPageState[0]['html_path'], $singleParamRecord['fileUrl']);
+            $this->assertSame($publicPageState[0]['client_class'], $singleParamRecord['clientClass']);
+            
+            // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+            $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
+            $this->assertEmpty($unpublishedResult);
+            
+            // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
+            $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $noParamStatus);
+            
+            foreach ($pagesState as $pageRecord) {
+                $id = $pageRecord['page_id'];
+                $published = $pageRecord['published'];
+                $userAccess = $pageRecord['user_has_access'];
+                if ($published == true or $userAccess == true) {
+                    $this->assertArrayHasKey($id, $noParamResult);
+                } else {
+                    $this->assertArrayNotHasKey($id, $noParamResult);
+                }
+                
+            }
+
+            // Non-authenticated GET returns 401 error.
+            $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $noAuthStatus);
+            $this->assertEmpty($noAuthResult);
+            
+    }
+    
+    /**
+     * @depends testPutAction
+     */
+    function testDeleteAction() {
+        // ARRANGE
+        // Query the database for the file/page created by testPostAction
         $conn = $this->getConnection();
         $sql = <<<SQL
         SELECT
              page_id
-        FROM
-            ext_html_page
-        ORDER BY
-            ext_html_page_id DESC
+            ,html_path
+        FROM ext_html_page
+        WHERE client_class = 'DummyClientClass'
+        ORDER BY ext_html_page_id DESC
         LIMIT 1
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute;
+        $stmt->execute();
         $result = $stmt->fetchAll();
         $pageId = $result[0]['page_id'];
+        $dbHtmlPath = $result[0]['html_path'];
+        
+        // Instantiate an ExtHtmlPageResource and dependencies.
+        $pageView = new JsonPageView($pageId);
+        $epr = new ExtHtmlPageResource($pageView);
+        $epr->parameters['id'] = strval($pageId);
+        $client = new DummyResourceClient();
+        $epr->client = $client;
         
         // ACT
-        // ASSERT
-        // Unauthenticated GET returns 401
-        // Autheniticated GET includes the fields inherited from PageDataResource
-        // Autheticated GET appends fileUrl to result
-
-    }
-    
-    
-    function testDeleteAction() {
-        // ARRANGE
-        // ACT
+        // Unauthenticated DELETE does not delete file
+        $this->unsetBasicAuth();
+        $epr->deleteAction();
+        $fileExistsNoAuth = file_exists($dbHtmlPath);
+        
+        // Unauthenticated DELETE does not delete ext_html_page record nor page record
+        $sql = <<<SQL
+        SELECT
+             p.page_id 
+            ,ext_html_page_id
+        FROM pages p
+        LEFT JOIN ext_html_page ehp ON p.page_id = ehp.page_id
+        WHERE p.page_id = :pageId
+SQL;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageId' => $pageId]);
+        $result = $stmt->fetchAll();
+        $extHtmlPageIdBefore = $result['ext_html_page_id'];
+        $pageIdBefore = $result['page_id'];
+        
+        // Authenticated DELETE deletes file
+        $this->setAdminAuth();
+        $epr->deleteAction();
+        $fileExistsAfter = file_exists($dbHtmlPath);
+        
+        // Authenticated DELETE deletes page record
+        $stmt->execute(['pageId' => $pageId]);
+        $resultAfter = $stmt->fetchAll();
+        
+        // Authenticated DELETE returns 204
+        $deletedStatus = $epr->httpStatus;
+        
+        
         // ASSERT
         // Unauthenticated DELETE does not delete file
+        $this->assertTrue($fileExistsNoAuth);
+
+        // Unauthenticated DELETE does not delete ext_html_page record nor page record
+        $this->assertNotEmpty($extHtmlPageIdBefore);
+        $this->assertNotEmpty($pageIdBefore);
+        
         // Authenticated DELETE deletes file
+        $this->assertFalse($fileExistsAfter);
+        
         // Authenticated DELETE deletes page record
+        $this->assertEmpty($resultAfter);
+
         // Authenticated DELETE returns 204
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $deletedStatus);
         
     }
     

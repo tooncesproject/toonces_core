@@ -179,7 +179,7 @@ SQL;
         $pageID = $rows[0][0];
 
         // Insert a record into the ext_html_page table
-        $sql = "INSERT INTO ext_html_page (page_id, html_path) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html')";
+        $sql = "INSERT INTO ext_html_page (page_id, html_path, client_class) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html', 'ResourceClient')";
         try {
             $stmt = $conn->prepare($sql);
             $stmt->execute([':pageID' => $pageID]);

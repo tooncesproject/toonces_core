@@ -29,7 +29,7 @@ include_once LIBPATH.'php/resource/toolbar/BlogPostToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/DefaultToolbarElement.php';
 include_once LIBPATH.'php/resource/abstract/ApiResource.php';
 include_once LIBPATH.'php/resource/abstract/DataResource.php';
-include_once LIBPATH.'php/resource/ExtHtmlPageResource.php';
+include_once LIBPATH.'php/resource/ExtHtmlResource.php';
 include_once LIBPATH.'php/utility/abstract/FieldValidator.php';
 include_once LIBPATH.'php/utility/interface/iFieldValidator.php';
 include_once LIBPATH.'php/utility/StringFieldValidator.php';
@@ -41,6 +41,7 @@ include_once LIBPATH.'php/resource/extension/core_services/PageDataResource.php'
 include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/FileResource.php';
+include_once LIBPATH.'php/resource/extension/core_services/ExtHtmlPageResource.php';
 include_once LIBPATH.'php/resource/abstract/ApiPageView.php';
 include_once LIBPATH.'php/resource/FilePageView.php';
 include_once LIBPATH.'php/resource/JsonPageView.php';

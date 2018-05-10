@@ -143,7 +143,7 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             }
             
             // If file creation was unsuccessful, roll back, break and error.
-            if (200 > $clientStatus > 299) {
+            if ($clientstatus != 200 || $clientStatus != 201) {
                 $this->parameters['id'] = strval($pageId);
                 parent::deleteAction();
                 $this->httpStatus = $clientStatus;
@@ -250,7 +250,7 @@ SQL;
                 $clientStatus = $this->client->getHttpStatus();
                     
                     
-                if (200 > $clientStatus > 299) {
+                if ($clientstatus != 200 || $clientStatus != 201) {
                     $this->httpStatus = $clientStatus;
                     $this->resourceData['status'] = 'Partial success; failed to upload body file.';
                     break;
@@ -300,31 +300,94 @@ SQL;
     
     
     public function getAction() {
+        // Query the database for the resource, depending upon parameters
+        // First - Validate GET parameters
+        $pageId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
         
-        // Require authentication.
-        $userId = $this->authenticateUser();
-        if ($userId) {
-            parent::getAction();
-            
-            // For each page returned, append the file URL.
-            foreach ($this->resourceData as $pageId => $record) {
-                // Query the database for the file URL
-                $sql = "SELECT html_path FROM ext_html_page WHERE page_id = :pageId";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(['pageId' => $pageId]);
-                $result = $stmt->fetchAll();
-                $pathUrl = $result[0]['html_path'];
-                $record['fileUrl'] = $pathUrl;
+        do {
+            // GET requests require authentication at this endpoint.
+            $userId = $this->authenticateUser();
+            if (empty($userId)) {
+                $this->statusMessage = 'Access denied. Go away.';
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                break;
             }
-        } else {
-            // Authentication failed.
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
-            $this->statusMessage = 'Access denied. Go away.';
-            $this->resourceData = array('status' => $this->statusMessage);
-            break;
-        }
-        
+
+            // If pageId is null, return 404
+            if (is_null($pageId)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+                break;
+            }
+
+            // OK so far? Build the query.
+            $sql = <<<SQL
+                SELECT
+                     p.page_id
+                    ,phb.page_id AS ancestor_page_id
+                    ,pathname
+                    ,page_title
+                    ,page_link_text
+                    ,pagebuilder_class
+                    ,pageview_class
+                    ,p.created_dt
+                    ,p.modified_dt
+                    ,redirect_on_error
+                    ,published
+                    ,pagetype_id
+                    ,ehp.html_path
+                    ,ehp.client_class
+                FROM pages p
+                JOIN ext_html_page ehp ON p.page_id = ehp.page_id
+                -- join to PHB is to get the parent page ID
+                LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
+                LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userId)
+                LEFT JOIN users u ON u.user_id = :userId
+                WHERE
+                    (p.page_id = :pageId OR :pageId IS NULL)
+                    AND
+                    (
+                        (p.published = 1 AND p.deleted IS NULL)
+                        OR
+                        pua.user_id IS NOT NULL
+                        OR
+                        u.is_admin = TRUE
+                    )
+                ORDER BY p.page_id ASC
+SQL;
+            // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
+            $result = null;
+            if ($pageId !== 0) {
+                $stmt = $conn->prepare($sql);
+                $sqlParams = array('userId' => $userId, 'pageId' => $pageId);
+                $stmt->execute($sqlParams);
+                $result = $stmt->fetchAll();
+            }
+
+            // Process the response
+            foreach ($result as $row) {
+                $this->resourceData[$row[0]] = array(
+                    'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
+                    ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
+                    ,'ancestorPageId' => intval($row['ancestor_page_id'])
+                    ,'pathName' => $row['pathname']
+                    ,'pageTitle' => $row['page_title']
+                    ,'pageLinkText' => $row['page_link_text']
+                    ,'pageBuilderClass' => $row['pagebuilder_class']
+                    ,'pageViewClass' => $row['pageview_class']
+                    ,'createdDate' => $row['created_dt']
+                    ,'modifiedDate' => $row['modified_dt']
+                    ,'redirectOnError' => boolval($row['redirect_on_error'])
+                    ,'published' => boolval($row['published'])
+                    ,'pageTypeId' => intval($row['pagetype_id'])
+                    ,'fileUrl' => $row['html_path']
+                    ,'clientClass' => $row['client_class']
+                );
+            }
+            
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+
+        } while (false);
         return $this->resourceData;
     }
 
