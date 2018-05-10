@@ -580,7 +580,6 @@ SQL;
          * Performs authentication, validation and execution of a GET request.
          * @return object (array), $this->resourceData
          */
-
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');

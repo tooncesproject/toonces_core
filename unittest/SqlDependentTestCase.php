@@ -101,7 +101,6 @@ SQL;
     public function createPage($published = true, $parentPageId = 1, $pathName = null) {
         // Create an unpublished page; non-admin users don't have access.
         $sqlConn = $this->getConnection();
-
         // In some cases, in case this is called twice in the same fixture,
         // we need to make the pathame unique. We'll use the expected page_id
         if (!$pathName) {

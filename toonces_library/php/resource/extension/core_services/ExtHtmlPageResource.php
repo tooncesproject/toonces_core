@@ -101,49 +101,71 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             // Attempt to instantiate the client
             $clientStatus = $this->setupClient(null);
             // Break if error.
+            
             if ($clientStatus == 1)
                 break;
             
-            // Acquire HTML body prior to page creation
+            // Validate the input. If invalid, authenticate the user; 
+            // We don't want to show our private parts to an unauthenticated
+            // someone or other.
+            // If user is validated, simply break and return the invalidation
+            // message.
+            $dataValid = $this->validateData($this->resourceData);
+            if (!$dataValid) {
+                $userId = $this->authenticateUser();
+                if (empty($userId)) {
+                    // Authentication failed.
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                    $this->statusMessage = 'Access denied. Go away.';
+                    $this->resourceData = array('status' => $this->statusMessage);
+                }
+                break;    
+            }
+                
+                
+            // Acquire critical variables body prior to page creation
             $htmlBody = $this->resourceData['htmlBody'];
+            $clientClass = $this->resourceData['clientClass'];
 
             // Attempt to create the page
-            $postResult = parent::postAction();
-        
-            // If successful, load the HTML to the store and create a record in
-            // ext_html_pages
-            $clientResponse = null;
-            $clientStatus = null;
-            $fileUrl = '';
-            $pageId = null;
+            parent::postAction();
+
             if ($this->httpStatus == Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse')) {
-            
-                $pageId = key($postResult);
-                $date = $postResult[$pageId]['createdDate'];
-                $fileNameDate = preg_replace('[ ]', '_', $date);
-                $fileNameDate = preg_replace('[:]','',$fileNameDate);
-                
-                // Get the resource URL from toonces_config.xml,
-                // if not already set.
-                if (!isset($this->urlPath)) {
-                    $xml = new DOMDocument();
-                    $xml->load(ROOTPATH.'toonces-config.xml');
-                    $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
-                    $this->urlPath = $pathNode->nodeValue;
-                }
-                
-                // Generate a file URL
-                $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
-                
-                // Create the file
-                $email = $_SERVER['PHP_AUTH_USER'];
-                $pw = $_SERVER['PHP_AUTH_PW'];
-                $clientResponse = $this->client->put($fileUrl, $htmlBody, $email, $pw);
-                $clientStatus = $this->client->getHttpStatus();                
+                $postResult = parent::getAction();
             }
             
+            // if we had a prior invalid
+            // If successful, load the HTML to the store and create a record in
+            // ext_html_pages
+            // If there was an error in calling the parent methods, break.
+            if ($this->httpStatus != Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse')) 
+                break;
+
+            $pageId = key($postResult);
+            $date = $postResult[$pageId]['createdDate'];
+            $fileNameDate = preg_replace('[ ]', '_', $date);
+            $fileNameDate = preg_replace('[:]','',$fileNameDate);
+                
+            // Get the resource URL from toonces_config.xml,
+            // if not already set.
+            if (!isset($this->urlPath)) {
+                $xml = new DOMDocument();
+                $xml->load(ROOTPATH.'toonces-config.xml');
+                $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
+                $this->urlPath = $pathNode->nodeValue;
+            }
+                
+            // Generate a file URL
+            $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
+                
+            // Create the file
+            $email = $_SERVER['PHP_AUTH_USER'];
+            $pw = $_SERVER['PHP_AUTH_PW'];
+            $clientResponse = $this->client->put($fileUrl, $htmlBody, $email, $pw);
+                $clientStatus = $this->client->getHttpStatus();
+            
             // If file creation was unsuccessful, roll back, break and error.
-            if ($clientstatus != 200 || $clientStatus != 201) {
+            if ($clientStatus != 200 && $clientStatus != 201) {
                 $this->parameters['id'] = strval($pageId);
                 parent::deleteAction();
                 $this->httpStatus = $clientStatus;
@@ -159,10 +181,11 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
                     (:pageId, :htmlPath, :clientClass)
 SQL;
             $stmt = $conn->prepare($sql);
+            
             $sqlParams = array(
                  'pageId' => $pageId
                 ,'htmlPath' => $fileUrl
-                ,'clientClass' => $this->resourceData['clientClass']
+                ,'clientClass' => $clientClass
             );
             try {
                 $stmt->execute($sqlParams);
@@ -178,7 +201,7 @@ SQL;
             // Success?
             $this->parameters['id'] = strval($pageId);
             $this->getAction();
-            $this->httpStatus = $client->getHttpStatus();
+            $this->httpStatus = $this->client->getHttpStatus();
             
             // Append the file URL to the output
             $this->resourceData['fileUrl'] = $fileUrl;
@@ -299,7 +322,7 @@ SQL;
     }
     
     
-    public function getAction() {
+    public function getAction() { 
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');
