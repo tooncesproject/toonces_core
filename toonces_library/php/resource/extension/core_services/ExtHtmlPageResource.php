@@ -95,7 +95,8 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
         
         if (!isset($this->resourceData['clientClass']))
             $this->resourceData['clientClass'] = 'FileResourceClient';
-
+        
+        $dataValid = $this->validateData($this->resourceData);
         // Go through validation and POST actions.
         do {
             // Attempt to instantiate the client
@@ -109,9 +110,9 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             // We don't want to show our private parts to an unauthenticated
             // someone or other.
             // If user is validated, simply break and return the invalidation
-            // message.
-            $dataValid = $this->validateData($this->resourceData);
-            if (!$dataValid) {
+            // message.            
+            
+            if ($dataValid == false) {
                 $userId = $this->authenticateUser();
                 if (empty($userId)) {
                     // Authentication failed.
@@ -119,10 +120,9 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
                     $this->statusMessage = 'Access denied. Go away.';
                     $this->resourceData = array('status' => $this->statusMessage);
                 }
-                break;    
+                break;
             }
-                
-                
+
             // Acquire critical variables body prior to page creation
             $htmlBody = $this->resourceData['htmlBody'];
             $clientClass = $this->resourceData['clientClass'];
@@ -133,8 +133,7 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             if ($this->httpStatus == Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse')) {
                 $postResult = parent::getAction();
             }
-            
-            // if we had a prior invalid
+
             // If successful, load the HTML to the store and create a record in
             // ext_html_pages
             // If there was an error in calling the parent methods, break.
@@ -201,13 +200,13 @@ SQL;
             // Success?
             $this->parameters['id'] = strval($pageId);
             $this->getAction();
-            $this->httpStatus = $this->client->getHttpStatus();
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
             
             // Append the file URL to the output
             $this->resourceData['fileUrl'] = $fileUrl;
              
         } while (false);
-        
+
         return $this->resourceData;
     }
     
@@ -221,37 +220,68 @@ SQL;
         // Build fields.
         $this->buildFields();
         
-        // Make the body field optional.
+        // Make some fields optional.
         $this->fields['htmlBody']->allowNull = true;
+        $this->fields['ancestorPageId']->allowNull = true;
+        $this->fields['pageTitle']->allowNull = true;
         $clientClass = null;
         $htmlBody = null;
-
         // Get the body if applicable.
-        if (isset($this->resourceData['htmlBody']))
+        if (isset($this->resourceData['htmlBody'])) {
             $htmlBody = $this->resourceData['htmlBody'];
-        
+        }
         if (isset($this->resourceData['clientClass']))
             $clientClass = $this->resourceData['clientClass'];
-            
+        
+        $dataValid = $this->validateData($this->resourceData);
+
         do {
-            // Call parent
-            $putResult = parent::putAction();
             
+            // Validate the input. If invalid, authenticate the user;
+            // We don't want to show our private parts to an unauthenticated
+            // someone or other.
+            // If user is validated, simply break and return the invalidation
+            // message.
+            
+            if ($dataValid == false) {
+                $userId = $this->authenticateUser();
+                if (empty($userId)) {
+                    // Authentication failed.
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
+                    $this->statusMessage = 'Access denied. Go away.';
+                    $this->resourceData = array('status' => $this->statusMessage);
+                }
+                break;
+            }
+
+            // Call parent
+            parent::putAction();
+            $putResult = null;
             // Page record updated successfully?
             if ($this->httpStatus != Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse')) {
                 break;
+            } else {
+                $putResult = parent::getAction();
             }
             
             // If htmlBody was set, upload the document and update ext_html_page
             $pageId = $this->parameters['id'];
+            
+            
             if ($htmlBody) {
                 // Attempt to instantiate the client
                 $clientStatus = $this->setupClient($pageId);
                 // Break if error.
                 if ($clientStatus == 1)
                     break;
+                
+                // Get current datetime from SQL server as basis for file name.
+                $sql = "SELECT CURRENT_TIMESTAMP()";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
+                $date = $result[0][0];
 
-                $date = $putResult[$pageId]['updatedDate'];
                 $fileNameDate = preg_replace('[ ]', '_', $date);
                 $fileNameDate = preg_replace('[:]','',$fileNameDate);
                 
@@ -271,20 +301,24 @@ SQL;
                 $pw = $_SERVER['PHP_AUTH_PW'];
                 $clientResponse = $this->client->put($fileUrl, $htmlBody, $email, $pw);
                 $clientStatus = $this->client->getHttpStatus();
-                    
-                    
-                if ($clientstatus != 200 || $clientStatus != 201) {
+                if ($clientStatus != 200 && $clientStatus != 201) {
                     $this->httpStatus = $clientStatus;
                     $this->resourceData['status'] = 'Partial success; failed to upload body file.';
                     break;
                 }
-                
+
                 // Update the record if success
                 $sql = <<<SQL
                 INSERT INTO ext_html_page
                     (page_id, html_path, client_class)
-                VALUES
-                    (:pageId, :htmlPath, :clientClass)
+                    SELECT
+                         :pageId
+                        ,:htmlPath
+                        ,COALESCE(:clientClass, client_class)
+                    FROM
+                        ext_html_page
+                    WHERE
+                        page_id = :pageId 
                 ON DUPLICATE KEY UPDATE
                      page_id = VALUES(page_id)
                     ,html_path = VALUES(html_path)
@@ -294,7 +328,7 @@ SQL;
                 $sqlParams = array(
                     'pageId' => $pageId
                     ,'htmlPath' => $fileUrl
-                    ,'clientClass' => $this->resourceData['clientClass']
+                    ,'clientClass' => $clientClass
                 );
                 try {
                     $stmt->execute($sqlParams);
@@ -386,7 +420,7 @@ SQL;
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchAll();
             }
-
+            //die(var_dump($sqlParams));
             // Process the response
             foreach ($result as $row) {
                 $this->resourceData[$row[0]] = array(
@@ -418,25 +452,24 @@ SQL;
         
         $conn = $this->pageViewReference->getSQLConn();
         
-        
-        do {
-            // Call parent - This will requre authentication.
-            parent::deleteAction();
-            
-            // If delete of page was successful, delete the file.
-            if ($this->httpStatus == Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse')) {
-                // Query the database for the file vector.
-                $id = $this->validateIntParameter['id'];
-                $sql = <<<SQL
+        // Query the database for the file vector.
+        $id = $this->validateIntParameter('id');
+        $sql = <<<SQL
                 SELECT html_path
                 FROM ext_html_page
                 WHERE page_id = :pageId
 SQL;
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(['pageId' => $id]);
-                $result = $stmt->fetchAll();
-                $htmlPath = $result[0]['html_path'];
-                
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageId' => $id]);
+        $result = $stmt->fetchAll();
+        $htmlPath = $result[0]['html_path'];
+        do {
+            // Call parent - This will requre authentication.
+            parent::deleteAction();
+
+            // If delete of page was successful, delete the file.
+            if ($this->httpStatus == Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse')) {
+
                 // Delete using client
                 $clientState = $this->setupClient($this->parameters['id']);
                 // Client setup successfully?
@@ -446,7 +479,7 @@ SQL;
                 $email = $_SERVER['PHP_AUTH_USER'];
                 $pw = $_SERVER['PHP_AUTH_PW'];
                 $this->client->delete($htmlPath, $email, $pw);
-                $clientStatus = $client->getHttpStatus();
+                $clientStatus = $this->client->getHttpStatus();
                 if ($clientStatus != Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse')) {
                     $this->resourceData['status'] = 'Failed to delete file ' . $htmlPath;
                 }

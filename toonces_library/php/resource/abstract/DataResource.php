@@ -110,6 +110,7 @@ SQL;
 
     public function validateData($data) {
         // Iterate through keys in dataObjects array
+
         $postValid = false;
         $missingFields = array();
         $invalidFields = array();
@@ -119,6 +120,7 @@ SQL;
             // We go through each requirement in order of priority
             // The first requirement for DataResource is that the data is an array
             // (JSON should already be validated and converted to array at this point).
+
             if (!is_array($data)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'The API only accepts well-formed JSON.  ';
@@ -144,15 +146,17 @@ SQL;
                 }
             }
 
-            if (count($missingFields)) {
+            if (!empty($missingFields)) {
                 // One or more required fields is missing - Break here.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'One or more required fields is missing: ' . implode(', ', $missingFields);
                 break;
             }
 
-            if (count($invalidFields)) {
-                // One or more fields had bogus data.
+
+            if (!empty($invalidFields)) {
+                 // One or more fields had bogus data.
+                
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $errorArray = array();
                 foreach($invalidFields as $invalidKey => $value) {
@@ -160,13 +164,14 @@ SQL;
                 }
                 $this->statusMessage = implode(', ', $errorArray);
                 break;
-            }
+            }            
             // If we've made it this far, we're OK.
             $postValid = true;
 
-        } while (false);
 
+        } while (false);
         return $postValid;
+
     }
 
 

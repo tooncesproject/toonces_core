@@ -98,6 +98,16 @@ BEGIN
     WHERE
         page_id = param_page_id;
 
+    -- Clear the foreign key reference in login_attempt, if it exists.
+    -- Otherwise, the delete will fail due to foreign key violation.
+    UPDATE
+        login_attempt
+    SET
+        page_id = NULL
+    WHERE
+        page_id = param_page_id;
+
+
     -- Finally, hard-delete the page.
     DELETE FROM
         toonces.pages

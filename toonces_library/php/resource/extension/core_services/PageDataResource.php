@@ -529,13 +529,14 @@ SQL;
                 array_push($updateFields, 'pagetype_id = :pageTypeId');
                 $sqlParams['pageTypeId'] = $this->resourceData['pageTypeId'];
             }
-
+            /*
             // Invalidate the request if no fields are set.
             if (empty($updateFields)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'At least one field must be specified in a PUT request.';
                 break;
             }
+            */
 
             // Add page ID parameter
             $sqlParams['pageId'] = $pageId;
@@ -551,16 +552,17 @@ SQL;
 SQL;
 
             $sql = sprintf($sql, $updateFieldsStr);
-
-            try {
-                $stmt = $conn->prepare($sql);
-                $stmt->execute($sqlParams);
-            } catch (PDOException $e) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                $this->statusMessage = $e->getMessage();
-                break;
+            
+            if (!empty($updateFields)) {
+                try {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute($sqlParams);
+                } catch (PDOException $e) {
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+                    $this->statusMessage = $e->getMessage();
+                    break;
+                }
             }
-
             // Success. Clear resourceData and call getAction().
             $this->resourceData = array();
             $this->parameters['id'] = strval($pageId);
