@@ -420,7 +420,6 @@ SQL;
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchAll();
             }
-            //die(var_dump($sqlParams));
             // Process the response
             foreach ($result as $row) {
                 $this->resourceData[$row[0]] = array(
