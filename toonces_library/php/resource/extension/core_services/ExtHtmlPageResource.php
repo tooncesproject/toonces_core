@@ -94,7 +94,7 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             $this->resourceData['pageTypeId'] = 5;
         
         if (!isset($this->resourceData['clientClass']))
-            $this->resourceData['clientClass'] = 'FileResourceClient';
+            $this->resourceData['clientClass'] = 'ResourceClient';
         
         $dataValid = $this->validateData($this->resourceData);
         // Go through validation and POST actions.
