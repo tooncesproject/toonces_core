@@ -62,6 +62,7 @@ include_once LIBPATH.'php/pagebuilders/abstract/APIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/CoreServicesAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/DocumentEndpointPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/PageApiPageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/core_services/ExtPageApiPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/TestPageBuilder.php';
 
 include_once LIBPATH.'php/pagebuilders/core_services/BlogPostAPIPageBuilder.php';
