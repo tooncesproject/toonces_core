@@ -370,13 +370,7 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                 break;
             }
-
-            // If pageId is null, return 404
-            if (is_null($pageId)) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
-                break;
-            }
-
+            
             // OK so far? Build the query.
             $sql = <<<SQL
                 SELECT
@@ -420,29 +414,32 @@ SQL;
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchAll();
             }
-            // Process the response
-            foreach ($result as $row) {
-                $this->resourceData[$row[0]] = array(
-                    'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
-                    ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
-                    ,'ancestorPageId' => intval($row['ancestor_page_id'])
-                    ,'pathName' => $row['pathname']
-                    ,'pageTitle' => $row['page_title']
-                    ,'pageLinkText' => $row['page_link_text']
-                    ,'pageBuilderClass' => $row['pagebuilder_class']
-                    ,'pageViewClass' => $row['pageview_class']
-                    ,'createdDate' => $row['created_dt']
-                    ,'modifiedDate' => $row['modified_dt']
-                    ,'redirectOnError' => boolval($row['redirect_on_error'])
-                    ,'published' => boolval($row['published'])
-                    ,'pageTypeId' => intval($row['pagetype_id'])
-                    ,'fileUrl' => $row['html_path']
-                    ,'clientClass' => $row['client_class']
-                );
-            }
             
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-
+            if ($result) {
+                // Process the response
+                foreach ($result as $row) {
+                    $this->resourceData[$row[0]] = array(
+                        'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
+                        ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
+                        ,'ancestorPageId' => intval($row['ancestor_page_id'])
+                        ,'pathName' => $row['pathname']
+                        ,'pageTitle' => $row['page_title']
+                        ,'pageLinkText' => $row['page_link_text']
+                        ,'pageBuilderClass' => $row['pagebuilder_class']
+                        ,'pageViewClass' => $row['pageview_class']
+                        ,'createdDate' => $row['created_dt']
+                        ,'modifiedDate' => $row['modified_dt']
+                        ,'redirectOnError' => boolval($row['redirect_on_error'])
+                        ,'published' => boolval($row['published'])
+                        ,'pageTypeId' => intval($row['pagetype_id'])
+                        ,'fileUrl' => $row['html_path']
+                        ,'clientClass' => $row['client_class']
+                    );
+                }
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+            } else {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
+            }
         } while (false);
         return $this->resourceData;
     }

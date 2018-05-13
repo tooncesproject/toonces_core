@@ -139,11 +139,18 @@ SQL;
             ,'clientClass' => 'DummyResourceClient'
         );
         
+        $pdrBadRequestBody = $badRequestBody;
+        $pdrBadRequestBody['ancestorPageId'] = 99999;
+        $pdrBadRequestBody['htmlBody'] = $pageHtml;
+        
         $goodRequestBody = $badRequestBody;
         $goodRequestBody['htmlBody'] = $pageHtml;
         
  
         // ACT
+        // Count the number of files before
+        $countFilesBefore = count(scandir($url));
+        
         // Unauthenticated POST returns 401
         $this->unsetBasicAuth();       
         $epr->resourceData = $goodRequestBody;
@@ -153,6 +160,15 @@ SQL;
         // Unauthenticated POST doesn't copy any files
         $noFiles = scandir($url);
 
+        // Unauthenticated POST with invalid data per PageDataResource returns 401
+        $this->unsetBasicAuth();
+        $epr->resourceData = $pdrBadRequestBody;
+        $pdrInvalidResult = $epr->postAction();
+        $pdrInvalidStatus = $epr->httpStatus;
+        
+        // Unauthenticated POST wih invalid data doesn't copy any files
+        $pdrNoFiles = scandir($url);
+        
         // null body POST returns 400
         $this->setAdminAuth();
         $epr->resourceData = $badRequestBody;
@@ -166,8 +182,6 @@ SQL;
         $goodStatus = $epr->httpStatus;
  
         // Authenticated POST creates matching record in ext_html_file
-        //die(var_dump($goodResult));
-        //die(var_dump($goodStatus));
         $pageId = key($goodResult);
         $sql = "SELECT html_path FROM ext_html_page WHERE page_id = :pageId";
         $stmt = $conn->prepare($sql);
@@ -187,7 +201,13 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $noAuthStatus);
         
         // Unauthenticated POST doesn't copy any files
-        $this->assertEquals(2, count($noFiles));
+        $this->assertEquals($countFilesBefore, count($noFiles));
+        
+        // Unauthenticated POST with invalid data per PageDataResource returns 401
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $pdrInvalidStatus);
+        
+        // Unauthenticated POST wih invalid data doesn't copy any files
+        $this->assertEquals($countFilesBefore, count($pdrNoFiles));
         
         // null body POST returns 400
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $nullBodyStatus);
@@ -245,6 +265,11 @@ SQL;
         $filesBefore = scandir($url);
         $countFilesBefore = count($filesBefore);
 
+        // Mock up an invalid PUT body
+        $invalidBody = array(
+          'pageTitle' => 6  
+        );
+        
         // ACT
         // Unauthenticated PUT returns 401
         $this->unsetBasicAuth();
@@ -256,6 +281,24 @@ SQL;
         $noAuthfiles = scandir($url);
         $noAuthFilesCount = count($noAuthfiles);
 
+        // Unauthenticated PUT with invalid data returns 401
+        $this->unsetBasicAuth();
+        $epr->resourceData = $invalidBody;
+        $unauthInvalidResult = $epr->putAction();
+        $unauthInvalidStatus = $epr->httpStatus;
+        
+        // Unauthenticated PUT with invalid data doesn't change extHtmlPage
+        $sql = <<<SQL
+        SELECT html_path
+        FROM ext_html_page
+        WHERE page_id = :pageId
+SQL;
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['pageId' => $pageId]);
+        $result = $stmt->fetchAll();
+        $unauthHtmlPath = $result[0]['html_path'];
+         
         // Authenticated PUT updates record in ext_html_file
         // Sleep 1 second so there will be a difference
         sleep(2);
@@ -285,10 +328,14 @@ SQL;
         // Unauthenticated PUT doesn't copy any files
         $this->assertEquals($countFilesBefore, $noAuthFilesCount);
         
+        // Unauthenticated PUT with invalid data returns 401
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $unauthInvalidStatus);
+        
+        // Unauthenticated PUT with invalid data doesn't change extHtmlPage
+        $this->assertSame($dbHtmlPathBefore, $unauthHtmlPath);
+        
         // Authenticated PUT updates record in ext_html_file
         $this->assertNotEmpty($dbHtmlPathAfter);
-        echo 'before ' . $dbHtmlPathBefore . PHP_EOL;
-        ECHO 'AFTER ' . $dbHtmlPathAfter . PHP_EOL;
         $this->assertNotSame($dbHtmlPathBefore, $dbHtmlPathAfter);
         $this->assertSame($dbHtmlPathAfter, $returnedHtmlPath);
         
@@ -300,6 +347,7 @@ SQL;
         // Authenticated PUT returns 200 HTTP status.
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $authStatus);
     }
+   
     
     /**
      * @depends testPostAction
@@ -399,7 +447,6 @@ SQL;
         
 
         // ACT
-        /*
         // GET with admin login returns all pages and 200
         $this->setAdminAuth();
         $adminResult = $pdr->getAction();
@@ -410,7 +457,7 @@ SQL;
         $pdr->parameters['id'] = '69420';
         $bogusParamResult = $pdr->getAction();
         $bogusParamStatus = $pdr->httpStatus;
-*/
+
          // GET with valid ID parameter returns single record and 200, with data matching database.
         //die(var_dump($publicPageId));
         $this->setAdminAuth();
@@ -420,30 +467,31 @@ SQL;
         $singleParamStatus = $pdr->httpStatus;
         $singleParamRecord = $singleParamResult[$publicPageId];
         //die(var_dump($singleParamRecord));
-        
+              
         // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
         $this->setNonAdminAuth();
         $pdr->resourceData = array();
         $pdr->parameters['id'] = strval($unpublishedPageId);
         $unpublishedResult = $pdr->getAction();
         $unpublishedStatus = $pdr->httpStatus;
-        
+
         // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
         $pdr->resourceData = array();
         $pdr->parameters = array();
         $noParamResult = $pdr->getAction();
         $noParamStatus = $pdr->httpStatus;
-        
+
         // Non-authenticated GET returns 401 error.
         $this->unsetBasicAuth();
         $pdr->resourceData = array();
         $nonAuthResult = $pdr->getAction();
         $nonAuthStatus = $pdr->httpStatus;
 
+
        
         // ASSERT
         // GET with admin login returns all pages and 200
-        /*
+
         foreach ($pagesState as $pageRecord)
             $this->assertArrayHasKey($pageRecord[0], $adminResult);
             
@@ -452,7 +500,7 @@ SQL;
         // GET with bogus ID parameter returns 404 and empty result
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $bogusParamStatus);
         $this->assertEmpty($bogusParamResult);
-        */
+        
         // GET with valid ID parameter returns single record and 200
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $singleParamStatus);
         $this->assertEquals(1, count($singleParamResult));
@@ -487,9 +535,9 @@ SQL;
             }
             
         }
-        
+
         // Non-authenticated GET returns 401 error.
-        $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $noAuthStatus);
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $nonAuthStatus);
         $this->assertEmpty($noAuthResult);
         
     }
@@ -565,7 +613,7 @@ SQL;
         // Unauthenticated DELETE does not delete ext_html_page record nor page record
         $this->assertNotEmpty($extHtmlPageIdBefore);
         $this->assertNotEmpty($pageIdBefore);
-        /*
+
         // Authenticated DELETE deletes file
         $this->assertFalse($fileExistsAfter);
         
@@ -574,7 +622,7 @@ SQL;
 
         // Authenticated DELETE returns 204
         $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $deletedStatus);
-        */
+
     }
     
 }
