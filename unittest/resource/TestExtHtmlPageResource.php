@@ -53,11 +53,17 @@ class DummyResourceClient implements iResourceClient {
 
 
 class TestExtHtmlPageResource extends FileDependentTestCase {
-    /*
+    
     function testSetupClient() {
         // ARRANGE
         // Get SQL connection
         $conn = $this->getConnection();
+        
+        // clear and build fixtures.
+        $this->destroyTestDatabase();
+        $this->buildTestDatabase();
+        $this->checkFileFixture();
+        
         // Create a page and insert an associated record in ext_html_page
         $pageId = $this->createPage(true);
         $sql = <<<SQL
@@ -71,6 +77,7 @@ SQL;
         
         // Instantiate an ExtHtmlPageResource and dependencies
         $pageView = new JsonPageView($pageId);
+        $pageView->setSQLConn($conn);
         $client = new DummyResourceClient();
         $ehpr = new ExtHtmlPageResource($pageView);
         
@@ -79,8 +86,8 @@ SQL;
         
         // ACT
         // Does not instantiate client if already set, returns 0
-        $frc = new FileResourceClient($pageView);
-        $ehpr->client = $frc;
+        $resourceClient = new ResourceClient($pageView);
+        $ehpr->client = $resourceClient;
         $ehpr->resourceData = $data;
         $ehpr->setupClient(null);
         $existingClass = get_class($ehpr->client);
@@ -98,7 +105,7 @@ SQL;
         
         // ASSERT
         // Does not instantiate client if already set, returns 0
-        $this->assertSame('FileResourceClient', $existingClass);
+        $this->assertSame('ResourceClient', $existingClass);
         
         // Instantiates client specified in resourceData, returns 0
         $this->assertSame('DummyResourceClient', $resourceDataClass);
@@ -106,18 +113,16 @@ SQL;
         // Instantiates client from ext_html_page if pageId parameter set, returns 0
         $this->assertSame('DummyResourceClient', $databaseClass);
     }
-    */    
+    
 
+    /**
+     * @depends testSetupClient
+     */
     function testPostAction() {
         // ARRANGE
         // Get SQL connection
         $conn = $this->getConnection();
-        
-        // clear and build fixtures.
-        $this->destroyTestDatabase();
-        $this->buildTestDatabase();
-        $this->checkFileFixture();
-        
+       
         // Instantiate a client 
         $client = new DummyResourceClient();
         
@@ -459,14 +464,12 @@ SQL;
         $bogusParamStatus = $pdr->httpStatus;
 
          // GET with valid ID parameter returns single record and 200, with data matching database.
-        //die(var_dump($publicPageId));
         $this->setAdminAuth();
         $pdr->resourceData = array();
         $pdr->parameters['id'] = strval($publicPageId);
         $singleParamResult = $pdr->getAction();
         $singleParamStatus = $pdr->httpStatus;
         $singleParamRecord = $singleParamResult[$publicPageId];
-        //die(var_dump($singleParamRecord));
               
         // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
         $this->setNonAdminAuth();
@@ -563,7 +566,7 @@ SQL;
         $result = $stmt->fetchAll();
         $pageId = $result[0]['page_id'];
         $dbHtmlPath = $result[0]['html_path'];
-        //die(var_dump($pageId));
+
         // Instantiate an ExtHtmlPageResource and dependencies.
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);

@@ -17,7 +17,7 @@ class FileResourceClient implements iResourceClient {
     var $resourceStatus;
     var $pageViewReference;
     
-    function getResourceStatus() {
+    function getHttpStatus() {
         return $this->resourceStatus;
     }
     
