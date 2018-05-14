@@ -17,7 +17,7 @@ class ExtHtmlResource extends HTMLResource implements iResource {
         // Query the database for this page's content HTML file 
         $conn = $this->pageViewReference->getSQLConn();
 
-        $sql = 'SELECT html_path, client_classs FROM ext_html_page WHERE page_id = :pageId';
+        $sql = 'SELECT html_path, client_class FROM ext_html_page WHERE page_id = :pageId';
         $stmt = $conn->prepare($sql);
 
         $stmt->execute(['pageId' => $this->pageViewReference->pageId]);
