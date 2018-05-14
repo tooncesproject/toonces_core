@@ -460,6 +460,12 @@ SQL;
         $result = $stmt->fetchAll();
         $htmlPath = $result[0]['html_path'];
         do {
+            // No record in ext_html_page? Return 404.
+            if (empty($htmlPath)) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
+                break;
+            }
+            
             // Set up client.
             $clientState = $this->setupClient(intval($id));
             // Client setup successfully?
