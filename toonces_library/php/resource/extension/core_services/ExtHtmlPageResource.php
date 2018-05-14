@@ -460,18 +460,19 @@ SQL;
         $result = $stmt->fetchAll();
         $htmlPath = $result[0]['html_path'];
         do {
+            // Set up client.
+            $clientState = $this->setupClient(intval($id));
+            // Client setup successfully?
+            if ($clientState == 1)
+                break;
+            
             // Call parent - This will requre authentication.
             parent::deleteAction();
 
             // If delete of page was successful, delete the file.
             if ($this->httpStatus == Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse')) {
 
-                // Delete using client
-                $clientState = $this->setupClient($this->parameters['id']);
-                // Client setup successfully?
-                if ($clientState == 1)
-                    break;
-                
+
                 $email = $_SERVER['PHP_AUTH_USER'];
                 $pw = $_SERVER['PHP_AUTH_PW'];
                 $this->client->delete($htmlPath, $email, $pw);
