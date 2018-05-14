@@ -63,6 +63,9 @@ class ResourceClient implements iResourceClient {
         
         $response = curl_exec($ch);
         $this->httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if (empty($this->httpStatus))
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_502_BAD_GATEWAY', 'EnumHTTPResponse');
+
         curl_close($ch);
         return $response;        
     }
@@ -98,6 +101,9 @@ class ResourceClient implements iResourceClient {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($ch);
         $this->httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if (empty($this->httpStatus))
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_502_BAD_GATEWAY', 'EnumHTTPResponse');
+
         curl_close($ch);
         return $response;
         
@@ -132,6 +138,9 @@ class ResourceClient implements iResourceClient {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($ch);
         $this->httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if (empty($this->httpStatus))
+            $this->httpStatus = Enumeration::getOrdinal('HTTP_502_BAD_GATEWAY', 'EnumHTTPResponse');
+
         curl_close($ch);
         return $response;
     }
