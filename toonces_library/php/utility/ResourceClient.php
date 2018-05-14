@@ -120,7 +120,7 @@ class ResourceClient implements iResourceClient {
         // Initialize cURL
         $ch = curl_init();
         // set options
-        curl_setopt($ch, CURLOPT_URL, $URL);
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
         curl_setopt($ch, CURLOPT_ENCODING, 'identity');
         
