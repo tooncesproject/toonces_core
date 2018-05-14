@@ -68,7 +68,7 @@ class ResourceClient implements iResourceClient {
     }
     
     
-    function put($url, $data, $username = null, $password = null, $headers = array()) {
+    function put($url, $data, $username = null, $password = null, $paramHeaders = array()) {
         /**
          * perform an HTTP PUT operation.
          * @param mixed $data - Body of PUT request. 
@@ -94,7 +94,7 @@ class ResourceClient implements iResourceClient {
             curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);  
 
         curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $paramHeaders);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($ch);
         $this->httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -104,7 +104,7 @@ class ResourceClient implements iResourceClient {
     }
     
     
-    function delete($url, $username = null, $password = null, $headers = array()) {
+    function delete($url, $username = null, $password = null, $paramHeaders = array()) {
         /**
          * perform an HTTP DELETE operation.
          * @param string $url - URL to request
@@ -128,7 +128,7 @@ class ResourceClient implements iResourceClient {
             curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
             
         curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $paramHeaders);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($ch);
         $this->httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
