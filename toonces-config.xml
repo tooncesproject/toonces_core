@@ -12,6 +12,6 @@
 	<sql_user_name>toonces</sql_user_name>
 	<sql_password>kittycat</sql_password>
 	<html_resource_path>/opt/toonces/toonces_library/html/</html_resource_path>
-	<html_resource_url>/coreservices/htmlresources/</html_resource_url>
+	<html_resource_url>127.0.0.1/coreservices/htmlresources/</html_resource_url>
 
 </toonces_settings>
