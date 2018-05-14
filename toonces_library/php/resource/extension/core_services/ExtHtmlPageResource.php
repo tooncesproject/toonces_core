@@ -462,7 +462,7 @@ SQL;
         do {
             // No record in ext_html_page? Return 404.
             if (empty($htmlPath)) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
             
@@ -477,7 +477,6 @@ SQL;
 
             // If delete of page was successful, delete the file.
             if ($this->httpStatus == Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse')) {
-
 
                 $email = $_SERVER['PHP_AUTH_USER'];
                 $pw = $_SERVER['PHP_AUTH_PW'];
