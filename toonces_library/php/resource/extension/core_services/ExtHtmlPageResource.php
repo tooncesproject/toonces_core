@@ -93,9 +93,14 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
         if (!isset($this->resourceData['pageTypeId']))
             $this->resourceData['pageTypeId'] = 5;
         
-        if (!isset($this->resourceData['clientClass']))
-            $this->resourceData['clientClass'] = 'ResourceClient';
-        
+        if (!isset($this->resourceData['clientClass'])) {
+            // If not already set, get the default client class from toonces-config.xml
+            $xml = new DOMDocument();
+            $xml->load(ROOTPATH.'toonces-config.xml');
+            $pathNode = $xml->getElementsByTagName('default_resource_client')->item(0);
+            $this->resourceData['clientClass']  = $pathNode->nodeValue;
+        }
+
         $dataValid = $this->validateData($this->resourceData);
         // Go through validation and POST actions.
         do {
