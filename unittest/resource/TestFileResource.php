@@ -15,15 +15,67 @@ require_once __DIR__ . '../../FileDependentTestCase.php';
 
 class TestFileResource extends FileDependentTestCase {
 
-    function testPutAction() {
+    /**
+     * @expectedException Exception
+     */
+    function testGetResource() {
         // ARRANGE
         // Check the file fixture per FileDependentTestCase.
         $this->checkFileFixture();
-        
+
         // Tear down (if exists) and rebuild the database fixture,.
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
-        
+
+        // Proceed
+        $pv = new FilePageview(1);
+        $pv->setSQLConn($this->getConnection());
+        $fr = new FileResource($pageView);
+        $testData = 'look here is some data' .PHP_EOL;
+        $fr->resourceData = $testData;
+        $fr->httpMethod = 'OPTIONS';
+
+        // ACT
+        // Call without resourcePath - Expect exception.
+        $noPathErrorState = false;
+        try {
+            $fr->getResource();
+        } finally {
+            $noPathErrorState = true;
+        }
+
+        // Call with bogus resource path - Except exception.
+        $bogusPathErrorState = false;
+        $fr->resourcePath = '/foo/foo/foo';
+        try {
+            $fr->getResource();
+        } finally {
+            $bogusPathErrorState = true;
+        }
+
+        // Call with OK resource path - Expect parent class (ApiResource) operations
+        $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
+        $validResponse = $fr->getResource();
+        $resourceUri = $fr->resourceUri;
+
+        // ASSERT
+        // Call without resourcePath - Expect exception.
+        $this->assertTrue($noPathErrorState);
+
+        // Call with bogus resource path - Except exception.
+        $this->assertTrue($bogusPathErrorState);
+
+        // Call with OK resource path - Expect parent class (ApiResource) operations
+        $this->assertSame($testData, $validResponse);
+
+    }
+
+    /**
+     * @depends testGetResource
+     */
+    function testPutAction() {
+        // ARRANGE
+        // See testGetResource for fixture injection.
         // Create a non-admin user.
         $this->createNonAdminUser();
 
