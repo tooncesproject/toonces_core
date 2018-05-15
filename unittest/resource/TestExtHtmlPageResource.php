@@ -11,46 +11,6 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../FileDependentTestCase.php';
 
-// Dummy client for testing.
-class DummyResourceClient implements iResourceClient {
-
-    var $httpStatus;
-    function getHttpStatus() {
-        return $this->httpStatus;
-    }
-    
-    function get($url, $username = null, $password = null, $paramHeaders = array()) {
-        $content = file_get_contents($url);
-        if ($content) {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-        } else {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-        }
-        return $content;
-            
-    }
-    
-    function put($url, $data, $username = null, $password = null, $headers = array()) {
-        $success = file_put_contents($url, $data);
-        if ($success) {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-        } else {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-        }
-            
-        return $success;
-    }
-    
-    function delete($url, $username = null, $password = null, $headers = array()) {
-        $success = unlink($url);
-        if ($success) {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
-        } else {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-        }
-    }
-}
-
 
 class TestExtHtmlPageResource extends FileDependentTestCase {
     
@@ -70,7 +30,7 @@ class TestExtHtmlPageResource extends FileDependentTestCase {
         INSERT INTO ext_html_page
             (page_id, html_path, client_class)
         VALUES
-            (:pageId, 'foo', 'DummyResourceClient')
+            (:pageId, 'foo', 'LocalResourceClient')
 SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(array('pageId' => $pageId));
@@ -78,11 +38,11 @@ SQL;
         // Instantiate an ExtHtmlPageResource and dependencies
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);
-        $client = new DummyResourceClient();
+        $client = new LocalResourceClient();
         $ehpr = new ExtHtmlPageResource($pageView);
         
         // Mock up some data
-        $data = array('clientClass' => 'DummyResourceClient');
+        $data = array('clientClass' => 'LocalResourceClient');
         
         // ACT
         // Does not instantiate client if already set, returns 0
@@ -108,10 +68,10 @@ SQL;
         $this->assertSame('ResourceClient', $existingClass);
         
         // Instantiates client specified in resourceData, returns 0
-        $this->assertSame('DummyResourceClient', $resourceDataClass);
+        $this->assertSame('LocalResourceClient', $resourceDataClass);
         
         // Instantiates client from ext_html_page if pageId parameter set, returns 0
-        $this->assertSame('DummyResourceClient', $databaseClass);
+        $this->assertSame('LocalResourceClient', $databaseClass);
     }
     
 
@@ -124,7 +84,7 @@ SQL;
         $conn = $this->getConnection();
        
         // Instantiate a client 
-        $client = new DummyResourceClient();
+        $client = new LocalResourceClient();
         
         // Instantiate an ExtHtmlPageResource and dependencies.
         $pageId = $this->createPage(false);
@@ -141,7 +101,7 @@ SQL;
              'ancestorPageId' => 1
             ,'pageTitle' => 'Hello World'
             ,'htmlBody' => null
-            ,'clientClass' => 'DummyResourceClient'
+            ,'clientClass' => 'LocalResourceClient'
         );
         
         $pdrBadRequestBody = $badRequestBody;
@@ -259,7 +219,7 @@ SQL;
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageResource($pageView);
-        $client = new DummyResourceClient();
+        $client = new LocalResourceClient();
         $epr->client = $client;
         $epr->parameters['id'] = strval($pageId);
         
@@ -557,7 +517,7 @@ SQL;
              page_id
             ,html_path
         FROM ext_html_page
-        WHERE client_class = 'DummyResourceClient'
+        WHERE client_class = 'LocalResourceClient'
         ORDER BY ext_html_page_id DESC
         LIMIT 1
 SQL;
@@ -572,7 +532,7 @@ SQL;
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageResource($pageView);
         $epr->parameters['id'] = strval($pageId);
-        $client = new DummyResourceClient();
+        $client = new LocalResourceClient();
         $epr->client = $client;
         
         // ACT
@@ -625,6 +585,10 @@ SQL;
 
         // Authenticated DELETE returns 204
         $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $deletedStatus);
+        
+        // Tear down the fixture.
+        $this->destroyFileFixture();
+        $this->destroyTestDatabase();
 
     }
     

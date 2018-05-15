@@ -6,6 +6,7 @@ include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
 include_once LIBPATH.'php/utility/static/EnumHTTPResponse.php';
 include_once LIBPATH.'php/utility/interface/iResourceClient.php';
 include_once LIBPATH.'php/utility/ResourceClient.php';
+include_once LIBPATH.'php/utility/LocalResourceClient.php';
 include_once LIBPATH.'php/resource/interface/iResource.php';
 include_once LIBPATH.'php/resource/abstract/Resource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';

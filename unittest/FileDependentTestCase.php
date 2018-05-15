@@ -40,7 +40,7 @@ abstract class FileDependentTestCase extends SqlDependentTestCase {
         foreach ($dirData as $file) {
             // Delete the file.
             if ($file != '..' && $file != '.')
-                unlink($file);
+                unlink($GLOBALS['TEST_FILE_PATH'] . $file);
         }
 
     }
