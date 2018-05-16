@@ -12,26 +12,45 @@ require_once LIBPATH.'php/toonces.php';
 
 class HtmlFieldValidator extends StringFieldValidator implements  iFieldValidator {
     
-    function validateHtml($string) {
+    function recursivelyDetectJs($tidyNode) {
+        // Iterates recursively through tidyNode objects and detects whether there is a 
+        // JavaScript node.
+
+        $hasScript = false;
+        // Is the node's name 'script'?
+        if ($tidyNode->name == 'script') {
+            $hasScript = true;
+        } else {
+                // Does the node have any children?
+                if ($tidyNode->hasChildren()) {
+                    $children = $tidyNode->child;
+                    foreach ($children as $child) {
+                        $hasScript = $this->recursivelyDetectJs($child);
+                        if ($hasScript) {
+                            break;
+                        }
+                        
+                    }
+                }
+        }
+        return $hasScript;
+        
+    }
+    
+    function detectScripts($data) {
         /**
-         * Ripped off from https://stackoverflow.com/questions/3167074/which-function-in-php-validate-if-the-string-is-valid-html
+         * Checks if there's any Javascript.
          * 
          */
+        // Parse the HTML using tidy.
+        $tidy = tidy_parse_string($data);
         
-        $start =strpos($string, '<');
-        $end  =strrpos($string, '>',$start);
+        $root = $tidy->root();
+        $scriptDetected = $this->recursivelyDetectJs($root);
+
+        return !$scriptDetected;
         
-        $len=strlen($string);
         
-        if ($end !== false) {
-            $string = substr($string, $start);
-        } else {
-            $string = substr($string, $start, $len-$start);
-        }
-        libxml_use_internal_errors(true);
-        libxml_clear_errors();
-        $xml = simplexml_load_string($string);
-        return count(libxml_get_errors())==0;
     }
     
     public function validateData($data) {
@@ -42,13 +61,20 @@ class HtmlFieldValidator extends StringFieldValidator implements  iFieldValidato
         
         // First - call parent to verify that the data is a string and under character limit (if applicable)
         $dataValid = parent::validateData($data);
-        
-        if ($dataValid) 
-            $dataValid = $this->validateHtml($data);
-        
-        if (!$dataValid) {
-            $this->statusMessage = 'Validation failed; the string is not well-formed HTML.';
-        }
+
+        do {
+            // Invalidated by parent?
+            if (!$dataValid)
+                break;
+            
+            // Scripts detectdd?
+            $dataValid = $this->detectScripts($data);
+            if (!$dataValid) {
+                $this->statusMessage = 'Validation failed. For security reasons, Javascript is not allowed.';
+                break;
+            }
+        } while (false);
+
         return $dataValid;
     }
 }
