@@ -19,7 +19,7 @@ class HtmlFieldValidatorTest extends TestCase {
         // ARRANGE
         $validator = new HtmlFieldValidator();
         // Some HTML with Javascript:
-        $jsHtml = '<div><script type="text/javascript">document.write("This is some JS")</script></div>';
+        $jsHtml = '<script type="text/javascript">document.write("This is some JS")</script>';
         $plainHtml = '<p>Foo!</p>';
         $notHtml = 69;
         

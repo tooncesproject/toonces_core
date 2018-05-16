@@ -20,18 +20,16 @@ class HtmlFieldValidator extends StringFieldValidator implements  iFieldValidato
         // Is the node's name 'script'?
         if ($tidyNode->name == 'script') {
             $hasScript = true;
-        } else {
-                // Does the node have any children?
-                if ($tidyNode->hasChildren()) {
-                    $children = $tidyNode->child;
-                    foreach ($children as $child) {
-                        $hasScript = $this->recursivelyDetectJs($child);
-                        if ($hasScript) {
-                            break;
-                        }
-                        
-                    }
-                }
+            
+        } elseif ($tidyNode->hasChildren()) {
+            // If it has children, iterate.
+            $children = $tidyNode->child;
+            foreach ($children as $child) {
+                $hasScript = $this->recursivelyDetectJs($child);
+                if ($hasScript) {
+                    break;
+                 }            
+            }
         }
         return $hasScript;
         
