@@ -560,7 +560,6 @@ SQL;
         $this->setAdminAuth();
         $epr->deleteAction();
         $fileExistsAfter = file_exists($dbHtmlPath);
-        echo 'dbhtmlpath ' . $dbHtmlPath . PHP_EOL;
         // Authenticated DELETE deletes page record
         $stmt->execute(['pageId' => $pageId]);
         $resultAfter = $stmt->fetchAll();
