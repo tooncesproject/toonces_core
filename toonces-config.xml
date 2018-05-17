@@ -17,5 +17,7 @@
 	<sql_user_name>toonces</sql_user_name>
 	<sql_password>kittycat</sql_password>
 	<html_resource_path>/opt/toonces/toonces_library/html/</html_resource_path>
+	<html_resource_url>/opt/toonces/toonces_library/html/</html_resource_url>
+	<default_resource_client>LocalResourceClient</default_resource_client>
 
 </toonces_settings>

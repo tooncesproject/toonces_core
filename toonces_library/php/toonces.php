@@ -1,8 +1,12 @@
 <?php
 
+include_once LIBPATH.'php/utility/static/SearchPathString.php';
 include_once LIBPATH.'php/utility/static/Enumeration.php';
 include_once LIBPATH.'php/utility/static/EnumInputTypes.php';
 include_once LIBPATH.'php/utility/static/EnumHTTPResponse.php';
+include_once LIBPATH.'php/utility/interface/iResourceClient.php';
+include_once LIBPATH.'php/utility/ResourceClient.php';
+include_once LIBPATH.'php/utility/LocalResourceClient.php';
 include_once LIBPATH.'php/resource/interface/iResource.php';
 include_once LIBPATH.'php/resource/abstract/Resource.php';
 include_once LIBPATH.'php/resource/HTMLResource.php';
@@ -30,6 +34,7 @@ include_once LIBPATH.'php/resource/ExtHtmlResource.php';
 include_once LIBPATH.'php/utility/abstract/FieldValidator.php';
 include_once LIBPATH.'php/utility/interface/iFieldValidator.php';
 include_once LIBPATH.'php/utility/StringFieldValidator.php';
+include_once LIBPATH.'php/utility/HtmlFieldValidator.php';
 include_once LIBPATH.'php/utility/IntegerFieldValidator.php';
 include_once LIBPATH.'php/utility/BooleanFieldValidator.php';
 include_once LIBPATH.'php/resource/extension/core_services/CoreServicesDataResource.php';
@@ -37,6 +42,7 @@ include_once LIBPATH.'php/resource/extension/core_services/PageDataResource.php'
 include_once LIBPATH.'php/resource/extension/core_services/BlogDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/BlogPostDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/FileResource.php';
+include_once LIBPATH.'php/resource/extension/core_services/ExtHtmlPageResource.php';
 include_once LIBPATH.'php/resource/abstract/ApiPageView.php';
 include_once LIBPATH.'php/resource/FilePageView.php';
 include_once LIBPATH.'php/resource/JsonPageView.php';
@@ -57,6 +63,7 @@ include_once LIBPATH.'php/pagebuilders/abstract/APIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/CoreServicesAPIPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/DocumentEndpointPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/PageApiPageBuilder.php';
+include_once LIBPATH.'php/pagebuilders/core_services/ExtPageApiPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/TestPageBuilder.php';
 
 include_once LIBPATH.'php/pagebuilders/core_services/BlogPostAPIPageBuilder.php';

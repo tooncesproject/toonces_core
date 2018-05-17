@@ -35,13 +35,19 @@ class PageDataResource extends DataResource implements iResource {
         $pageLinkText->allowNull = true;
         $this->fields['pageLinkText'] = $pageLinkText;
 
-        $pageBuilderClass= new StringFieldValidator();
-        $pageBuilderClass->maxLength = 50;
-        $this->fields['pageBuilderClass'] = $pageBuilderClass;
+        // Pagebuilder can be overriden by child classes
+        if (!isset($this->fields['pageBuilderClass'])) {
+            $pageBuilderClass= new StringFieldValidator();
+            $pageBuilderClass->maxLength = 50;
+            $this->fields['pageBuilderClass'] = $pageBuilderClass;
+        }
 
-        $pageViewClass = new StringFieldValidator();
-        $pageViewClass->maxLength = 50;
-        $this->fields['pageViewClass'] = $pageViewClass;
+        // PageViewClass can be overridden by child classes
+        if (!isset($this->fields['pageViewClass'])) {
+            $pageViewClass = new StringFieldValidator();
+            $pageViewClass->maxLength = 50;
+            $this->fields['pageViewClass'] = $pageViewClass;
+        }
 
         $redirectOnError = new BooleanFieldValidator();
         // Defaults to FALSE
@@ -523,13 +529,14 @@ SQL;
                 array_push($updateFields, 'pagetype_id = :pageTypeId');
                 $sqlParams['pageTypeId'] = $this->resourceData['pageTypeId'];
             }
-
+            /*
             // Invalidate the request if no fields are set.
             if (empty($updateFields)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'At least one field must be specified in a PUT request.';
                 break;
             }
+            */
 
             // Add page ID parameter
             $sqlParams['pageId'] = $pageId;
@@ -546,15 +553,16 @@ SQL;
 
             $sql = sprintf($sql, $updateFieldsStr);
 
-            try {
-                $stmt = $conn->prepare($sql);
-                $stmt->execute($sqlParams);
-            } catch (PDOException $e) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
-                $this->statusMessage = $e->getMessage();
-                break;
+            if (!empty($updateFields)) {
+                try {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute($sqlParams);
+                } catch (PDOException $e) {
+                    $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
+                    $this->statusMessage = $e->getMessage();
+                    break;
+                }
             }
-
             // Success. Clear resourceData and call getAction().
             $this->resourceData = array();
             $this->parameters['id'] = strval($pageId);
@@ -574,7 +582,6 @@ SQL;
          * Performs authentication, validation and execution of a GET request.
          * @return object (array), $this->resourceData
          */
-
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');
@@ -684,13 +691,6 @@ SQL;
                 $this->statusMessage = 'DELETE requests require the parameter "id" in the query string to specify a resource to be deleted.';
                 break;
             }
-
-            /*
-            // Make all input fields optional.
-            $this->buildFields();
-            foreach($this->fields as $field)
-                $field->allowNull = true;
-            */
 
             // if user is not an admin...
             if (!$this->sessionManager->userIsAdmin) {

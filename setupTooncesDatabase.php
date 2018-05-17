@@ -179,7 +179,7 @@ SQL;
         $pageID = $rows[0][0];
 
         // Insert a record into the ext_html_page table
-        $sql = "INSERT INTO ext_html_page (page_id, html_path) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html')";
+        $sql = "INSERT INTO ext_html_page (page_id, html_path, client_class) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html', 'LocalResourceClient')";
         try {
             $stmt = $conn->prepare($sql);
             $stmt->execute([':pageID' => $pageID]);
@@ -277,11 +277,36 @@ SQL;
         )
 SQL;
     $stmt = $conn->prepare($sql);
+    $pagesEndpointPageId = null;
     try {
         $stmt->execute(array('csPageId' => $csPageId));
         $result = $stmt->fetchAll();
+        $pagesEndpointPageId = $result[0][0];
     } catch (PDOException $e) {
         echo('Failed to create Core Services API (pages): ' . $e->getMessage());
+        throw $e;
+    }
+
+    // external content pages endpoint
+    $sql = <<<SQL
+        SELECT CREATE_PAGE (
+             :pagesPageId                               -- parent_page_id BIGINT
+            ,'contentpages'                             -- ,pathname VARCHAR(50)
+            ,'Toonces Core Services - Content Pages'    -- ,page_title VARCHAR(50)
+            ,'Toonces Core Services - Content Pages'    -- ,page_link_text VARCHAR(50)
+            ,'ExtPageApiPageBuilder'                    -- ,pagebuilder_class VARCHAR(50)
+            ,'JsonPageView'                             -- ,pageview_class VARCHAR(50)
+            ,FALSE                                      -- ,redirect_on_error BOOL
+            ,FALSE                                      -- ,published BOOL
+            ,6                                          -- ,pagetype_id BIGINT
+        )
+SQL;
+    $stmt = $conn->prepare($sql);
+    try {
+        $stmt->execute(array('pagesPageId' => $pagesEndpointPageId));
+        $result = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        echo('Failed to create Core Services API (Content pages): ' . $e->getMessage());
         throw $e;
     }
 
