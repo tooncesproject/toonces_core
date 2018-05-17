@@ -3,24 +3,24 @@
  * @author paulanderson
  * ExtHtmlPageResource.php
  * Initial commit: 5/5/2018
- * 
+ *
  * DataResource class (and subclass of PageDataResource) for managing HTML-content pages.
- * 
+ *
  */
 
 require_once LIBPATH.'php/toonces.php';
 
 class ExtHtmlPageResource extends PageDataResource implements iResource {
-    
+
     var $client;
     var $urlPath;
-    
-    function setupClient($pageId = null) {        
+
+    function setupClient($pageId = null) {
         $conn = $this->pageViewReference->getSQLConn();
 
         if (isset($this->resourceData['clientClass']))
             $clientClass = $this->resourceData['clientClass'];
-        
+
         // Only instantiate the client if it hasn't been set externally
         // (Unit tests will set a "dummy" client)
         if (!isset($this->client)) {
@@ -33,53 +33,53 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
                 $result = $stmt->fetchAll();
                 $clientClass = $result[0]['client_class'];
             }
-            
+
             // Attempt to instantiate the client
             try {
                 $this->client = new $clientClass($this->pageViewReference);
             } catch (Exception $e) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'Failed to instantiate the ResourceClient object: '. $e->getMessage();
-                return 1;                
+                return 1;
             }
         }
         return 0;
     }
-    
-    
+
+
     function buildFields() {
         /**
-         * @override PageDataResource->buildFields to create fields specific to 
-         * ExtHtmlPageResource 
+         * @override PageDataResource->buildFields to create fields specific to
+         * ExtHtmlPageResource
          */
         // Call PageDataResource-buildFields
         parent::buildFields();
         // Make some fields optional
         $this->fields['pageBuilderClass']->allowNull = true;
         $this->fields['pageViewClass']->allowNull = true;
-        
+
         // Add a field for the HTML body
         $htmlBodyField = new HtmlFieldValidator();
         $this->fields['htmlBody'] = $htmlBodyField;
-        
+
         // Add a field for the Client class
         $clientClassField = new StringFieldValidator();
         $clientClassField->allowNull = true;
         $this->fields['clientClass'] = $clientClassField;
-        
+
     }
-    
-    
+
+
     function postAction() {
         /**
          * @override PageDataResource->postAction
          */
-        
+
         $conn = $this->pageViewReference->getSQLConn();
-        
+
         // Build fields.
         $this->buildFields();
-                
+
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
@@ -89,10 +89,10 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
 
         if (!isset($this->resourceData['pageViewClass']))
             $this->resourceData['pageViewClass'] = 'HTMLPageView';
-        
+
         if (!isset($this->resourceData['pageTypeId']))
             $this->resourceData['pageTypeId'] = 5;
-        
+
         if (!isset($this->resourceData['clientClass'])) {
             // If not already set, get the default client class from toonces-config.xml
             $xml = new DOMDocument();
@@ -107,16 +107,16 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             // Attempt to instantiate the client
             $clientStatus = $this->setupClient(null);
             // Break if error.
-            
+
             if ($clientStatus == 1)
                 break;
-            
-            // Validate the input. If invalid, authenticate the user; 
+
+            // Validate the input. If invalid, authenticate the user;
             // We don't want to show our private parts to an unauthenticated
             // someone or other.
             // If user is validated, simply break and return the invalidation
-            // message.            
-            
+            // message.
+
             if ($dataValid == false) {
                 $userId = $this->authenticateUser();
                 if (empty($userId)) {
@@ -142,14 +142,14 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
             // If successful, load the HTML to the store and create a record in
             // ext_html_pages
             // If there was an error in calling the parent methods, break.
-            if ($this->httpStatus != Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse')) 
+            if ($this->httpStatus != Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'))
                 break;
 
             $pageId = key($postResult);
             $date = $postResult[$pageId]['createdDate'];
             $fileNameDate = preg_replace('[ ]', '_', $date);
             $fileNameDate = preg_replace('[:]','',$fileNameDate);
-                
+
             // Get the resource URL from toonces_config.xml,
             // if not already set.
             if (!isset($this->urlPath)) {
@@ -158,16 +158,16 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
                 $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
                 $this->urlPath = $pathNode->nodeValue;
             }
-                
+
             // Generate a file URL
             $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
-                
+
             // Create the file
             $email = $_SERVER['PHP_AUTH_USER'];
             $pw = $_SERVER['PHP_AUTH_PW'];
             $clientResponse = $this->client->put($fileUrl, $htmlBody, $email, $pw);
                 $clientStatus = $this->client->getHttpStatus();
-            
+
             // If file creation was unsuccessful, roll back, break and error.
             if ($clientStatus != 200 && $clientStatus != 201) {
                 $this->parameters['id'] = strval($pageId);
@@ -185,7 +185,7 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
                     (:pageId, :htmlPath, :clientClass)
 SQL;
             $stmt = $conn->prepare($sql);
-            
+
             $sqlParams = array(
                  'pageId' => $pageId
                 ,'htmlPath' => $fileUrl
@@ -201,30 +201,30 @@ SQL;
                 $this->statusMessage = 'PDO error occured when inserting into ext_html_page: ' . $e->getMessage();
                 break;
             }
-          
+
             // Success?
             $this->parameters['id'] = strval($pageId);
             $this->getAction();
             $this->httpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
-            
+
             // Append the file URL to the output
             $this->resourceData['fileUrl'] = $fileUrl;
-             
+
         } while (false);
 
         return $this->resourceData;
     }
-    
-    
+
+
     public function putAction() {
         $conn = $this->pageViewReference->getSQLConn();
         // Acquire the PUT body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
-        
+
         // Build fields.
         $this->buildFields();
-        
+
         // Make some fields optional.
         $this->fields['htmlBody']->allowNull = true;
         $this->fields['ancestorPageId']->allowNull = true;
@@ -237,17 +237,17 @@ SQL;
         }
         if (isset($this->resourceData['clientClass']))
             $clientClass = $this->resourceData['clientClass'];
-        
+
         $dataValid = $this->validateData($this->resourceData);
 
         do {
-            
+
             // Validate the input. If invalid, authenticate the user;
             // We don't want to show our private parts to an unauthenticated
             // someone or other.
             // If user is validated, simply break and return the invalidation
             // message.
-            
+
             if ($dataValid == false) {
                 $userId = $this->authenticateUser();
                 if (empty($userId)) {
@@ -268,18 +268,18 @@ SQL;
             } else {
                 $putResult = parent::getAction();
             }
-            
+
             // If htmlBody was set, upload the document and update ext_html_page
             $pageId = $this->parameters['id'];
-            
-            
+
+
             if ($htmlBody) {
                 // Attempt to instantiate the client
                 $clientStatus = $this->setupClient($pageId);
                 // Break if error.
                 if ($clientStatus == 1)
                     break;
-                
+
                 // Get current datetime from SQL server as basis for file name.
                 $sql = "SELECT CURRENT_TIMESTAMP()";
                 $stmt = $conn->prepare($sql);
@@ -289,7 +289,7 @@ SQL;
 
                 $fileNameDate = preg_replace('[ ]', '_', $date);
                 $fileNameDate = preg_replace('[:]','',$fileNameDate);
-                
+
                 // Get the resource URL from toonces_config.xml
                 if (!isset($this->urlPath)) {
                     $xml = new DOMDocument();
@@ -297,10 +297,10 @@ SQL;
                     $pathNode = $xml->getElementsByTagName('html_resource_url')->item(0);
                     $this->urlPath = $pathNode->nodeValue;
                 }
-                
+
                 // Generate a file URL
                 $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
-                    
+
                 // Create the file
                 $email = $_SERVER['PHP_AUTH_USER'];
                 $pw = $_SERVER['PHP_AUTH_PW'];
@@ -323,7 +323,7 @@ SQL;
                     FROM
                         ext_html_page
                     WHERE
-                        page_id = :pageId 
+                        page_id = :pageId
                 ON DUPLICATE KEY UPDATE
                      page_id = VALUES(page_id)
                     ,html_path = VALUES(html_path)
@@ -346,27 +346,27 @@ SQL;
                     break;
                 }
             }
-            
+
             // Success
             $this->getAction();
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
-            
+
             // Append the file URL to the output
             $this->resourceData['fileUrl'] = $fileUrl;
-            
+
         } while (false);
-        
+
         return $this->resourceData;
-  
+
     }
-    
-    
-    public function getAction() { 
+
+
+    public function getAction() {
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
-        
+
         do {
             // GET requests require authentication at this endpoint.
             $userId = $this->authenticateUser();
@@ -375,7 +375,7 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // OK so far? Build the query.
             $sql = <<<SQL
                 SELECT
@@ -419,7 +419,7 @@ SQL;
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchAll();
             }
-            
+
             if ($result) {
                 // Process the response
                 foreach ($result as $row) {
@@ -450,9 +450,9 @@ SQL;
     }
 
     public function deleteAction() {
-        
+
         $conn = $this->pageViewReference->getSQLConn();
-        
+
         // Query the database for the file vector.
         $id = $this->validateIntParameter('id');
         $sql = <<<SQL
@@ -470,13 +470,13 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-            
+
             // Set up client.
             $clientState = $this->setupClient(intval($id));
             // Client setup successfully?
             if ($clientState == 1)
                 break;
-            
+
             // Call parent - This will requre authentication.
             parent::deleteAction();
 
@@ -494,7 +494,7 @@ SQL;
             }
 
         } while (false);
-        
+
         return $this->resourceData;
     }
 }

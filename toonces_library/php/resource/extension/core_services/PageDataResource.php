@@ -552,7 +552,7 @@ SQL;
 SQL;
 
             $sql = sprintf($sql, $updateFieldsStr);
-            
+
             if (!empty($updateFields)) {
                 try {
                     $stmt = $conn->prepare($sql);

@@ -309,8 +309,8 @@ SQL;
         echo('Failed to create Core Services API (Content pages): ' . $e->getMessage());
         throw $e;
     }
-    
-    
+
+
     // Blogs endpoint
     $sql = <<<SQL
         SELECT CREATE_PAGE (

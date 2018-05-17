@@ -3,24 +3,24 @@
  * @author paulanderson
  * HtmlFieldValidator.php
  * Initial commit: Paul Anderson, 5/5/2018
- * 
+ *
  * Extends StringFieldValidator to validate HTML strings.
- * 
+ *
  */
 
 require_once LIBPATH.'php/toonces.php';
 
 class HtmlFieldValidator extends StringFieldValidator implements  iFieldValidator {
-    
+
     function recursivelyDetectJs($tidyNode) {
-        // Iterates recursively through tidyNode objects and detects whether there is a 
+        // Iterates recursively through tidyNode objects and detects whether there is a
         // JavaScript node.
 
         $hasScript = false;
         // Is the node's name 'script'?
         if ($tidyNode->name == 'script') {
             $hasScript = true;
-            
+
         } elseif ($tidyNode->hasChildren()) {
             // If it has children, iterate.
             $children = $tidyNode->child;
@@ -28,35 +28,35 @@ class HtmlFieldValidator extends StringFieldValidator implements  iFieldValidato
                 $hasScript = $this->recursivelyDetectJs($child);
                 if ($hasScript) {
                     break;
-                 }            
+                 }
             }
         }
         return $hasScript;
-        
+
     }
-    
+
     function detectScripts($data) {
         /**
          * Checks if there's any Javascript.
-         * 
+         *
          */
         // Parse the HTML using tidy.
         $tidy = tidy_parse_string($data);
-        
+
         $root = $tidy->root();
         $scriptDetected = $this->recursivelyDetectJs($root);
 
         return !$scriptDetected;
-        
-        
+
+
     }
-    
+
     public function validateData($data) {
         /**
          * @override StringFieldValidator->validateData
-         * 
+         *
          */
-        
+
         // First - call parent to verify that the data is a string and under character limit (if applicable)
         $dataValid = parent::validateData($data);
 
@@ -64,7 +64,7 @@ class HtmlFieldValidator extends StringFieldValidator implements  iFieldValidato
             // Invalidated by parent?
             if (!$dataValid)
                 break;
-            
+
             // Scripts detectdd?
             $dataValid = $this->detectScripts($data);
             if (!$dataValid) {

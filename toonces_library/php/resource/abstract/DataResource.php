@@ -156,7 +156,7 @@ SQL;
 
             if (!empty($invalidFields)) {
                  // One or more fields had bogus data.
-                
+
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $errorArray = array();
                 foreach($invalidFields as $invalidKey => $value) {
@@ -164,7 +164,7 @@ SQL;
                 }
                 $this->statusMessage = implode(', ', $errorArray);
                 break;
-            }            
+            }
             // If we've made it this far, we're OK.
             $postValid = true;
 

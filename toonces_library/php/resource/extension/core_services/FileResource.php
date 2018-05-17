@@ -52,8 +52,8 @@ class FileResource extends ApiResource implements iResource {
         // Acquire page ID if not set.
         if (!isset($this->pageId))
             $this->pageId = $this->pageViewReference->pageId;
-        
-            
+
+
         $filename = preg_replace('~^.+/~', '', $this->requestPath);
         $fileVector = $this->resourcePath . $filename;
 

@@ -1,12 +1,12 @@
 <?php
 /**
  * @author paulanderson
- * 
+ *
  * ExtHtmlResource.php
  * Initial commit: 4/25/2018
- * 
+ *
  * Acquires HTML content from a file referenced by the table ext_html_page table.
- * 
+ *
 */
 
 require_once LIBPATH.'php/toonces.php';
@@ -14,7 +14,7 @@ require_once LIBPATH.'php/toonces.php';
 class ExtHtmlResource extends HTMLResource implements iResource {
 
     function getResource() {
-        // Query the database for this page's content HTML file 
+        // Query the database for this page's content HTML file
         $conn = $this->pageViewReference->getSQLConn();
 
         $sql = 'SELECT html_path, client_class FROM ext_html_page WHERE page_id = :pageId';
@@ -27,7 +27,7 @@ class ExtHtmlResource extends HTMLResource implements iResource {
 
         // Dynamically instantiate a client.
         $client = new $clientClass;
-        
+
         // Get the HTML resource.
         $this->html = $client->get($htmlPath);
         /*
@@ -39,7 +39,7 @@ class ExtHtmlResource extends HTMLResource implements iResource {
             throw $e;
         }
         */
-        
+
         return $this->html;
     }
 }
