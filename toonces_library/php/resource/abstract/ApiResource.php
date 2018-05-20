@@ -41,6 +41,11 @@ abstract class ApiResource extends Resource implements iResource {
     }
 
     // execution method
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     public function getResource() {
 
         // Get the resource URI if it hasn't already been set externally

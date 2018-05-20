@@ -248,12 +248,12 @@ SQL;
         return $userHasAccess;
     }
 
+    /**
+     * Called by abstract ApiResource::getResource.
+     * Performs authentication, validation and execution of a POST request.
+     * @return object (array), $this->resourceData
+     */
     function postAction() {
-        /**
-         * Called by abstract ApiResource::getResource.
-         * Performs authentication, validation and execution of a POST request.
-         * @return object (array), $this->resourceData
-         */
 
         $conn = $this->pageViewReference->getSQLConn();
         // Set up field validators
@@ -263,7 +263,7 @@ SQL;
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
 
         // Set defaults.
-        if (!isset($this->resourceData['pageLinkText']))
+        if (!isset($this->resourceData['pageLinkText']) && isset($this->resourceData['pageTitle']))
             $this->resourceData['pageLinkText'] = $this->resourceData['pageTitle'];
 
         if (!isset($this->resourceData['redirectOnError']))
@@ -415,7 +415,6 @@ SQL;
 
         // Build fields
         $this->buildFields();
-        $conn = $this->pageViewReference->getSqlConn();
 
         // Allow nulls on certain fields
         $this->fields['ancestorPageId']->allowNull = true;

@@ -407,7 +407,7 @@ SQL;
 
         // DELETE unpublished page without any login
         $this->unsetBasicAuth();
-        $bdr->parameters['id'] = strval($blodId);
+        $bdr->parameters['id'] = strval($blogId);
         $noLoginResult = $bdr->deleteAction();
         $noLoginStatus = $bdr->httpStatus;
 
@@ -419,7 +419,7 @@ SQL;
 
         // DELETE unpublished page without admin login
         $this->setNonAdminAuth();
-        $bdr->parameters['id'] = strval($blodId);
+        $bdr->parameters['id'] = strval($blogId);
         $nonAdminResult = $bdr->deleteAction();
         $nonAdminStatus = $bdr->httpStatus;
 

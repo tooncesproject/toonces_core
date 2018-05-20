@@ -169,7 +169,7 @@ SQL;
 		$bruteForce = $this->checkBruteForce(
 		       $loginAttemptVars['httpClientIp']
 		      ,$loginAttemptVars['httpXForwardedFor']
-		      ,$loginAttemptVars['remoteAddr']
+		      ,$loginAttemptVars['httpRemoteAddr']
 		);
 
 		// if successful, begin session

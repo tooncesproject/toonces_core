@@ -35,7 +35,7 @@ class FileResourceClient implements iResourceClient {
     function get($url) {
         $fileResource = new FileResource(null);
         $fileResource->resourcePath = $this->getResourcePath();
-        $fileResource->requreAuthentication = false;
+        $fileResource->requireAuthentication = false;
         $fileResource->requestPath = $url;
         $fileVector = $fileResource->getAction();
 

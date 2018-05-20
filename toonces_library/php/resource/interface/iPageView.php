@@ -14,7 +14,14 @@ interface iPageView
     public function setPageURI($paramPageURI);
     public function getPageURI();
 
+    /**
+     * @param PDO $paramSQLConn
+     */
     public function setSQLConn($paramSQLConn);
+
+    /**
+     * @return PDO]
+     */
     public function getSQLConn();
 
     public function setPageLinkText($paramPageLinkText);

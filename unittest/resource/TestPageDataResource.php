@@ -376,14 +376,14 @@ SQL;
 SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['pageId' => $newPageId]);
-        $result = $stmt->fetchAll;
-        $insertedPageTitle = $result[0][0];
-        $insertedPathName = $result[0][1];
-        $insertedPageBuilderClass = $result[0][2];
-        $insertedPageViewClass = $result[0][3];
-        $insertedRedirectOnError = $result[0][4];
-        $insertedPublished = $result[0][5];
-        $insertedPageTypeId = $result[0][6];
+        $result = $stmt->fetchAll();
+        $insertedPageTitle = $result[0]['page_title'];
+        $insertedPathName = $result[0]['pathname'];
+        $insertedPageBuilderClass = $result[0]['pagebuilder_class'];
+        $insertedPageViewClass = $result[0]['pageview_class'];
+        $insertedRedirectOnError = boolval($result[0]['redirect_on_error']);
+        $insertedPublished = boolval($result[0]['published']);
+        $insertedPageTypeId = intval($result[0]['pagetype_id']);
 
 
         // ASSERT
@@ -418,13 +418,14 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse'), $goodStatus);
 
         // POST with valid input created a record in the database.
-        $this->assertSame($validResult['pageTitle'], $insertedPageTitle);
-        $this->assertSame($validResult['pathName'], $insertedPathName);
-        $this->assertSame($validResult['pageBuilderClass'], $insertedPageBuilderClass);
-        $this->assertSame($validResult['pageViewClass'], $insertedPageViewClass);
-        $this->assertSame($validResult['redirectOnError'], $insertedRedirectOnError);
-        $this->assertSame($validResult['published'], $insertedPublished);
-        $this->assertSame($validResult['pageTypeId'], $insertedPageTypeId);
+
+        $this->assertSame($validResult[$newPageId]['pageTitle'], $insertedPageTitle);
+        $this->assertSame($validResult[$newPageId]['pathName'], $insertedPathName);
+        $this->assertSame($validResult[$newPageId]['pageBuilderClass'], $insertedPageBuilderClass);
+        $this->assertSame($validResult[$newPageId]['pageViewClass'], $insertedPageViewClass);
+        $this->assertSame($validResult[$newPageId]['redirectOnError'], $insertedRedirectOnError);
+        $this->assertSame($validResult[$newPageId]['published'], $insertedPublished);
+        $this->assertSame($validResult[$newPageId]['pageTypeId'], $insertedPageTypeId);
 
     }
 
@@ -513,7 +514,7 @@ SQL;
         $this->setNonAdminAuth();
         $pdr->parameters['id'] = strval($unpublishedPageId);
         $pdr->resourceData = $validPost;
-        $nonAdminResult = $pdr->putAction();
+        $pdr->putAction();
         $nonAdminStatus = $pdr->httpStatus;
 
         // PUT with invalid pathName returns 400 error
@@ -568,16 +569,14 @@ SQL;
 SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['pageId' => $unpublishedPageId]);
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $newPageId]);
-        $result = $stmt->fetchAll;
-        $insertedPageTitle = $result[0][0];
-        $insertedPathName = $result[0][1];
-        $insertedPageViewClass = $result[0][3];
-        $insertedPageBuilderClass = $result[0][2];
-        $insertedRedirectOnError = $result[0][4];
-        $insertedPublished = $result[0][5];
-        $insertedPageTypeId = $result[0][6];
+        $result = $stmt->fetchAll();
+        $insertedPageTitle = $result[0]['page_title'];
+        $insertedPathName = $result[0]['pathname'];
+        $insertedPageViewClass = $result[0]['pageview_class'];
+        $insertedPageBuilderClass = $result[0]['pagebuilder_class'];
+        $insertedRedirectOnError = boolval($result[0]['redirect_on_error']);
+        $insertedPublished = boolval($result[0]['published']);
+        $insertedPageTypeId = intval($result[0]['pagetype_id']);
 
 
         // ASSERT
@@ -606,13 +605,13 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $validPutStatus);
 
         // Page record is updated in database
-        $this->assertSame($validResult['pageTitle'], $insertedPageTitle);
-        $this->assertSame($validResult['pathName'], $insertedPathName);
-        $this->assertSame($validResult['pageViewClass'], $insertedPageViewClass);
-        $this->assertSame($validResult['pageBuilderClass'], $insertedPageBuilderClass);
-        $this->assertSame($validResult['redirectOnError'], $insertedRedirectOnError);
-        $this->assertSame($validResult['published'], $insertedPublished);
-        $this->assertSame($validResult['pageTypeId'], $insertedPageTypeId);
+        $this->assertSame($validResult[$unpublishedPageId]['pageTitle'], $insertedPageTitle);
+        $this->assertSame($validResult[$unpublishedPageId]['pathName'], $insertedPathName);
+        $this->assertSame($validResult[$unpublishedPageId]['pageViewClass'], $insertedPageViewClass);
+        $this->assertSame($validResult[$unpublishedPageId]['pageBuilderClass'], $insertedPageBuilderClass);
+        $this->assertSame($validResult[$unpublishedPageId]['redirectOnError'], $insertedRedirectOnError);
+        $this->assertSame($validResult[$unpublishedPageId]['published'], $insertedPublished);
+        $this->assertSame($validResult[$unpublishedPageId]['pageTypeId'], $insertedPageTypeId);
 
     }
 

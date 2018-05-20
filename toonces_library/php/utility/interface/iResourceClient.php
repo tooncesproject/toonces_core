@@ -13,8 +13,8 @@ include_once LIBPATH.'php/toonces.php';
 interface iResourceClient {
 
     function getHttpStatus();
-    function get($url);
-    function put($url, $data);
-    function delete($url);
+    function get($url, $username = null, $password = null, $paramHeaders = array());
+    function put($url, $data, $username = null, $password = null, $paramHeaders = array());
+    function delete($url, $username = null, $password = null, $paramHeaders = array());
 
 }

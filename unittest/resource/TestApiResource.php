@@ -16,6 +16,10 @@ require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 class ConcreteApiResource extends ApiResource {
     // inherits all functionality
+    public function getResource()
+    {
+        return parent::getResource();
+    }
 }
 
 class TestApiResource extends SqlDependentTestCase {
@@ -63,10 +67,10 @@ class TestApiResource extends SqlDependentTestCase {
                 $this->assertTrue(is_int(intval($goodLogin)));
     }
 
-    public function testGetResource() {
-        // This test also covers the "action" methods of the abstract class.
-        //
-
+    /**
+     * @expectedException Exception
+     */
+    public function testGetResourceException() {
         // ARRANGE
         // Instantiate base objects
         $jsonPageView = new JsonPageView(1);
@@ -85,16 +89,42 @@ class TestApiResource extends SqlDependentTestCase {
         // Try it with no HTTP verb
 
         if (isset($_SERVER['REQUEST_METHOD'])) {
-                unset($_SERVER['REQUEST_METHOD']);
+            unset($_SERVER['REQUEST_METHOD']);
         }
 
         $caughtException = false;
         try {
-            $ar->getResource;
+            $ar->getResource();
         } finally {
             $caughtException = true;
         }
 
+        // ASSERT
+
+        // No HTTP verb
+        $this->assertTrue($caughtException);
+
+    }
+
+
+    public function testGetResource() {
+        // This test also covers the "action" methods of the abstract class.
+        //
+
+        // ARRANGE
+        // Instantiate base objects
+        $jsonPageView = new JsonPageView(1);
+        $ar = new ConcreteApiResource($jsonPageView);
+        $testObjectArray = array('testObject' => 'foo');
+        $ar->dataObjects = $testObjectArray;
+
+        // Inject HTTP host
+        $_SERVER['HTTP_HOST'] = 'example.com';
+
+        // Inject Resource URI
+        $ar->resourceUri = 'path';
+
+        // ACT
         // Call the method with each "supported" HTTP verb.
         // Also, we include the required content-type header.
 
@@ -137,11 +167,8 @@ class TestApiResource extends SqlDependentTestCase {
         $connectResult = $ar->getResource();
         $connectStatus = $ar->httpStatus;
 
+
         // ASSERT
-
-        // No HTTP verb
-        $this->assertTrue($caughtException);
-
         // GET
         // Only one assertion for $testObjectArray - We just wanna know it will return something.
         $this->assertSame($testObjectArray, $getResult);

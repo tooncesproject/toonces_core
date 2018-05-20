@@ -501,7 +501,7 @@ SQL;
 
         // Non-authenticated GET returns 401 error.
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $nonAuthStatus);
-        $this->assertEmpty($noAuthResult);
+        $this->assertEmpty($nonAuthResult);
 
     }
 

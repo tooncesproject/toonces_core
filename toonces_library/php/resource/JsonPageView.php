@@ -14,6 +14,9 @@ require_once LIBPATH.'php/toonces.php';
 class JsonPageView extends ApiPageView implements iPageView, iResource
 {
 
+    /**
+     * @throws Exception
+     */
     public function renderPage() {
         // Called by index.php - Converts the resource data to JSON, executes the server's response.
         $dataObject = $this->getResource();
@@ -27,7 +30,10 @@ class JsonPageView extends ApiPageView implements iPageView, iResource
         // Once executed, the resource must have an HTTP status.
         // If it doesn't, throw an exception.
         $httpStatus = $dataObject->httpStatus;
-        $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
+        $httpStatusString = null;
+        if (isset($httpStatus))
+            $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
+
         if (!$httpStatusString)
             throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
 
