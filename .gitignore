@@ -30,6 +30,7 @@ toonces_dash_mockup.html
 # external libraries
 ckeditor
 go-pear.phar
+phpunit-6.5.8.phar
 
 # EB stuff
 .elasticbeanstalk
