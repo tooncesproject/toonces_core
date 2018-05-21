@@ -1,50 +1,55 @@
 <?php
 /**
  * @author paulanderson
- * TestJsonPageView.php
- * Initial Commit: Paul Anderson, 4/25/2018
+ * FilePageViewTest.php
+ * Initial commit: Paul Anderson, 4/28/2018
  *
- * // Unit test for JsonPageView class
+ * Unit test for the FilePageView class.
  *
-*/
+ */
 
 use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
 // Setting up some concrete DataResource objects for testing
-class GoodDataResource extends DataResource {
+class GoodFileResource extends FileResource {
     function getResource() {
-        $testData = array('foo' => 'bar');
+        $testData = array('example.com/barf');
         $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPStatus');
         return $testData;
     }
 }
 
-class BadDataResource extends DataResource {
+class BadFileResource extends FileResource {
     function getResource() {
-        $testData = array('foo' => 'bar');
+        $testData = array('example.com/barf');
         $this->httpStatus = null;
         return $testData;
     }
 }
 
-class TestJsonPageView extends TestCase {
+class FilePageViewTest extends TestCase {
+
 
     /**
      * @expectedException Exception
      */
     function testRenderPage() {
+        // Notes: Without a wrapper, PHPUnit doesn't include a way to test the
+        // readfile() output of this class.
+        // We'll lean on integration testing and/or trust that the PHP-native functions
+        // actually work.
         // ARRANGE
-        $jpv = new JsonPageView(1);
-        $goodDataResource = new GoodDataResource($jpv);
-        $badDataResource = new BadDataResource($jpv);
+        $jpv = new FilePageview(1);
+        $goodFileResource = new GoodFileResource($jpv);
+        $badFileResource = new BadFileResource($jpv);
         $badOutput = null;
         $goodOutput = null;
 
         // ACT
         // With invalid DataResource
-        $jpv->dataObjects = array(0 => $badDataResource );
+        $jpv->dataObjects = array(0 => $badFileResource );
 
         $errorState = false;
         try {
@@ -54,15 +59,13 @@ class TestJsonPageView extends TestCase {
         }
 
         // with valid DataResource
-        $jpv->dataObjects = array(0 => $goodDataResource );
+        $jpv->dataObjects = array(0 => $goodFileResource );
         $goodOutput = $jpv->renderPage();
-        json_decode($goodOutput);
 
         // ASSERT
         $this->assertNull($badOutput);
         $this->assertTrue($errorState);
-        $this->assertTrue(is_array($goodOutput));
-        $this->assertTrue(json_last_error() == JSON_ERROR_NONE);
+        $this->assertSame('example.com/barf', $goodOutput);
 
     }
 }

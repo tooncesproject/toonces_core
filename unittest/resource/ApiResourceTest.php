@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestApiResource.php
+ * ApiResourceTest.php
  * Initial commit: Paul Anderson, 4/27/2018
  *
  * Unit tests for the ApiResource abstract class
@@ -22,7 +22,7 @@ class ConcreteApiResource extends ApiResource {
     }
 }
 
-class TestApiResource extends SqlDependentTestCase {
+class ApiResourceTest extends SqlDependentTestCase {
 
     public function testAuthenticateUser() {
         // ARRANGE

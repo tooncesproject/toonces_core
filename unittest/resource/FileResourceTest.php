@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestFileResource.php
+ * FileResourceTest.php
  * Initial commit: Paul Anderson, 4/27/2018
  *
  * Unit tests for the FileResource class.
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../FileDependentTestCase.php';
 
-class TestFileResource extends FileDependentTestCase {
+class FileResourceTest extends FileDependentTestCase {
 
 
     /**

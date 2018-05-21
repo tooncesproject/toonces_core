@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestPageDataResource.php
+ * PageDataResourceTest.php
  * Initial commit: Paul Anderson, 5/2/2018
  *
  * Unit tests for the PageApiResource class.
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestPageDataResource extends SqlDependentTestCase {
+class PageDataResourceTest extends SqlDependentTestCase {
 
     function testValidatePathName() {
         // ARRANGE

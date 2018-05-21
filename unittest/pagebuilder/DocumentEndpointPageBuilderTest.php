@@ -1,10 +1,10 @@
 <?php
 /**
  * @author paulanderson
- * TestPageApiPageBuilder.php
- * Initial commit: 5/5/2018
+ * DocumentEndpointPageBuilderTest.php
+ * Initial commit: 4/29/2018
  *
- * Unit tests for the PageApiPageBuilder class
+ * Unit tests for the DocumentEndpointPageBuilder class
  */
 
 use PHPUnit\Framework\TestCase;
@@ -12,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
-class TestPageApiPageBuilder extends TestCase {
+class DocumentEndpointPageBuilderTest extends TestCase {
 
     function testBuildPage() {
         // ARRANGE
         $pageView = new FilePageview(1);
-        $builder = new PageApiPageBuilder($pageView);
+        $builder = new DocumentEndpointPageBuilder($pageView);
 
         // ACT
         $array = $builder->buildPage();
@@ -25,7 +25,7 @@ class TestPageApiPageBuilder extends TestCase {
 
         // ASSERT
         // Builder creates resource
-        $this->assertInstanceOf(PageDataResource::class, $resource);
+        $this->assertInstanceOf(FileResource::class, $resource);
 
     }
 }

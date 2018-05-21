@@ -16,30 +16,30 @@ Initial Commit: Paul Anderson, 12/11/2017
 	</php>
 	<testsuites>
 		<testsuite name="installers">
-			<file>unittest/install/TestSetupDatabase.php</file>
+			<file>unittest/install/SetupDatabaseTest.php</file>
 		</testsuite>
 		<testsuite name="resources">
-			<file>unittest/resource/TestApiPageView.php</file>
-			<file>unittest/resource/TestJsonPageView.php</file>
-			<file>unittest/resource/TestFilePageView.php</file>
-			<file>unittest/resource/TestApiResource.php</file>
-			<file>unittest/resource/TestDataResource.php</file>
-			<file>unittest/resource/TestBlogDataResource.php</file>
-			<file>unittest/resource/TestHTMLPageView.php</file>
-			<file>unittest/resource/TestHTMLResource.php</file>
-			<file>unittest/resource/TestHTMLViewResource.php</file>
-			<file>unittest/resource/TestFileResource.php</file>
-			<file>unittest/resource/TestPageDataResource.php</file>
-			<file>unittest/resource/TestExtHtmlPageResource.php</file>
+			<file>unittest/resource/ApiPageViewTest.php</file>
+			<file>unittest/resource/JsonPageViewTest.php</file>
+			<file>unittest/resource/FilePageViewTest.php</file>
+			<file>unittest/resource/ApiResourceTest.php</file>
+			<file>unittest/resource/DataResourceTest.php</file>
+			<file>unittest/resource/BlogDataResourceTest.php</file>
+			<file>unittest/resource/HtmlPageViewTest.php</file>
+			<file>unittest/resource/HtmlResourceTest.php</file>
+			<file>unittest/resource/HtmlViewResourceTest.php</file>
+			<file>unittest/resource/FileResourceTest.php</file>
+			<file>unittest/resource/PageDataResourceTest.php</file>
+			<file>unittest/resource/ExtHtmlPageResourceTest.php</file>
 		</testsuite>
 		<testsuite name="pagebuilders">
-			<file>unittest/pagebuilder/TestPageApiPageBuilder.php</file>
-			<file>unittest/pagebuilder/TestExtHtmlPageBuilder.php</file>
-			<file>unittest/pagebuilder/TestDocumentEndpointPageBuilder.php</file>
+			<file>unittest/pagebuilder/PageApiPageBuilderTest.php</file>
+			<file>unittest/pagebuilder/ExtHtmlPageBuilderTest.php</file>
+			<file>unittest/pagebuilder/DocumentEndpointPageBuilderTest.php</file>
 		</testsuite>
 		<testsuite name="utility_classes">
-			<file>unittest/utility/TestCheckPageUserAccess.php</file>
-			<file>unittest/utility/TestGrabParentPageId.php</file>
+			<file>unittest/utility/CheckPageUserAccessTest.php</file>
+			<file>unittest/utility/GrabParentPageIdTest.php</file>
 			<file>unittest/utility/LocalResourceClientTest.php</file>
 			<file>unittest/utility/HtmlFieldValidatorTest.php</file>
 		</testsuite>

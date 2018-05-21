@@ -1,6 +1,7 @@
 <?php
-/*
- * TestSetupDatabase.php
+/**
+ * @author paulanderson
+ * SetupDatabaseTest.php
  * Initial commit: Paul Anderson, 4/20/2018
  * 
  * PHPUnit test case for the Toonces database installation script.
@@ -16,7 +17,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../setupTooncesDatabase.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestSetupTooncesDatabase extends SqlDependentTestCase {
+class SetupTooncesDatabaseTest extends SqlDependentTestCase {
     
     public function testSetupDatabase() {
         
