@@ -1,6 +1,7 @@
 <?php
-/*
-* TestBlogDataResource.php
+/**
+* @author paulanderson
+* BlogDataResourceTest.php
 * Initial commit: Paul Anderson, 4/17/2018
 *
 * Unit tests for the BlogDataResource class
@@ -13,7 +14,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestBlogDataResource extends SqlDependentTestCase {
+class BlogDataResourceTest extends SqlDependentTestCase {
 
 
     function testBuildFields() {

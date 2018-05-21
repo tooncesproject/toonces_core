@@ -1,11 +1,15 @@
 <?php
+/**
+ * @author paulanderson
+ */
+
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
 
-class TestHTMLResource extends TestCase
+class HtmlResourceTest extends TestCase
 {
     public function testElementConstruct()
     {

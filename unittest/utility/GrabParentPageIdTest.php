@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestGrabParentPageId.php
+ * GrabParentPageIdTest.php
  * Initial commit: Paul Anderson, 4/2/2018
  *
  * Unit test for the static utility GrabParentPageId
@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestGrabParentPageIdTest extends SqlDependentTestCase {
+class GrabParentPageIdTest extends SqlDependentTestCase {
 
     function testGrabParentPageId() {
         // ARRANGE

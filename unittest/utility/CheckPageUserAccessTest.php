@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestCheckPageUserAccess.php
+ * CheckPageUserAccessTest.php
  * Initial Commit: Paul Anderson, 4/27/2018
  *
  * Unit test for the CheckUserAccess static utility.
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestCheckPageUserAccess extends SqlDependentTestCase {
+class CheckPageUserAccessTest extends SqlDependentTestCase {
 
     public function testCheckUserAccess() {
         // ARRANGE

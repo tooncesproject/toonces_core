@@ -2,7 +2,7 @@
 /**
  * @author paulanderson
  *
- * TestExtHtmlPageBuilder.php
+ * ExtHtmlPageBuilderTest.php
  * Initial commit: Paul Anderson, 4/25/2018
  *
  * Unit test the ExtHtmlPageBuilder class
@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class TestExtHtmlPageBuilder extends SqlDependentTestCase{
+class ExtHtmlPageBuilderTest extends SqlDependentTestCase{
 
     /**
      * @runInSeparateProcess

@@ -1,7 +1,7 @@
 <?php
-/*
+/**
  * @author paulanderson
- * TestDataResource.php
+ * DataResourceTest.php
  * Initial commit: 4/21/2018
  *
  * Unit tests for the DataResource abstract class.
@@ -19,7 +19,7 @@ class ConcreteDataResource extends DataResource {
     // No overrides or additional functionality.
 }
 
-class TestDataResource extends SqlDependentTestCase {
+class DataResourceTest extends SqlDependentTestCase {
 
 
     public function testValidateHeaders() {

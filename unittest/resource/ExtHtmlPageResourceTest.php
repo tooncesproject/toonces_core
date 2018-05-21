@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * TestExtHtmlPageResource.php
+ * ExtHtmlPageResourceTest.php
  * Unit tests for the class ExtHtmlPageResource
  *
  */
@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../FileDependentTestCase.php';
 
 
-class TestExtHtmlPageResource extends FileDependentTestCase {
+class ExtHtmlPageResourceTest extends FileDependentTestCase {
 
     function testSetupClient() {
         // ARRANGE

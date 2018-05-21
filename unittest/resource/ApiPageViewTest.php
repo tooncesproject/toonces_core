@@ -2,7 +2,7 @@
 /**
  * @author paulanderson
  *
- * TestApiPageView.php
+ * ApiPageViewTest.php
  * Initial commit: Paul Anderson, 4/25/2018
  *
  * Unit tests for the ApiPageView class
@@ -20,7 +20,7 @@ class ConcreteApiPageView extends ApiPageView {
     // No additional functionality.
 }
 
-class TestApiPageView extends SqlDependentTestCase {
+class ApiPageViewTest extends SqlDependentTestCase {
 
     // We will omit unit tests for simple setter/getter methods.
     // I'm not THAT pedantic. --Paul
