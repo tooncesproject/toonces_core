@@ -12,14 +12,25 @@ require_once LIBPATH.'php/toonces.php';
 
 class ExtHtmlPageResource extends PageDataResource implements iResource {
 
+    /**
+     * @var iResourceClient
+     */
     var $client;
+    /**
+     * @var string
+     */
     var $urlPath;
 
+    /**
+     * @param int $pageId
+     * @return int
+     */
     function setupClient($pageId = null) {
+        // woo!
         $conn = $this->pageViewReference->getSQLConn();
-
+        $clientClass = null;
         if (isset($this->resourceData['clientClass']))
-            $clientClass = $this->resourceData['clientClass'];
+        $clientClass = $this->resourceData['clientClass'];
 
         // Only instantiate the client if it hasn't been set externally
         // (Unit tests will set a "dummy" client)
@@ -47,11 +58,11 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
     }
 
 
+    /**
+     * Override PageDataResource->buildFields to create fields specific to
+     * ExtHtmlPageResource
+     */
     function buildFields() {
-        /**
-         * @override PageDataResource->buildFields to create fields specific to
-         * ExtHtmlPageResource
-         */
         // Call PageDataResource-buildFields
         parent::buildFields();
         // Make some fields optional
@@ -69,11 +80,11 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
 
     }
 
-
+    /**
+     * override PageDataResource->postAction
+     * @return array
+     */
     function postAction() {
-        /**
-         * @override PageDataResource->postAction
-         */
 
         $conn = $this->pageViewReference->getSQLConn();
 
@@ -215,7 +226,9 @@ SQL;
         return $this->resourceData;
     }
 
-
+    /**
+     * @return array
+     */
     public function putAction() {
         $conn = $this->pageViewReference->getSQLConn();
         // Acquire the PUT body (if not already set)
@@ -261,18 +274,17 @@ SQL;
 
             // Call parent
             parent::putAction();
-            $putResult = null;
             // Page record updated successfully?
             if ($this->httpStatus != Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse')) {
                 break;
             } else {
-                $putResult = parent::getAction();
+                parent::getAction();
             }
 
             // If htmlBody was set, upload the document and update ext_html_page
             $pageId = $this->parameters['id'];
 
-
+            $fileUrl = null;
             if ($htmlBody) {
                 // Attempt to instantiate the client
                 $clientStatus = $this->setupClient($pageId);
@@ -304,7 +316,7 @@ SQL;
                 // Create the file
                 $email = $_SERVER['PHP_AUTH_USER'];
                 $pw = $_SERVER['PHP_AUTH_PW'];
-                $clientResponse = $this->client->put($fileUrl, $htmlBody, $email, $pw);
+                $this->client->put($fileUrl, $htmlBody, $email, $pw);
                 $clientStatus = $this->client->getHttpStatus();
                 if ($clientStatus != 200 && $clientStatus != 201) {
                     $this->httpStatus = $clientStatus;
@@ -360,7 +372,9 @@ SQL;
 
     }
 
-
+    /**
+     * @return array
+     */
     public function getAction() {
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
@@ -449,6 +463,9 @@ SQL;
         return $this->resourceData;
     }
 
+    /**
+     * @return array
+     */
     public function deleteAction() {
 
         $conn = $this->pageViewReference->getSQLConn();

@@ -15,10 +15,11 @@ require_once __DIR__ . '../../FileDependentTestCase.php';
 
 class TestFileResource extends FileDependentTestCase {
 
+
     /**
      * @expectedException Exception
      */
-    function testGetResource() {
+    function testGetResourceExcNull() {
         // ARRANGE
         // Check the file fixture per FileDependentTestCase.
         $this->checkFileFixture();
@@ -30,45 +31,62 @@ class TestFileResource extends FileDependentTestCase {
         // Proceed
         $pv = new FilePageview(1);
         $pv->setSQLConn($this->getConnection());
-        $fr = new FileResource($pageView);
+        $fr = new FileResource($pv);
         $testData = 'look here is some data' .PHP_EOL;
         $fr->resourceData = $testData;
         $fr->httpMethod = 'OPTIONS';
 
         // ACT
         // Call without resourcePath - Expect exception.
-        $noPathErrorState = false;
-        try {
-            $fr->getResource();
-        } finally {
-            $noPathErrorState = true;
-        }
+        $fr->getResource();
 
+    }
+
+    /**
+     * @expectedException Exception
+     * @depends testGetResourceExcNull
+     */
+    function testGetResourceExcBogus() {
+        // ARRANGE
+        $pv = new FilePageview(1);
+        $pv->setSQLConn($this->getConnection());
+        $fr = new FileResource($pv);
+        $testData = 'look here is some data' .PHP_EOL;
+        $fr->resourceData = $testData;
+        $fr->httpMethod = 'OPTIONS';
+
+        // ACT
         // Call with bogus resource path - Except exception.
-        $bogusPathErrorState = false;
         $fr->resourcePath = '/foo/foo/foo';
-        try {
-            $fr->getResource();
-        } finally {
-            $bogusPathErrorState = true;
-        }
+        $fr->getResource();
 
+    }
+
+
+    /**
+     * @depends testGetResourceExcBogus
+     */
+    function testGetResource() {
+        // ARRANGE
+        $pv = new FilePageview(1);
+        $pv->setSQLConn($this->getConnection());
+        $fr = new FileResource($pv);
+        $testData = 'look here is some data' .PHP_EOL;
+        $fr->resourceData = $testData;
+        $fr->httpMethod = 'OPTIONS';
+
+        // ACT
         // Call with OK resource path - Expect parent class (ApiResource) operations
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $validResponse = $fr->getResource();
-        $resourceUri = $fr->resourceUri;
+
 
         // ASSERT
-        // Call without resourcePath - Expect exception.
-        $this->assertTrue($noPathErrorState);
-
-        // Call with bogus resource path - Except exception.
-        $this->assertTrue($bogusPathErrorState);
-
         // Call with OK resource path - Expect parent class (ApiResource) operations
         $this->assertSame($testData, $validResponse);
 
     }
+
 
     /**
      * @depends testGetResource
@@ -100,8 +118,8 @@ class TestFileResource extends FileDependentTestCase {
         if (file_exists($testFileVector))
             unlink($testFileVector);
 
-        // ACT
 
+        // ACT
         // Attempt a PUT without authentication
         $this->unsetBasicAuth();
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
@@ -209,7 +227,7 @@ class TestFileResource extends FileDependentTestCase {
 
         // Attempt a GET without authentication where authentication is required
         $this->unsetBasicAuth();
-        $fr->requreAuthentication = true;
+        $fr->requireAuthentication = true;
         $fr->requestPath = $requestPath;
         $noAuthResult = $fr->getAction();
         $noAuthStatus = $fr->httpStatus;
@@ -229,7 +247,7 @@ class TestFileResource extends FileDependentTestCase {
         // Attempt a GET without authentication where authentication is not required
         $fr->resourceData = null;
         $this->unsetBasicAuth();
-        $fr->requreAuthentication = false;
+        $fr->requireAuthentication = false;
         $publicAccessResult = $fr->getAction();
         $publicAccessStatus = $fr->httpStatus;
         $publicAccessContent = file_get_contents($publicAccessResult);

@@ -20,6 +20,14 @@ abstract class SqlDependentTestCase extends TestCase
     static private $pdo = null;
     private $conn;
 
+    protected function setUp() {
+        // Set server variables so xdebug doesn't break the unit tests
+        $_SERVER['REQUEST_METHOD'] = null;
+        $_SERVER['QUERY_STRING'] = '';
+        $_SERVER['HTTP_USER_AGENT'] = '';
+        $_SERVER['REMOTE_ADDR'] = null;
+    }
+
     final public function getConnection() {
         if ($this->conn === null) {
             if (self::$pdo == null) {

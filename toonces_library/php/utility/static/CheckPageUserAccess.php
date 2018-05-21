@@ -35,8 +35,12 @@ SQL;
         $sqlParams = array('userId' => $userId, 'pageId' => $pageId);
         $stmt->execute($sqlParams);
         $result = $stmt->fetchAll();
-        $readAccessStr = $result[0][0];
-        $writeAccessStr = $result[0][1];
+        $readAccessStr = '';
+        $writeAccessStr = '';
+        if ($result) {
+            $readAccessStr = $result[0][0];
+            $writeAccessStr = $result[0][1];
+        }
         $userHasReadAccess = !empty($readAccessStr);
         $userHasWriteAccess = !empty($writeAccessStr);
 

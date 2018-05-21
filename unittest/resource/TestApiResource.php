@@ -16,6 +16,10 @@ require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 class ConcreteApiResource extends ApiResource {
     // inherits all functionality
+    public function getResource()
+    {
+        return parent::getResource();
+    }
 }
 
 class TestApiResource extends SqlDependentTestCase {
@@ -63,9 +67,37 @@ class TestApiResource extends SqlDependentTestCase {
                 $this->assertTrue(is_int(intval($goodLogin)));
     }
 
+    /**
+     * @expectedException Exception
+     */
+    public function testGetResourceException() {
+        // ARRANGE
+        // Instantiate base objects
+        $jsonPageView = new JsonPageView(1);
+        $ar = new ConcreteApiResource($jsonPageView);
+        $testObjectArray = array('testObject' => 'foo');
+        $ar->dataObjects = $testObjectArray;
+
+        // Inject HTTP host
+        $_SERVER['HTTP_HOST'] = 'example.com';
+
+        // Inject Resource URI
+        $ar->resourceUri = 'path';
+
+        // ACT
+        // Try it with no HTTP verb
+        if (isset($_SERVER['REQUEST_METHOD'])) {
+            unset($_SERVER['REQUEST_METHOD']);
+        }
+
+        // Expect Exception here
+        $ar->getResource();
+
+    }
+
+
     public function testGetResource() {
         // This test also covers the "action" methods of the abstract class.
-        //
 
         // ARRANGE
         // Instantiate base objects
@@ -81,20 +113,6 @@ class TestApiResource extends SqlDependentTestCase {
         $ar->resourceUri = 'path';
 
         // ACT
-
-        // Try it with no HTTP verb
-
-        if (isset($_SERVER['REQUEST_METHOD'])) {
-                unset($_SERVER['REQUEST_METHOD']);
-        }
-
-        $caughtException = false;
-        try {
-            $ar->getResource;
-        } finally {
-            $caughtException = true;
-        }
-
         // Call the method with each "supported" HTTP verb.
         // Also, we include the required content-type header.
 
@@ -114,34 +132,31 @@ class TestApiResource extends SqlDependentTestCase {
 
         // HEAD
         $_SERVER['REQUEST_METHOD'] = 'HEAD';
-        $headResult = $ar->getResource();
+        $ar->getResource();
         $headStatus = $ar->httpStatus;
 
         // PUT
         $_SERVER['REQUEST_METHOD'] = 'PUT';
-        $putResult = $ar->getResource();
+        $ar->getResource();
         $putStatus = $ar->httpStatus;
 
         // OPTIONS
         $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
-        $optionsResult = $ar->getResource();
+        $ar->getResource();
         $optionsStatus = $ar->httpStatus;
 
         // DELETE
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $deleteResult = $ar->getResource();
+        $ar->getResource();
         $deleteStatus = $ar->httpStatus;
 
         // CONNECT
         $_SERVER['REQUEST_METHOD'] = 'CONNECT';
-        $connectResult = $ar->getResource();
+        $ar->getResource();
         $connectStatus = $ar->httpStatus;
 
+
         // ASSERT
-
-        // No HTTP verb
-        $this->assertTrue($caughtException);
-
         // GET
         // Only one assertion for $testObjectArray - We just wanna know it will return something.
         $this->assertSame($testObjectArray, $getResult);

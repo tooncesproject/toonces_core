@@ -15,7 +15,7 @@ class FileResource extends ApiResource implements iResource {
 
     var $resourcePath;
     var $requestPath;
-    var $requreAuthentication;
+    var $requireAuthentication;
     var $conn;
     var $pageId;
 
@@ -141,7 +141,7 @@ class FileResource extends ApiResource implements iResource {
 
         do {
             // Authenticate, if required.
-            if ($this->requreAuthentication) {
+            if ($this->requireAuthentication) {
                 $userId = $this->authenticateUser();
                 if ($userId == 0) {
                     // Security through obscurity; 404 status if authentication failed.
@@ -246,6 +246,10 @@ class FileResource extends ApiResource implements iResource {
         } while (false);
     }
 
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     public function getResource() {
         // Add functionality to ApiResource::getResource - Validate the resourcePath
         if (!isset($this->resourcePath))

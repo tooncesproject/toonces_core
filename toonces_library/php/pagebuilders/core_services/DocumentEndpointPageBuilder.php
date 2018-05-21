@@ -25,7 +25,7 @@ class DocumentEndpointPageBuilder extends APIPageBuilder {
 
         $fileResource = new FileResource($this->pageViewReference);
         $fileResource->resourcePath = $path;
-        $fileResource->requreAuthentication = true;
+        $fileResource->requireAuthentication = true;
 
         array_push($this->resourceArray, $fileResource);
         return $this->resourceArray;

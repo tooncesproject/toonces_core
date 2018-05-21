@@ -12,6 +12,10 @@ require_once LIBPATH.'php/toonces.php';
 
 class FilePageview extends ApiPageView implements iPageView, iResource {
 
+    /**
+     * @throws Exception
+     * @return string
+     */
     public function renderPage() {
         // Called by index.php - Serves a file download, if applicable.
 
@@ -24,7 +28,9 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
         // Once executed, the resource must have an HTTP status.
         // If it doesn't, throw an exception.
         $httpStatus = $dataObject->httpStatus;
-        $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
+        $httpStatusString = null;
+        if (isset($httpStatus))
+            $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
         if (!$httpStatusString)
             throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
 
