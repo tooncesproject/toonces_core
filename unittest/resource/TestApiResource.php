@@ -85,31 +85,19 @@ class TestApiResource extends SqlDependentTestCase {
         $ar->resourceUri = 'path';
 
         // ACT
-
         // Try it with no HTTP verb
-
         if (isset($_SERVER['REQUEST_METHOD'])) {
             unset($_SERVER['REQUEST_METHOD']);
         }
 
-        $caughtException = false;
-        try {
-            $ar->getResource();
-        } finally {
-            $caughtException = true;
-        }
-
-        // ASSERT
-
-        // No HTTP verb
-        $this->assertTrue($caughtException);
+        // Expect Exception here
+        $ar->getResource();
 
     }
 
 
     public function testGetResource() {
         // This test also covers the "action" methods of the abstract class.
-        //
 
         // ARRANGE
         // Instantiate base objects
@@ -144,27 +132,27 @@ class TestApiResource extends SqlDependentTestCase {
 
         // HEAD
         $_SERVER['REQUEST_METHOD'] = 'HEAD';
-        $headResult = $ar->getResource();
+        $ar->getResource();
         $headStatus = $ar->httpStatus;
 
         // PUT
         $_SERVER['REQUEST_METHOD'] = 'PUT';
-        $putResult = $ar->getResource();
+        $ar->getResource();
         $putStatus = $ar->httpStatus;
 
         // OPTIONS
         $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
-        $optionsResult = $ar->getResource();
+        $ar->getResource();
         $optionsStatus = $ar->httpStatus;
 
         // DELETE
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $deleteResult = $ar->getResource();
+        $ar->getResource();
         $deleteStatus = $ar->httpStatus;
 
         // CONNECT
         $_SERVER['REQUEST_METHOD'] = 'CONNECT';
-        $connectResult = $ar->getResource();
+        $ar->getResource();
         $connectStatus = $ar->httpStatus;
 
 

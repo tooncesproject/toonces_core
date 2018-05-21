@@ -40,8 +40,8 @@ abstract class ApiResource extends Resource implements iResource {
         return $userID;
     }
 
-    // execution method
 
+    // execution method
     /**
      * @return mixed
      * @throws Exception
