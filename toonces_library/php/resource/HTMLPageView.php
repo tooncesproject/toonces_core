@@ -91,7 +91,7 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 	// execution methods
 	public function checkSessionAccess() {
 	
-		$userID = 0;
+		$userId = 0;
 		$userIsAdmin = false;
 		$isAdminPage = false;
 		$pageIsPublished = false;
@@ -107,7 +107,7 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 		$this->adminSessionActive = $this->sessionManager->adminSessionActive;
 
 		if ($this->adminSessionActive) {
-			$userID = $this->sessionManager->userId;
+			$userId = $this->sessionManager->userId;
 			$userIsAdmin = $this->sessionManager->userIsAdmin;
 		}
 		// Query the database for publication and user access state
@@ -125,14 +125,14 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 			LEFT OUTER JOIN
 				toonces.page_user_access pua
 					ON p.page_id = pua.page_id
-					AND pua.user_id = :userID
+					AND pua.user_id = :userId
 			WHERE
-				p.page_id = :pageID;
+				p.page_id = :pageId;
 
 SQL;
 	
 		$stmt = $this->sqlConn->prepare($sql);
-		$stmt->execute(array(':userID' => $userID, ':pageID' => $this->pageId));
+		$stmt->execute(array(':userId' => $userId, ':pageId' => $this->pageId));
 		$result = $stmt->fetchAll();
 		$row = $result[0];
 		$this->pageIsPublished = $row['published'];

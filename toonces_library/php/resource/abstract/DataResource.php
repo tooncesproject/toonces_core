@@ -60,7 +60,7 @@ abstract class DataResource extends ApiResource implements iResource
         $sqlConn = $this->pageViewReference->getSQLConn();
 
         // Acquire the user id if this is an authenticated request.
-        $userID = $this->authenticateUser() ?? 0;
+        $userId = $this->authenticateUser() ?? 0;
 
         // Query the database for any children of the current page.
         $sql = <<<SQL
@@ -70,10 +70,10 @@ abstract class DataResource extends ApiResource implements iResource
                 ,p.page_title
             FROM page_hierarchy_bridge phb
             JOIN pages p ON phb.descendant_page_id = p.page_id
-            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userID)
-            LEFT JOIN users u ON u.user_id = :userID
+            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userId)
+            LEFT JOIN users u ON u.user_id = :userId
             WHERE
-                (phb.page_id = :pageID)
+                (phb.page_id = :pageId)
                 AND
                 (
                     (p.published = 1 AND p.deleted IS NULL)
@@ -85,7 +85,7 @@ abstract class DataResource extends ApiResource implements iResource
             ORDER BY p.page_id ASC
 SQL;
         $stmt = $sqlConn->prepare($sql);
-        $stmt->execute(array('userID' => $userID, 'pageID' => $this->pageViewReference->pageId));
+        $stmt->execute(array('userId' => $userId, 'pageId' => $this->pageViewReference->pageId));
         $result = $stmt->fetchAll();
         if ($result) {
             // Results? Serialize the output.

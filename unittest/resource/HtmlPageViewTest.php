@@ -14,9 +14,9 @@ class HtmlPageViewTest extends TestCase
     public function testConstructHTMLPageView()
     {
         // arrange
-        $pageID = 1;
+        $pageId = 1;
         // act
-        $pageView = new HTMLPageView($pageID);
+        $pageView = new HTMLPageView($pageId);
         
         // assert
         $this->assertInstanceOf(HTMLPageView::class, $pageView);
@@ -25,8 +25,8 @@ class HtmlPageViewTest extends TestCase
     public function testAddElement()
     {
         // arrange
-        $pageID = 1;
-        $pageView = new HTMLPageView($pageID);
+        $pageId = 1;
+        $pageView = new HTMLPageView($pageId);
         $element = new HTMLResource($pageView);
         
         // act
@@ -40,8 +40,8 @@ class HtmlPageViewTest extends TestCase
     public function testGetHTML()
     {
         // arrange
-        $pageID = 1;
-        $pageView = new HTMLPageView($pageID);
+        $pageId = 1;
+        $pageView = new HTMLPageView($pageId);
         $element = new HTMLResource($pageView);
         
         $html = '</html>';

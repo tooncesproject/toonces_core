@@ -176,13 +176,13 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll();
-        $pageID = $rows[0][0];
+        $pageId = $rows[0][0];
 
         // Insert a record into the ext_html_page table
-        $sql = "INSERT INTO ext_html_page (page_id, html_path, client_class) VALUES (:pageID, 'toonces_library/html/toonces_welcome.html', 'LocalResourceClient')";
+        $sql = "INSERT INTO ext_html_page (page_id, html_path, client_class) VALUES (:pageId, 'toonces_library/html/toonces_welcome.html', 'LocalResourceClient')";
         try {
             $stmt = $conn->prepare($sql);
-            $stmt->execute([':pageID' => $pageID]);
+            $stmt->execute([':pageId' => $pageId]);
         } catch (PDOException $e) {
             echo('Failed to insert a record into ext_html_page: ' . $e->getMessage());
             throw $e;

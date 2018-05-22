@@ -10,8 +10,8 @@ class HtmlViewResourceTest extends TestCase
     public function testAddElement()
     {
         // arrange
-        $pageID = 1;
-        $pageView = new HTMLPageView($pageID);
+        $pageId = 1;
+        $pageView = new HTMLPageView($pageId);
         $viewElement = new HTMLViewResource($pageView);
         $element = new HTMLResource($pageView);
         
@@ -26,8 +26,8 @@ class HtmlViewResourceTest extends TestCase
     public function testGetHTML()
     {
         // Arrange
-        $pageID = 1;
-        $pageView = new HTMLPageView($pageID);
+        $pageId = 1;
+        $pageView = new HTMLPageView($pageId);
         $viewElement = new HTMLViewResource($pageView);
         $element = new HTMLResource($pageView);
         
