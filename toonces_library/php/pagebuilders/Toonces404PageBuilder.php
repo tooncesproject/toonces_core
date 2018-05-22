@@ -1,5 +1,6 @@
 <?php
-/*
+/**
+ * @author paulanderson
  * Toonces404PageBuilder.php
  * Initial Commit: Paul Anderson, 1/8/2018
  *
@@ -15,7 +16,6 @@ class Toonces404PageBuilder extends StandardPageBuilder {
 
         // Instantiate an Element
         $element = new HTMLResource($this->pageViewReference);
-        $pageID = $this->pageViewReference->pageId;
         
         $html= <<<HTML
 		<div class="copy_block">

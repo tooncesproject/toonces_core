@@ -23,7 +23,7 @@ abstract class ApiResource extends Resource implements iResource {
         // Toonces Core Services API uses Basic Auth for authentication, and the same
         // user structure as Toonces Admin.
         // Returns a user ID if login valid, null if not.
-        $userID = NULL;
+        $userId  = NULL;
 
         // If there is no SessionManager object, instantiate one now.
         if (!$this->sessionManager)
@@ -34,10 +34,10 @@ abstract class ApiResource extends Resource implements iResource {
             $pw = $_SERVER['PHP_AUTH_PW'];
             $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->pageId);
             if ($loginSuccess)
-                $userID = $this->sessionManager->userId;
+                $userId = $this->sessionManager->userId;
         }
 
-        return $userID;
+        return $userId;
     }
 
 

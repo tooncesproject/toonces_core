@@ -143,12 +143,11 @@ SELECT
 FROM
     toonces.pages p
 WHERE
-    p.page_id = :pageID;
+    p.page_id = :pageId;
 SQL;
 
-//$query = sprintf($sql,$pageId);
 $stmt = $conn->prepare($sql);
-$stmt->execute(array(':pageID' => $pageId));
+$stmt->execute(array(':pageId' => $pageId));
 
 $pageRecord = $stmt->fetchall();
 $pageExists = false;
