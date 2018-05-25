@@ -9,4 +9,12 @@
 
 abstract class FieldValidator {
     public $allowNull;
+
+    /**
+     * FieldValidator constructor.
+     * @param bool $paramAllowNull
+     */
+    public function __construct($paramAllowNull = false) {
+        $this->allowNull = $paramAllowNull;
+    }
 }

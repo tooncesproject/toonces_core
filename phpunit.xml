@@ -30,7 +30,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/resource/HtmlViewResourceTest.php</file>
 			<file>unittest/resource/FileResourceTest.php</file>
 			<file>unittest/resource/PageDataResourceTest.php</file>
-			<file>unittest/resource/ExtHtmlPageResourceTest.php</file>
+			<file>unittest/resource/ExtHtmlPageDataResourceTest.php</file>
 		</testsuite>
 		<testsuite name="pagebuilders">
 			<file>unittest/pagebuilder/PageApiPageBuilderTest.php</file>
@@ -42,6 +42,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/utility/GrabParentPageIdTest.php</file>
 			<file>unittest/utility/LocalResourceClientTest.php</file>
 			<file>unittest/utility/HtmlFieldValidatorTest.php</file>
+			<file>unittest/utility/ApiDataValidatorTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

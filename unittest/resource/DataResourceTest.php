@@ -19,6 +19,22 @@ class ConcreteDataResource extends DataResource {
     // No overrides or additional functionality.
 }
 
+class ConcreteApiDataValidator extends ApiDataValidator {
+
+    /**
+     * @throws Exception
+     */
+    function buildFields() {
+
+        $integerFieldValidator = new IntegerFieldValidator(false);
+        $this->addFieldValidator('requiredField', $integerFieldValidator);
+
+        $stringFieldValidator = new StringFieldValidator(true);
+        $this->addFieldValidator('nullableField', $stringFieldValidator);
+
+    }
+}
+
 class DataResourceTest extends SqlDependentTestCase {
 
 
@@ -129,57 +145,58 @@ SQL;
         $jsonPageView = new JsonPageView(1);
         $dr = new ConcreteDataResource($jsonPageView);
 
-        // Set up the DataResource object's field validators.
-        $nullableField = new StringFieldValidator();
-        $nullableField->maxLength = 50;
-        $nullableField->allowNull=true;
-        $dr->fields['nullableField'] = $nullableField;
-
-        $requiredField = new IntegerFieldValidator();
-        $dr->fields['requiredField'] = $requiredField;
+        // Set up the DataResource object's Data Validator.
+        $dr->apiDataValidator = new ConcreteApiDataValidator();
 
         // Build several objects to inject as data to be validated.
         $nonArrayObject = 'I am not an array';
-        $validWithAllFields = array('nullableField' => 'foo', 'requiredField' => 666);
         $validWithRequiredField = array('requiredField' => 123);
         $invalidMissingField = array('nullableField' => 'butt');
         $invalidBadRequiredField = array('nullableField' => 'foo', 'requiredField' => 'boo');
         $invalidBadNullableField = array('nullableField' => 123, 'requiredField' => 456);
 
         // ACT
+        // data failing ValidateDataStructure generates 400 error and returns false
         $nonArrayResult = $dr->validateData($nonArrayObject);
         $nonArrayStatus = $dr->httpStatus;
 
-        $validAllResult = $dr->validateData($validWithAllFields);
+        // Valid data returns true
+        $validDataResult = $dr->validateData($validWithRequiredField);
 
-        $validRequiredResult = $dr->validateData($validWithRequiredField);
-
+        // Data with missing field generates 400 error and returns false
         $missingFieldresult = $dr->validateData($invalidMissingField);
         $missingFieldStatus = $dr->httpStatus;
 
+        // Data with invalid required field generates 400 error and returns false
         $badRequiredResult = $dr->validateData($invalidBadRequiredField);
         $badRequiredStatus = $dr->httpStatus;
 
-        $badNullableResult = $dr->validateData($invalidBadRequiredField);
+        // Data with invalid nullable field generates 400 error and returns false
+        $badNullableResult = $dr->validateData($invalidBadNullableField);
         $badNullableStatus = $dr->httpStatus;
 
         // ASSERT
+        // data failing ValidateDataStructure generates 400 error and returns false
         $this->assertFalse($nonArrayResult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $nonArrayStatus);
 
-        $this->assertTrue($validRequiredResult);
-        $this->assertTrue($validRequiredResult);
+        // Valid data returns true
+        $this->assertTrue($validDataResult);
 
+        // Data with missing field generates 400 error and returns false
         $this->assertFalse($missingFieldresult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $missingFieldStatus);
 
+        // Data with invalid field generates 400 error and returns false
         $this->assertFalse($badRequiredResult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badRequiredStatus);
 
+        // Data with invalid nullable field generates 400 error and returns false
         $this->assertFalse($badNullableResult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badNullableStatus);
 
     }
+
 
     /**
      * @depends testGetSubResources

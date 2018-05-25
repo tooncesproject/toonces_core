@@ -2,7 +2,7 @@
 /**
  * @author paulanderson
  * ExtHtmlPageResourceTest.php
- * Unit tests for the class ExtHtmlPageResource
+ * Unit tests for the class ExtHtmlPageDataResource
  *
  */
 
@@ -35,11 +35,11 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(array('pageId' => $pageId));
 
-        // Instantiate an ExtHtmlPageResource and dependencies
+        // Instantiate an ExtHtmlPageDataResource and dependencies
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);
         $client = new LocalResourceClient();
-        $ehpr = new ExtHtmlPageResource($pageView);
+        $ehpr = new ExtHtmlPageDataResource($pageView);
 
         // Mock up some data
         $data = array('clientClass' => 'LocalResourceClient');
@@ -86,11 +86,11 @@ SQL;
         // Instantiate a client
         $client = new LocalResourceClient();
 
-        // Instantiate an ExtHtmlPageResource and dependencies.
+        // Instantiate an ExtHtmlPageDataResource and dependencies.
         $pageId = $this->createPage(false);
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);
-        $epr = new ExtHtmlPageResource($pageView);
+        $epr = new ExtHtmlPageDataResource($pageView);
         $epr->client = $client;
 
         $url = $GLOBALS['TEST_FILE_PATH'];
@@ -215,10 +215,10 @@ SQL;
         $pageId = $result[0]['page_id'];
         $dbHtmlPathBefore = $result[0]['html_path'];
 
-        // Instantiate an ExtHtmlPageResource and dependencies.
+        // Instantiate an ExtHtmlPageDataResource and dependencies.
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);
-        $epr = new ExtHtmlPageResource($pageView);
+        $epr = new ExtHtmlPageDataResource($pageView);
         $client = new LocalResourceClient();
         $epr->client = $client;
         $epr->parameters['id'] = strval($pageId);
@@ -326,7 +326,7 @@ SQL;
         $conn = $this->getConnection();
         $pageView = new JsonPageView(1);
         $pageView->setSQLConn($conn);
-        $pdr = new ExtHtmlPageResource($pageView);
+        $pdr = new ExtHtmlPageDataResource($pageView);
 
         // Create a non-admin user
         $nonAdminUserId = $this->createNonAdminUser();
@@ -527,10 +527,10 @@ SQL;
         $pageId = $result[0]['page_id'];
         $dbHtmlPath = $result[0]['html_path'];
 
-        // Instantiate an ExtHtmlPageResource and dependencies.
+        // Instantiate an ExtHtmlPageDataResource and dependencies.
         $pageView = new JsonPageView($pageId);
         $pageView->setSQLConn($conn);
-        $epr = new ExtHtmlPageResource($pageView);
+        $epr = new ExtHtmlPageDataResource($pageView);
         $epr->parameters['id'] = strval($pageId);
         $client = new LocalResourceClient();
         $epr->client = $client;

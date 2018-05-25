@@ -12,68 +12,14 @@ require_once LIBPATH.'php/toonces.php';
 
 class PageDataResource extends DataResource implements iResource {
 
-    function buildFields() {
-        /**
-         * Instantiates FieldValidator objects that validate the PUT or POST body.
-         *
-         */
-        $ancestorPageId = new IntegerFieldValidator();
-        $this->fields['ancestorPageId'] = $ancestorPageId;
-
-        $pathName = new StringFieldValidator();
-        $pathName->maxLength = 50;
-        $pathName->allowNull = true;
-        $this->fields['pathName'] = $pathName;
-
-        $pageTitle = new StringFieldValidator();
-        $pageTitle->maxLength = 50;
-        $this->fields['pageTitle'] = $pageTitle;
-
-        $pageLinkText = new StringFieldValidator();
-        $pageLinkText->maxLength = 50;
-        // Defaults to title if not included
-        $pageLinkText->allowNull = true;
-        $this->fields['pageLinkText'] = $pageLinkText;
-
-        // Pagebuilder can be overriden by child classes
-        if (!isset($this->fields['pageBuilderClass'])) {
-            $pageBuilderClass= new StringFieldValidator();
-            $pageBuilderClass->maxLength = 50;
-            $this->fields['pageBuilderClass'] = $pageBuilderClass;
-        }
-
-        // PageViewClass can be overridden by child classes
-        if (!isset($this->fields['pageViewClass'])) {
-            $pageViewClass = new StringFieldValidator();
-            $pageViewClass->maxLength = 50;
-            $this->fields['pageViewClass'] = $pageViewClass;
-        }
-
-        $redirectOnError = new BooleanFieldValidator();
-        // Defaults to FALSE
-        $redirectOnError->allowNull = true;
-        $this->fields['redirectOnError'] = $redirectOnError;
-
-        $published = new BooleanFieldValidator();
-        // defaults to FALSE
-        $published->allowNull = true;
-        $this->fields['published'] = $published;
-
-        $pageTypeId = new IntegerFieldValidator();
-        // Defaults to "general"
-        $pageTypeId->allowNull = true;
-        $this->fields['pageTypeId'] = $pageTypeId;
-
-    }
-
-
+    /**
+     * Validates path name as set in resourceData.
+     * @param int $ancestorPageId: ID of the page to potentially add a child with the pathname.
+     * @param int $pageId: Optional. If set, disregard a page with the same pathname; assume we are operating on that existing page.
+     * @return bool t/f path name is valid and doesn't conflict with an existing one.
+     */
     function validatePathName($ancestorPageId, $pageId = null) {
-        /**
-         * Validates path name as set in resourceData.
-         * @param int $ancestorPageId: ID of the page to potentially add a child with the pathname.
-         * @param int $pageId: Optional. If set, disregard a page with the same pathname; assume we are operating on that existing page.
-         * @return bool t/f path name is valid and doesn't conflict with an existing one.
-         */
+
         $pathNameValid = false;
         do {
             $conn = $this->pageViewReference->getSqlConn();
@@ -173,13 +119,12 @@ SQL;
     }
 
 
+    /**
+     * Attempts to instantiate the PageView class specified in resourceData.
+     * @var string $pageViewClass
+     * @return bool t/f, the named class can be instantiated.
+     */
     function validatePageViewClass() {
-        /**
-         * Attempts to instantiate the PageView class specified in resourceData.
-         * @var string $pageViewClass
-         * @return bool t/f, the named class can be instantiated.
-         */
-        // Return true/false, class is valid.
         // If invalid, update HTTP status and message.
         $pageViewClass = $this->resourceData['pageViewClass'];
 
@@ -193,12 +138,11 @@ SQL;
 
     }
 
-
+    /**
+     * Performs a database lookup to check whether the page type of the request is valid.
+     * @return bool $pageTypeValid - T/F page type exists.
+     */
     function validatePageTypeId() {
-        /**
-         * Performs a database lookup to check whether the page type of the request is valid.
-         * @return bool $pageTypeValid - T/F page type exists.
-         */
 
         $pageTypeValid = false;
         $conn = $this->pageViewReference->getSqlConn();
@@ -217,13 +161,14 @@ SQL;
     }
 
 
+    /**
+     * Recursively tests whether a user ID has write access to a page and all of its children,
+     * @param int $userId - User ID to be tested.
+     * @param int $pageId - The page ID where we start.
+     * @return bool $userHasAccess - t/f, user has write access to this page and all its children.
+     */
     function recursiveCheckWriteAccess($userId, $pageId) {
-        /**
-         * Recursively tests whether a user ID has write access to a page and all of its children,
-         * @param int $userId - User ID to be tested.
-         * @param int $pageId - The page ID where we start.
-         * @return bool $userHasAccess - t/f, user has write access to this page and all its children.
-         */
+
         $conn = $this->pageViewReference->getSqlConn();
         // Can the user access the current page?
         $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $pageId, $conn, true);
@@ -248,6 +193,23 @@ SQL;
         return $userHasAccess;
     }
 
+
+    /**
+     * Instantiate an APIDataValidator outside PostAction so it isn't inherited.
+     */
+    function instantiatePostValidator() {
+        $this->apiDataValidator = new PagePostApiDataValidator();
+    }
+
+
+    /**
+     * Instantiate an APIDataValidator outside PutAction so it isn't inherited.
+     */
+    function instantiatePutValidator() {
+        $this->apiDataValidator = new PagePutApiDataValidator();
+    }
+
+
     /**
      * Called by abstract ApiResource::getResource.
      * Performs authentication, validation and execution of a POST request.
@@ -256,8 +218,9 @@ SQL;
     function postAction() {
 
         $conn = $this->pageViewReference->getSQLConn();
-        // Set up field validators
-        $this->buildFields();
+
+        $this->instantiatePostValidator();
+
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
@@ -406,22 +369,13 @@ SQL;
     }
 
 
+    /**
+     * Performs authentication, validation and execution of a PUT request.
+     * @return array
+     */
     function putAction() {
-        /**
-         * Called by abstract ApiResource::getResource.
-         * Performs authentication, validation and execution of a PUT request.
-         * @return object (array), $this->resourceData
-         */
 
-        // Build fields
-        $this->buildFields();
-
-        // Allow nulls on certain fields
-        $this->fields['ancestorPageId']->allowNull = true;
-        $this->fields['pageTitle']->allowNull = true;
-        $this->fields['pageBuilderClass']->allowNull = true;
-        $this->fields['pageViewClass']->allowNull = true;
-        $this->fields['published']->allowNull = true;
+        $this->instantiatePutValidator();
 
         // Connect to SQL
         $conn = $this->pageViewReference->getSQLConn();
@@ -528,14 +482,6 @@ SQL;
                 array_push($updateFields, 'pagetype_id = :pageTypeId');
                 $sqlParams['pageTypeId'] = $this->resourceData['pageTypeId'];
             }
-            /*
-            // Invalidate the request if no fields are set.
-            if (empty($updateFields)) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                $this->statusMessage = 'At least one field must be specified in a PUT request.';
-                break;
-            }
-            */
 
             // Add page ID parameter
             $sqlParams['pageId'] = $pageId;
@@ -575,12 +521,13 @@ SQL;
     }
 
 
+    /**
+     * Called by abstract ApiResource::getResource.
+     * Performs authentication, validation and execution of a GET request.
+     * @return object (array), $this->resourceData
+     */
     function getAction() {
-        /**
-         * Called by abstract ApiResource::getResource.
-         * Performs authentication, validation and execution of a GET request.
-         * @return object (array), $this->resourceData
-         */
+
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $pageId = $this->validateIntParameter('id');
@@ -661,13 +608,13 @@ SQL;
     }
 
 
+    /**
+     * Performs authentication, validation and execution of a DELETE request.
+     * hard-deletes the page and any of its children.
+     * @return array
+     */
     function deleteAction() {
-        /**
-         * Called by abstract ApiResource::getResource.
-         * Performs authentication, validation and execution of a DELETE request.
-         * hard-deletes the page and any of its children.
-         * @return object (array), $this->resourceData
-         */
+
 
         $pageId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();

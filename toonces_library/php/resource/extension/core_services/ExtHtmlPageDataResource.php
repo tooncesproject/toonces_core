@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * ExtHtmlPageResource.php
+ * ExtHtmlPageDataResource.php.php
  * Initial commit: 5/5/2018
  *
  * DataResource class (and subclass of PageDataResource) for managing HTML-content pages.
@@ -10,12 +10,13 @@
 
 require_once LIBPATH.'php/toonces.php';
 
-class ExtHtmlPageResource extends PageDataResource implements iResource {
+class ExtHtmlPageDataResource extends PageDataResource implements iResource {
 
     /**
      * @var iResourceClient
      */
     var $client;
+
     /**
      * @var string
      */
@@ -59,26 +60,20 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
 
 
     /**
-     * Override PageDataResource->buildFields to create fields specific to
-     * ExtHtmlPageResource
+     * Instantiate an APIDataValidator outside PostAction so it isn't inherited.
      */
-    function buildFields() {
-        // Call PageDataResource-buildFields
-        parent::buildFields();
-        // Make some fields optional
-        $this->fields['pageBuilderClass']->allowNull = true;
-        $this->fields['pageViewClass']->allowNull = true;
-
-        // Add a field for the HTML body
-        $htmlBodyField = new HtmlFieldValidator();
-        $this->fields['htmlBody'] = $htmlBodyField;
-
-        // Add a field for the Client class
-        $clientClassField = new StringFieldValidator();
-        $clientClassField->allowNull = true;
-        $this->fields['clientClass'] = $clientClassField;
-
+    function instantiatePostValidator() {
+        $this->apiDataValidator = new ExtHtmlPagePostApiDataValidator();
     }
+
+
+    /**
+     * Instantiate an APIDataValidator outside PutAction so it isn't inherited.
+     */
+    function instantiatePutValidator() {
+        $this->apiDataValidator = new PagePutApiDataValidator();
+    }
+
 
     /**
      * override PageDataResource->postAction
@@ -88,8 +83,7 @@ class ExtHtmlPageResource extends PageDataResource implements iResource {
 
         $conn = $this->pageViewReference->getSQLConn();
 
-        // Build fields.
-        $this->buildFields();
+        $this->instantiatePostValidator();
 
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
@@ -235,13 +229,8 @@ SQL;
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
 
-        // Build fields.
-        $this->buildFields();
+        $this->instantiatePutValidator();
 
-        // Make some fields optional.
-        $this->fields['htmlBody']->allowNull = true;
-        $this->fields['ancestorPageId']->allowNull = true;
-        $this->fields['pageTitle']->allowNull = true;
         $clientClass = null;
         $htmlBody = null;
         // Get the body if applicable.

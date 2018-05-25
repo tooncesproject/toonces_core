@@ -14,7 +14,15 @@ abstract class DataResource extends ApiResource implements iResource
     var $fields = array();
     var $statusMessage = '';
 
+    /**
+     * @var iApiDataValidator
+     */
+    var $apiDataValidator;
 
+
+    /**
+     * @return bool
+     */
     function validateHeaders() {
         // Confirms that the HTTP request has the required headers.
         $headersValid = false;
@@ -27,6 +35,10 @@ abstract class DataResource extends ApiResource implements iResource
     }
 
 
+    /**
+     * @param $parameterKey
+     * @return int|null
+     */
     public function validateIntParameter($parameterKey) {
         // This method provides basic validation for any named GET parameters expecting an integer.
         // It will return an integer.
@@ -51,6 +63,10 @@ abstract class DataResource extends ApiResource implements iResource
         return $id;
     }
 
+
+    /**
+     * @return bool
+     */
     function getSubResources() {
         // Acquires any endpoints that are children of the current endpoint and provides the URLs of those endpoints.
         // Return:
@@ -108,12 +124,15 @@ SQL;
 
     }
 
+
+    /**
+     * @param $data
+     * @return bool
+     */
     public function validateData($data) {
         // Iterate through keys in dataObjects array
 
         $postValid = false;
-        $missingFields = array();
-        $invalidFields = array();
 
         // Check validation.
         do {
@@ -121,30 +140,14 @@ SQL;
             // The first requirement for DataResource is that the data is an array
             // (JSON should already be validated and converted to array at this point).
 
-            if (!is_array($data)) {
+            if (!$this->apiDataValidator->validateDataStructure($data)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'The API only accepts well-formed JSON.  ';
                 break;
             }
 
-            // Iterate through each field and check for validity.
-            foreach ($this->fields as $key => $field) {
-
-                // Is the POST/PUT data missing any required fields?
-                $fieldExists = array_key_exists($key, $data);
-                if (!$field->allowNull && !$fieldExists) {
-                    // Required key missing
-                    array_push($missingFields, $key);
-                }
-
-                // Is the input data valid, per the data object's requirements?
-                if ($fieldExists) {
-                    if (!$field->validateData($data[$key])) {
-                        // Field does not pass validation
-                        $invalidFields[$key] = $field->statusMessage;
-                    }
-                }
-            }
+            $missingFields = $this->apiDataValidator->getMissingRequiredFields($data);
+            $invalidFields = $this->apiDataValidator->getInvalidFields($data);
 
             if (!empty($missingFields)) {
                 // One or more required fields is missing - Break here.
@@ -153,10 +156,8 @@ SQL;
                 break;
             }
 
-
             if (!empty($invalidFields)) {
                  // One or more fields had bogus data.
-
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $errorArray = array();
                 foreach($invalidFields as $invalidKey => $value) {
@@ -175,6 +176,10 @@ SQL;
     }
 
 
+    /**
+     * @return array|null
+     * @throws Exception
+     */
     public function getResource() {
         // Override APIResource::getResource
         $returnData = null;

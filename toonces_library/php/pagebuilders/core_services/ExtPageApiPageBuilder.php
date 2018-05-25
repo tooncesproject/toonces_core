@@ -4,7 +4,7 @@
  * ExtPageApiPageBuilder.php
  * Initial commit: Paul Anderson, 5/13/2018
  *
- * ApiPageBuilder subclass creating an ExtHtmlPageResource object/endpoint.
+ * ApiPageBuilder subclass creating an ExtHtmlPageDataResource object/endpoint.
  *
  */
 
@@ -14,8 +14,8 @@ class ExtPageApiPageBuilder extends APIPageBuilder {
 
     function buildPage() {
 
-        // It's an ExtHtmlPageResource
-        $ehpr = new ExtHtmlPageResource($this->pageViewReference);
+        // It's an ExtHtmlPageDataResource
+        $ehpr = new ExtHtmlPageDataResource($this->pageViewReference);
         array_push($this->resourceArray, $ehpr);
         return $this->resourceArray;
 
