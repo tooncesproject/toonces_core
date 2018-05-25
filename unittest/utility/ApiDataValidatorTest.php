@@ -65,7 +65,7 @@ class ApiDataValidatorTest extends TestCase {
         // ARRANGE
         $validator = new ConcreteApiDataValidator();
         $validData = array('integerField' => 1, 'stringField' => 'foo');
-        $invalidData = array('integerField' => 1);
+        $invalidData = array('stringField' => 'foo');
 
         // ACT
         $nothingInvalid = $validator->getMissingRequiredFields($validData);
@@ -73,7 +73,7 @@ class ApiDataValidatorTest extends TestCase {
 
         // ASSERT
         $this->assertEmpty($nothingInvalid);
-        $this->assertArrayHasKey('integerField', $somethingInvalid);
+        $this->assertEquals('integerField', $somethingInvalid[0]);
     }
 
 

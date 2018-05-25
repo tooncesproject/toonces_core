@@ -24,7 +24,6 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/resource/FilePageViewTest.php</file>
 			<file>unittest/resource/ApiResourceTest.php</file>
 			<file>unittest/resource/DataResourceTest.php</file>
-			<file>unittest/resource/BlogDataResourceTest.php</file>
 			<file>unittest/resource/HtmlPageViewTest.php</file>
 			<file>unittest/resource/HtmlResourceTest.php</file>
 			<file>unittest/resource/HtmlViewResourceTest.php</file>

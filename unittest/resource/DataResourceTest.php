@@ -19,7 +19,7 @@ class ConcreteDataResource extends DataResource {
     // No overrides or additional functionality.
 }
 
-class ConcreteApiDataValidator extends ApiDataValidator {
+class TestApiDataValidator extends ApiDataValidator {
 
     /**
      * @throws Exception
@@ -146,7 +146,7 @@ SQL;
         $dr = new ConcreteDataResource($jsonPageView);
 
         // Set up the DataResource object's Data Validator.
-        $dr->apiDataValidator = new ConcreteApiDataValidator();
+        $dr->apiDataValidator = new TestApiDataValidator();
 
         // Build several objects to inject as data to be validated.
         $nonArrayObject = 'I am not an array';
