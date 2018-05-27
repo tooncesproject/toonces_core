@@ -20,17 +20,6 @@ abstract class PageBuilder {
 
 		if ($this->pageViewReference->checkAdminSession()) {
 			switch ($this->pageViewReference->pageTypeId) {
-				// blog root
-				case 2:
-					$blogToolbarElement = new BlogToolbarElement($this->pageViewReference);
-					$this->toolbarElement = $blogToolbarElement;
-					break;
-				// blog post
-				case 3:
-					$blogPostToolbarElement = new BlogPostToolbarElement($this->pageViewReference);
-					$this->toolbarElement = $blogPostToolbarElement;
-					break;
-				// REST API resource
 				case 6:
 				    // No toolbar element
 				    break;
