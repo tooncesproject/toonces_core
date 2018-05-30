@@ -311,52 +311,6 @@ SQL;
     }
 
 
-    // Blogs endpoint
-    $sql = <<<SQL
-        SELECT CREATE_PAGE (
-             :csPageId                          -- parent_page_id BIGINT
-            ,'blogs'                            -- ,pathname VARCHAR(50)
-            ,'Toonces Core Services - Blogs'    -- ,page_title VARCHAR(50)
-            ,'Toonces Core Services - Blogs'    -- ,page_link_text VARCHAR(50)
-            ,'BlogsAPIPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
-            ,'JsonPageView'                      -- ,pageview_class VARCHAR(50)
-            ,FALSE                              -- ,redirect_on_error BOOL
-            ,FALSE                              -- ,published BOOL
-            ,6                                  -- ,pagetype_id BIGINT
-        )
-SQL;
-    $stmt = $conn->prepare($sql);
-    try {
-        $stmt->execute(array('csPageId' => $csPageId));
-        $result = $stmt->fetchAll();
-    } catch (PDOException $e) {
-        echo('Failed to create Core Services API (blogs): ' . $e->getMessage());
-        throw $e;
-    }
-
-    // Blog Posts endpoint
-    $sql = <<<SQL
-        SELECT CREATE_PAGE (
-             :csPageId                              -- parent_page_id BIGINT
-            ,'blogposts'                            -- ,pathname VARCHAR(50)
-            ,'Toonces Core Services - Blog Posts'   -- ,page_title VARCHAR(50)
-            ,'Toonces Core Services - Blog Posts'   -- ,page_link_text VARCHAR(50)
-            ,'BlogPostAPIPageBuilder'               -- ,pagebuilder_class VARCHAR(50)
-            ,'JsonPageView'                          -- ,pageview_class VARCHAR(50)
-            ,FALSE                                  -- ,redirect_on_error BOOL
-            ,FALSE                                  -- ,published BOOL
-            ,6                                      -- ,pagetype_id BIGINT
-        )
-SQL;
-    $stmt = $conn->prepare($sql);
-    try {
-        $stmt->execute(array('csPageId' => $csPageId));
-        $result = $stmt->fetchAll();
-    } catch (PDOException $e) {
-        echo('Failed to create Core Services API (blog posts): ' . $e->getMessage());
-        throw $e;
-    }
-
     // HTML Files endpoint
     $sql = <<<SQL
         SELECT CREATE_PAGE (

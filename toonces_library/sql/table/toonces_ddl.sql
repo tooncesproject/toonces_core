@@ -52,21 +52,6 @@ CREATE TABLE IF NOT EXISTS page_hierarchy_bridge (
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-CREATE TABLE IF NOT EXISTS blogs (
-     blog_id            BIGINT         NOT NULL AUTO_INCREMENT
-    ,name               VARCHAR(255)   NULL
-    ,description        VARCHAR(255)   NULL
-    ,page_id            BIGINT         NOT NULL
-    ,created            TIMESTAMP      NOT NULL
-    ,modified_dt        TIMESTAMP      NULL ON UPDATE CURRENT_TIMESTAMP
-    ,deleted            TIMESTAMP      NULL
-
-        ,CONSTRAINT pk_blogs PRIMARY KEY (blog_id)
-        ,CONSTRAINT fk_blog_page FOREIGN KEY (page_id) REFERENCES pages(page_id)
-
-) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
-
-
 CREATE TABLE IF NOT EXISTS users (
      user_id        BIGINT      NOT NULL    AUTO_INCREMENT
     ,email          VARCHAR(40) NOT NULL
@@ -84,27 +69,6 @@ CREATE TABLE IF NOT EXISTS users (
         ,CONSTRAINT ak_email UNIQUE KEY (email)
         ,CONSTRAINT ak_nickname UNIQUE KEY (nickname)
 
-) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
-
-
-CREATE TABLE IF NOT EXISTS blog_posts (
-     blog_post_id           BIGINT          NOT NULL AUTO_INCREMENT
-    ,blog_id                BIGINT          NOT NULL
-    ,page_id                BIGINT          NOT NULL
-    ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
-    ,deleted                TIMESTAMP       NULL
-    ,user_id                BIGINT          NOT NULL
-    ,title                  VARCHAR(200)    NULL
-    ,body                   TEXT            NULL
-    ,thumbnail_image_vector VARCHAR(50)     NULL
-    ,published              BOOL            NOT NULL DEFAULT 0
-
-        ,CONSTRAINT pk_blog_posts PRIMARY KEY (blog_post_id)
-        ,CONSTRAINT fk_blog_post_user FOREIGN KEY (user_id) REFERENCES users (user_id)
-        ,CONSTRAINT fk_blog_post_blog FOREIGN KEY (blog_id) REFERENCES blogs (blog_id)
-        ,CONSTRAINT fk_blog_post_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
-    
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 

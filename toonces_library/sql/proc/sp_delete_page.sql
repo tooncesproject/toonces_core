@@ -7,7 +7,7 @@ This SQL procedure permanently deletes
 a page and (recursively) all its children.
 
 It also deletes all dependent records,
-such as toonces.blogs or toonces.blog_post.
+such as toonces.ext_html_page
 
 ***************** WOO ********************/
 
@@ -78,19 +78,6 @@ BEGIN
         page_id = param_page_id
     ;
 
-    -- Hard-delete any record in blog posts, if it exists.
-    DELETE FROM
-        toonces.blog_posts
-    WHERE
-        page_id = param_page_id
-    ;
-    
-    -- Hard-delete any record in blogs, if it exists
-    DELETE FROM
-        toonces.blogs
-    WHERE
-        page_id = param_page_id
-    ;
 
     -- Hard-delete the record in ext_html_page, if it exists.
     DELETE FROM
