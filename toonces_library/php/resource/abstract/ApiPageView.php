@@ -18,7 +18,6 @@ abstract class ApiPageView
     public $pageURI;
     public $sqlConn;
     public $pageLinkText;
-    public $pageTypeID;
 
     public $sessionManager;
 
@@ -61,14 +60,6 @@ abstract class ApiPageView
 
     public function getPageLinkText() {
         return $this->pageLinkText;
-    }
-
-    public function setPageTypeID($paramPageTypeID) {
-        $this->pageTypeID = $paramPageTypeID;
-    }
-
-    public function getPageTypeID() {
-        return $this->pageTypeID;
     }
 
     public function setPageTitle($paramPageTitle) {

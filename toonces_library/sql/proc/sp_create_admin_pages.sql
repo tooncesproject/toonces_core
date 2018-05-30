@@ -113,7 +113,7 @@ BEGIN
             FROM
                 toonces.pages
             WHERE
-                pagetype_id = 1
+                pagebuilder_class IN ('AdminHomeBuilder','UserAdminPageBuilder','CreateUserAdminPageBuilder')
             AND
                 pathname = var_pathname;
         END;
@@ -137,7 +137,6 @@ BEGIN
                 ,var_pageview_class     -- pageview_class VARCHAR(50)
                 ,var_redirect_on_error  -- redirect_on_error BOOL
                 ,var_published          -- published BOOL
-                ,1                      -- pagetype_id BIGINT - type for admin page (1)
             ) INTO var_new_admin_page_id;
 
         END IF;

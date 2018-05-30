@@ -138,28 +138,6 @@ SQL;
 
     }
 
-    /**
-     * Performs a database lookup to check whether the page type of the request is valid.
-     * @return bool $pageTypeValid - T/F page type exists.
-     */
-    function validatePageTypeId() {
-
-        $pageTypeValid = false;
-        $conn = $this->pageViewReference->getSqlConn();
-        $sql = "SELECT pagetype_id FROM pagetypes WHERE pagetype_id = :pageTypeId";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageTypeId' => $this->resourceData['pageTypeId']]);
-        $result = $stmt->fetchAll();
-        if ($result) {
-            $pageTypeValid = true;
-        } else {
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-            $this->statusMessage = 'Error: Invalid pageTypeId: ' . strval($this->resourceData['pageTypeId']);
-        }
-
-        return $pageTypeValid;
-    }
-
 
     /**
      * Recursively tests whether a user ID has write access to a page and all of its children,
@@ -235,9 +213,6 @@ SQL;
         if (!isset($this->resourceData['published']))
             $this->resourceData['published'] = false;
 
-        if (!isset($this->resourceData['pageTypeId']))
-            $this->resourceData['pageTypeId'] = 0;
-
         // begin validation sequence
         do {
             $userId = $this->authenticateUser();
@@ -288,12 +263,6 @@ SQL;
                 break;
             }
 
-            // Validate pageTypeId
-            if (!$this->validatePageTypeId()) {
-                $this->resourceData = array('status' => $this->statusMessage);
-                break;
-            }
-
             // Attempt the page insert
             $sql = <<<SQL
             SELECT CREATE_PAGE(
@@ -305,7 +274,6 @@ SQL;
                 ,:pageViewClass
                 ,:redirectOnError
                 ,:published
-                ,:pageTypeId
             )
 SQL;
             $sqlParams = array(
@@ -317,7 +285,6 @@ SQL;
                 ,'pageViewClass' => $this->resourceData['pageViewClass']
                 ,'redirectOnError' => intval($this->resourceData['redirectOnError'])
                 ,'published' => intval($this->resourceData['published'])
-                ,'pageTypeId' => $this->resourceData['pageTypeId']
             );
 
             $pageId = null;
@@ -430,14 +397,6 @@ SQL;
                 }
             }
 
-            // If supplied, is the page type ID valid?
-            if (isset($this->resourceData['pageTypeId'])) {
-                if (!$this->validatePageTypeId()) {
-                    $this->resourceData = array('status' => $this->statusMessage);
-                    break;
-                }
-            }
-
             // If all validation so far has passed, update the page and its associated records.
             // Build the SQL depending on the fields to be updated
             $updateFields = array();
@@ -476,11 +435,6 @@ SQL;
             if(isset($this->resourceData['published'])) {
                 array_push($updateFields, 'published = :published');
                 $sqlParams['published'] = $this->resourceData['published'];
-            }
-            // pagetype id
-            if(isset($this->resourceData['pageTypeId'])) {
-                array_push($updateFields, 'pagetype_id = :pageTypeId');
-                $sqlParams['pageTypeId'] = $this->resourceData['pageTypeId'];
             }
 
             // Add page ID parameter
@@ -549,7 +503,6 @@ SQL;
                 ,p.modified_dt
                 ,redirect_on_error
                 ,published
-                ,pagetype_id
             FROM pages p
             -- join to PHB is to get the parent page ID
             LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
@@ -593,7 +546,6 @@ SQL;
                     ,'modifiedDate' => $row['modified_dt']
                     ,'redirectOnError' => boolval($row['redirect_on_error'])
                     ,'published' => boolval($row['published'])
-                    ,'pageTypeId' => intval($row['pagetype_id'])
                 );
 
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');

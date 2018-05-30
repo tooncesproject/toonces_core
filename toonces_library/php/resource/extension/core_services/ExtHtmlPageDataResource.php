@@ -95,9 +95,6 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
         if (!isset($this->resourceData['pageViewClass']))
             $this->resourceData['pageViewClass'] = 'HTMLPageView';
 
-        if (!isset($this->resourceData['pageTypeId']))
-            $this->resourceData['pageTypeId'] = 5;
-
         if (!isset($this->resourceData['clientClass'])) {
             // If not already set, get the default client class from toonces-config.xml
             $xml = new DOMDocument();
@@ -393,7 +390,6 @@ SQL;
                     ,p.modified_dt
                     ,redirect_on_error
                     ,published
-                    ,pagetype_id
                     ,ehp.html_path
                     ,ehp.client_class
                 FROM pages p
@@ -439,7 +435,6 @@ SQL;
                         ,'modifiedDate' => $row['modified_dt']
                         ,'redirectOnError' => boolval($row['redirect_on_error'])
                         ,'published' => boolval($row['published'])
-                        ,'pageTypeId' => intval($row['pagetype_id'])
                         ,'fileUrl' => $row['html_path']
                         ,'clientClass' => $row['client_class']
                     );

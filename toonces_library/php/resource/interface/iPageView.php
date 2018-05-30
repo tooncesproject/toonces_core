@@ -26,10 +26,7 @@ interface iPageView
 
     public function setPageLinkText($paramPageLinkText);
     public function getPageLinkText();
-    
-    public function setPageTypeID($paramPageTypeID);
-    public function getPageTypeID();
-    
+
     public function setPageTitle($paramPageTitle);
     public function getPageTitle();
     

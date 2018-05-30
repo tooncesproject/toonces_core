@@ -130,7 +130,6 @@ SQL;
             ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
             ,FALSE                          -- redirect_on_error BOOL
             ,:published                     -- published BOOL
-            ,0                              -- pagetype_id BIGINT
 )
 SQL;
         $stmt = $sqlConn->prepare($sql);

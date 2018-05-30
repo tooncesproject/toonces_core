@@ -378,7 +378,6 @@ SQL;
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-            ,p.pagetype_id
             ,CASE WHEN pua.page_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
             ,ehp.html_path
             ,ehp.client_class
@@ -399,7 +398,6 @@ SQL;
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-            ,p.pagetype_id
             ,ehp.html_path
             ,ehp.client_class
         FROM pages p
@@ -476,7 +474,6 @@ SQL;
         $this->assertSame($publicPageState[0]['pageview_class'], $singleParamRecord['pageViewClass']);
         $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);
         $this->assertSame(boolval($publicPageState[0]['published']), $singleParamRecord['published']);
-        $this->assertSame(intval($publicPageState[0]['pagetype_id']), $singleParamRecord['pageTypeId']);
         $this->assertSame($publicPageState[0]['html_path'], $singleParamRecord['fileUrl']);
         $this->assertSame($publicPageState[0]['client_class'], $singleParamRecord['clientClass']);
 

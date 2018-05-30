@@ -37,7 +37,7 @@ class AdminNavElement extends NavElement implements iResource
 			toonces.page_hierarchy_bridge phb2
 				ON p.page_id = phb2.page_id
 		WHERE
-			p.pagetype_id = 1
+			p.pagebuilder_class IN ('AdminHomeBuilder','UserAdminPageBuilder','CreateUserAdminPageBuilder')
 		ORDER BY
 			p.page_id
 SQL;

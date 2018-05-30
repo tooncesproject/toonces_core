@@ -290,10 +290,6 @@ SQL;
         $badPvPost = $validPost;
         $badPvPost['pageViewClass'] = 'foo';
 
-        // invalid post - Bogus page type ID
-        $badPtPost = $validPost;
-        $badPtPost['pageTypeId'] = 69;
-
         // Record how many pages currently reside in the database
         $sql = "SELECT COUNT(*) FROM pages";
         $stmt = $conn->prepare($sql);
@@ -342,11 +338,6 @@ SQL;
         $pdr->postAction();
         $badPvStatus = $pdr->httpStatus;
 
-        // POST with invalid page type ID return 400 error
-        $pdr->resourceData = $badPtPost;
-        $pdr->postAction();
-        $badPtStatus = $pdr->httpStatus;
-
         // Page not created after unauthenticated or invalid attempts.
         $sql = "SELECT COUNT(*) FROM pages";
         $stmt = $conn->prepare($sql);
@@ -370,7 +361,6 @@ SQL;
             ,pageview_class
             ,redirect_on_error
             ,published
-            ,pagetype_id
         FROM pages
         WHERE page_id = :pageId
 SQL;
@@ -383,7 +373,6 @@ SQL;
         $insertedPageViewClass = $result[0]['pageview_class'];
         $insertedRedirectOnError = boolval($result[0]['redirect_on_error']);
         $insertedPublished = boolval($result[0]['published']);
-        $insertedPageTypeId = intval($result[0]['pagetype_id']);
 
 
         // ASSERT
@@ -408,9 +397,6 @@ SQL;
         // POST with invalid pageview class returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPvStatus);
 
-        // POST with invalid page type ID return 400 error
-        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPtStatus);
-
         // Page not created after unauthenticated or invalid attempts.
         $this->assertEquals($pageCountBefore, $pageCountAfter);
 
@@ -425,7 +411,6 @@ SQL;
         $this->assertSame($validResult[$newPageId]['pageViewClass'], $insertedPageViewClass);
         $this->assertSame($validResult[$newPageId]['redirectOnError'], $insertedRedirectOnError);
         $this->assertSame($validResult[$newPageId]['published'], $insertedPublished);
-        $this->assertSame($validResult[$newPageId]['pageTypeId'], $insertedPageTypeId);
 
     }
 
@@ -456,7 +441,6 @@ SQL;
             ,'pageBuilderClass' => 'DocumentEndpointPageBuilder'
             ,'redirectOnError' => true
             ,'published' => true
-            ,'pageTypeId' => 0
         );
 
         // invalid post
@@ -467,10 +451,6 @@ SQL;
         $invalidPathnamePost = $validPost;
         $invalidPathnamePost['pathName'] = '$%$^#&';
 
-        // invalid pageType
-        $invalidPageTypePost = $validPost;
-        $invalidPageTypePost['pageTypeId'] = 53456;
-
         // Query database for state before PUT attempts
         $sql = <<<SQL
             SELECT
@@ -480,7 +460,6 @@ SQL;
                 ,pagebuilder_class
                 ,redirect_on_error
                 ,published
-                ,pagetype_id
             FROM pages
             WHERE page_id = :pageId
 SQL;
@@ -523,11 +502,6 @@ SQL;
         $pdr->putAction();
         $invalidPathnameStatus = $pdr->httpStatus;
 
-        // PUT with invalid pageTypeId returns 400 error
-        $pdr->resourceData = $invalidPageTypePost;
-        $pdr->putAction();
-        $invalidPtStatus = $pdr->httpStatus;
-
         // No change to page data after unauthenticated or invalid PUT attempts
         // Query database for state after PUT attempts
         $sql = <<<SQL
@@ -538,7 +512,6 @@ SQL;
                 ,pagebuilder_class
                 ,redirect_on_error
                 ,published
-                ,pagetype_id
             FROM pages
             WHERE page_id = :pageId
 SQL;
@@ -563,7 +536,6 @@ SQL;
                 ,pagebuilder_class
                 ,redirect_on_error
                 ,published
-                ,pagetype_id
             FROM pages
             WHERE page_id = :pageId
 SQL;
@@ -576,7 +548,6 @@ SQL;
         $insertedPageBuilderClass = $result[0]['pagebuilder_class'];
         $insertedRedirectOnError = boolval($result[0]['redirect_on_error']);
         $insertedPublished = boolval($result[0]['published']);
-        $insertedPageTypeId = intval($result[0]['pagetype_id']);
 
 
         // ASSERT
@@ -595,9 +566,6 @@ SQL;
         // PUT with invalid pathName returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $invalidPathnameStatus);
 
-        // PUT with invalid pageTypeId returns 400 error
-        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $invalidPtStatus);
-
         // No change to page data after unauthenticated or invalid PUT attempts
         $this->assertSame($pageStateBefore, $pageStateAfter);
 
@@ -611,7 +579,6 @@ SQL;
         $this->assertSame($validResult[$unpublishedPageId]['pageBuilderClass'], $insertedPageBuilderClass);
         $this->assertSame($validResult[$unpublishedPageId]['redirectOnError'], $insertedRedirectOnError);
         $this->assertSame($validResult[$unpublishedPageId]['published'], $insertedPublished);
-        $this->assertSame($validResult[$unpublishedPageId]['pageTypeId'], $insertedPageTypeId);
 
     }
 
@@ -663,7 +630,6 @@ SQL;
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-            ,p.pagetype_id
             ,CASE WHEN pua.page_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
         FROM pages p
         LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND pua.user_id = :userId
@@ -681,7 +647,6 @@ SQL;
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-            ,p.pagetype_id
         FROM pages p
         WHERE page_id = :pageId
 SQL;
@@ -759,7 +724,6 @@ SQL;
         $this->assertSame($publicPageState[0]['pageview_class'], $singleParamRecord['pageViewClass']);
         $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);
         $this->assertSame(boolval($publicPageState[0]['published']), $singleParamRecord['published']);
-        $this->assertSame(intval($publicPageState[0]['pagetype_id']), $singleParamRecord['pageTypeId']);
 
         // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
@@ -872,7 +836,7 @@ SQL;
         $noAccessStatus = $pdr->httpStatus;
 
         // Invalid attempts so far have not deleted any pages
-        $sql = "SELECT COUNT(*) FROM PAGES";
+        $sql = "SELECT COUNT(*) FROM pages";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
