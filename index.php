@@ -123,7 +123,6 @@ $pageTitle = 'Error 404';
 $pageLinkText = '';
 
 // Page state
-$loadedPageTypeId = 0;
 $loadedPageIsDeleted = false;
 
 // user state
@@ -138,7 +137,6 @@ SELECT
     ,p.page_link_text
     ,p.pagebuilder_class
     ,p.pageview_class
-    ,p.pagetype_id
     ,p.deleted
 FROM
     toonces.pages p
@@ -158,7 +156,6 @@ if (count($pageRecord)) {
     $loadedPageLinkText = $pageRecord[0]['page_link_text'];
     $loadedPageBuilderClass = $pageRecord[0]['pagebuilder_class'];
     $loadedPageViewClass = $pageRecord[0]['pageview_class'];
-    $loadedPageTypeId = $pageRecord[0]['pagetype_id'];
     $loadedPageIsDeleted = empty($pageRecord[0]['deleted']) ? false : true;
 }
 
@@ -190,7 +187,6 @@ if ($allowAccess) {
 // set PageView class variables
 $pageView->setPageTitle($pageTitle);
 $pageView->setPageLInkText($pageLinkText);
-$pageView->setPageTypeID($loadedPageTypeId);
 
 $pageBuilder = new $pageBuilderClass($pageView);
 

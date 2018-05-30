@@ -46,7 +46,5 @@ class PagePostApiDataValidator extends ApiDataValidator implements iApiDataValid
         $published = new BooleanFieldValidator(true);
         $this->addFieldValidator('published', $published);
 
-        $pageTypeId = new IntegerFieldValidator(true);
-        $this->addFieldValidator('pageTypeId', $pageTypeId);
     }
 }

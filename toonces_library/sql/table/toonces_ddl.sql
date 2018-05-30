@@ -2,17 +2,6 @@ CREATE DATABASE IF NOT EXISTS toonces;
 
 USE toonces;
 
-CREATE TABLE IF NOT EXISTS pagetypes (
-     pagetype_id        BIGINT          NOT NULL
-    ,name               VARCHAR(50)     NOT NULL
-    ,description        VARCHAR(512)    NOT NULL
-    ,restricted_access  BOOL            NOT NULL
-    ,created_dt         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt        TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
-
-        ,CONSTRAINT pk_pagetypes PRIMARY KEY (pagetype_id)
-
-) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
 CREATE TABLE IF NOT EXISTS pages (
@@ -27,10 +16,8 @@ CREATE TABLE IF NOT EXISTS pages (
     ,deleted            TIMESTAMP       NULL
     ,redirect_on_error  BOOL            NOT NULL
     ,published          BOOL            NOT NULL DEFAULT 0
-    ,pagetype_id        BIGINT          NOT NULL DEFAULT 0
 
         ,CONSTRAINT pk_pages PRIMARY KEY (page_id)
-        ,CONSTRAINT fk_pagetype FOREIGN KEY (pagetype_id) REFERENCES pagetypes (pagetype_id)
         ,INDEX idx_pathname (pathname)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;

@@ -24,7 +24,6 @@ CREATE FUNCTION CREATE_PAGE  (
     ,pageview_class VARCHAR(50)
     ,redirect_on_error BOOL
     ,published BOOL
-    ,pagetype_id BIGINT
 
 )
 
@@ -101,7 +100,6 @@ BEGIN
             ,pageview_class
             ,redirect_on_error
             ,published
-            ,pagetype_id
         ) VALUES (
             pathname
             ,page_title
@@ -110,7 +108,6 @@ BEGIN
             ,pageview_class
             ,redirect_on_error
             ,published
-            ,pagetype_id
         );   
         
         INSERT INTO page_hierarchy_bridge (

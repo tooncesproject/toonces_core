@@ -17,7 +17,6 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 	var $logoutSignal;
 	var $userCanEdit;
 	var $userCanAccessAdminPage;
-	var $pageTypeId;
 	var $pageURI;
 	var $pageIsPublished;
 	var $sqlConn;
@@ -80,14 +79,6 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 		return $this->pageLinkText;
 	}
 
-	public function setPageTypeID($paramPageTypeID) {
-		$this->pageTypeId = $paramPageTypeID;
-	}
-
-	public function getPageTypeID() {
-	   return $this->pageTypeID;
-	}
-
 	// execution methods
 	public function checkSessionAccess() {
 	
@@ -114,7 +105,6 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 		$sql = <<<SQL
 			SELECT
 				 p.published
-				,p.pagetype_id
 				,CASE
 					WHEN pua.page_id IS NOT NULL THEN 1
 					ELSE 0
@@ -136,8 +126,6 @@ SQL;
 		$result = $stmt->fetchAll();
 		$row = $result[0];
 		$this->pageIsPublished = $row['published'];
-		$pageTypeId = $row['pagetype_id'];
-		$isAdminPage = ($row['pagetype_id'] == 1) ? true : false;
 		$userHasPageAccess = $row['user_has_access'];
 		// Admin user can always edit
 		$this->userCanEdit = ($userIsAdmin) ? true : $row['can_edit'];
@@ -145,15 +133,11 @@ SQL;
 		// Is the page unpublished?
 		if (!$this->pageIsPublished) {
 			// Allow access to page if:
-			// user is logged in and page is admin page (defer access to page)
-			if ($this->adminSessionActive && $isAdminPage)
-				$allowAccess = true;
-
 			// user is admin
 			if ($userIsAdmin)
 				$allowAccess = true;
 
-			// page isn't necessarily admin page but user is logged in and has access
+			// user is logged in and has access
 			if ($userHasPageAccess )
 				$allowAccess = true;
 

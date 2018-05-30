@@ -150,7 +150,6 @@ SQL;
         ,pageview_class
         ,redirect_on_error
         ,published
-        ,pagetype_id
         ) VALUES (
          'Sorry, This is Toonces.'
         ,'Home Page'
@@ -158,7 +157,6 @@ SQL;
         ,'HTMLPageView'
         ,FALSE
         ,TRUE
-        ,5
         );
 
 SQL;
@@ -249,7 +247,6 @@ SQL;
             ,'JsonPageView'                  -- ,pageview_class VARCHAR(50)
             ,FALSE                          -- ,redirect_on_error BOOL
             ,FALSE                          -- ,published BOOL
-            ,6                              -- ,pagetype_id BIGINT
         )
 SQL;
     $stmt = $conn->prepare($sql);
@@ -273,7 +270,6 @@ SQL;
             ,'JsonPageView'                      -- ,pageview_class VARCHAR(50)
             ,FALSE                              -- ,redirect_on_error BOOL
             ,FALSE                              -- ,published BOOL
-            ,6                                  -- ,pagetype_id BIGINT
         )
 SQL;
     $stmt = $conn->prepare($sql);
@@ -298,7 +294,6 @@ SQL;
             ,'JsonPageView'                             -- ,pageview_class VARCHAR(50)
             ,FALSE                                      -- ,redirect_on_error BOOL
             ,FALSE                                      -- ,published BOOL
-            ,6                                          -- ,pagetype_id BIGINT
         )
 SQL;
     $stmt = $conn->prepare($sql);
@@ -322,7 +317,6 @@ SQL;
             ,'FilePageView'                         -- ,pageview_class VARCHAR(50)
             ,TRUE                                   -- ,redirect_on_error BOOL
             ,FALSE                                  -- ,published BOOL
-            ,6                                      -- ,pagetype_id BIGINT
         )
 SQL;
 
