@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <toonces_settings>
 	<!-- Standard page settings: File locations from document root -->
-	<standard_page header_html_file="toonces_library/html/toonces_default_header.html" footer_html_file="toonces_library/html/toonces_default_footer.html" head_tags_file="toonces_library/html/head_tags.html" css_stylesheet_file="toonces_library/css/toonces.css">
+	<standard_page
+		header_html_file="toonces_library/html/toonces_default_header.html"
+		footer_html_file="toonces_library/html/toonces_default_footer.html"
+		head_tags_file="toonces_library/html/head_tags.html"
+		css_stylesheet_file="toonces_library/css/toonces.css"
+	>
 		<body_attributes>
 		</body_attributes>
 	</standard_page>
