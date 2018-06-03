@@ -127,25 +127,6 @@ CREATE TABLE IF NOT EXISTS login_attempt (
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-CREATE TABLE IF NOT EXISTS adminpages (
-     adminpage_id           BIGINT          NOT NULL
-    ,admin_parent_page_id   BIGINT          NOT NULL
-    ,pathname               VARCHAR(50)     NULL
-    ,page_title             VARCHAR(100)    NULL
-    ,page_link_text         VARCHAR(100)    NULL
-    ,pagebuilder_class      VARCHAR(50)     NOT NULL
-    ,pageview_class         VARCHAR(50)     NOT NULL
-    ,created_by             VARCHAR(50)     NULL
-    ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
-    ,redirect_on_error      BOOL            NOT NULL DEFAULT 0
-    ,published              BOOL            NOT NULL
-
-        ,CONSTRAINT pk_adminpages PRIMARY KEY (adminpage_id)
-
-) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
-
-
 CREATE TABLE IF NOT EXISTS ext_html_page (
      ext_html_page_id       BIGINT          NOT NULL AUTO_INCREMENT
     ,page_id                BIGINT          NOT NULL

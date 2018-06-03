@@ -19,7 +19,6 @@ include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
 include_once LIBPATH.'php/utility/SessionManager.php';
 include_once LIBPATH.'php/utility/static/GrabParentPageId.php';
 include_once LIBPATH.'php/utility/static/CheckPageUserAccess.php';
-include_once LIBPATH.'php/resource/formelement/abstract/FormElement.php';
 include_once LIBPATH.'php/utility/DynamicNavigationLink.php';
 include_once LIBPATH.'php/resource/toolbar/abstract/ToolbarElement.php';
 include_once LIBPATH.'php/resource/toolbar/DefaultToolbarElement.php';
@@ -41,15 +40,11 @@ include_once LIBPATH.'php/utility/datavalidator/ExtHtmlPagePutApiDataValidator.p
 include_once LIBPATH.'php/resource/extension/core_services/CoreServicesDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/PageDataResource.php';
 include_once LIBPATH.'php/resource/extension/core_services/FileResource.php';
-include_once LIBPATH . 'php/resource/extension/core_services/ExtHtmlPageDataResource.php';
+include_once LIBPATH.'php/resource/extension/core_services/ExtHtmlPageDataResource.php';
 include_once LIBPATH.'php/resource/abstract/ApiPageView.php';
 include_once LIBPATH.'php/resource/FilePageView.php';
 include_once LIBPATH.'php/resource/JsonPageView.php';
 
-include_once LIBPATH.'php/pagebuilders/admin/abstract/AdminPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/admin/AdminHomeBuilder.php';
-include_once LIBPATH.'php/pagebuilders/admin/UserAdminPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/admin/CreateUserAdminPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/ExtHTMLPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
@@ -60,7 +55,6 @@ include_once LIBPATH.'php/pagebuilders/core_services/PageApiPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/core_services/ExtPageApiPageBuilder.php';
 include_once LIBPATH.'php/pagebuilders/TestPageBuilder.php';
 
-include_once LIBPATH.'php/resource/extension/admin/AdminHTMLViewResource.php';
 include_once LIBPATH.'php/resource/html_component/BodyHTMLViewResource.php';
 
 include_once LIBPATH.'php/utility/static/UniversalConnect.php';
@@ -68,13 +62,8 @@ include_once LIBPATH.'php/utility/static/GrabPageURL.php';
 include_once LIBPATH.'php/utility/static/GrabParentPageURL.php';
 
 include_once LIBPATH.'php/resource/html_component/HeadElement.php';
-include_once LIBPATH.'php/resource/extension/admin/LoginFormElement.php';
-include_once LIBPATH.'php/resource/extension/admin/CreateUserFormElement.php';
 include_once LIBPATH.'php/utility/UserManager.php';
 include_once LIBPATH.'php/resource/navelement/abstract/NavElement.php';
-include_once LIBPATH.'php/resource/extension/admin/AdminNavElement.php';
-include_once LIBPATH.'php/resource/formelement/delegate/FormElementInput.php';
-include_once LIBPATH.'php/resource/extension/admin/LogoutFormElement.php';
 include_once LIBPATH.'php/resource/interactionelement/interface/iInteractionDelegate.php';
 include_once LIBPATH.'php/resource/interactionelement/delegate/abstract/InteractionDelegate.php';
 include_once LIBPATH.'php/resource/interactionelement/InteractionElement.php';
