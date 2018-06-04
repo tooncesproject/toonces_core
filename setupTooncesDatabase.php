@@ -189,16 +189,6 @@ SQL;
         echo '    Detected existing home page in database; Skipping.' . PHP_EOL;
     }
 
-    // Create admin pages
-    echo 'Creating Toonces admin tools...' . PHP_EOL;
-    $sql = "CALL sp_create_admin_pages(FALSE)";
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-    } catch (PDOException $e) {
-        echo('Failed to create admin pages: ' . $e->getMessage());
-        throw $e;
-    }
 
     // Create Core Services API
     echo 'Creating Core Services API...' . PHP_EOL;
