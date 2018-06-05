@@ -14,8 +14,8 @@ include_once LIBPATH.'php/resource/HTMLViewResource.php';
 include_once LIBPATH.'php/resource/interface/iPageView.php';
 include_once LIBPATH.'php/resource/interface/iHTMLView.php';
 include_once LIBPATH.'php/resource/HTMLPageView.php';
-include_once LIBPATH.'php/pagebuilders/abstract/PageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
+include_once LIBPATH.'php/pagebuilder/abstract/PageBuilder.php';
+include_once LIBPATH.'php/pagebuilder/abstract/StandardPageBuilder.php';
 include_once LIBPATH.'php/utility/SessionManager.php';
 include_once LIBPATH.'php/utility/static/GrabParentPageId.php';
 include_once LIBPATH.'php/utility/static/CheckPageUserAccess.php';
@@ -45,15 +45,15 @@ include_once LIBPATH.'php/resource/abstract/ApiPageView.php';
 include_once LIBPATH.'php/resource/FilePageView.php';
 include_once LIBPATH.'php/resource/JsonPageView.php';
 
-include_once LIBPATH.'php/pagebuilders/abstract/StandardPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/ExtHTMLPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/Toonces404PageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/abstract/APIPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/core_services/CoreServicesAPIPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/core_services/DocumentEndpointPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/core_services/PageApiPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/core_services/ExtPageApiPageBuilder.php';
-include_once LIBPATH.'php/pagebuilders/TestPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/abstract/StandardPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/ExtHTMLPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/Toonces404PageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/abstract/APIPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/core_services/CoreServicesAPIPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/core_services/DocumentEndpointPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/core_services/PageApiPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/core_services/ExtPageApiPageBuilder.php';
+include_once LIBPATH .'php/pagebuilder/TestPageBuilder.php';
 
 include_once LIBPATH.'php/resource/html_component/BodyHTMLViewResource.php';
 
