@@ -44,7 +44,7 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 		return $this->pageIsPublished;
 	}
 
-	public function addElement ($element) {
+	public function setResource ($element) {
 		array_push($this->pageElements,$element);
 		$this->elementsCount++;
 	}
@@ -53,15 +53,6 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 	    return $this->userCanEdit;
 	}
 
-	// Setters and getters for compliance to iPageView
-
-	public function setPageURI($paramPageURI) {
-		$this->pageURI = $paramPageURI;
-	}
-
-	public function getPageURI() {
-		return $this->pageURI;
-	}
 
 	public function setSQLConn($paramSQLConn) {
 		$this->sqlConn = $paramSQLConn;
@@ -165,7 +156,7 @@ SQL;
 		return $htmlString;
 	}
 
-	public function renderPage() {
+	public function renderResource() {
 
 		echo $this->getResource();
 

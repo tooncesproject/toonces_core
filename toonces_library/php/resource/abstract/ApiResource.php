@@ -50,7 +50,7 @@ abstract class ApiResource extends Resource implements iResource {
 
         // Get the resource URI if it hasn't already been set externally
         if (!$this->resourceUri)
-            $this->resourceUri = $this->pageViewReference->getPageURI();
+            $this->resourceUri = GrabPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->getSQLConn());
 
         // Build the full URL path
         $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';

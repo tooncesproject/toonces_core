@@ -40,33 +40,6 @@ class ApiPageViewTest extends SqlDependentTestCase {
     }
 
 
-    function testGetPageURI() {
-        // ARRANGE
-        $conn = $this->getConnection();
-        $this->buildTestDatabase();
-
-        // Get a page ID from the test fixture.
-        $sql = "SELECT MAX(page_id) FROM pages";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-        $pageId = $result[0][0];
-
-        $pagePath = GrabPageURL::getURL($pageId, $conn);
-
-        // ACT
-        // Instantiate an ApiPageView object with the page ID set as the example retrieved from the fixture.
-        $apv = new ConcreteApiPageView($pageId);
-        $testpath = $apv->getPageURI();
-
-        // ASSERT
-        $this->assertSame($pagePath, $testpath);
-
-        // tear down fixture
-        $this->destroyTestDatabase();
-
-    }
-
     /**
      * @expectedException Exception
      */

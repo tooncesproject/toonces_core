@@ -205,6 +205,7 @@ SQL;
         // ARRANGE
         // See testGetSubResources for fixture injection
         $pageView = new JsonPageView(1);
+        $pageView->setSQLConn($this->getConnection());
         $dr = new ConcreteDataResource($pageView);
         $dr->httpMethod = 'GET';
         $testData = array('foo' => 'bar');

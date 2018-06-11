@@ -35,7 +35,7 @@ class FilePageViewTest extends TestCase {
     /**
      * @expectedException Exception
      */
-    function testRenderPage() {
+    function testRenderResource() {
         // Notes: Without a wrapper, PHPUnit doesn't include a way to test the
         // readfile() output of this class.
         // We'll lean on integration testing and/or trust that the PHP-native functions
@@ -53,14 +53,14 @@ class FilePageViewTest extends TestCase {
 
         $errorState = false;
         try {
-            $badOutput = $jpv->renderPage();
+            $badOutput = $jpv->renderResource();
         } finally {
             $errorState = true;
         }
 
         // with valid DataResource
         $jpv->dataObjects = array(0 => $goodFileResource );
-        $goodOutput = $jpv->renderPage();
+        $goodOutput = $jpv->renderResource();
 
         // ASSERT
         $this->assertNull($badOutput);

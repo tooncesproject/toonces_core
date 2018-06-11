@@ -31,19 +31,9 @@ abstract class ApiPageView
 
 
     // iPageView setters and getters
-    public function setPageURI($paramPageURI) {
-        $this->pageURI = $paramPageURI;
-    }
 
-    public function addElement($element) {
-        array_push($this->dataObjects, $element);
-    }
-
-    public function getPageURI() {
-        if (!$this->pageURI)
-            $this->setPageURI(GrabPageURL::getURL($this->pageId, $this->sqlConn));
-
-            return $this->pageURI;
+    public function setResource($paramResource) {
+        array_push($this->dataObjects, $paramResource);
     }
 
     public function setSQLConn($paramSQLConn) {
