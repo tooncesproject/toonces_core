@@ -194,4 +194,4 @@ foreach($pageElements as $element) {
 	$pageView->addElement($element);
 }
 
-$pageView->renderPage();
+$pageView->renderResource();
