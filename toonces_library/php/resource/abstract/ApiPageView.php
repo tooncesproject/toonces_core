@@ -32,8 +32,8 @@ abstract class ApiPageView
 
     // iPageView setters and getters
 
-    public function addElement($element) {
-        array_push($this->dataObjects, $element);
+    public function setResource($paramResource) {
+        array_push($this->dataObjects, $paramResource);
     }
 
     public function setSQLConn($paramSQLConn) {

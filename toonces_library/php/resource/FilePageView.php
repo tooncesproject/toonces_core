@@ -16,7 +16,7 @@ class FilePageview extends ApiPageView implements iPageView, iResource {
      * @throws Exception
      * @return string
      */
-    public function renderPage() {
+    public function renderResource() {
         // Called by index.php - Serves a file download, if applicable.
 
         // $dataObject will be a FileResource or similar Resource subclass instance.

@@ -17,7 +17,7 @@ class JsonPageView extends ApiPageView implements iPageView, iResource
     /**
      * @throws Exception
      */
-    public function renderPage() {
+    public function renderResource() {
         // Called by index.php - Converts the resource data to JSON, executes the server's response.
         $dataObject = $this->getResource();
 

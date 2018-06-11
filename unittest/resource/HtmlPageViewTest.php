@@ -22,7 +22,7 @@ class HtmlPageViewTest extends TestCase
         $this->assertInstanceOf(HTMLPageView::class, $pageView);
     }
     
-    public function testAddElement()
+    public function testSetResource()
     {
         // arrange
         $pageId = 1;
@@ -30,14 +30,14 @@ class HtmlPageViewTest extends TestCase
         $element = new HTMLResource($pageView);
         
         // act
-        $pageView->addElement($element);
+        $pageView->setResource($element);
 
         // assert
         $pageElements = $pageView->pageElements;
         $this->assertContains($element, $pageElements);
     }
  
-    public function testGetHTML()
+    public function testGetResource()
     {
         // arrange
         $pageId = 1;
@@ -46,7 +46,7 @@ class HtmlPageViewTest extends TestCase
         
         $html = '</html>';
         $element->html = $html;
-        $pageView->addElement($element);
+        $pageView->setResource($element);
         
         // act
         $htmlOut = $pageView->getResource();

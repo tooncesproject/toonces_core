@@ -17,7 +17,7 @@ interface iPageView
     public function setSQLConn($paramSQLConn);
 
     /**
-     * @return PDO]
+     * @return PDO
      */
     public function getSQLConn();
 
@@ -29,8 +29,12 @@ interface iPageView
     
     // Action methods
     public function __construct($pageViewPageId);
-    public function addElement($element);
-    public function renderPage();
+
+    /**
+     * @param iResource $paramResource
+     */
+    public function setResource($paramResource);
+    public function renderResource();
     public function checkSessionAccess();
     public function checkAdminSession();
     

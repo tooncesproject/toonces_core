@@ -34,7 +34,7 @@ class JsonPageViewTest extends TestCase {
     /**
      * @expectedException Exception
      */
-    function testRenderPage() {
+    function testRenderResource() {
         // ARRANGE
         $jpv = new JsonPageView(1);
         $goodDataResource = new GoodDataResource($jpv);
@@ -48,14 +48,14 @@ class JsonPageViewTest extends TestCase {
 
         $errorState = false;
         try {
-            $badOutput = $jpv->renderPage();
+            $badOutput = $jpv->renderResource();
         } finally {
             $errorState = true;
         }
 
         // with valid DataResource
         $jpv->dataObjects = array(0 => $goodDataResource );
-        $goodOutput = $jpv->renderPage();
+        $goodOutput = $jpv->renderResource();
         json_decode($goodOutput);
 
         // ASSERT
