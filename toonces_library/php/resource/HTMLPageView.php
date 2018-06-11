@@ -53,15 +53,6 @@ class HTMLPageView extends HTMLViewResource implements iHTMLView, iPageView
 	    return $this->userCanEdit;
 	}
 
-	// Setters and getters for compliance to iPageView
-
-	public function setPageURI($paramPageURI) {
-		$this->pageURI = $paramPageURI;
-	}
-
-	public function getPageURI() {
-		return $this->pageURI;
-	}
 
 	public function setSQLConn($paramSQLConn) {
 		$this->sqlConn = $paramSQLConn;

@@ -11,9 +11,6 @@
 interface iPageView
 {
     // Setters and getters
-    public function setPageURI($paramPageURI);
-    public function getPageURI();
-
     /**
      * @param PDO $paramSQLConn
      */

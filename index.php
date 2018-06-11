@@ -164,7 +164,6 @@ if (count($pageRecord)) {
 if ($pageExists) {
     // instantiate the page renderer
     $pageView = new $loadedPageViewClass($pageId);
-    $pageView->setPageURI($path);
     $pageView->setSQLConn($conn);
     $allowAccess = !$loadedPageIsDeleted && $pageView->checkSessionAccess();
 }
@@ -178,7 +177,6 @@ if ($allowAccess) {
 } else {
     // If no access, reset PageView class to default and send a 404 header.
     $pageView = new $defaultPageViewClass($pageId);
-    $pageView->setPageURI($path);
     $pageView->setSQLConn($conn);
     $httpStatusString = Enumeration::getString(404, 'EnumHTTPResponse');
     header($httpStatusString, true, 404);
