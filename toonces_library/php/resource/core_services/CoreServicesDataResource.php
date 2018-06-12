@@ -7,7 +7,7 @@
  *
 */
 
-require_once LIBPATH.'php/toonces.php';
+require_once LIBPATH . 'php/toonces.php';
 
 class CoreServicesDataResource extends DataResource implements iResource {
 

@@ -17,7 +17,6 @@ function getPage($pathString, $conn) {
 
 	$defaultPage = 1;
 	$depthCount = 0;
-	$pathArray = array();
 
 	// return home page if no path string
 	if (trim($pathString) == '') {

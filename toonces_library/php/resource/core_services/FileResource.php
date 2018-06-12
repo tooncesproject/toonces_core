@@ -9,7 +9,7 @@
  *
  * */
 
-include_once LIBPATH.'php/toonces.php';
+include_once LIBPATH . 'php/toonces.php';
 
 class FileResource extends ApiResource implements iResource {
 

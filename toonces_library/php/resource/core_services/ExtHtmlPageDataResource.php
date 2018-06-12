@@ -8,7 +8,7 @@
  *
  */
 
-require_once LIBPATH.'php/toonces.php';
+require_once LIBPATH . 'php/toonces.php';
 
 class ExtHtmlPageDataResource extends PageDataResource implements iResource {
 
