@@ -17,8 +17,8 @@ class PagePostApiDataValidator extends ApiDataValidator implements iApiDataValid
      */
     function buildFields() {
 
-        $ancestorPageId = new IntegerFieldValidator(false);
-        $this->addFieldValidator('ancestorPageId', $ancestorPageId);
+        $ancestorResourceId = new IntegerFieldValidator(false);
+        $this->addFieldValidator('ancestorResourceId', $ancestorResourceId);
 
         $pathName = new StringFieldValidator(true);
         $pathName->maxLength = 50;
@@ -27,10 +27,6 @@ class PagePostApiDataValidator extends ApiDataValidator implements iApiDataValid
         $pageTitle = new StringFieldValidator(false);
         $pageTitle->maxLength = 50;
         $this->addFieldValidator('pageTitle', $pageTitle);
-
-        $pageLinkText = new StringFieldValidator(true);
-        $pageLinkText->maxLength = 50;
-        $this->addFieldValidator('pageLinkText', $pageLinkText);
 
         $pageBuilderClass= new StringFieldValidator(false);
         $pageBuilderClass->maxLength = 50;

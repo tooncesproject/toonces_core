@@ -12,33 +12,32 @@ require_once LIBPATH.'/php/toonces.php';
 
 class SearchPathString {
 
-    public static function grabPageId($pathArray, $pageId, $depthCount, $conn) {
+    public static function grabResourceId($pathArray, $resourceId, $depthCount, $conn) {
 
         $pageFound = false;
-        $descendantPageId;
+        $descendantResourceId;
 
-        //$query = sprintf(file_get_contents(LIBPATH.'/sql/query/retrieve_child_page_ids.sql'),$pageid);
         $sql = <<<SQL
         SELECT
-	       phb.descendant_page_id,
-	       pg.pathname
-        FROM page_hierarchy_bridge phb
-        LEFT JOIN pages pg on pg.page_id = phb.descendant_page_id
-        WHERE phb.page_id = :pageId;
+	       rhb.descendant_resource_id,
+	       r.pathname
+        FROM resource_hierarchy_bridge rhb
+        LEFT JOIN resource r on r.resource_id = rhb.descendant_resource_id
+        WHERE rhb.resource_id = :resourceId;
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $pageId]);
+        $stmt->execute(['resourceId' => $resourceId]);
 
         $descenantPages = $stmt->fetchAll();
 
         if (!$descenantPages) {
-            return $pageId;
+            return $resourceId;
         }
 
         foreach ($descenantPages as $row) {
 
             if ($row['pathname'] == $pathArray[$depthCount]) {
-                $descendantPageId = $row['descendant_page_id'];
+                $descendantResourceId = $row['descendant_resource_id'];
                 $pageFound = true;
                 break;
             }
@@ -48,16 +47,16 @@ SQL;
         $nextDepthCount = ++$depthCount;
 
         if ($pageFound && (!array_key_exists($nextDepthCount, $pathArray) OR trim($pathArray[$nextDepthCount]) == '')) {
-            return $descendantPageId;
+            return $descendantResourceId;
 
         } else if ($pageFound) {
             //iterate recursion if page found
-            return $this->grabPageId($pathArray, $descendantPageId, $nextDepthCount, $conn);
+            return $this->grabResourceId($pathArray, $descendantResourceId, $nextDepthCount, $conn);
 
         } else {
 
             //if not found, query deepest page for whether it allows a redirect
-            $query = 'SELECT redirect_on_error FROM toonces.pages WHERE page_id = '.$pageId;
+            $query = 'SELECT redirect_on_error FROM toonces.resource WHERE resource_id = '.$resourceId;
             $result = $conn->query($query);
 
             foreach($result as $row) {
@@ -65,7 +64,7 @@ SQL;
             }
 
             if ($redirectOnError) {
-                return $pageId;
+                return $resourceId;
             }
             else {
                 return 0;

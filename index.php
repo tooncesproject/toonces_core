@@ -4,21 +4,21 @@
 *	Copyright (c) 2015 by Paul Anderson, All Rigths Reserved
 *
 *	This script is the root script for any given application in the site.
-*	It instantiates an iPageView-compliant object which provides the base rendering for a page
+*	It instantiates an iPageView-compliant object which provides the base rendering for a resource
 *
 */
 
 include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
 
-// function to get page from path
+// function to get resource from path
 
 function getPage($pathString, $conn) {
 
 	$defaultPage = 1;
 	$depthCount = 0;
 
-	// return home page if no path string
+	// return home resource if no path string
 	if (trim($pathString) == '') {
 		return $defaultPage;
 	} else {
@@ -31,42 +31,55 @@ function getPage($pathString, $conn) {
 	}
 }
 
-function pageSearch($pathArray, $pageid, $depthCount, $conn) {
+function pageSearch($pathArray, $resourceId, $depthCount, $conn) {
 
 	$pageFound = false;
-	$descendantPageId;
+	$descendantResourceId;
 
-	$query = sprintf(file_get_contents(LIBPATH.'/sql/query/retrieve_child_page_ids.sql'),$pageid);
+	$sqlQuery = <<<SQL
+    SELECT
+	  rhb.descendant_resource_id,
+	  pg.pathname
+    FROM
+	  toonces.resource_hierarchy_bridge rhb
+    LEFT JOIN
+    	toonces.resource pg on pg.resource_id = rhb.descendant_resource_id
+    WHERE
+    	rhb.resource_id = %d
+SQL;
+
+
+	$query = sprintf($sqlQuery),$resourceId);
 
 	$descenantPages = $conn->query($query);
 
 	if (!$descenantPages) {
-		return $pageid;
+		return $resourceId;
 	}
 
 	foreach ($descenantPages as $row) {
 
 		if ($row['pathname'] == $pathArray[$depthCount]) {
-			$descendantPageId = $row['descendant_page_id'];
+			$descendantResourceId = $row['descendant_resource_id'];
 			$pageFound = true;
 			break;
 		}
 	}
-	// if a page was found and the end of the array has been reached, return the descendant ID
+	// if a resource was found and the end of the array has been reached, return the descendant ID
 	// otherwise continue recursion
 	$nextDepthCount = ++$depthCount;
 
 	if ($pageFound && (!array_key_exists($nextDepthCount, $pathArray) OR trim($pathArray[$nextDepthCount]) == '')) {
-		return $descendantPageId;
+		return $descendantResourceId;
 
 	} else if ($pageFound) {
-		//iterate recursion if page found
-		return pageSearch($pathArray, $descendantPageId, $nextDepthCount, $conn);
+		//iterate recursion if resource found
+		return pageSearch($pathArray, $descendantResourceId, $nextDepthCount, $conn);
 
 	} else {
 
-		//if not found, query deepest page for whether it allows a redirect
-		$query = 'SELECT redirect_on_error FROM toonces.pages WHERE page_id = '.$pageid;
+		//if not found, query deepest resource for whether it allows a redirect
+		$query = 'SELECT redirect_on_error FROM toonces.resource WHERE resource_id = '.$resourceId;
 		$result = $conn->query($query);
 
 		foreach($result as $row) {
@@ -74,7 +87,7 @@ function pageSearch($pathArray, $pageid, $depthCount, $conn) {
 		}
 
 		if ($redirectOnError) {
-			return $pageid;
+			return $resourceId;
 		}
 		else {
 			return 0;
@@ -91,7 +104,7 @@ $conn = UniversalConnect::doConnect();
 $pageTitle = 'Toonces Page';
 $defaultPageViewClass = 'HTMLPageView';
 
-$pageId = 1;
+$resourceId = 1;
 
 // Acquire path query from request
 $url = $_SERVER['REQUEST_URI'];
@@ -100,15 +113,15 @@ $url = $_SERVER['REQUEST_URI'];
 $queryString = $_SERVER['QUERY_STRING'];
 
 $path = parse_url($url,PHP_URL_PATH);
-// Check for a URL page path string. If none, defaults to home page.
+// Check for a URL resource path string. If none, defaults to home resource.
 
 // trim last slash from path
 $path = substr($path,1,strlen($path)-1);
 
 if (trim($path))
-	$pageId = getPage($path, $conn);
+	$resourceId = getPage($path, $conn);
 
-// Default content state for page access is 404.
+// Default content state for resource access is 404.
 
 // First, get the 404 pagebuiilder class from toonces-config.xml
 $xml = new DOMDocument();
@@ -119,7 +132,6 @@ $pageBuilderClass = $error404Node->nodeValue;
 
 $pathName = '';
 $pageTitle = 'Error 404';
-$pageLinkText = '';
 
 // Page state
 $loadedPageIsDeleted = false;
@@ -130,21 +142,20 @@ $allowAccess = false;
 // get sql query
 $sql = <<<SQL
 SELECT
-     p.page_id
+     p.resource_id
     ,p.pathname
     ,p.page_title
-    ,p.page_link_text
     ,p.pagebuilder_class
     ,p.pageview_class
     ,p.deleted
 FROM
-    toonces.pages p
+    toonces.resources p
 WHERE
-    p.page_id = :pageId;
+    p.resource_id = :resourceId;
 SQL;
 
 $stmt = $conn->prepare($sql);
-$stmt->execute(array(':pageId' => $pageId));
+$stmt->execute(array(':resourceId' => $resourceId));
 
 $pageRecord = $stmt->fetchall();
 $pageExists = false;
@@ -152,45 +163,41 @@ if (count($pageRecord)) {
     $pageExists = true;
     $loadedPagePathName = $pageRecord[0]['pathname'];
     $loadedPagePageTitle = $pageRecord[0]['page_title'];
-    $loadedPageLinkText = $pageRecord[0]['page_link_text'];
     $loadedPageBuilderClass = $pageRecord[0]['pagebuilder_class'];
     $loadedPageViewClass = $pageRecord[0]['pageview_class'];
     $loadedPageIsDeleted = empty($pageRecord[0]['deleted']) ? false : true;
 }
 
-// Check page deletion state and access.
+// Check resource deletion state and access.
 // Note: APIPageView pages will always return 'true' from checkSessionAccess method due to stateless authentication.
 if ($pageExists) {
-    // instantiate the page renderer
-    $pageView = new $loadedPageViewClass($pageId);
+    // instantiate the resource renderer
+
+    $pageView = new $loadedPageViewClass($resourceId);
     $pageView->setSQLConn($conn);
     $allowAccess = !$loadedPageIsDeleted && $pageView->checkSessionAccess();
 }
 
-// If access state is true, build the page.
+// If access state is true, build the resource.
 if ($allowAccess) {
     $pathName = $loadedPagePathName;
     $pageBuilderClass = $loadedPageBuilderClass;
     $pageTitle = $loadedPagePageTitle;
-    $pageLinkText = $loadedPageLinkText;
 } else {
     // If no access, reset PageView class to default and send a 404 header.
-    $pageView = new $defaultPageViewClass($pageId);
+    $pageView = new $defaultPageViewClass($resourceId);
     $pageView->setSQLConn($conn);
     $httpStatusString = Enumeration::getString(404, 'EnumHTTPResponse');
     header($httpStatusString, true, 404);
 }
 
-// set PageView class variables
-$pageView->setPageTitle($pageTitle);
-$pageView->setPageLInkText($pageLinkText);
 
 $pageBuilder = new $pageBuilderClass($pageView);
 
 $pageElements = $pageBuilder->buildPage();
 
 foreach($pageElements as $element) {
-	$pageView->addElement($element);
+	$pageView->setResource($element);
 }
 
 $pageView->renderResource();

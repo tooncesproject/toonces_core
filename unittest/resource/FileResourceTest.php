@@ -97,11 +97,11 @@ class FileResourceTest extends FileDependentTestCase {
         // Create a non-admin user.
         $this->createNonAdminUser();
 
-        // Create an unpublished page
-        $pageId = $this-> createPage(false);
+        // Create an unpublished resource
+        $resourceId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
-        $pageView = new FilePageview($pageId);
+        $pageView = new FilePageview($resourceId);
         $conn = $this->getConnection();
         $pageView->setSQLConn($conn);
 
@@ -206,11 +206,11 @@ class FileResourceTest extends FileDependentTestCase {
      */
     function testGetAction() {
         // ARRANGE
-        // Create an unpublished page
-        $pageId = $this-> createPage(false);
+        // Create an unpublished resource
+        $resourceId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
-        $pageView = new FilePageview($pageId);
+        $pageView = new FilePageview($resourceId);
         $conn = $this->getConnection();
         $pageView->setSQLConn($conn);
 
@@ -299,11 +299,11 @@ class FileResourceTest extends FileDependentTestCase {
      */
     function testDeleteAction() {
         // ARRANGE
-        // Create an unpublished page
-        $pageId = $this-> createPage(false);
+        // Create an unpublished resource
+        $resourceId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
-        $pageView = new FilePageview($pageId);
+        $pageView = new FilePageview($resourceId);
         $conn = $this->getConnection();
         $pageView->setSQLConn($conn);
 

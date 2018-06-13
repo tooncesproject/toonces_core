@@ -24,7 +24,6 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/resource/FilePageViewTest.php</file>
 			<file>unittest/resource/ApiResourceTest.php</file>
 			<file>unittest/resource/DataResourceTest.php</file>
-			<file>unittest/resource/HtmlPageViewTest.php</file>
 			<file>unittest/resource/HtmlResourceTest.php</file>
 			<file>unittest/resource/HtmlViewResourceTest.php</file>
 			<file>unittest/resource/FileResourceTest.php</file>
@@ -38,7 +37,7 @@ Initial Commit: Paul Anderson, 12/11/2017
 		</testsuite>
 		<testsuite name="utility_classes">
 			<file>unittest/utility/CheckPageUserAccessTest.php</file>
-			<file>unittest/utility/GrabParentPageIdTest.php</file>
+			<file>unittest/utility/GrabParentResourceIdTest.php</file>
 			<file>unittest/utility/LocalResourceClientTest.php</file>
 			<file>unittest/utility/HtmlFieldValidatorTest.php</file>
 			<file>unittest/utility/ApiDataValidatorTest.php</file>

@@ -55,8 +55,8 @@ class FileResourceClient implements iResourceClient {
         // object can authenticate user access to the page.
         $path = parse_url($url, PHP_URL_PATH);
         $pathArray = explode('/', $path);
-        $pageId = SearchPathString::grabPageId($pathArray, 1, 0, $this->conn);
-        $fileResource->pageId = $pageId;
+        $resourceId = SearchPathString::grabResourceId($pathArray, 1, 0, $this->conn);
+        $fileResource->resourceId = $resourceId;
         $fileResource->requestPath = $url;
         $fileResource->resourceData = $data;
 
@@ -78,8 +78,8 @@ class FileResourceClient implements iResourceClient {
         // object can authenticate user access to the page.
         $path = parse_url($url, PHP_URL_PATH);
         $pathArray = explode('/', $path);
-        $pageId = SearchPathString::grabPageId($pathArray, 1, 0, $this->conn);
-        $fileResource->pageId = $pageId;
+        $resourceId = SearchPathString::grabResourceId($pathArray, 1, 0, $this->conn);
+        $fileResource->resourceId = $resourceId;
         $fileResource->requestPath = $url;
 
         $response = $fileResource->deleteAction();

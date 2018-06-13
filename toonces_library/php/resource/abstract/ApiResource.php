@@ -32,7 +32,7 @@ abstract class ApiResource extends Resource implements iResource {
         if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
             $email = $_SERVER['PHP_AUTH_USER'];
             $pw = $_SERVER['PHP_AUTH_PW'];
-            $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->pageId);
+            $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->resourceId);
             if ($loginSuccess)
                 $userId = $this->sessionManager->userId;
         }
@@ -50,7 +50,7 @@ abstract class ApiResource extends Resource implements iResource {
 
         // Get the resource URI if it hasn't already been set externally
         if (!$this->resourceUri)
-            $this->resourceUri = GrabPageURL::getURL($this->pageViewReference->pageId, $this->pageViewReference->getSQLConn());
+            $this->resourceUri = GrabResourceURL::getURL($this->pageViewReference->resourceId, $this->pageViewReference->getSQLConn());
 
         // Build the full URL path
         $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';

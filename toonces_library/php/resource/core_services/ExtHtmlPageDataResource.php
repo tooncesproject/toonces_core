@@ -23,10 +23,10 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
     var $urlPath;
 
     /**
-     * @param int $pageId
+     * @param int $resourceId
      * @return int
      */
-    function setupClient($pageId = null) {
+    function setupClient($resourceId = null) {
         // woo!
         $conn = $this->pageViewReference->getSQLConn();
         $clientClass = null;
@@ -37,11 +37,11 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
         // (Unit tests will set a "dummy" client)
         if (!isset($this->client)) {
             // Class set in parameters?
-            if (!$clientClass && $pageId) {
+            if (!$clientClass && $resourceId) {
                 // If not set in parameters, query the database for the client class
-                $sql = "SELECT client_class FROM ext_html_page WHERE page_id = :pageId";
+                $sql = "SELECT client_class FROM ext_html_page WHERE resource_id = :resourceId";
                 $stmt = $conn->prepare($sql);
-                $stmt->execute(['pageId' => $pageId]);
+                $stmt->execute(['resourceId' => $resourceId]);
                 $result = $stmt->fetchAll();
                 $clientClass = $result[0]['client_class'];
             }
@@ -130,11 +130,11 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
                 break;
             }
 
-            // Acquire critical variables body prior to page creation
+            // Acquire critical variables body prior to resource creation
             $htmlBody = $this->resourceData['htmlBody'];
             $clientClass = $this->resourceData['clientClass'];
 
-            // Attempt to create the page
+            // Attempt to create the resource
             parent::postAction();
 
             if ($this->httpStatus == Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse')) {
@@ -147,8 +147,8 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
             if ($this->httpStatus != Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'))
                 break;
 
-            $pageId = key($postResult);
-            $date = $postResult[$pageId]['createdDate'];
+            $resourceId = key($postResult);
+            $date = $postResult[$resourceId]['createdDate'];
             $fileNameDate = preg_replace('[ ]', '_', $date);
             $fileNameDate = preg_replace('[:]','',$fileNameDate);
 
@@ -162,7 +162,7 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
             }
 
             // Generate a file URL
-            $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
+            $fileUrl = $this->urlPath . strval($resourceId) . '_' . $fileNameDate . '.htm';
 
             // Create the file
             $email = $_SERVER['PHP_AUTH_USER'];
@@ -172,7 +172,7 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
 
             // If file creation was unsuccessful, roll back, break and error.
             if ($clientStatus != 200 && $clientStatus != 201) {
-                $this->parameters['id'] = strval($pageId);
+                $this->parameters['id'] = strval($resourceId);
                 parent::deleteAction();
                 $this->httpStatus = $clientStatus;
                 $this->resourceData = $clientResponse;
@@ -182,22 +182,22 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
             // Insert a record into ext_html_page
             $sql = <<<SQL
                 INSERT INTO ext_html_page
-                    (page_id, html_path, client_class)
+                    (resource_id, html_path, client_class)
                 VALUES
-                    (:pageId, :htmlPath, :clientClass)
+                    (:resourceId, :htmlPath, :clientClass)
 SQL;
             $stmt = $conn->prepare($sql);
 
             $sqlParams = array(
-                 'pageId' => $pageId
+                 'resourceId' => $resourceId
                 ,'htmlPath' => $fileUrl
                 ,'clientClass' => $clientClass
             );
             try {
                 $stmt->execute($sqlParams);
             } catch (PDOException $e) {
-                // If unsuccessful, delete the page record.
-                $this->parameters['id'] = strval($pageId);
+                // If unsuccessful, delete the resource record.
+                $this->parameters['id'] = strval($resourceId);
                 parent::deleteAction();
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 $this->statusMessage = 'PDO error occured when inserting into ext_html_page: ' . $e->getMessage();
@@ -205,7 +205,7 @@ SQL;
             }
 
             // Success?
-            $this->parameters['id'] = strval($pageId);
+            $this->parameters['id'] = strval($resourceId);
             $this->getAction();
             $this->httpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
 
@@ -268,12 +268,12 @@ SQL;
             }
 
             // If htmlBody was set, upload the document and update ext_html_page
-            $pageId = $this->parameters['id'];
+            $resourceId = $this->parameters['id'];
 
             $fileUrl = null;
             if ($htmlBody) {
                 // Attempt to instantiate the client
-                $clientStatus = $this->setupClient($pageId);
+                $clientStatus = $this->setupClient($resourceId);
                 // Break if error.
                 if ($clientStatus == 1)
                     break;
@@ -297,7 +297,7 @@ SQL;
                 }
 
                 // Generate a file URL
-                $fileUrl = $this->urlPath . strval($pageId) . '_' . $fileNameDate . '.htm';
+                $fileUrl = $this->urlPath . strval($resourceId) . '_' . $fileNameDate . '.htm';
 
                 // Create the file
                 $email = $_SERVER['PHP_AUTH_USER'];
@@ -313,31 +313,31 @@ SQL;
                 // Update the record if success
                 $sql = <<<SQL
                 INSERT INTO ext_html_page
-                    (page_id, html_path, client_class)
+                    (resource_id, html_path, client_class)
                     SELECT
-                         :pageId
+                         :resourceId
                         ,:htmlPath
                         ,COALESCE(:clientClass, client_class)
                     FROM
                         ext_html_page
                     WHERE
-                        page_id = :pageId
+                        resource_id = :resourceId
                 ON DUPLICATE KEY UPDATE
-                     page_id = VALUES(page_id)
+                     resource_id = VALUES(resource_id)
                     ,html_path = VALUES(html_path)
                     ,client_class = VALUES(client_class)
 SQL;
                 $stmt = $conn->prepare($sql);
                 $sqlParams = array(
-                    'pageId' => $pageId
+                    'resourceId' => $resourceId
                     ,'htmlPath' => $fileUrl
                     ,'clientClass' => $clientClass
                 );
                 try {
                     $stmt->execute($sqlParams);
                 } catch (PDOException $e) {
-                    // If unsuccessful, delete the page record.
-                    $this->parameters['id'] = strval($pageId);
+                    // If unsuccessful, delete the resource record.
+                    $this->parameters['id'] = strval($resourceId);
                     parent::deleteAction();
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                     $this->statusMessage = 'PDO error occured when inserting into ext_html_page: ' . $e->getMessage();
@@ -364,7 +364,7 @@ SQL;
     public function getAction() {
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
-        $pageId = $this->validateIntParameter('id');
+        $resourceId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
 
         do {
@@ -379,11 +379,10 @@ SQL;
             // OK so far? Build the query.
             $sql = <<<SQL
                 SELECT
-                     p.page_id
-                    ,phb.page_id AS ancestor_page_id
+                     p.resource_id
+                    ,rhb.resource_id AS ancestor_resource_id
                     ,pathname
                     ,page_title
-                    ,page_link_text
                     ,pagebuilder_class
                     ,pageview_class
                     ,p.created_dt
@@ -392,29 +391,29 @@ SQL;
                     ,published
                     ,ehp.html_path
                     ,ehp.client_class
-                FROM pages p
-                JOIN ext_html_page ehp ON p.page_id = ehp.page_id
-                -- join to PHB is to get the parent page ID
-                LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
-                LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userId)
+                FROM resource p
+                JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+                -- join to PHB is to get the parent resource ID
+                LEFT JOIN resource_hierarchy_bridge rhb ON p.resource_id = rhb.descendant_resource_id
+                LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND (rua.user_id = :userId)
                 LEFT JOIN users u ON u.user_id = :userId
                 WHERE
-                    (p.page_id = :pageId OR :pageId IS NULL)
+                    (p.resource_id = :resourceId OR :resourceId IS NULL)
                     AND
                     (
                         (p.published = 1 AND p.deleted IS NULL)
                         OR
-                        pua.user_id IS NOT NULL
+                        rua.user_id IS NOT NULL
                         OR
                         u.is_admin = TRUE
                     )
-                ORDER BY p.page_id ASC
+                ORDER BY p.resource_id ASC
 SQL;
             // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
             $result = null;
-            if ($pageId !== 0) {
+            if ($resourceId !== 0) {
                 $stmt = $conn->prepare($sql);
-                $sqlParams = array('userId' => $userId, 'pageId' => $pageId);
+                $sqlParams = array('userId' => $userId, 'resourceId' => $resourceId);
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchAll();
             }
@@ -423,12 +422,11 @@ SQL;
                 // Process the response
                 foreach ($result as $row) {
                     $this->resourceData[$row[0]] = array(
-                        'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
-                        ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
-                        ,'ancestorPageId' => intval($row['ancestor_page_id'])
+                        'url' => $this->resourceUrl . '?id=' . strval($row['resource_id'])
+                        ,'pageUri' => GrabResourceURL::getURL($row['resource_id'], $conn)
+                        ,'ancestorResourceId' => intval($row['ancestor_resource_id'])
                         ,'pathName' => $row['pathname']
                         ,'pageTitle' => $row['page_title']
-                        ,'pageLinkText' => $row['page_link_text']
                         ,'pageBuilderClass' => $row['pagebuilder_class']
                         ,'pageViewClass' => $row['pageview_class']
                         ,'createdDate' => $row['created_dt']
@@ -459,10 +457,10 @@ SQL;
         $sql = <<<SQL
                 SELECT html_path
                 FROM ext_html_page
-                WHERE page_id = :pageId
+                WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $id]);
+        $stmt->execute(['resourceId' => $id]);
         $result = $stmt->fetchAll();
         $htmlPath = $result[0]['html_path'];
         do {
@@ -481,7 +479,7 @@ SQL;
             // Call parent - This will requre authentication.
             parent::deleteAction();
 
-            // If delete of page was successful, delete the file.
+            // If delete of resource was successful, delete the file.
             if ($this->httpStatus == Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse')) {
 
                 $email = $_SERVER['PHP_AUTH_USER'];

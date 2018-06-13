@@ -18,7 +18,7 @@ class ExtHtmlPagePutApiDataValidator extends ExtHtmlPagePostApiDataValidator imp
 
         // Make some fields optional.
         $this->fieldValidators['htmlBody']->allowNull = true;
-        $this->fieldValidators['ancestorPageId']->allowNull = true;
+        $this->fieldValidators['ancestorResourceId']->allowNull = true;
         $this->fieldValidators['pageTitle']->allowNull = true;
     }
 }

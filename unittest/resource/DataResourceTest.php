@@ -99,20 +99,20 @@ class DataResourceTest extends SqlDependentTestCase {
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
         // We'll use the 'coreservices' API root for our test.
-        // The JsonPageView object needs to know its page ID.
+        // The JsonPageView object needs to know its resource ID.
         $sql = <<<SQL
         SELECT
-            page_id
+            resource_id
         FROM
-            toonces.pages
+            toonces.resource
         WHERE
             pathname = 'coreservices'
 SQL;
         $stmt = $sqlConn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
-        $pageId = $result[0][0];
-        $jsonPageView = new JsonPageView($pageId);
+        $resourceId = $result[0][0];
+        $jsonPageView = new JsonPageView($resourceId);
         $jsonPageView->setSQLConn($sqlConn);
         $dr = new ConcreteDataResource($jsonPageView);
 

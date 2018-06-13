@@ -27,15 +27,15 @@ class ApiPageViewTest extends SqlDependentTestCase {
 
     function testConstruct() {
         // ARRANGE
-        $pageId = 1;
+        $resourceId = 1;
         $version = '2.0';
         $_SERVER['HTTP_ACCEPT_VERSION'] = $version;
 
         //ACT
-        $apv = new ConcreteApiPageView($pageId);
+        $apv = new ConcreteApiPageView($resourceId);
 
         // ASSERT
-        $this->assertEquals($pageId, $apv->pageId);
+        $this->assertEquals($resourceId, $apv->resourceId);
         $this->assertSame($version, $apv->apiVersion);
     }
 

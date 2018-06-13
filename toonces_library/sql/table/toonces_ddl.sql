@@ -4,11 +4,10 @@ USE toonces;
 
 
 
-CREATE TABLE IF NOT EXISTS pages (
-     page_id            BIGINT          NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS resource (
+     resource_id        BIGINT          NOT NULL AUTO_INCREMENT
     ,pathname           VARCHAR(50)     NULL
     ,page_title         VARCHAR(100)    NULL
-    ,page_link_text     VARCHAR(100)    NULL
     ,pagebuilder_class  VARCHAR(50)     NOT NULL
     ,pageview_class     VARCHAR(50)     NOT NULL
     ,created_dt         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -17,24 +16,24 @@ CREATE TABLE IF NOT EXISTS pages (
     ,redirect_on_error  BOOL            NOT NULL
     ,published          BOOL            NOT NULL DEFAULT 0
 
-        ,CONSTRAINT pk_pages PRIMARY KEY (page_id)
+        ,CONSTRAINT pk_resource PRIMARY KEY (resource_id)
         ,INDEX idx_pathname (pathname)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-CREATE TABLE IF NOT EXISTS page_hierarchy_bridge (
-     bridge_id          BIGINT      NOT NULL AUTO_INCREMENT
-    ,page_id            BIGINT      NOT NULL
-    ,ancestor_page_id   BIGINT      NULL
-    ,descendant_page_id BIGINT      NULL
-    ,created_dt         TIMESTAMP   NOT NULL
+CREATE TABLE IF NOT EXISTS resource_hierarchy_bridge (
+     bridge_id              BIGINT    NOT NULL AUTO_INCREMENT
+    ,resource_id            BIGINT    NOT NULL
+    ,ancestor_resource_id   BIGINT    NULL
+    ,descendant_resource_id BIGINT    NULL
+    ,created_dt             TIMESTAMP NOT NULL
 
-        ,CONSTRAINT pk_page_hierarchy_bridge PRIMARY KEY (bridge_id)
-        ,CONSTRAINT fk_phb_page FOREIGN KEY (page_id) REFERENCES pages (page_id)
-        ,CONSTRAINT fk_phb_ancestor FOREIGN KEY (ancestor_page_id) REFERENCES pages (page_id)
-        ,CONSTRAINT fk_phb_descendant FOREIGN KEY (descendant_page_id) REFERENCES pages (page_id)
-        ,INDEX idx_page_ancestor (page_id, ancestor_page_id)
+        ,CONSTRAINT pk_resource_hierarchy_bridge PRIMARY KEY (bridge_id)
+        ,CONSTRAINT fk_rhb_resource FOREIGN KEY (resource_id) REFERENCES resource (resource_id)
+        ,CONSTRAINT fk_rhb_ancestor FOREIGN KEY (ancestor_resource_id) REFERENCES resource (resource_id)
+        ,CONSTRAINT fk_rhb_descendant FOREIGN KEY (descendant_resource_id) REFERENCES resource (resource_id)
+        ,INDEX idx_resource_ancestor (resource_id, ancestor_resource_id)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
@@ -75,17 +74,17 @@ CREATE TABLE IF NOT EXISTS sessions (
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-CREATE TABLE IF NOT EXISTS page_user_access (
-     page_user_access_id     BIGINT         NOT NULL    AUTO_INCREMENT
-    ,page_id                 BIGINT         NOT NULL
+CREATE TABLE IF NOT EXISTS resource_user_access (
+     resource_user_access_id     BIGINT         NOT NULL    AUTO_INCREMENT
+    ,resource_id             BIGINT         NOT NULL
     ,user_id                 BIGINT         NOT NULL
     ,can_edit                BOOL           NOT NULL    DEFAULT 0
     ,created_dt              TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
     ,modified_dt             TIMESTAMP      NULL ON UPDATE CURRENT_TIMESTAMP
 
-        ,CONSTRAINT pk_page_user_access PRIMARY KEY (page_user_access_id)
-        ,CONSTRAINT ak_pageid_userid UNIQUE INDEX (page_id,user_id)
-        ,CONSTRAINT fk_page_id FOREIGN KEY (page_id) REFERENCES pages(page_id)
+        ,CONSTRAINT pk_resource_user_access PRIMARY KEY (resource_user_access_id)
+        ,CONSTRAINT ak_resourceid_userid UNIQUE INDEX (resource_id,user_id)
+        ,CONSTRAINT fk_resource_id FOREIGN KEY (resource_id) REFERENCES resource (resource_id)
         ,CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(user_id)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
@@ -103,19 +102,20 @@ CREATE TABLE IF NOT EXISTS meta_http_method (
 
 
 CREATE TABLE IF NOT EXISTS login_attempt (
-     login_attempt_id       BIGINT          NOT NULL    AUTO_INCREMENT
-    ,page_id                BIGINT          NULL
-    ,meta_http_method_id    BIGINT          NULL
-    ,attempt_user_id        BIGINT          NULL
-    ,attempt_time           TIMESTAMP       NOT NULL
-    ,http_client_ip         INT UNSIGNED    NULL
-    ,http_x_forwarded_for   INT UNSIGNED    NULL
-    ,remote_addr            INT UNSIGNED    NULL
-    ,attempt_success        BOOL            NOT NULL DEFAULT FALSE
-    ,user_agent             VARCHAR(1000)   NULL
+     login_attempt_id     BIGINT        NOT NULL    AUTO_INCREMENT
+    ,
+     resource_id          BIGINT        NULL
+    ,meta_http_method_id  BIGINT        NULL
+    ,attempt_user_id      BIGINT        NULL
+    ,attempt_time         TIMESTAMP     NOT NULL
+    ,http_client_ip       INT UNSIGNED  NULL
+    ,http_x_forwarded_for INT UNSIGNED  NULL
+    ,remote_addr          INT UNSIGNED  NULL
+    ,attempt_success      BOOL          NOT NULL DEFAULT FALSE
+    ,user_agent           VARCHAR(1000) NULL
 
         ,CONSTRAINT pk_login_attempts PRIMARY KEY (login_attempt_id)
-        ,CONSTRAINT fk_login_attempt_page FOREIGN KEY (page_id) REFERENCES pages (page_id)
+        ,CONSTRAINT fk_login_attempt_resource FOREIGN KEY (resource_id) REFERENCES resource (resource_id)
         ,CONSTRAINT fk_login_attempt_user FOREIGN KEY (attempt_user_id) REFERENCES users (user_id)
         ,CONSTRAINT fk_login_attempt_http_method FOREIGN KEY (meta_http_method_id) REFERENCES meta_http_method (meta_http_method_id)
         ,INDEX idx_attempt_time (attempt_time)
@@ -128,17 +128,18 @@ CREATE TABLE IF NOT EXISTS login_attempt (
 
 
 CREATE TABLE IF NOT EXISTS ext_html_page (
-     ext_html_page_id       BIGINT          NOT NULL AUTO_INCREMENT
-    ,page_id                BIGINT          NOT NULL
-    ,html_path              VARCHAR(200)    NOT NULL
-    ,client_class           VARCHAR(50)     NOT NULL
-    ,created_by             VARCHAR(50)     NULL
-    ,created_dt             TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt            TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
+     ext_html_page_id BIGINT       NOT NULL AUTO_INCREMENT
+    ,
+     resource_id      BIGINT       NOT NULL
+    ,html_path        VARCHAR(200) NOT NULL
+    ,client_class     VARCHAR(50)  NOT NULL
+    ,created_by       VARCHAR(50)  NULL
+    ,created_dt       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt      TIMESTAMP    NULL ON UPDATE CURRENT_TIMESTAMP
 
         ,CONSTRAINT pk_ext_html_page PRIMARY KEY (ext_html_page_id)
-        ,CONSTRAINT fk_ext_html_page_pages FOREIGN KEY (page_id) REFERENCES pages (page_id)
-        ,CONSTRAINT ak_page_id UNIQUE INDEX (page_id)
+        ,CONSTRAINT fk_ext_html_page_pages FOREIGN KEY (resource_id) REFERENCES resource (resource_id)
+        ,CONSTRAINT ak_resource_id UNIQUE INDEX (resource_id)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 

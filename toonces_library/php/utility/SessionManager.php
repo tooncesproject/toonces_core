@@ -98,7 +98,7 @@ SQL;
 	}
 
 	// login
-	function login($email,$formPassword, $pageId) {
+	function login($email, $formPassword, $resourceId) {
 
 		//vars
 		$userId = 0;
@@ -140,7 +140,7 @@ SQL;
 		$sql = <<<SQL
         CALL sp_record_login_attempt
         (   
-             :pageId    		              -- param_attempt_page_id     BIGINT
+             :resourceId    		              -- param_attempt_resource_id     BIGINT
             ,:httpMethod		              -- param_http_method              VARCHAR(10)
             ,:userId 		                 -- param_attempt_user_id          BIGINT UNSIGNED
             ,:attemptTime		             -- param_attempt_time             TIMESTAMP
@@ -152,7 +152,7 @@ SQL;
 SQL;
 		$stmt = $this->conn->prepare($sql);
 		$loginAttemptVars = array(
-		     'pageId' => $pageId
+		     'resourceId' => $resourceId
 		    ,'httpMethod' => $_SERVER['REQUEST_METHOD']
 		    ,'userId' => isset($this->userId) ? strval($this->userId) : null
 		    ,'attemptTime' => date('Y-m-d h:i:s', time())

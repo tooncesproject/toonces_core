@@ -14,11 +14,11 @@ class PageDataResource extends DataResource implements iResource {
 
     /**
      * Validates path name as set in resourceData.
-     * @param int $ancestorPageId: ID of the page to potentially add a child with the pathname.
-     * @param int $pageId: Optional. If set, disregard a page with the same pathname; assume we are operating on that existing page.
+     * @param int $ancestorResourceId: ID of the resource to potentially add a child with the pathname.
+     * @param int $resourceId: Optional. If set, disregard a resource with the same pathname; assume we are operating on that existing resource.
      * @return bool t/f path name is valid and doesn't conflict with an existing one.
      */
-    function validatePathName($ancestorPageId, $pageId = null) {
+    function validatePathName($ancestorResourceId, $resourceId = null) {
 
         $pathNameValid = false;
         do {
@@ -38,19 +38,19 @@ class PageDataResource extends DataResource implements iResource {
                 break;
             }
 
-            // Pathname already exists for ancestor page?
+            // Pathname already exists for ancestor resource?
             $sql = <<<SQL
             SELECT p.pathname
-            FROM page_hierarchy_bridge phb
-            JOIN pages p ON phb.descendant_page_id = p.page_id
-            WHERE phb.page_id = :ancestorPageId
+            FROM resource_hierarchy_bridge rhb
+            JOIN resource p ON rhb.descendant_resource_id = p.resource_id
+            WHERE rhb.resource_id = :ancestorResourceId
             AND pathname = :pathName
-            AND (phb.descendant_page_id != :pageId OR :pageId IS NULL)
+            AND (rhb.descendant_resource_id != :resourceId OR :resourceId IS NULL)
 SQL;
             $sqlParams = array(
-                 'ancestorPageId' => $ancestorPageId
+                 'ancestorResourceId' => $ancestorResourceId
                 ,'pathName' => $this->resourceData['pathName']
-                ,'pageId' => $pageId
+                ,'resourceId' => $resourceId
             );
             $stmt = $conn->prepare($sql);
             $stmt->execute($sqlParams);;
@@ -63,16 +63,16 @@ SQL;
 
             // Ancestor page doesn't exist?
             $sql = <<<SQL
-            SELECT page_id
-            FROM pages
-            WHERE page_id = :ancestorPageId;
+            SELECT resource_id
+            FROM resource
+            WHERE resource_id = :ancestorResourceId;
 SQL;
             $stmt = $conn->prepare($sql);
-            $stmt->execute(array('ancestorPageId' => $ancestorPageId));
+            $stmt->execute(array('ancestorResourceId' => $ancestorResourceId));
             $result = $stmt->fetchAll();
             if (empty($result)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                $this->statusMessage = 'ancestorPageId refers to a page that does not exist.';
+                $this->statusMessage = 'ancestorResourceId refers to a resource that does not exist.';
                 break;
             }
 
@@ -142,25 +142,25 @@ SQL;
     /**
      * Recursively tests whether a user ID has write access to a page and all of its children,
      * @param int $userId - User ID to be tested.
-     * @param int $pageId - The page ID where we start.
+     * @param int $resourceId - The page ID where we start.
      * @return bool $userHasAccess - t/f, user has write access to this page and all its children.
      */
-    function recursiveCheckWriteAccess($userId, $pageId) {
+    function recursiveCheckWriteAccess($userId, $resourceId) {
 
         $conn = $this->pageViewReference->getSqlConn();
         // Can the user access the current page?
-        $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $pageId, $conn, true);
+        $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $resourceId, $conn, true);
         // If yes, recurse, checking any children of the page.
         if ($userHasAccess) {
-            $sql = "SELECT descendant_page_id FROM page_hierarchy_bridge WHERE page_id = :pageId";
+            $sql = "SELECT descendant_resource_id FROM resource_hierarchy_bridge WHERE resource_id = :resourceId";
             $stmt = $conn->prepare($sql);
-            $stmt->execute(['pageId' => $pageId]);
+            $stmt->execute(['resourceId' => $resourceId]);
             $result = $stmt->fetchAll();
             // If the page has children, recurse.
             foreach ($result as $row) {
-                $childPageId = $row[0];
+                $childResourceId = $row[0];
                 // Recurse here to test each child page.
-                $userHasAccess = $this->recursiveCheckWriteAccess($userId, $childPageId);
+                $userHasAccess = $this->recursiveCheckWriteAccess($userId, $childResourceId);
                 if (!$userHasAccess) {
                     // If we find a page where user doesn't have write access, break the loop and stop recursion.
                     break;
@@ -203,10 +203,6 @@ SQL;
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
 
-        // Set defaults.
-        if (!isset($this->resourceData['pageLinkText']) && isset($this->resourceData['pageTitle']))
-            $this->resourceData['pageLinkText'] = $this->resourceData['pageTitle'];
-
         if (!isset($this->resourceData['redirectOnError']))
             $this->resourceData['redirectOnError'] = false;
 
@@ -234,7 +230,7 @@ SQL;
             }
 
             // Is the ancestor page valid, and does the user have write access?
-            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->resourceData['ancestorPageId'], $conn, true);
+            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $this->resourceData['ancestorResourceId'], $conn, true);
             if (!$userHasAccess) {
                 // No access or page doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -246,7 +242,7 @@ SQL;
                 $this->generatePathName();
 
             // Now validate the path name
-            if (!$this->validatePathName($this->resourceData['ancestorPageId'])) {
+            if (!$this->validatePathName($this->resourceData['ancestorResourceId'])) {
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
@@ -265,11 +261,10 @@ SQL;
 
             // Attempt the page insert
             $sql = <<<SQL
-            SELECT CREATE_PAGE(
-                 :parentPageId
+            SELECT CREATE_RESOURCE(
+                 :parentResourceId
                 ,:pathName
                 ,:pageTitle
-                ,:pageLinkText
                 ,:pageBuilderClass
                 ,:pageViewClass
                 ,:redirectOnError
@@ -277,23 +272,22 @@ SQL;
             )
 SQL;
             $sqlParams = array(
-                 'parentPageId' => $this->resourceData['ancestorPageId']
+                 'parentResourceId' => $this->resourceData['ancestorResourceId']
                 ,'pathName' => $this->resourceData['pathName']
                 ,'pageTitle' => $this->resourceData['pageTitle']
-                ,'pageLinkText' => $this->resourceData['pageLinkText']
                 ,'pageBuilderClass' => $this->resourceData['pageBuilderClass']
                 ,'pageViewClass' => $this->resourceData['pageViewClass']
                 ,'redirectOnError' => intval($this->resourceData['redirectOnError'])
                 ,'published' => intval($this->resourceData['published'])
             );
 
-            $pageId = null;
+            $resourceId = null;
             $stmt = $conn->prepare($sql);
 
             try {
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchall();
-                $pageId = $result[0][0];
+                $resourceId = $result[0][0];
             } catch (PDOException $e) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
                 $this->statusMessage = 'Creation of page in database failed due to database error: ' . $e->getMessage();
@@ -302,18 +296,18 @@ SQL;
             }
 
             // Check to ensure page ID was actually created
-            if (!$pageId) {
+            if (!$resourceId) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'Page creation failed, possible due to a silent database error. Debug the data supplied to PageDataResource.';
                 break;
             }
 
-            // If the user is a non-admin user, create a record in page_user_access.
+            // If the user is a non-admin user, create a record in resource_user_access.
             $sql = <<<SQL
-            INSERT INTO page_user_access
-                (page_id, user_id, can_edit)
+            INSERT INTO resource_user_access
+                (resource_id, user_id, can_edit)
                 SELECT
-                     :pageId
+                     :resourceId
                     ,:userId
                     ,1
                 FROM users u
@@ -321,12 +315,12 @@ SQL;
 
 SQL;
             $stmt = $conn->prepare($sql);
-            $sqlParams = array('pageId' => $pageId, 'userId' => $userId);
+            $sqlParams = array('resourceId' => $resourceId, 'userId' => $userId);
             $stmt->execute($sqlParams);
 
             // Success. Clear resource data and call getAction().
             $this->resourceData = array();
-            $this->parameters['id'] = strval($pageId);
+            $this->parameters['id'] = strval($resourceId);
             $this->getAction();
             $this->httpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
         } while(false);
@@ -347,7 +341,7 @@ SQL;
         // Connect to SQL
         $conn = $this->pageViewReference->getSQLConn();
         // The blogID should be set in the URL parameters.
-        $pageId = $this->validateIntParameter('id');
+        $resourceId = $this->validateIntParameter('id');
 
         // Acquire the PUT body (if not already set)
         if (count($this->resourceData) == 0)
@@ -366,7 +360,7 @@ SQL;
             }
 
             // Reject the PUT if the 'id' parameter is not set.
-            if (empty($pageId)) {
+            if (empty($resourceId)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
                 $this->statusMessage = 'PUT requests require the parameter "id" in the query string to specify a resource to be updated.';
                 break;
@@ -381,7 +375,7 @@ SQL;
             }
 
             // Is the page valid, and does the user have write access?
-            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $pageId, $conn, true);
+            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $resourceId, $conn, true);
             if (!$userHasAccess) {
                 // No access or page doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -390,8 +384,8 @@ SQL;
 
             // If supplied, is the path name valid?
             if (isset($this->resourceData['pathName'])) {
-                $parentPageId = GrabParentPageId::getParentId($pageId, $conn);
-                if (!$this->validatePathName($parentPageId, $pageId)) {
+                $parentResourceId = GrabParentResourceId::getParentId($resourceId, $conn);
+                if (!$this->validatePathName($parentResourceId, $resourceId)) {
                     $this->resourceData = array('status' => $this->statusMessage);
                     break;
                 }
@@ -410,11 +404,6 @@ SQL;
             if (isset($this->resourceData['pageTitle'])) {
                 array_push($updateFields, 'page_title = :pageTitle');
                 $sqlParams['pageTitle'] = $this->resourceData['pageTitle'];
-            }
-            // page link text
-            if (isset($this->resourceData['pageLinkText'])) {
-                array_push($updateFields, 'page_link_text = :pageLinkText');
-                $sqlParams['pageLinkText'] = $this->resourceData['pageLinkText'];
             }
             // pagebuilder class
             if (isset($this->resourceData['pageBuilderClass'])) {
@@ -438,15 +427,15 @@ SQL;
             }
 
             // Add page ID parameter
-            $sqlParams['pageId'] = $pageId;
+            $sqlParams['resourceId'] = $resourceId;
             $updateFieldsStr = implode(PHP_EOL . ',', $updateFields);
 
             $sql = <<<SQL
-            UPDATE pages p
+            UPDATE resource
             SET
                 %s
             WHERE
-                page_id = :pageId
+                resource_id = :resourceId
 
 SQL;
 
@@ -464,7 +453,7 @@ SQL;
             }
             // Success. Clear resourceData and call getAction().
             $this->resourceData = array();
-            $this->parameters['id'] = strval($pageId);
+            $this->parameters['id'] = strval($resourceId);
             $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
             $this->getAction();
 
@@ -484,7 +473,7 @@ SQL;
 
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
-        $pageId = $this->validateIntParameter('id');
+        $resourceId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
 
         // Acquire the user id if this is an authenticated request.
@@ -492,40 +481,39 @@ SQL;
         // Build the query
         $sql = <<<SQL
             SELECT
-                 p.page_id
-                ,phb.page_id AS ancestor_page_id
+                 p.resource_id
+                ,rhb.resource_id AS ancestor_resource_id
                 ,pathname
                 ,page_title
-                ,page_link_text
                 ,pagebuilder_class
                 ,pageview_class
                 ,p.created_dt
                 ,p.modified_dt
                 ,redirect_on_error
                 ,published
-            FROM pages p
+            FROM resource p
             -- join to PHB is to get the parent page ID
-            LEFT JOIN page_hierarchy_bridge phb ON p.page_id = phb.descendant_page_id
-            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userId)
+            LEFT JOIN resource_hierarchy_bridge rhb ON p.resource_id = rhb.descendant_resource_id
+            LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND (rua.user_id = :userId)
             LEFT JOIN users u ON u.user_id = :userId
             WHERE
-                (p.page_id = :pageId OR :pageId IS NULL)
+                (p.resource_id = :resourceId OR :resourceId IS NULL)
                 AND
                 (
                     (p.published = 1 AND p.deleted IS NULL)
                     OR
-                    pua.user_id IS NOT NULL
+                    rua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
                 )
-            ORDER BY p.page_id ASC
+            ORDER BY p.resource_id ASC
 
 SQL;
         // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
         $result = null;
-        if ($pageId !== 0) {
+        if ($resourceId !== 0) {
             $stmt = $conn->prepare($sql);
-            $sqlParams = array('userId' => $userId, 'pageId' => $pageId);
+            $sqlParams = array('userId' => $userId, 'resourceId' => $resourceId);
             $stmt->execute($sqlParams);
             $result = $stmt->fetchAll();
         }
@@ -534,12 +522,11 @@ SQL;
         if (count($result) > 0) {
             foreach ($result as $row)
                 $this->resourceData[$row[0]] = array(
-                     'url' => $this->resourceUrl . '?id=' . strval($row['page_id'])
-                    ,'pageUri' => GrabPageURL::getURL($row['page_id'], $conn)
-                    ,'ancestorPageId' => intval($row['ancestor_page_id'])
+                     'url' => $this->resourceUrl . '?id=' . strval($row['resource_id'])
+                    ,'pageUri' => GrabResourceURL::getURL($row['resource_id'], $conn)
+                    ,'ancestorResourceId' => intval($row['ancestor_resource_id'])
                     ,'pathName' => $row['pathname']
                     ,'pageTitle' => $row['page_title']
-                    ,'pageLinkText' => $row['page_link_text']
                     ,'pageBuilderClass' => $row['pagebuilder_class']
                     ,'pageViewClass' => $row['pageview_class']
                     ,'createdDate' => $row['created_dt']
@@ -568,7 +555,7 @@ SQL;
     function deleteAction() {
 
 
-        $pageId = $this->validateIntParameter('id');
+        $resourceId = $this->validateIntParameter('id');
         $conn = $this->pageViewReference->getSQLConn();
         $this->resourceData = array();
 
@@ -584,7 +571,7 @@ SQL;
             }
 
             // Reject the DELETE if the 'id' parameter is not set.
-            if (!isset($pageId)) {
+            if (!isset($resourceId)) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
                 $this->statusMessage = 'DELETE requests require the parameter "id" in the query string to specify a resource to be deleted.';
                 break;
@@ -593,7 +580,7 @@ SQL;
             // if user is not an admin...
             if (!$this->sessionManager->userIsAdmin) {
                 // Check whether user has write access to this page and ALL its children (since deletion is also recursive).
-                $userHasAccess = $this->recursiveCheckWriteAccess($userId, $pageId);
+                $userHasAccess = $this->recursiveCheckWriteAccess($userId, $resourceId);
                 if (!$userHasAccess) {
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse');
                     $this->statusMessage = 'DELETE access denied; you do not have write access to this page or one of its children.';
@@ -603,10 +590,10 @@ SQL;
             }
 
             // Validation has passed; delete the page.
-            // Note: sp_delete_page is recursive; it also deletes any children the page has.
-            $sql = "CALL sp_delete_page(:pageId)";
+            // Note: sp_delete_resource is recursive; it also deletes any children the page has.
+            $sql = "CALL sp_delete_resource(:resourceId)";
             $stmt = $conn->prepare($sql);
-            $stmt->execute(array('pageId' => $pageId));
+            $stmt->execute(array('resourceId' => $resourceId));
             $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
 
         } while(false);

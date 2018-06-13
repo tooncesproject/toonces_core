@@ -106,13 +106,13 @@ SQL;
     }
 
 
-    public function createPage($published = true, $parentPageId = 1, $pathName = null) {
-        // Create an unpublished page; non-admin users don't have access.
+    public function createPage($published = true, $parentResourceId = 1, $pathName = null) {
+        // Create an unpublished resource; non-admin users don't have access.
         $sqlConn = $this->getConnection();
         // In some cases, in case this is called twice in the same fixture,
-        // we need to make the pathame unique. We'll use the expected page_id
+        // we need to make the pathame unique. We'll use the expected resource_id
         if (!$pathName) {
-            $sql = "SELECT MAX(page_id) + 1 FROM pages";
+            $sql = "SELECT MAX(resource_id) + 1 FROM resource";
             $stmt = $sqlConn->prepare($sql);
             $stmt->execute();
             $result = $stmt->fetchall();
@@ -121,11 +121,10 @@ SQL;
         }
 
         $sql = <<<SQL
-        SELECT CREATE_PAGE  (
-             :parentPageId                  -- parent_page_id BIGINT
+        SELECT CREATE_RESOURCE  (
+             :parentResourceId                  -- parent_resource_id BIGINT
             ,:pathName                      -- pathname VARCHAR(50)
             ,'Unpublished Page'             -- page_title VARCHAR(50)
-            ,'Unpublished Page'             -- page_link_text VARCHAR(50)
             ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
             ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
             ,FALSE                          -- redirect_on_error BOOL
@@ -134,12 +133,12 @@ SQL;
 SQL;
         $stmt = $sqlConn->prepare($sql);
 
-        $stmt->execute(['parentPageId' => $parentPageId, 'pathName' => $pathName, 'published' => intval($published)]);
+        $stmt->execute(['parentResourceId' => $parentResourceId, 'pathName' => $pathName, 'published' => intval($published)]);
         $result = $stmt->fetchAll();
 
-        $newPageId = intval($result[0][0]);
+        $newResourceId = intval($result[0][0]);
 
-        return $newPageId;
+        return $newResourceId;
 
     }
 

@@ -1,21 +1,21 @@
 /*************** WOO *********************
 
-DELETE_PAGE
+sp_delete_resource
 Paul Anderson 10/4/2015
 
 This SQL procedure permanently deletes
-a page and (recursively) all its children.
+a resource and (recursively) all its children.
 
 It also deletes all dependent records,
 such as toonces.ext_html_page
 
 ***************** WOO ********************/
 
-DROP PROCEDURE IF EXISTS toonces.sp_delete_page;
+DROP PROCEDURE IF EXISTS toonces.sp_delete_resource;
 --%c
 DELIMITER //
 --/%c
-CREATE PROCEDURE toonces.sp_delete_page(param_page_id BIGINT)
+CREATE PROCEDURE toonces.sp_delete_resource(param_resource_id BIGINT)
 
 READS SQL DATA
 MODIFIES SQL DATA
@@ -23,40 +23,40 @@ MODIFIES SQL DATA
 BEGIN
 
     -- functional variables
-    DECLARE var_page_id BIGINT;
-    DECLARE var_descendant_page_id BIGINT;
+    DECLARE var_resource_id BIGINT;
+    DECLARE var_descendant_resource_id BIGINT;
 
     DECLARE var_loopfinished BOOL DEFAULT FALSE;
     DECLARE var_child_page_cursor CURSOR FOR 
         SELECT
-             page_id
-            ,descendant_page_id
+             resource_id
+            ,descendant_resource_id
         FROM
-            toonces.page_hierarchy_bridge
+            toonces.resource_hierarchy_bridge
         WHERE
-            page_id = param_page_id
+            resource_id = param_resource_id
     ;
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET var_loopfinished = TRUE;
 
     SET max_sp_recursion_depth = 255;
 
-    -- Does the page have any children?
+    -- Does the resource have any children?
     -- If so, recurse the function for each of its children.
     OPEN var_child_page_cursor;
 
     read_loop: LOOP
 
         FETCH var_child_page_cursor INTO
-             var_page_id
-            ,var_descendant_page_id
+             var_resource_id
+            ,var_descendant_resource_id
         ;
 
         IF var_loopfinished THEN 
             LEAVE read_loop;
         END IF;
 
-        CALL toonces.sp_delete_page(var_descendant_page_id);
+        CALL toonces.sp_delete_resource(var_descendant_resource_id);
 
     END LOOP;
 
@@ -66,16 +66,16 @@ BEGIN
 
     -- Hard-delete parent page_hierarchy_bridge record
     DELETE FROM
-        toonces.page_hierarchy_bridge
+        toonces.resource_hierarchy_bridge
     WHERE
-        descendant_page_id = param_page_id
+        descendant_resource_id = param_resource_id
     ;
 
-    -- Hard-delete page_user_access record
+    -- Hard-delete resource_user_access record
     DELETE FROM
-        page_user_access
+        resource_user_access
     WHERE
-        page_id = param_page_id
+        resource_id = param_resource_id
     ;
 
 
@@ -83,23 +83,23 @@ BEGIN
     DELETE FROM
         toonces.ext_html_page
     WHERE
-        page_id = param_page_id;
+        resource_id = param_resource_id;
 
     -- Clear the foreign key reference in login_attempt, if it exists.
     -- Otherwise, the delete will fail due to foreign key violation.
     UPDATE
         login_attempt
     SET
-        page_id = NULL
+        resource_id = NULL
     WHERE
-        page_id = param_page_id;
+        resource_id = param_resource_id;
 
 
     -- Finally, hard-delete the page.
     DELETE FROM
-        toonces.pages
+        toonces.resource
     WHERE
-        page_id = param_page_id
+        resource_id = param_resource_id
     ;
 
 END

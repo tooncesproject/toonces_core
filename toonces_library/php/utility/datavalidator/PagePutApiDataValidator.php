@@ -17,7 +17,7 @@ class PagePutApiDataValidator extends PagePostApiDataValidator implements iApiDa
         parent::buildFields();
 
         // Allow nulls on certain fields
-        $this->fieldValidators['ancestorPageId']->allowNull = true;
+        $this->fieldValidators['ancestorResourceId']->allowNull = true;
         $this->fieldValidators['pageTitle']->allowNull = true;
         $this->fieldValidators['pageBuilderClass']->allowNull = true;
         $this->fieldValidators['pageViewClass']->allowNull = true;

@@ -28,36 +28,36 @@ class PageDataResourceTest extends SqlDependentTestCase {
         $pdr = new PageDataResource($pageView);
         $pdr->resourceData = array();
 
-        // Create a page and a sub-page
-        $parentPageId = $this->createPage(true, 1, 'parentpage');
-        $childPageId = $this->createPage(true, $parentPageId, 'childpage');
+        // Create a resource and a sub-resource
+        $parentResourceId = $this->createPage(true, 1, 'parentpage');
+        $childResourceId = $this->createPage(true, $parentResourceId, 'childpage');
 
         // ACT
         // pathname with disallowed characters invalidated
         $pdr->resourceData['pathName'] = '%&dank^$#';
-        $invalidNameResult = $pdr->validatePathName($parentPageId);
+        $invalidNameResult = $pdr->validatePathName($parentResourceId);
 
         // empty pathname invalidated
         $pdr->resourceData['pathName'] = '';
-        $emptyResult = $pdr->validatePathName($parentPageId);
+        $emptyResult = $pdr->validatePathName($parentResourceId);
 
         // Legit pathname validated
         $pdr->resourceData['pathName'] = 'good-path_name';
-        $legitResult = $pdr->validatePathName($parentPageId);
+        $legitResult = $pdr->validatePathName($parentResourceId);
 
         // existing child path name invalidated
         $pdr->resourceData['pathName'] = 'childpage';
-        $existingPathResult = $pdr->validatePathName($parentPageId);
+        $existingPathResult = $pdr->validatePathName($parentResourceId);
 
-        // Existing child pathname with overwrite page ID validated
+        // Existing child pathname with overwrite resource ID validated
         $pdr->resourceData['pathName'] = 'childpage';
-        $existingOverwriteResult = $pdr->validatePathName($parentPageId, $childPageId);
+        $existingOverwriteResult = $pdr->validatePathName($parentResourceId, $childResourceId);
 
         // Existing child pathname with bogus overwrite ID invalidated
         $pdr->resourceData['pathName'] = 'childpage';
-        $badOverwriteResult = $pdr->validatePathName($parentPageId, 9999);
+        $badOverwriteResult = $pdr->validatePathName($parentResourceId, 9999);
 
-        // Bogus parent page ID invalidated
+        // Bogus parent resource ID invalidated
         $pdr->resourceData['pathName'] = 'good-path_name';
         $bogusParentResult = $pdr->validatePathName(69420);
 
@@ -76,13 +76,13 @@ class PageDataResourceTest extends SqlDependentTestCase {
         // existing child path name invalidated
         $this->assertFalse($existingPathResult);
 
-        // Existing child pathname with overwrite page ID validated
+        // Existing child pathname with overwrite resource ID validated
         $this->assertTrue($existingOverwriteResult);
 
         // Existing child pathname with bogus overwrite ID invalidated
         $this->assertFalse($badOverwriteResult);
 
-        // Bogus parent page ID invalidated
+        // Bogus parent resource ID invalidated
         $this->assertFalse($bogusParentResult);
 
     }
@@ -97,7 +97,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
         $pageView = new JsonPageView(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
-        $pdr->resourceData = array('pageTitle' => 'Hi! I\'m a page.');
+        $pdr->resourceData = array('pageTitle' => 'Hi! I\'m a resource.');
 
         // ACT
         $newPathName = $pdr->generatePathName();
@@ -172,9 +172,9 @@ class PageDataResourceTest extends SqlDependentTestCase {
         $adminUserId = 1;
 
         // Create a hierarchy of pages.
-        $parentPageId = $this->createPage(true);
-        $childPageOneId = $this->createPage(true, $parentPageId);
-        $childPageTwoId = $this->createPage(true, $parentPageId);
+        $parentResourceId = $this->createPage(true);
+        $childPageOneId = $this->createPage(true, $parentResourceId);
+        $childPageTwoId = $this->createPage(true, $parentResourceId);
         $grandchildPageOneId = $this->createPage(true, $childPageOneId);
         $grandchildPageTwoId = $this->createPage(true, $childPageOneId);
         $grandchildPageThreeId = $this->createPage(true, $childPageTwoId);
@@ -183,8 +183,8 @@ class PageDataResourceTest extends SqlDependentTestCase {
         // (not going to worry about read-only access;
         // That is covered by TestCheckPageUserAccess).
         $sql = <<<SQL
-        INSERT INTO page_user_access
-            (page_id, user_id, can_edit)
+        INSERT INTO resource_user_access
+            (resource_id, user_id, can_edit)
         VALUES
              (:childPageOneId, :userId, 1)
             ,(:grandchildPageOneId, :userId, 1)
@@ -206,10 +206,10 @@ SQL;
         // Access denied where access not granted, no children.
         $noChildrenNoAccessResult = $pdr->recursiveCheckWriteAccess($nonAdminUserId, $grandchildPageTwoId);
 
-        // Access denied where access not granted to base, page has children with access
-        $childrenNoAccessResult = $pdr->recursiveCheckWriteAccess($nonAdminUserId, $parentPageId);
+        // Access denied where access not granted to base, resource has children with access
+        $childrenNoAccessResult = $pdr->recursiveCheckWriteAccess($nonAdminUserId, $parentResourceId);
 
-        // Access denied where access granted to base, page has a child with no access
+        // Access denied where access granted to base, resource has a child with no access
         $grantedBaseResult =  $pdr->recursiveCheckWriteAccess($nonAdminUserId, $childPageOneId);
 
         // Access allowed where access granted to base, base has no children
@@ -219,14 +219,14 @@ SQL;
         $allGrantedResult = $pdr->recursiveCheckWriteAccess($nonAdminUserId, $childPageTwoId);
 
         // Access allowed where user is admin
-        $adminUserResult = $pdr->recursiveCheckWriteAccess($adminUserId, $parentPageId);
+        $adminUserResult = $pdr->recursiveCheckWriteAccess($adminUserId, $parentResourceId);
 
 
         // ASSERT
         // Access denied where access not granted, no children.
         $this->assertFalse($noChildrenNoAccessResult);
 
-        // Access denied where access not granted to base, page has children with access
+        // Access denied where access not granted to base, resource has children with access
         $this->assertFalse($childrenNoAccessResult);
 
         // Access allowed where access granted to base, base has no children
@@ -255,28 +255,28 @@ SQL;
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 
-        // Create an unpublished page
-        $unpublishedPageId = $this->createPage(false);
+        // Create an unpublished resource
+        $unpublishedResourceId = $this->createPage(false);
 
         // create some input data mockups
-        // Invalid post - missing page title
+        // Invalid post - missing resource title
         $invalidPost = array (
-             'ancestorPageId' => 1
+             'ancestorResourceId' => 1
             ,'pageBuilderClass' => 'Toonces404PageBuilder'
             ,'pageViewClass' => 'JsonPageView'
         );
 
-        // Valid post - has page title
+        // Valid post - has resource title
         $validPost = $invalidPost;
         $validPost['pageTitle'] = 'Page Title';
 
         // Valid post but no non-admin access
         $validNoAccessPost = $validPost;
-        $validNoAccessPost['ancestorPageId'] = $unpublishedPageId;
+        $validNoAccessPost['ancestorResourceId'] = $unpublishedResourceId;
 
-        // Invalid post - bogus ancestorPageId
-        $badPageIDPost = $validPost;
-        $badPageIdPost['ancestorPageId'] = 69420;
+        // Invalid post - bogus ancestorResourceId
+        $badResourceIdPost = $validPost;
+        $badResourceIdPost['ancestorResourceId'] = 69420;
 
         // Invalid post - Invalid pathname
         $badPathnamePost = $validPost;
@@ -291,7 +291,7 @@ SQL;
         $badPvPost['pageViewClass'] = 'foo';
 
         // Record how many pages currently reside in the database
-        $sql = "SELECT COUNT(*) FROM pages";
+        $sql = "SELECT COUNT(*) FROM resource";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -305,7 +305,7 @@ SQL;
         $pdr->postAction();
         $failedAuthStatus = $pdr->httpStatus;
 
-        // POST with parent page to which non-admin user doesn't have access returns 404
+        // POST with parent resource to which non-admin user doesn't have access returns 404
         $this->setNonAdminAuth();
         $pdr->resourceData = $validNoAccessPost;
         $pdr->postAction();
@@ -317,8 +317,8 @@ SQL;
         $pdr->postAction();
         $invalidPostStatus = $pdr->httpStatus;
 
-        // POST with non-existent parent page ID returns 400
-        $pdr->resourceData = $badPageIdPost;
+        // POST with non-existent parent resource ID returns 400
+        $pdr->resourceData = $badResourceIdPost;
         $pdr->postAction();
         $badPidStatus = $pdr->httpStatus;
 
@@ -339,7 +339,7 @@ SQL;
         $badPvStatus = $pdr->httpStatus;
 
         // Page not created after unauthenticated or invalid attempts.
-        $sql = "SELECT COUNT(*) FROM pages";
+        $sql = "SELECT COUNT(*) FROM resource";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -351,8 +351,8 @@ SQL;
         $goodStatus = $pdr->httpStatus;
 
         // POST with valid input created a record in the database.
-        $pageIdStr = key($validResult);
-        $newPageId = intval($pageIdStr);
+        $resourceIdStr = key($validResult);
+        $newResourceId = intval($resourceIdStr);
         $sql = <<<SQL
         SELECT
              page_title
@@ -361,11 +361,11 @@ SQL;
             ,pageview_class
             ,redirect_on_error
             ,published
-        FROM pages
-        WHERE page_id = :pageId
+        FROM resource
+        WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $newPageId]);
+        $stmt->execute(['resourceId' => $newResourceId]);
         $result = $stmt->fetchAll();
         $insertedPageTitle = $result[0]['page_title'];
         $insertedPathName = $result[0]['pathname'];
@@ -379,14 +379,14 @@ SQL;
         // POST with failed authentication returns 401 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $failedAuthStatus);
 
-        // POST with parent page to which non-admin user doesn't have access returns 404
+        // POST with parent resource to which non-admin user doesn't have access returns 404
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminStatus);
 
         // POST with invalid or missing data returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $invalidPostStatus);
 
-        // POST with non-existent parent page ID returns 400
-        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPidStatus);
+        // POST with non-existent parent resource ID returns 400
+        $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $badPidStatus);
 
         // POST with invalid pathName returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPathnameStatus);
@@ -405,12 +405,12 @@ SQL;
 
         // POST with valid input created a record in the database.
 
-        $this->assertSame($validResult[$newPageId]['pageTitle'], $insertedPageTitle);
-        $this->assertSame($validResult[$newPageId]['pathName'], $insertedPathName);
-        $this->assertSame($validResult[$newPageId]['pageBuilderClass'], $insertedPageBuilderClass);
-        $this->assertSame($validResult[$newPageId]['pageViewClass'], $insertedPageViewClass);
-        $this->assertSame($validResult[$newPageId]['redirectOnError'], $insertedRedirectOnError);
-        $this->assertSame($validResult[$newPageId]['published'], $insertedPublished);
+        $this->assertSame($validResult[$newResourceId]['pageTitle'], $insertedPageTitle);
+        $this->assertSame($validResult[$newResourceId]['pathName'], $insertedPathName);
+        $this->assertSame($validResult[$newResourceId]['pageBuilderClass'], $insertedPageBuilderClass);
+        $this->assertSame($validResult[$newResourceId]['pageViewClass'], $insertedPageViewClass);
+        $this->assertSame($validResult[$newResourceId]['redirectOnError'], $insertedRedirectOnError);
+        $this->assertSame($validResult[$newResourceId]['published'], $insertedPublished);
 
     }
 
@@ -429,8 +429,8 @@ SQL;
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 
-        // Create an unpublished page
-        $unpublishedPageId = $this->createPage(false);
+        // Create an unpublished resource
+        $unpublishedResourceId = $this->createPage(false);
 
         // create some input data mockups
         // valid post
@@ -460,11 +460,11 @@ SQL;
                 ,pagebuilder_class
                 ,redirect_on_error
                 ,published
-            FROM pages
-            WHERE page_id = :pageId
+            FROM resource
+            WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $unpublishedPageId]);
+        $stmt->execute(['resourceId' => $unpublishedResourceId]);
         $result = $stmt->fetchAll();
         $pageStateBefore = $result[0];
 
@@ -472,7 +472,7 @@ SQL;
         // ACT
         // PUT with failed authentication returns 401 error
         $this->unsetBasicAuth();
-        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $pdr->parameters['id'] = strval($unpublishedResourceId);
         $pdr->resourceData = $validPost;
         $pdr->putAction();
         $badAuthStatus = $pdr->httpStatus;
@@ -484,14 +484,14 @@ SQL;
         $badIdStatus = $pdr->httpStatus;
 
         // PUT with failed data validation returns 400 error
-        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $pdr->parameters['id'] = strval($unpublishedResourceId);
         $pdr->resourceData = $invalidPost;
         $pdr->putAction();
         $invalidDataStatus = $pdr->httpStatus;
 
         // PUT where authenticated user doesn't have write access returns 404 error
         $this->setNonAdminAuth();
-        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $pdr->parameters['id'] = strval($unpublishedResourceId);
         $pdr->resourceData = $validPost;
         $pdr->putAction();
         $nonAdminStatus = $pdr->httpStatus;
@@ -502,7 +502,7 @@ SQL;
         $pdr->putAction();
         $invalidPathnameStatus = $pdr->httpStatus;
 
-        // No change to page data after unauthenticated or invalid PUT attempts
+        // No change to resource data after unauthenticated or invalid PUT attempts
         // Query database for state after PUT attempts
         $sql = <<<SQL
             SELECT
@@ -512,18 +512,18 @@ SQL;
                 ,pagebuilder_class
                 ,redirect_on_error
                 ,published
-            FROM pages
-            WHERE page_id = :pageId
+            FROM resource
+            WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $unpublishedPageId]);
+        $stmt->execute(['resourceId' => $unpublishedResourceId]);
         $result = $stmt->fetchAll();
         $pageStateAfter = $result[0];
 
         // PUT with valid input returns 200 status
         $this->setAdminAuth();
         $pdr->resourceData = $validPost;
-        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $pdr->parameters['id'] = strval($unpublishedResourceId);
         $validResult = $pdr->putAction();
         $validPutStatus = $pdr->httpStatus;
 
@@ -536,11 +536,11 @@ SQL;
                 ,pagebuilder_class
                 ,redirect_on_error
                 ,published
-            FROM pages
-            WHERE page_id = :pageId
+            FROM resource
+            WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $unpublishedPageId]);
+        $stmt->execute(['resourceId' => $unpublishedResourceId]);
         $result = $stmt->fetchAll();
         $insertedPageTitle = $result[0]['page_title'];
         $insertedPathName = $result[0]['pathname'];
@@ -566,19 +566,19 @@ SQL;
         // PUT with invalid pathName returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $invalidPathnameStatus);
 
-        // No change to page data after unauthenticated or invalid PUT attempts
+        // No change to resource data after unauthenticated or invalid PUT attempts
         $this->assertSame($pageStateBefore, $pageStateAfter);
 
         // PUT with valid input returns 200 status
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $validPutStatus);
 
         // Page record is updated in database
-        $this->assertSame($validResult[$unpublishedPageId]['pageTitle'], $insertedPageTitle);
-        $this->assertSame($validResult[$unpublishedPageId]['pathName'], $insertedPathName);
-        $this->assertSame($validResult[$unpublishedPageId]['pageViewClass'], $insertedPageViewClass);
-        $this->assertSame($validResult[$unpublishedPageId]['pageBuilderClass'], $insertedPageBuilderClass);
-        $this->assertSame($validResult[$unpublishedPageId]['redirectOnError'], $insertedRedirectOnError);
-        $this->assertSame($validResult[$unpublishedPageId]['published'], $insertedPublished);
+        $this->assertSame($validResult[$unpublishedResourceId]['pageTitle'], $insertedPageTitle);
+        $this->assertSame($validResult[$unpublishedResourceId]['pathName'], $insertedPathName);
+        $this->assertSame($validResult[$unpublishedResourceId]['pageViewClass'], $insertedPageViewClass);
+        $this->assertSame($validResult[$unpublishedResourceId]['pageBuilderClass'], $insertedPageBuilderClass);
+        $this->assertSame($validResult[$unpublishedResourceId]['redirectOnError'], $insertedRedirectOnError);
+        $this->assertSame($validResult[$unpublishedResourceId]['published'], $insertedPublished);
 
     }
 
@@ -602,19 +602,19 @@ SQL;
 
         // Create some pages:
         // This one is public
-        $publicPageId = $this->createPage(true);
+        $publicResourceId = $this->createPage(true);
         // This one is not
-        $unpublishedPageId = $this->createPage(false);
+        $unpublishedResourceId = $this->createPage(false);
         // This one is not published, but we will grant non-admin read access
-        $grantedPageId = $this->createPage(false);
+        $grantedResourceId = $this->createPage(false);
         $sql = <<<SQL
-        INSERT INTO page_user_access
-            (page_id, user_id, can_edit)
+        INSERT INTO resource_user_access
+            (resource_id, user_id, can_edit)
         VALUES
-            (:grantedPageId, :nonAdminUserId, TRUE)
+            (:grantedResourceId, :nonAdminUserId, TRUE)
 SQL;
         $sqlParams = array(
-             'grantedPageId' => $grantedPageId
+             'grantedResourceId' => $grantedResourceId
             ,'nonAdminUserId' => $nonAdminUserId
         );
         $stmt = $conn->prepare($sql);
@@ -623,16 +623,16 @@ SQL;
         // Now that we've created pages, query the database for its current state
         $sql = <<<SQL
         SELECT
-             p.page_id
+             p.resource_id
             ,p.page_title
             ,p.pathname
             ,p.pagebuilder_class
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-            ,CASE WHEN pua.page_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
-        FROM pages p
-        LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND pua.user_id = :userId
+            ,CASE WHEN rua.resource_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
+        FROM resource p
+        LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND rua.user_id = :userId
 SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['userId' => $nonAdminUserId]);
@@ -640,18 +640,18 @@ SQL;
 
         $sql = <<<SQL
         SELECT
-             p.page_id
+             p.resource_id
             ,p.page_title
             ,p.pathname
             ,p.pagebuilder_class
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-        FROM pages p
-        WHERE page_id = :pageId
+        FROM resource p
+        WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $publicPageId]);
+        $stmt->execute(['resourceId' => $publicResourceId]);
         $publicPageState = $stmt->fetchAll();
 
 
@@ -669,15 +669,15 @@ SQL;
 
         // GET with valid ID parameter returns single record and 200, with data matching database.
         $pdr->resourceData = array();
-        $pdr->parameters['id'] = strval($publicPageId);
+        $pdr->parameters['id'] = strval($publicResourceId);
         $singleParamResult = $pdr->getAction();
         $singleParamStatus = $pdr->httpStatus;
-        $singleParamRecord = $singleParamResult[$publicPageId];
+        $singleParamRecord = $singleParamResult[$publicResourceId];
 
-        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted resource
         $this->setNonAdminAuth();
         $pdr->resourceData = array();
-        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $pdr->parameters['id'] = strval($unpublishedResourceId);
         $unpublishedResult = $pdr->getAction();
         $unpublishedStatus = $pdr->httpStatus;
 
@@ -693,10 +693,10 @@ SQL;
         $nonAuthResult = $pdr->getAction();
         $nonAuthStatus = $pdr->httpStatus;
 
-        // Non-authenticated GET on unpublished page parameter returns 404
+        // Non-authenticated GET on unpublished resource parameter returns 404
         $this->unsetBasicAuth();
         $pdr->resourceData = array();
-        $pdr->parameters['id'] = strval($grantedPageId);
+        $pdr->parameters['id'] = strval($grantedResourceId);
         $noAuthUnpublishedResult = $pdr->getAction();
         $noAuthUnpublishedStatus = $pdr->httpStatus;
 
@@ -717,7 +717,7 @@ SQL;
         $this->assertEquals(1, count($singleParamResult));
 
         // ... with data matching database.
-        $this->assertSame(intval($publicPageState[0]['page_id']), key($singleParamResult));
+        $this->assertSame(intval($publicPageState[0]['resource_id']), key($singleParamResult));
         $this->assertSame($publicPageState[0]['page_title'], $singleParamRecord['pageTitle']);
         $this->assertSame($publicPageState[0]['pathname'], $singleParamRecord['pathName']);
         $this->assertSame($publicPageState[0]['pagebuilder_class'], $singleParamRecord['pageBuilderClass']);
@@ -725,7 +725,7 @@ SQL;
         $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);
         $this->assertSame(boolval($publicPageState[0]['published']), $singleParamRecord['published']);
 
-        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted resource
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
         $this->assertEmpty($unpublishedResult);
 
@@ -733,7 +733,7 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $noParamStatus);
 
         foreach ($pagesState as $pageRecord) {
-            $id = $pageRecord['page_id'];
+            $id = $pageRecord['resource_id'];
             $published = $pageRecord['published'];
             $userAccess = $pageRecord['user_has_access'];
             if ($published == true or $userAccess == true) {
@@ -747,7 +747,7 @@ SQL;
         // Non-authenticated GET returns all and only published pages
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $nonAuthStatus);
         foreach ($pagesState as $pageRecord) {
-            $id = $pageRecord['page_id'];
+            $id = $pageRecord['resource_id'];
             $published = $pageRecord['published'];
             if ($published == true) {
                 $this->assertArrayHasKey($id, $nonAuthResult);
@@ -757,7 +757,7 @@ SQL;
         }
 
 
-        // Non-authenticated GET on unpublished page parameter returns 404
+        // Non-authenticated GET on unpublished resource parameter returns 404
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $noAuthUnpublishedStatus);
         $this->assertEmpty($noAuthUnpublishedResult);
 
@@ -779,9 +779,9 @@ SQL;
         $adminUserId = 1;
 
         // Create a hierarchy of pages.
-        $parentPageId = $this->createPage(true);
-        $childPageOneId = $this->createPage(true, $parentPageId);
-        $childPageTwoId = $this->createPage(true, $parentPageId);
+        $parentResourceId = $this->createPage(true);
+        $childPageOneId = $this->createPage(true, $parentResourceId);
+        $childPageTwoId = $this->createPage(true, $parentResourceId);
         $grandchildPageOneId = $this->createPage(true, $childPageOneId);
         $grandchildPageTwoId = $this->createPage(true, $childPageOneId);
         $grandchildPageThreeId = $this->createPage(true, $childPageTwoId);
@@ -790,8 +790,8 @@ SQL;
         // (not going to worry about read-only access;
         // That is covered by TestCheckPageUserAccess).
         $sql = <<<SQL
-        INSERT INTO page_user_access
-            (page_id, user_id, can_edit)
+        INSERT INTO resource_user_access
+            (resource_id, user_id, can_edit)
         VALUES
              (:childPageOneId, :userId, 1)
             ,(:grandchildPageOneId, :userId, 1)
@@ -809,7 +809,7 @@ SQL;
         $stmt->execute($sqlParams);
 
         // Capture the count of pages before any operations
-        $sql = "SELECT COUNT(*) FROM PAGES";
+        $sql = "SELECT COUNT(*) FROM resource";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -829,35 +829,35 @@ SQL;
         $pdr->deleteAction();
         $noParameterStatus = $pdr->httpStatus;
 
-        // Authenticated attempt where user has no write access to an affected page returns 401
+        // Authenticated attempt where user has no write access to an affected resource returns 401
         $this->setNonAdminAuth();
         $pdr->parameters['id'] = strval($childPageOneId);
         $pdr->deleteAction();
         $noAccessStatus = $pdr->httpStatus;
 
         // Invalid attempts so far have not deleted any pages
-        $sql = "SELECT COUNT(*) FROM pages";
+        $sql = "SELECT COUNT(*) FROM resource";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
         $pageCountAfter = $result[0][0];
 
-        // Authenticated non-admin user successfully deletes page with write access, returns 204
+        // Authenticated non-admin user successfully deletes resource with write access, returns 204
         $pdr->parameters['id'] = strval($grandchildPageThreeId);
         $pdr->deleteAction();
         $nonAdminValidStatus = $pdr->httpStatus;
-        $sql = "SELECT page_id FROM pages WHERE page_id = :pageId";
+        $sql = "SELECT resource_id FROM resource WHERE resource_id = :resourceId";
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $grandchildPageThreeId]);
+        $stmt->execute(['resourceId' => $grandchildPageThreeId]);
         $resultAfterDelete = $stmt->fetchAll();
 
-        // Authenticated admin user successfully deletes page and all its children, returns 204
+        // Authenticated admin user successfully deletes resource and all its children, returns 204
         $this->setAdminAuth();
-        $pdr->parameters['id'] = strval($parentPageId);
+        $pdr->parameters['id'] = strval($parentResourceId);
         $pdr->deleteAction();
         $adminDeleteStatus = $pdr->httpStatus;
         // ... query for the current count of pages
-        $sql = "SELECT COUNT(*) FROM PAGES";
+        $sql = "SELECT COUNT(*) FROM resource";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -871,17 +871,17 @@ SQL;
         // Authenticated attempt without parameter returns 405
         $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $noParameterStatus);
 
-        // Authenticated attempt where user has no write access to an affected page returns 401
+        // Authenticated attempt where user has no write access to an affected resource returns 401
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $noAccessStatus);
 
         // Invalid attempts so far have not deleted any pages
         $this->assertEquals($pageCountBefore, $pageCountAfter);
 
-        // Authenticated non-admin user successfully deletes page with write access, returns 204
+        // Authenticated non-admin user successfully deletes resource with write access, returns 204
         $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $nonAdminValidStatus);
         $this->assertEmpty($resultAfterDelete);
 
-        // Authenticated admin user successfully deletes page and all its children, returns 204
+        // Authenticated admin user successfully deletes resource and all its children, returns 204
         $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $adminDeleteStatus);
         // ... All 6 pages created by the unit test should be deleted.
         $this->assertEquals($pageCountBefore - 6, $pageCountFinal);

@@ -20,22 +20,14 @@ interface iPageView
      * @return PDO
      */
     public function getSQLConn();
-
-    public function setPageLinkText($paramPageLinkText);
-    public function getPageLinkText();
-
-    public function setPageTitle($paramPageTitle);
-    public function getPageTitle();
     
     // Action methods
-    public function __construct($pageViewPageId);
+    public function __construct($pageViewResourceId);
 
     /**
      * @param iResource $paramResource
      */
     public function setResource($paramResource);
     public function renderResource();
-    public function checkSessionAccess();
-    public function checkAdminSession();
-    
+
 }

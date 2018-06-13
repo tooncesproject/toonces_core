@@ -15,8 +15,8 @@ include_once LIBPATH . 'php/resource/interface/iPageView.php';
 include_once LIBPATH . 'php/pagebuilder/abstract/PageBuilder.php';
 include_once LIBPATH . 'php/pagebuilder/abstract/StandardPageBuilder.php';
 include_once LIBPATH . 'php/utility/SessionManager.php';
-include_once LIBPATH . 'php/utility/static/GrabParentPageId.php';
-include_once LIBPATH . 'php/utility/static/CheckPageUserAccess.php';
+include_once LIBPATH . 'php/utility/static/GrabParentResourceId.php';
+include_once LIBPATH . 'php/utility/static/CheckResourceUserAccess.php';
 include_once LIBPATH . 'php/resource/abstract/ApiResource.php';
 include_once LIBPATH . 'php/resource/abstract/DataResource.php';
 include_once LIBPATH . 'php/resource/ExtHtmlResource.php';
@@ -52,8 +52,8 @@ include_once LIBPATH . 'php/pagebuilder/TestPageBuilder.php';
 
 
 include_once LIBPATH . 'php/utility/static/UniversalConnect.php';
-include_once LIBPATH . 'php/utility/static/GrabPageURL.php';
-include_once LIBPATH . 'php/utility/static/GrabParentPageURL.php';
+include_once LIBPATH . 'php/utility/static/GrabResourceURL.php';
+include_once LIBPATH . 'php/utility/static/GrabParentResourceURL.php';
 include_once LIBPATH . 'php/utility/UserManager.php';
 
 

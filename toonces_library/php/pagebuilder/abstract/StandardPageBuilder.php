@@ -107,7 +107,7 @@ abstract class StandardPageBuilder extends PageBuilder {
 		$pageHeader->html = $this->headerHTML;
 		$this->bodyHTMLViewResource->addElement($pageHeader);
 
-		$pageId = $this->pageViewReference->pageId;
+		$resourceId = $this->pageViewReference->resourceId;
 
 		// Add the content element, which holds the page content.
 		$this->bodyHTMLViewResource->addElement($this->contentElement);

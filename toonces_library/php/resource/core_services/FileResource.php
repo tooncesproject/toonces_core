@@ -17,7 +17,7 @@ class FileResource extends ApiResource implements iResource {
     var $requestPath;
     var $requireAuthentication;
     var $conn;
-    var $pageId;
+    var $resourceId;
 
     public function validateGetHeaders() {
         // Override if the implementation requires any specific HTTP headers for GET requests.
@@ -49,9 +49,9 @@ class FileResource extends ApiResource implements iResource {
         if (!isset($this->conn))
             $this->conn = $this->pageViewReference->getSQLConn();
 
-        // Acquire page ID if not set.
-        if (!isset($this->pageId))
-            $this->pageId = $this->pageViewReference->pageId;
+        // Acquire resource ID if not set.
+        if (!isset($this->resourceId))
+            $this->resourceId = $this->pageViewReference->resourceId;
 
 
         $filename = preg_replace('~^.+/~', '', $this->requestPath);
@@ -71,7 +71,7 @@ class FileResource extends ApiResource implements iResource {
                 break;
             }
 
-            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageId, $this->conn);
+            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $this->resourceId, $this->conn);
             if (!$userHasAccess) {
                 // Security through obscurity; 404 status if user not authorized.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -135,9 +135,9 @@ class FileResource extends ApiResource implements iResource {
         if (!isset($this->conn))
             $this->conn = $this->pageViewReference->getSQLConn();
 
-        // Acquire page ID if not set.
-        if (!isset($this->pageId))
-            $this->pageId = $this->pageViewReference->pageId;
+        // Acquire resource ID if not set.
+        if (!isset($this->resourceId))
+            $this->resourceId = $this->pageViewReference->resourceId;
 
         do {
             // Authenticate, if required.
@@ -149,7 +149,7 @@ class FileResource extends ApiResource implements iResource {
                     break;
                 }
 
-                $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageId, $this->conn);
+                $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $this->resourceId, $this->conn);
                 if (!$userHasAccess) {
                     // Security through obscurity; 404 status if authentication failed.
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -195,9 +195,9 @@ class FileResource extends ApiResource implements iResource {
         if (!isset($this->conn))
             $this->conn = $this->pageViewReference->getSQLConn();
 
-        // Acquire page ID if not set.
-        if (!isset($this->pageId))
-            $this->pageId = $this->pageViewReference->pageId;
+        // Acquire resource ID if not set.
+        if (!isset($this->resourceId))
+            $this->resourceId = $this->pageViewReference->resourceId;
 
         do {
             // Go through the validation sequcence.
@@ -209,7 +209,7 @@ class FileResource extends ApiResource implements iResource {
                 break;
             }
 
-            $userHasAccess = CheckPageUserAccess::checkUserAccess($userId, $this->pageId, $this->conn);
+            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $this->resourceId, $this->conn);
             if (!$userHasAccess) {
                 // Security through obscurity; 404 status if user not authorized.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');

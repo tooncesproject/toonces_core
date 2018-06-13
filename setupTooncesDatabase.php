@@ -4,7 +4,7 @@ require_once LIBPATH . 'php/utility/UserManager.php';
 
 // function setupTooncesDatabase -
 // Creates the toonces MySQL user, grants privileges, builds tables, inserts data, compiles functions and procedures,
-// creates the default home page and admin apges.
+// creates the default home resource and admin apges.
 function setupTooncesDatabase(
     $conn       // SQL connection object (PDO)
     ,$tup        // Toonces MySQL user password
@@ -126,10 +126,10 @@ SQL;
     }
 
     // Run the setup procedures
-    echo 'Creating default home page...' . PHP_EOL;
+    echo 'Creating default home resource...' . PHP_EOL;
 
-    // Check for any existing pages:
-    $sql = 'SELECT page_id FROM toonces.pages';
+    // Check for any existing resources:
+    $sql = 'SELECT resource_id FROM toonces.resource';
     $stmt = $conn->prepare($sql);
 
     try {
@@ -141,18 +141,16 @@ SQL;
 
     $rows = $stmt->fetchAll();
     if (count($rows) == 0) {
-        // Create main page if it doesn't already exist.
+        // Create main resource if it doesn't already exist.
         $sql = <<<SQL
-        INSERT INTO pages (
+        INSERT INTO resource (
          page_title
-        ,page_link_text
         ,pagebuilder_class
         ,pageview_class
         ,redirect_on_error
         ,published
         ) VALUES (
          'Sorry, This is Toonces.'
-        ,'Home Page'
         ,'ExtHTMLPageBuilder'
         ,'HTMLPageView'
         ,FALSE
@@ -165,43 +163,43 @@ SQL;
             $stmt = $conn->prepare($sql);
             $stmt->execute();
         } catch (PDOException $e) {
-            echo('Failed to create main page: ' . $e->getMessage());
+            echo('Failed to create main resource: ' . $e->getMessage());
             throw $e;
         }
 
-        // Get the page ID
+        // Get the resource ID
         $sql = 'SELECT LAST_INSERT_ID()';
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll();
-        $pageId = $rows[0][0];
+        $resourceId = $rows[0][0];
 
         // Insert a record into the ext_html_page table
-        $sql = "INSERT INTO ext_html_page (page_id, html_path, client_class) VALUES (:pageId, 'toonces_library/html/toonces_welcome.html', 'LocalResourceClient')";
+        $sql = "INSERT INTO ext_html_page (resource_id, html_path, client_class) VALUES (:resourceId, 'toonces_library/html/toonces_welcome.html', 'LocalResourceClient')";
         try {
             $stmt = $conn->prepare($sql);
-            $stmt->execute([':pageId' => $pageId]);
+            $stmt->execute([':resourceId' => $resourceId]);
         } catch (PDOException $e) {
             echo('Failed to insert a record into ext_html_page: ' . $e->getMessage());
             throw $e;
         }
     } else {
-        echo '    Detected existing home page in database; Skipping.' . PHP_EOL;
+        echo '    Detected existing home resource in database; Skipping.' . PHP_EOL;
     }
 
 
     // Create Core Services API
     echo 'Creating Core Services API...' . PHP_EOL;
 
-    // Does the coreservices page already exist? If so, delete it.
+    // Does the coreservices resource already exist? If so, delete it.
     $result = null;
     $sql = <<<SQL
         SELECT
-            p.page_id
-        FROM page_hierarchy_bridge phb
-        JOIN pages p ON phb.descendant_page_id = p.page_id
+            p.resource_id
+        FROM resource_hierarchy_bridge rhb
+        JOIN resource p ON rhb.descendant_resource_id = p.resource_id
         WHERE
-            phb.page_id = 1
+            rhb.resource_id = 1
             AND
             p.pathname = 'coreservices'
 SQL;
@@ -214,10 +212,10 @@ SQL;
         throw $e;
     }
     if ($result) {
-        $sql = "CALL sp_delete_page(:pageId)";
+        $sql = "CALL sp_delete_resource(:resourceId)";
         $stmt = $conn->prepare($sql);
         try {
-            $stmt->execute(array('pageId' => $result[0][0]));
+            $stmt->execute(array('resourceId' => $result[0][0]));
         } catch (PDOException $e) {
             echo('Failed to create Core Services API: ' . $e->getMessage());
             throw $e;
@@ -226,13 +224,12 @@ SQL;
 
     // Now create the core services endpoints.
     // Core Services root
-    $csPageId = null;
+    $csResourceId = null;
     $sql = <<<SQL
-        SELECT CREATE_PAGE (
-             1                              -- parent_page_id BIGINT
+        SELECT CREATE_RESOURCE (
+             1                              -- parent_resource_id BIGINT
             ,'coreservices'                 -- ,pathname VARCHAR(50)
             ,'Toonces Core Services'        -- ,page_title VARCHAR(50)
-            ,'Toonces Core Services'        -- ,page_link_text VARCHAR(50)
             ,'CoreServicesAPIPageBuilder'   -- ,pagebuilder_class VARCHAR(50)
             ,'JsonPageView'                  -- ,pageview_class VARCHAR(50)
             ,FALSE                          -- ,redirect_on_error BOOL
@@ -243,7 +240,7 @@ SQL;
     try {
         $stmt->execute();
         $result = $stmt->fetchAll();
-        $csPageId = $result[0][0];
+        $csResourceId = $result[0][0];
     } catch (PDOException $e) {
         echo('Failed to create Core Services API: ' . $e->getMessage());
         throw $e;
@@ -251,11 +248,10 @@ SQL;
 
     // Pages endpoint
     $sql = <<<SQL
-        SELECT CREATE_PAGE (
-             :csPageId                          -- parent_page_id BIGINT
-            ,'pages'                            -- ,pathname VARCHAR(50)
+        SELECT CREATE_RESOURCE (
+             :csResourceId                          -- parent_resource_id BIGINT
+            ,'resources'                            -- ,pathname VARCHAR(50)
             ,'Toonces Core Services - Pages'    -- ,page_title VARCHAR(50)
-            ,'Toonces Core Services - Pages'    -- ,page_link_text VARCHAR(50)
             ,'PageApiPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
             ,'JsonPageView'                      -- ,pageview_class VARCHAR(50)
             ,FALSE                              -- ,redirect_on_error BOOL
@@ -263,23 +259,22 @@ SQL;
         )
 SQL;
     $stmt = $conn->prepare($sql);
-    $pagesEndpointPageId = null;
+    $resourcesEndpointResourceId = null;
     try {
-        $stmt->execute(array('csPageId' => $csPageId));
+        $stmt->execute(array('csResourceId' => $csResourceId));
         $result = $stmt->fetchAll();
-        $pagesEndpointPageId = $result[0][0];
+        $resourcesEndpointResourceId = $result[0][0];
     } catch (PDOException $e) {
-        echo('Failed to create Core Services API (pages): ' . $e->getMessage());
+        echo('Failed to create Core Services API (resources): ' . $e->getMessage());
         throw $e;
     }
 
-    // external content pages endpoint
+    // external content resources endpoint
     $sql = <<<SQL
-        SELECT CREATE_PAGE (
-             :pagesPageId                               -- parent_page_id BIGINT
-            ,'contentpages'                             -- ,pathname VARCHAR(50)
+        SELECT CREATE_RESOURCE (
+             :resourcesResourceId                               -- parent_resource_id BIGINT
+            ,'contentresources'                             -- ,pathname VARCHAR(50)
             ,'Toonces Core Services - Content Pages'    -- ,page_title VARCHAR(50)
-            ,'Toonces Core Services - Content Pages'    -- ,page_link_text VARCHAR(50)
             ,'ExtPageApiPageBuilder'                    -- ,pagebuilder_class VARCHAR(50)
             ,'JsonPageView'                             -- ,pageview_class VARCHAR(50)
             ,FALSE                                      -- ,redirect_on_error BOOL
@@ -288,21 +283,20 @@ SQL;
 SQL;
     $stmt = $conn->prepare($sql);
     try {
-        $stmt->execute(array('pagesPageId' => $pagesEndpointPageId));
+        $stmt->execute(array('resourcesResourceId' => $resourcesEndpointResourceId));
         $result = $stmt->fetchAll();
     } catch (PDOException $e) {
-        echo('Failed to create Core Services API (Content pages): ' . $e->getMessage());
+        echo('Failed to create Core Services API (Content resources): ' . $e->getMessage());
         throw $e;
     }
 
 
     // HTML Files endpoint
     $sql = <<<SQL
-        SELECT CREATE_PAGE (
-             :csPageId                              -- parent_page_id BIGINT
+        SELECT CREATE_RESOURCE (
+             :csResourceId                              -- parent_resource_id BIGINT
             ,'htmlresources'                        -- ,pathname VARCHAR(50)
             ,'Toonces Core Services - HTML Files'   -- ,page_title VARCHAR(50)
-            ,'Toonces Core Services - HTML Files'   -- ,page_link_text VARCHAR(50)
             ,'DocumentEndpointPageBuilder'          -- ,pagebuilder_class VARCHAR(50)
             ,'FilePageView'                         -- ,pageview_class VARCHAR(50)
             ,TRUE                                   -- ,redirect_on_error BOOL
@@ -312,7 +306,7 @@ SQL;
 
     $stmt = $conn->prepare($sql);
     try {
-        $stmt->execute(array('csPageId' => $csPageId));
+        $stmt->execute(array('csResourceId' => $csResourceId));
         $result = $stmt->fetchAll();
     } catch (PDOException $e) {
         echo('Failed to create Core Services API (HTML resources): ' . $e->getMessage());

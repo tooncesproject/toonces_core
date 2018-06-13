@@ -24,19 +24,19 @@ class ExtHtmlPageResourceTest extends FileDependentTestCase {
         $this->buildTestDatabase();
         $this->checkFileFixture();
 
-        // Create a page and insert an associated record in ext_html_page
-        $pageId = $this->createPage(true);
+        // Create a resource and insert an associated record in ext_html_page
+        $resourceId = $this->createPage(true);
         $sql = <<<SQL
         INSERT INTO ext_html_page
-            (page_id, html_path, client_class)
+            (resource_id, html_path, client_class)
         VALUES
-            (:pageId, 'foo', 'LocalResourceClient')
+            (:resourceId, 'foo', 'LocalResourceClient')
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(array('pageId' => $pageId));
+        $stmt->execute(array('resourceId' => $resourceId));
 
         // Instantiate an ExtHtmlPageDataResource and dependencies
-        $pageView = new JsonPageView($pageId);
+        $pageView = new JsonPageView($resourceId);
         $pageView->setSQLConn($conn);
         $client = new LocalResourceClient();
         $ehpr = new ExtHtmlPageDataResource($pageView);
@@ -57,10 +57,10 @@ SQL;
         $ehpr->setupClient(null);
         $resourceDataClass = get_class($ehpr->client);
 
-        // Instantiates client from ext_html_page if pageId parameter set, returns 0
+        // Instantiates client from ext_html_page if resourceId parameter set, returns 0
         unset($ehpr->client);
         unset($ehpr->resourceData);
-        $ehpr->setupClient($pageId);
+        $ehpr->setupClient($resourceId);
         $databaseClass = get_class($ehpr->client);
 
         // ASSERT
@@ -70,7 +70,7 @@ SQL;
         // Instantiates client specified in resourceData, returns 0
         $this->assertSame('LocalResourceClient', $resourceDataClass);
 
-        // Instantiates client from ext_html_page if pageId parameter set, returns 0
+        // Instantiates client from ext_html_page if resourceId parameter set, returns 0
         $this->assertSame('LocalResourceClient', $databaseClass);
     }
 
@@ -87,8 +87,8 @@ SQL;
         $client = new LocalResourceClient();
 
         // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageId = $this->createPage(false);
-        $pageView = new JsonPageView($pageId);
+        $resourceId = $this->createPage(false);
+        $pageView = new JsonPageView($resourceId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageDataResource($pageView);
         $epr->client = $client;
@@ -98,14 +98,14 @@ SQL;
         $pageHtml = '<html><p>Hello!</p></html>';
 
         $badRequestBody = array(
-             'ancestorPageId' => 1
+             'ancestorResourceId' => 1
             ,'pageTitle' => 'Hello World'
             ,'htmlBody' => null
             ,'clientClass' => 'LocalResourceClient'
         );
 
         $pdrBadRequestBody = $badRequestBody;
-        $pdrBadRequestBody['ancestorPageId'] = 99999;
+        $pdrBadRequestBody['ancestorResourceId'] = 99999;
         $pdrBadRequestBody['htmlBody'] = $pageHtml;
 
         $goodRequestBody = $badRequestBody;
@@ -140,17 +140,17 @@ SQL;
         $nullBodyResult = $epr->postAction();
         $nullBodyStatus = $epr->httpStatus;
 
-        // Authenticated POST creates page
+        // Authenticated POST creates resource
         $this->setAdminAuth();
         $epr->resourceData = $goodRequestBody;
         $goodResult = $epr->postAction();
         $goodStatus = $epr->httpStatus;
 
         // Authenticated POST creates matching record in ext_html_file
-        $pageId = key($goodResult);
-        $sql = "SELECT html_path FROM ext_html_page WHERE page_id = :pageId";
+        $resourceId = key($goodResult);
+        $sql = "SELECT html_path FROM ext_html_page WHERE resource_id = :resourceId";
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $pageId]);
+        $stmt->execute(['resourceId' => $resourceId]);
         $result = $stmt->fetchAll();
         $databaseUrl = $result[0]['html_path'];
 
@@ -177,7 +177,7 @@ SQL;
         // null body POST returns 400
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $nullBodyStatus);
 
-        // Authenticated POST creates page
+        // Authenticated POST creates resource
         $this->assertEquals(Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse'), $goodStatus);
 
         // Authenticated POST creates matching record in ext_html_file
@@ -196,11 +196,11 @@ SQL;
      */
     function testPutAction() {
         // ARRANGE
-        // Query the database for the file/page created by testPostAction
+        // Query the database for the file/resource created by testPostAction
         $conn = $this->getConnection();
         $sql = <<<SQL
         SELECT
-             page_id
+             resource_id
             ,html_path
         FROM
             ext_html_page
@@ -212,16 +212,16 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
-        $pageId = $result[0]['page_id'];
+        $resourceId = $result[0]['resource_id'];
         $dbHtmlPathBefore = $result[0]['html_path'];
 
         // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageView = new JsonPageView($pageId);
+        $pageView = new JsonPageView($resourceId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageDataResource($pageView);
         $client = new LocalResourceClient();
         $epr->client = $client;
-        $epr->parameters['id'] = strval($pageId);
+        $epr->parameters['id'] = strval($resourceId);
 
         $url = $GLOBALS['TEST_FILE_PATH'];
         $epr->urlPath = $url;
@@ -256,11 +256,11 @@ SQL;
         $sql = <<<SQL
         SELECT html_path
         FROM ext_html_page
-        WHERE page_id = :pageId
+        WHERE resource_id = :resourceId
 SQL;
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $pageId]);
+        $stmt->execute(['resourceId' => $resourceId]);
         $result = $stmt->fetchAll();
         $unauthHtmlPath = $result[0]['html_path'];
 
@@ -271,9 +271,9 @@ SQL;
         $epr->resourceData = $putBody;
         $authResult = $epr->putAction();
 
-        $sql = "SELECT html_path FROM ext_html_page WHERE page_id = :pageId";
+        $sql = "SELECT html_path FROM ext_html_page WHERE resource_id = :resourceId";
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $pageId]);
+        $stmt->execute(['resourceId' => $resourceId]);
         $result = $stmt->fetchAll();
         $dbHtmlPathAfter = $result[0]['html_path'];
         $returnedHtmlPath = $authResult['fileUrl'];
@@ -333,57 +333,57 @@ SQL;
 
         // Create some pages:
         // This one is public
-        $publicPageId = $this->createPage(true);
+        $publicResourceId = $this->createPage(true);
         // This one is not
-        $unpublishedPageId = $this->createPage(false);
+        $unpublishedResourceId = $this->createPage(false);
         // This one is not published, but we will grant non-admin read access
-        $grantedPageId = $this->createPage(false);
+        $grantedResourceId = $this->createPage(false);
         $sql = <<<SQL
-        INSERT INTO page_user_access
-            (page_id, user_id, can_edit)
+        INSERT INTO resource_user_access
+            (resource_id, user_id, can_edit)
         VALUES
-            (:grantedPageId, :nonAdminUserId, TRUE)
+            (:grantedResourceId, :nonAdminUserId, TRUE)
 SQL;
         $sqlParams = array(
-            'grantedPageId' => $grantedPageId
+            'grantedResourceId' => $grantedResourceId
             ,'nonAdminUserId' => $nonAdminUserId
         );
         $stmt = $conn->prepare($sql);
         $stmt->execute($sqlParams);
 
-        // For each page, insert a record into ext_html_page
+        // For each resource, insert a record into ext_html_page
         $sql = <<<SQL
         INSERT INTO ext_html_page
-            (page_id, html_path, client_class)
+            (resource_id, html_path, client_class)
         VALUES
-             (:publicPageId, 'path', 'Class')
-            ,(:unpublishedPageId, 'path2', 'Class2')
-            ,(:grantedPageId, 'path3', 'Class3')
+             (:publicResourceId, 'path', 'Class')
+            ,(:unpublishedResourceId, 'path2', 'Class2')
+            ,(:grantedResourceId, 'path3', 'Class3')
 SQL;
         $stmt = $conn->prepare($sql);
         $sqlParams = array(
-             'publicPageId' => $publicPageId
-            ,'unpublishedPageId' => $unpublishedPageId
-            ,'grantedPageId' => $grantedPageId
+             'publicResourceId' => $publicResourceId
+            ,'unpublishedResourceId' => $unpublishedResourceId
+            ,'grantedResourceId' => $grantedResourceId
         );
         $stmt->execute($sqlParams);
 
         // Now that we've created pages, query the database for its current state
         $sql = <<<SQL
         SELECT
-             p.page_id
+             p.resource_id
             ,p.page_title
             ,p.pathname
             ,p.pagebuilder_class
             ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
-            ,CASE WHEN pua.page_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
+            ,CASE WHEN rua.resource_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
             ,ehp.html_path
             ,ehp.client_class
-        FROM pages p
-        JOIN ext_html_page ehp ON p.page_id = ehp.page_id
-        LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND pua.user_id = :userId
+        FROM resource p
+        JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+        LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND rua.user_id = :userId
 SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['userId' => $nonAdminUserId]);
@@ -391,7 +391,7 @@ SQL;
 
         $sql = <<<SQL
         SELECT
-             p.page_id
+             p.resource_id
             ,p.page_title
             ,p.pathname
             ,p.pagebuilder_class
@@ -400,12 +400,12 @@ SQL;
             ,p.published
             ,ehp.html_path
             ,ehp.client_class
-        FROM pages p
-        JOIN ext_html_page ehp ON p.page_id = ehp.page_id
-        WHERE p.page_id = :pageId
+        FROM resource p
+        JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+        WHERE p.resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $publicPageId]);
+        $stmt->execute(['resourceId' => $publicResourceId]);
         $publicPageState = $stmt->fetchAll();
 
 
@@ -424,15 +424,15 @@ SQL;
          // GET with valid ID parameter returns single record and 200, with data matching database.
         $this->setAdminAuth();
         $pdr->resourceData = array();
-        $pdr->parameters['id'] = strval($publicPageId);
+        $pdr->parameters['id'] = strval($publicResourceId);
         $singleParamResult = $pdr->getAction();
         $singleParamStatus = $pdr->httpStatus;
-        $singleParamRecord = $singleParamResult[$publicPageId];
+        $singleParamRecord = $singleParamResult[$publicResourceId];
 
-        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted resource
         $this->setNonAdminAuth();
         $pdr->resourceData = array();
-        $pdr->parameters['id'] = strval($unpublishedPageId);
+        $pdr->parameters['id'] = strval($unpublishedResourceId);
         $unpublishedResult = $pdr->getAction();
         $unpublishedStatus = $pdr->httpStatus;
 
@@ -467,7 +467,7 @@ SQL;
         $this->assertEquals(1, count($singleParamResult));
 
         // ... with data matching database.
-        $this->assertSame(intval($publicPageState[0]['page_id']), key($singleParamResult));
+        $this->assertSame(intval($publicPageState[0]['resource_id']), key($singleParamResult));
         $this->assertSame($publicPageState[0]['page_title'], $singleParamRecord['pageTitle']);
         $this->assertSame($publicPageState[0]['pathname'], $singleParamRecord['pathName']);
         $this->assertSame($publicPageState[0]['pagebuilder_class'], $singleParamRecord['pageBuilderClass']);
@@ -477,7 +477,7 @@ SQL;
         $this->assertSame($publicPageState[0]['html_path'], $singleParamRecord['fileUrl']);
         $this->assertSame($publicPageState[0]['client_class'], $singleParamRecord['clientClass']);
 
-        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted page
+        // Authenticated non-admin GET returns 404 on parameterized request for access-restricted resource
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
         $this->assertEmpty($unpublishedResult);
 
@@ -485,7 +485,7 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $noParamStatus);
 
         foreach ($pagesState as $pageRecord) {
-            $id = $pageRecord['page_id'];
+            $id = $pageRecord['resource_id'];
             $published = $pageRecord['published'];
             $userAccess = $pageRecord['user_has_access'];
             if ($published == true or $userAccess == true) {
@@ -507,11 +507,11 @@ SQL;
      */
     function testDeleteAction() {
         // ARRANGE
-        // Query the database for the file/page created by testPostAction
+        // Query the database for the file/resource created by testPostAction
         $conn = $this->getConnection();
         $sql = <<<SQL
         SELECT
-             page_id
+             resource_id
             ,html_path
         FROM ext_html_page
         WHERE client_class = 'LocalResourceClient'
@@ -521,14 +521,14 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
-        $pageId = $result[0]['page_id'];
+        $resourceId = $result[0]['resource_id'];
         $dbHtmlPath = $result[0]['html_path'];
 
         // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageView = new JsonPageView($pageId);
+        $pageView = new JsonPageView($resourceId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageDataResource($pageView);
-        $epr->parameters['id'] = strval($pageId);
+        $epr->parameters['id'] = strval($resourceId);
         $client = new LocalResourceClient();
         $epr->client = $client;
 
@@ -538,27 +538,27 @@ SQL;
         $epr->deleteAction();
         $fileExistsNoAuth = file_exists($dbHtmlPath);
 
-        // Unauthenticated DELETE does not delete ext_html_page record nor page record
+        // Unauthenticated DELETE does not delete ext_html_page record nor resource record
         $sql = <<<SQL
         SELECT
-             p.page_id
+             p.resource_id
             ,ext_html_page_id
-        FROM pages p
-        LEFT JOIN ext_html_page ehp ON p.page_id = ehp.page_id
-        WHERE p.page_id = :pageId
+        FROM resource p
+        LEFT JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+        WHERE p.resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['pageId' => $pageId]);
+        $stmt->execute(['resourceId' => $resourceId]);
         $result = $stmt->fetchAll();
-        $extHtmlPageIdBefore = $result[0]['ext_html_page_id'];
-        $pageIdBefore = $result[0]['page_id'];
+        $extHtmlResourceIdBefore = $result[0]['ext_html_page_id'];
+        $resourceIdBefore = $result[0]['resource_id'];
 
         // Authenticated DELETE deletes file
         $this->setAdminAuth();
         $epr->deleteAction();
         $fileExistsAfter = file_exists($dbHtmlPath);
-        // Authenticated DELETE deletes page record
-        $stmt->execute(['pageId' => $pageId]);
+        // Authenticated DELETE deletes resource record
+        $stmt->execute(['resourceId' => $resourceId]);
         $resultAfter = $stmt->fetchAll();
 
         // Authenticated DELETE returns 204
@@ -569,14 +569,14 @@ SQL;
         // Unauthenticated DELETE does not delete file
         $this->assertTrue($fileExistsNoAuth);
 
-        // Unauthenticated DELETE does not delete ext_html_page record nor page record
-        $this->assertNotEmpty($extHtmlPageIdBefore);
-        $this->assertNotEmpty($pageIdBefore);
+        // Unauthenticated DELETE does not delete ext_html_page record nor resource record
+        $this->assertNotEmpty($extHtmlResourceIdBefore);
+        $this->assertNotEmpty($resourceIdBefore);
 
         // Authenticated DELETE deletes file
         $this->assertFalse($fileExistsAfter);
 
-        // Authenticated DELETE deletes page record
+        // Authenticated DELETE deletes resource record
         $this->assertEmpty($resultAfter);
 
         // Authenticated DELETE returns 204

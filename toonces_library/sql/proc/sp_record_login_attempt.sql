@@ -8,7 +8,7 @@ DELIMITER //
 --/%c
 
 CREATE PROCEDURE sp_record_login_attempt(
-     param_attempt_page_id          BIGINT
+     param_attempt_resource_id      BIGINT
     ,param_http_method              VARCHAR(10)
     ,param_attempt_user_id          BIGINT UNSIGNED
     ,param_attempt_time             TIMESTAMP
@@ -38,7 +38,7 @@ BEGIN
             -- Insert the attempt
             INSERT INTO login_attempt
             (
-                 page_id
+                 resource_id
                 ,meta_http_method_id
                 ,attempt_user_id
                 ,attempt_time
@@ -47,7 +47,7 @@ BEGIN
                 ,remote_addr
                 ,user_agent
             ) VALUES (
-                 param_attempt_page_id
+                 param_attempt_resource_id
                 ,var_meta_http_method_id
                 ,param_attempt_user_id
                 ,param_attempt_time

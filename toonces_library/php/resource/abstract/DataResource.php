@@ -78,30 +78,31 @@ abstract class DataResource extends ApiResource implements iResource
         // Acquire the user id if this is an authenticated request.
         $userId = $this->authenticateUser() ?? 0;
 
-        // Query the database for any children of the current page.
+        // Query the database for any children of the current resource.
         $sql = <<<SQL
             SELECT
-                 p.page_id
-                ,p.pathname
-                ,p.page_title
-            FROM page_hierarchy_bridge phb
-            JOIN pages p ON phb.descendant_page_id = p.page_id
-            LEFT JOIN page_user_access pua ON p.page_id = pua.page_id AND (pua.user_id = :userId)
+                 r.resource_id
+                ,r.pathname
+                ,r.page_title
+            FROM resource_hierarchy_bridge rhb
+            JOIN resource r ON rhb.descendant_resource_id = r.resource_id
+            LEFT JOIN resource_user_access rua ON r.resource_id = rua.resource_id AND (rua.user_id = :userId)
             LEFT JOIN users u ON u.user_id = :userId
             WHERE
-                (phb.page_id = :pageId)
+                (rhb.resource_id = :resourceId)
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
+                    (r.published = 1 AND r.deleted IS NULL)
                     OR
-                    pua.user_id IS NOT NULL
+                    rua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
                 )
-            ORDER BY p.page_id ASC
+            ORDER BY r.resource_id ASC
 SQL;
         $stmt = $sqlConn->prepare($sql);
-        $stmt->execute(array('userId' => $userId, 'pageId' => $this->pageViewReference->pageId));
+        $sqlParams = array('userId' => $userId, 'resourceId' => $this->pageViewReference->resourceId);
+        $stmt->execute($sqlParams);
         $result = $stmt->fetchAll();
         if ($result) {
             // Results? Serialize the output.

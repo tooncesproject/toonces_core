@@ -17,10 +17,10 @@ class ExtHtmlResource extends HTMLResource implements iResource {
         // Query the database for this page's content HTML file
         $conn = $this->pageViewReference->getSQLConn();
 
-        $sql = 'SELECT html_path, client_class FROM ext_html_page WHERE page_id = :pageId';
+        $sql = 'SELECT html_path, client_class FROM ext_html_page WHERE resource_id = :resourceId';
         $stmt = $conn->prepare($sql);
 
-        $stmt->execute(['pageId' => $this->pageViewReference->pageId]);
+        $stmt->execute(['resourceId' => $this->pageViewReference->resourceId]);
         $result = $stmt->fetchAll();
         $htmlPath = $result[0]['html_path'];
         $clientClass = $result[0]['client_class'];
