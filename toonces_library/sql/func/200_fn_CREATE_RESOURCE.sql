@@ -92,14 +92,14 @@ BEGIN
         INSERT INTO resource (
              pathname
             ,page_title
-            ,pagebuilder_class
+            ,resource_class
             ,pageview_class
             ,redirect_on_error
             ,published
         ) VALUES (
             pathname
             ,page_title
-            ,pagebuilder_class
+            ,resource_class
             ,pageview_class
             ,redirect_on_error
             ,published

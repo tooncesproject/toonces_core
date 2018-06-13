@@ -47,11 +47,7 @@ class FileResource extends ApiResource implements iResource {
 
         // Acquire SQL conn if not set
         if (!isset($this->conn))
-            $this->conn = $this->pageViewReference->getSQLConn();
-
-        // Acquire resource ID if not set.
-        if (!isset($this->resourceId))
-            $this->resourceId = $this->pageViewReference->resourceId;
+            $this->conn = UniversalConnect::doConnect();
 
 
         $filename = preg_replace('~^.+/~', '', $this->requestPath);
@@ -122,7 +118,10 @@ class FileResource extends ApiResource implements iResource {
 
     }
 
-
+    /**
+     * @return string
+     * @throws Exception
+     */
     public function getAction() {
         // Acquire the file name
         if (!isset($this->requestPath))
@@ -133,11 +132,7 @@ class FileResource extends ApiResource implements iResource {
 
         // Acquire SQL connection if not set
         if (!isset($this->conn))
-            $this->conn = $this->pageViewReference->getSQLConn();
-
-        // Acquire resource ID if not set.
-        if (!isset($this->resourceId))
-            $this->resourceId = $this->pageViewReference->resourceId;
+            $this->conn = UniversalConnect::doConnect();
 
         do {
             // Authenticate, if required.
@@ -193,11 +188,7 @@ class FileResource extends ApiResource implements iResource {
 
         // Acquire SQL connection if not set.
         if (!isset($this->conn))
-            $this->conn = $this->pageViewReference->getSQLConn();
-
-        // Acquire resource ID if not set.
-        if (!isset($this->resourceId))
-            $this->resourceId = $this->pageViewReference->resourceId;
+            $this->conn = UniversalConnect::doConnect();
 
         do {
             // Go through the validation sequcence.
@@ -259,6 +250,15 @@ class FileResource extends ApiResource implements iResource {
             throw new Exception('Error: getResource() was called without a valid resourcePath variable set.');
 
         return parent::getResource();
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public function render() {
+        $renderer = new FileRenderer();
+        $renderer->renderResource($this);
     }
 
 }

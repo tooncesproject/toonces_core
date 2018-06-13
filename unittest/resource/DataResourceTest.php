@@ -41,7 +41,7 @@ class DataResourceTest extends SqlDependentTestCase {
     public function testValidateHeaders() {
         // ARRANGE
         // Instantiate with a PageView object
-        $jsonPageView = new JsonPageView(1);
+        $jsonPageView = new JsonRenderer(1);
         $dr = new ConcreteDataResource($jsonPageView);
 
         // ACT
@@ -63,7 +63,7 @@ class DataResourceTest extends SqlDependentTestCase {
 
         // ARRANGE
         // Instantiate with a PageView object
-        $jsonPageView = new JsonPageView(1);
+        $jsonPageView = new JsonRenderer(1);
         $dr = new ConcreteDataResource($jsonPageView);
 
         $parameterArray = array(
@@ -99,7 +99,7 @@ class DataResourceTest extends SqlDependentTestCase {
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
         // We'll use the 'coreservices' API root for our test.
-        // The JsonPageView object needs to know its resource ID.
+        // The JsonRenderer object needs to know its resource ID.
         $sql = <<<SQL
         SELECT
             resource_id
@@ -112,7 +112,7 @@ SQL;
         $stmt->execute();
         $result = $stmt->fetchAll();
         $resourceId = $result[0][0];
-        $jsonPageView = new JsonPageView($resourceId);
+        $jsonPageView = new JsonRenderer($resourceId);
         $jsonPageView->setSQLConn($sqlConn);
         $dr = new ConcreteDataResource($jsonPageView);
 
@@ -142,7 +142,7 @@ SQL;
     public function testValidateData () {
         // ARRANGE
         // Instantiate base objects
-        $jsonPageView = new JsonPageView(1);
+        $jsonPageView = new JsonRenderer(1);
         $dr = new ConcreteDataResource($jsonPageView);
 
         // Set up the DataResource object's Data Validator.
@@ -204,7 +204,7 @@ SQL;
     function testGetResource() {
         // ARRANGE
         // See testGetSubResources for fixture injection
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($this->getConnection());
         $dr = new ConcreteDataResource($pageView);
         $dr->httpMethod = 'GET';

@@ -3,18 +3,14 @@ CREATE DATABASE IF NOT EXISTS toonces;
 USE toonces;
 
 
-
 CREATE TABLE IF NOT EXISTS resource (
-     resource_id        BIGINT          NOT NULL AUTO_INCREMENT
-    ,pathname           VARCHAR(50)     NULL
-    ,page_title         VARCHAR(100)    NULL
-    ,pagebuilder_class  VARCHAR(50)     NOT NULL
-    ,pageview_class     VARCHAR(50)     NOT NULL
-    ,created_dt         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt        TIMESTAMP       NULL ON UPDATE CURRENT_TIMESTAMP
-    ,deleted            TIMESTAMP       NULL
-    ,redirect_on_error  BOOL            NOT NULL
-    ,published          BOOL            NOT NULL DEFAULT 0
+     resource_id       BIGINT      NOT NULL AUTO_INCREMENT
+    ,pathname          VARCHAR(50) NULL
+    ,resource_class    VARCHAR(50) NOT NULL
+    ,created_dt        TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt       TIMESTAMP   NULL ON UPDATE CURRENT_TIMESTAMP
+    ,redirect_on_error BOOL        NOT NULL
+    ,published         BOOL        NOT NULL DEFAULT 0
 
         ,CONSTRAINT pk_resource PRIMARY KEY (resource_id)
         ,INDEX idx_pathname (pathname)
@@ -127,18 +123,20 @@ CREATE TABLE IF NOT EXISTS login_attempt (
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;
 
 
-CREATE TABLE IF NOT EXISTS ext_html_page (
-     ext_html_page_id BIGINT       NOT NULL AUTO_INCREMENT
-    ,
-     resource_id      BIGINT       NOT NULL
-    ,html_path        VARCHAR(200) NOT NULL
-    ,client_class     VARCHAR(50)  NOT NULL
-    ,created_by       VARCHAR(50)  NULL
-    ,created_dt       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ,modified_dt      TIMESTAMP    NULL ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS dom_resource (
+     dom_resource_id        BIGINT       NOT NULL AUTO_INCREMENT
+    ,resource_id            BIGINT       NOT NULL
+    ,title                  VARCHAR(200) NOT NULL
+    ,template_html_path     VARCHAR(200) NOT NULL
+    ,template_client_class  VARCHAR(50) NOT NULL
+    ,content_html_path      VARCHAR(200) NOT NULL
+    ,content_client_class   VARCHAR(50)  NOT NULL
+    ,created_by             VARCHAR(50)  NULL
+    ,created_dt             TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ,modified_dt            TIMESTAMP    NULL ON UPDATE CURRENT_TIMESTAMP
 
-        ,CONSTRAINT pk_ext_html_page PRIMARY KEY (ext_html_page_id)
-        ,CONSTRAINT fk_ext_html_page_pages FOREIGN KEY (resource_id) REFERENCES resource (resource_id)
+        ,CONSTRAINT pk_dom_resource PRIMARY KEY (dom_resource_id)
+        ,CONSTRAINT fk_dom_resource_resource FOREIGN KEY (resource_id) REFERENCES resource (resource_id)
         ,CONSTRAINT ak_resource_id UNIQUE INDEX (resource_id)
 
 ) ENGINE=INNODB ROW_FORMAT=COMPRESSED;

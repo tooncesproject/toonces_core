@@ -319,7 +319,7 @@ SQL;
                         ,:htmlPath
                         ,COALESCE(:clientClass, client_class)
                     FROM
-                        ext_html_page
+                        dom_resource
                     WHERE
                         resource_id = :resourceId
                 ON DUPLICATE KEY UPDATE
@@ -392,7 +392,7 @@ SQL;
                     ,ehp.html_path
                     ,ehp.client_class
                 FROM resource p
-                JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+                JOIN dom_resource ehp ON p.resource_id = ehp.resource_id
                 -- join to PHB is to get the parent resource ID
                 LEFT JOIN resource_hierarchy_bridge rhb ON p.resource_id = rhb.descendant_resource_id
                 LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND (rua.user_id = :userId)
@@ -456,7 +456,7 @@ SQL;
         $id = $this->validateIntParameter('id');
         $sql = <<<SQL
                 SELECT html_path
-                FROM ext_html_page
+                FROM dom_resource
                 WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);

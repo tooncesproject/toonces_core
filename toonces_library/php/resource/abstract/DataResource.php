@@ -194,4 +194,15 @@ SQL;
 
         return $returnData;
     }
+
+
+    /**
+     * @throws Exception
+     */
+    public function render() {
+        $renderer = new JsonRenderer();
+        $renderer->renderResource($this);
+
+    }
+
 }

@@ -36,7 +36,7 @@ SQL;
         $stmt->execute(array('resourceId' => $resourceId));
 
         // Instantiate an ExtHtmlPageDataResource and dependencies
-        $pageView = new JsonPageView($resourceId);
+        $pageView = new JsonRenderer($resourceId);
         $pageView->setSQLConn($conn);
         $client = new LocalResourceClient();
         $ehpr = new ExtHtmlPageDataResource($pageView);
@@ -88,7 +88,7 @@ SQL;
 
         // Instantiate an ExtHtmlPageDataResource and dependencies.
         $resourceId = $this->createPage(false);
-        $pageView = new JsonPageView($resourceId);
+        $pageView = new JsonRenderer($resourceId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageDataResource($pageView);
         $epr->client = $client;
@@ -203,7 +203,7 @@ SQL;
              resource_id
             ,html_path
         FROM
-            ext_html_page
+            dom_resource
         ORDER BY
             ext_html_page_id DESC
         LIMIT 1
@@ -216,7 +216,7 @@ SQL;
         $dbHtmlPathBefore = $result[0]['html_path'];
 
         // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageView = new JsonPageView($resourceId);
+        $pageView = new JsonRenderer($resourceId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageDataResource($pageView);
         $client = new LocalResourceClient();
@@ -324,7 +324,7 @@ SQL;
 
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new ExtHtmlPageDataResource($pageView);
 
@@ -382,7 +382,7 @@ SQL;
             ,ehp.html_path
             ,ehp.client_class
         FROM resource p
-        JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+        JOIN dom_resource ehp ON p.resource_id = ehp.resource_id
         LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND rua.user_id = :userId
 SQL;
         $stmt = $conn->prepare($sql);
@@ -401,7 +401,7 @@ SQL;
             ,ehp.html_path
             ,ehp.client_class
         FROM resource p
-        JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+        JOIN dom_resource ehp ON p.resource_id = ehp.resource_id
         WHERE p.resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
@@ -513,7 +513,7 @@ SQL;
         SELECT
              resource_id
             ,html_path
-        FROM ext_html_page
+        FROM dom_resource
         WHERE client_class = 'LocalResourceClient'
         ORDER BY ext_html_page_id DESC
         LIMIT 1
@@ -525,7 +525,7 @@ SQL;
         $dbHtmlPath = $result[0]['html_path'];
 
         // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageView = new JsonPageView($resourceId);
+        $pageView = new JsonRenderer($resourceId);
         $pageView->setSQLConn($conn);
         $epr = new ExtHtmlPageDataResource($pageView);
         $epr->parameters['id'] = strval($resourceId);
@@ -544,7 +544,7 @@ SQL;
              p.resource_id
             ,ext_html_page_id
         FROM resource p
-        LEFT JOIN ext_html_page ehp ON p.resource_id = ehp.resource_id
+        LEFT JOIN dom_resource ehp ON p.resource_id = ehp.resource_id
         WHERE p.resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);

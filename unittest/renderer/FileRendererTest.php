@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * FilePageViewTest.php
+ * FileRendererTest.php
  * Initial commit: Paul Anderson, 4/28/2018
  *
  * Unit test for the FilePageView class.
@@ -29,7 +29,7 @@ class BadFileResource extends FileResource {
     }
 }
 
-class FilePageViewTest extends TestCase {
+class FileRendererTest extends TestCase {
 
 
     /**
@@ -41,7 +41,7 @@ class FilePageViewTest extends TestCase {
         // We'll lean on integration testing and/or trust that the PHP-native functions
         // actually work.
         // ARRANGE
-        $jpv = new FilePageview(1);
+        $jpv = new FileRenderer(1);
         $goodFileResource = new GoodFileResource($jpv);
         $badFileResource = new BadFileResource($jpv);
         $badOutput = null;

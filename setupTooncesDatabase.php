@@ -231,7 +231,7 @@ SQL;
             ,'coreservices'                 -- ,pathname VARCHAR(50)
             ,'Toonces Core Services'        -- ,page_title VARCHAR(50)
             ,'CoreServicesAPIPageBuilder'   -- ,pagebuilder_class VARCHAR(50)
-            ,'JsonPageView'                  -- ,pageview_class VARCHAR(50)
+            ,JJsonRenderer                 -- ,pageview_class VARCHAR(50)
             ,FALSE                          -- ,redirect_on_error BOOL
             ,FALSE                          -- ,published BOOL
         )
@@ -253,7 +253,7 @@ SQL;
             ,'resources'                            -- ,pathname VARCHAR(50)
             ,'Toonces Core Services - Pages'    -- ,page_title VARCHAR(50)
             ,'PageApiPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
-            ,'JsonPageView'                      -- ,pageview_class VARCHAR(50)
+            ,'JsJsonRenderer                     -- ,pageview_class VARCHAR(50)
             ,FALSE                              -- ,redirect_on_error BOOL
             ,FALSE                              -- ,published BOOL
         )
@@ -276,7 +276,7 @@ SQL;
             ,'contentresources'                             -- ,pathname VARCHAR(50)
             ,'Toonces Core Services - Content Pages'    -- ,page_title VARCHAR(50)
             ,'ExtPageApiPageBuilder'                    -- ,pagebuilder_class VARCHAR(50)
-            ,'JsonPageView'                             -- ,pageview_class VARCHAR(50)
+            ,'JsJsonRenderer                            -- ,pageview_class VARCHAR(50)
             ,FALSE                                      -- ,redirect_on_error BOOL
             ,FALSE                                      -- ,published BOOL
         )

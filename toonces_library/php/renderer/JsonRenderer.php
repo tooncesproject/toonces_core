@@ -1,6 +1,6 @@
 <?php
 /*
- * JsonPageView.php
+ * JsonRenderer.php
  * Initial commit: Paul Anderson, 1/24/2018
  *
  * iPageView implementation for REST API resources.
@@ -9,27 +9,26 @@
  *
  */
 
-require_once LIBPATH.'php/toonces.php';
+require_once LIBPATH . 'php/toonces.php';
 
-class JsonPageView extends ApiPageView implements iPageView, iResource
+class JsonRenderer extends Renderer implements iRenderer
 {
 
     /**
+     * @param DataResource $paramResource
      * @throws Exception
      */
-    public function renderResource() {
-        // Called by index.php - Converts the resource data to JSON, executes the server's response.
-        $dataObject = $this->getResource();
+    public function renderResource($paramResource) {
 
         // Execute the object
-        $resourceData = $dataObject->getResource();
+        $resourceData = $paramResource->getResource();
         // If the resource has a status message, add it to the output
-        if ($dataObject->statusMessage)
-            $resourceData['status'] = $dataObject->statusMessage;
+        if ($paramResource->statusMessage)
+            $resourceData['status'] = $paramResource->statusMessage;
 
         // Once executed, the resource must have an HTTP status.
         // If it doesn't, throw an exception.
-        $httpStatus = $dataObject->httpStatus;
+        $httpStatus = $paramResource->httpStatus;
         $httpStatusString = null;
         if (isset($httpStatus))
             $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');

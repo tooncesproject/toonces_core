@@ -18,10 +18,12 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<testsuite name="installers">
 			<file>unittest/install/SetupDatabaseTest.php</file>
 		</testsuite>
+		<testsuite name="renderers">
+			<file>unittest/resource/RendererTest.php</file>
+			<file>unittest/resource/JsonRendererTest.php</file>
+			<file>unittest/resource/FileRendererTest.php</file>
+		</testsuite>
 		<testsuite name="resources">
-			<file>unittest/resource/ApiPageViewTest.php</file>
-			<file>unittest/resource/JsonPageViewTest.php</file>
-			<file>unittest/resource/FilePageViewTest.php</file>
 			<file>unittest/resource/ApiResourceTest.php</file>
 			<file>unittest/resource/DataResourceTest.php</file>
 			<file>unittest/resource/HtmlResourceTest.php</file>
@@ -29,11 +31,6 @@ Initial Commit: Paul Anderson, 12/11/2017
 			<file>unittest/resource/FileResourceTest.php</file>
 			<file>unittest/resource/PageDataResourceTest.php</file>
 			<file>unittest/resource/ExtHtmlPageDataResourceTest.php</file>
-		</testsuite>
-		<testsuite name="pagebuilders">
-			<file>unittest/pagebuilder/PageApiPageBuilderTest.php</file>
-			<file>unittest/pagebuilder/ExtHtmlPageBuilderTest.php</file>
-			<file>unittest/pagebuilder/DocumentEndpointPageBuilderTest.php</file>
 		</testsuite>
 		<testsuite name="utility_classes">
 			<file>unittest/utility/CheckPageUserAccessTest.php</file>

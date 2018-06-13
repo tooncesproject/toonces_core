@@ -2,10 +2,10 @@
 /**
  * @author paulanderson
  *
- * ApiPageViewTest.php
+ * RendererTest.php
  * Initial commit: Paul Anderson, 4/25/2018
  *
- * Unit tests for the ApiPageView class
+ * Unit tests for the ApiRenderer class
  *
 */
 
@@ -16,11 +16,11 @@ require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 
 // Concrete class for testing
-class ConcreteApiPageView extends ApiPageView {
+class ConcreteRenderer extends Renderer {
     // No additional functionality.
 }
 
-class ApiPageViewTest extends SqlDependentTestCase {
+class RendererTest extends SqlDependentTestCase {
 
     // We will omit unit tests for simple setter/getter methods.
     // I'm not THAT pedantic. --Paul
@@ -32,7 +32,7 @@ class ApiPageViewTest extends SqlDependentTestCase {
         $_SERVER['HTTP_ACCEPT_VERSION'] = $version;
 
         //ACT
-        $apv = new ConcreteApiPageView($resourceId);
+        $apv = new ConcreteRenderer($resourceId);
 
         // ASSERT
         $this->assertEquals($resourceId, $apv->resourceId);
@@ -45,7 +45,7 @@ class ApiPageViewTest extends SqlDependentTestCase {
      */
     function testGetResource() {
         // ARRANGE
-        $apv = new ConcreteApiPageView(1);
+        $apv = new ConcreteRenderer(1);
 
         $tooManyDataObjects = array('oneObject' => 'foo', 'oneObjectTooMany' => 'bar');
         $justOneDataObject = array('oneObject' => 'foo');

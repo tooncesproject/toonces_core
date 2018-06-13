@@ -1,33 +1,31 @@
 <?php
 /**
  * @author paulanderson
- * FilePageView.php
+ * FileRenderer.php
  * Initial commit: Paul Anderson, 4/26/2018
  *
- * PageView extension for handling transfers of files from a vector.
+ * Renderer extension for handling transfers of files from a vector.
  *
 */
 
-require_once LIBPATH.'php/toonces.php';
+require_once LIBPATH . 'php/toonces.php';
 
-class FilePageview extends ApiPageView implements iPageView, iResource {
+class FileRenderer extends Renderer implements iRenderer {
 
     /**
+     * @param FileResource $paramResource
      * @throws Exception
      * @return string
      */
-    public function renderResource() {
+    public function renderResource($paramResource) {
         // Called by index.php - Serves a file download, if applicable.
 
-        // $dataObject will be a FileResource or similar Resource subclass instance.
-        $dataObject = $this->getResource();
-
         // Execute the object.
-        $resourcePath = $dataObject->getResource();
+        $resourcePath = $paramResource->getResource();
 
         // Once executed, the resource must have an HTTP status.
         // If it doesn't, throw an exception.
-        $httpStatus = $dataObject->httpStatus;
+        $httpStatus = $paramResource->httpStatus;
         $httpStatusString = null;
         if (isset($httpStatus))
             $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');

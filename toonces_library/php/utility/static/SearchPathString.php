@@ -15,7 +15,7 @@ class SearchPathString {
     public static function grabResourceId($pathArray, $resourceId, $depthCount, $conn) {
 
         $pageFound = false;
-        $descendantResourceId;
+        $descendantResourceId = null;
 
         $sql = <<<SQL
         SELECT
@@ -51,7 +51,7 @@ SQL;
 
         } else if ($pageFound) {
             //iterate recursion if page found
-            return $this->grabResourceId($pathArray, $descendantResourceId, $nextDepthCount, $conn);
+            return SearchPathString::grabResourceId($pathArray, $descendantResourceId, $nextDepthCount, $conn);
 
         } else {
 

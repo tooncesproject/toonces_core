@@ -29,7 +29,7 @@ class FileResourceTest extends FileDependentTestCase {
         $this->buildTestDatabase();
 
         // Proceed
-        $pv = new FilePageview(1);
+        $pv = new FileRenderer(1);
         $pv->setSQLConn($this->getConnection());
         $fr = new FileResource($pv);
         $testData = 'look here is some data' .PHP_EOL;
@@ -48,7 +48,7 @@ class FileResourceTest extends FileDependentTestCase {
      */
     function testGetResourceExcBogus() {
         // ARRANGE
-        $pv = new FilePageview(1);
+        $pv = new FileRenderer(1);
         $pv->setSQLConn($this->getConnection());
         $fr = new FileResource($pv);
         $testData = 'look here is some data' .PHP_EOL;
@@ -68,7 +68,7 @@ class FileResourceTest extends FileDependentTestCase {
      */
     function testGetResource() {
         // ARRANGE
-        $pv = new FilePageview(1);
+        $pv = new FileRenderer(1);
         $pv->setSQLConn($this->getConnection());
         $fr = new FileResource($pv);
         $testData = 'look here is some data' .PHP_EOL;
@@ -101,7 +101,7 @@ class FileResourceTest extends FileDependentTestCase {
         $resourceId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
-        $pageView = new FilePageview($resourceId);
+        $pageView = new FileRenderer($resourceId);
         $conn = $this->getConnection();
         $pageView->setSQLConn($conn);
 
@@ -210,7 +210,7 @@ class FileResourceTest extends FileDependentTestCase {
         $resourceId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
-        $pageView = new FilePageview($resourceId);
+        $pageView = new FileRenderer($resourceId);
         $conn = $this->getConnection();
         $pageView->setSQLConn($conn);
 
@@ -303,7 +303,7 @@ class FileResourceTest extends FileDependentTestCase {
         $resourceId = $this-> createPage(false);
 
         // Instantiate a PageView object and dependencies
-        $pageView = new FilePageview($resourceId);
+        $pageView = new FileRenderer($resourceId);
         $conn = $this->getConnection();
         $pageView->setSQLConn($conn);
 

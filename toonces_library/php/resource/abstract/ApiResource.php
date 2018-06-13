@@ -27,12 +27,12 @@ abstract class ApiResource extends Resource implements iResource {
 
         // If there is no SessionManager object, instantiate one now.
         if (!$this->sessionManager)
-            $this->sessionManager = new SessionManager($this->pageViewReference->getSQLConn());
+            $this->sessionManager = new SessionManager(UniversalConnect::doConnect());
 
         if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
             $email = $_SERVER['PHP_AUTH_USER'];
             $pw = $_SERVER['PHP_AUTH_PW'];
-            $loginSuccess = $this->sessionManager->login($email, $pw, $this->pageViewReference->resourceId);
+            $loginSuccess = $this->sessionManager->login($email, $pw, $this->resourceId);
             if ($loginSuccess)
                 $userId = $this->sessionManager->userId;
         }
@@ -41,16 +41,16 @@ abstract class ApiResource extends Resource implements iResource {
     }
 
 
-    // execution method
     /**
      * @return mixed
      * @throws Exception
      */
     public function getResource() {
 
+        $conn = UniversalConnect::doConnect();
         // Get the resource URI if it hasn't already been set externally
         if (!$this->resourceUri)
-            $this->resourceUri = GrabResourceURL::getURL($this->pageViewReference->resourceId, $this->pageViewReference->getSQLConn());
+            $this->resourceUri = GrabResourceURL::getURL($this->resourceId, $conn);
 
         // Build the full URL path
         $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';

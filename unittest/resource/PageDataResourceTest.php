@@ -23,7 +23,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
         $this->buildTestDatabase();
 
         // Instantiate a PageDataResource and dependencies
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
         $pdr->resourceData = array();
@@ -94,7 +94,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
         $pdr->resourceData = array('pageTitle' => 'Hi! I\'m a resource.');
@@ -115,7 +115,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
 
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pdr = new PageDataResource($pageView);
         $pdr->resourceData = array();
 
@@ -138,7 +138,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
     function testValidatePageViewClass() {
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pdr = new PageDataResource($pageView);
         $pdr->resourceData = array();
 
@@ -148,7 +148,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
         $bogusResult = $pdr->validatePageViewClass();
 
         // legit pagebuilder class validated
-        $pdr->resourceData['pageViewClass'] = 'JsonPageView';
+        $pdr->resourceData['pageViewClass'] = 'JsonRenderer';
         $goodResult = $pdr->validatePageViewClass();
 
         // ASSERT
@@ -163,7 +163,7 @@ class PageDataResourceTest extends SqlDependentTestCase {
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 
@@ -251,7 +251,7 @@ SQL;
 
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 
@@ -263,7 +263,7 @@ SQL;
         $invalidPost = array (
              'ancestorResourceId' => 1
             ,'pageBuilderClass' => 'Toonces404PageBuilder'
-            ,'pageViewClass' => 'JsonPageView'
+            ,'pageViewClass' => 'JsonRenderer'
         );
 
         // Valid post - has resource title
@@ -425,7 +425,7 @@ SQL;
 
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 
@@ -437,7 +437,7 @@ SQL;
         $validPost = array (
              'pageTitle' => 'New Title'
             ,'pathName' => 'newpathname'
-            ,'pageViewClass' => 'FilePageView'
+            ,'pageViewClass' => 'FileRenderer'
             ,'pageBuilderClass' => 'DocumentEndpointPageBuilder'
             ,'redirectOnError' => true
             ,'published' => true
@@ -593,7 +593,7 @@ SQL;
 
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 
@@ -770,7 +770,7 @@ SQL;
         // ARRANGE
         // Instantiate a PageDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonPageView(1);
+        $pageView = new JsonRenderer(1);
         $pageView->setSQLConn($conn);
         $pdr = new PageDataResource($pageView);
 

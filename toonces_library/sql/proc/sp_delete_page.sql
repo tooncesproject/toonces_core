@@ -81,7 +81,7 @@ BEGIN
 
     -- Hard-delete the record in ext_html_page, if it exists.
     DELETE FROM
-        toonces.ext_html_page
+        toonces.dom_resource
     WHERE
         resource_id = param_resource_id;
 

@@ -1,10 +1,10 @@
 <?php
 /**
  * @author paulanderson
- * JsonPageViewTest.php
+ * JsonRendererTest.php
  * Initial Commit: Paul Anderson, 4/25/2018
  *
- * // Unit test for JsonPageView class
+ * // Unit test for JsonRenderer class
  *
 */
 
@@ -29,14 +29,14 @@ class BadDataResource extends DataResource {
     }
 }
 
-class JsonPageViewTest extends TestCase {
+class JsonRendererTest extends TestCase {
 
     /**
      * @expectedException Exception
      */
     function testRenderResource() {
         // ARRANGE
-        $jpv = new JsonPageView(1);
+        $jpv = new JsonRenderer(1);
         $goodDataResource = new GoodDataResource($jpv);
         $badDataResource = new BadDataResource($jpv);
         $badOutput = null;
