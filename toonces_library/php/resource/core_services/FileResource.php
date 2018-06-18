@@ -11,12 +11,11 @@
 
 include_once LIBPATH . 'php/toonces.php';
 
-class FileResource extends ApiResource implements iResource {
+class FileResource extends ApiResource implements iFileResource {
 
     var $resourcePath;
     var $requestPath;
     var $requireAuthentication;
-    var $conn;
     var $resourceId;
 
     public function validateGetHeaders() {

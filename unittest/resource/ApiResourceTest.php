@@ -26,12 +26,10 @@ class ApiResourceTest extends SqlDependentTestCase {
 
     public function testAuthenticateUser() {
         // ARRANGE
-        // Instantiate with a PageView object
-        $jsonPageView = new JsonRenderer(1);
-        $ar = new ConcreteApiResource($jsonPageView);
+        $ar = new ConcreteApiResource();
         // Set up SQL connection
         $sqlConn = $this->getConnection();
-        $jsonPageView->setSQLConn($sqlConn);
+        $ar->conn = $sqlConn;
 
         // Set up Toonces database fixture
         $this->destroyTestDatabase();
@@ -73,8 +71,7 @@ class ApiResourceTest extends SqlDependentTestCase {
     public function testGetResourceException() {
         // ARRANGE
         // Instantiate base objects
-        $jsonPageView = new JsonRenderer(1);
-        $ar = new ConcreteApiResource($jsonPageView);
+        $ar = new ConcreteApiResource();
         $testObjectArray = array('testObject' => 'foo');
         $ar->dataObjects = $testObjectArray;
 
@@ -101,10 +98,9 @@ class ApiResourceTest extends SqlDependentTestCase {
 
         // ARRANGE
         // Instantiate base objects
-        $jsonPageView = new JsonRenderer(1);
-        $ar = new ConcreteApiResource($jsonPageView);
+        $ar = new ConcreteApiResource();
         $testObjectArray = array('testObject' => 'foo');
-        $ar->dataObjects = $testObjectArray;
+        $ar->resourceData = $testObjectArray;
 
         // Inject HTTP host
         $_SERVER['HTTP_HOST'] = 'example.com';

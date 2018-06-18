@@ -12,6 +12,7 @@ require_once LIBPATH.'php/toonces.php';
 abstract class Resource implements iResource {
 
     public $resourceId;
+    public $httpStatus;
 
     public function setResourceId($paramResourceId) {
         $this->resourceId = $paramResourceId;
@@ -19,6 +20,11 @@ abstract class Resource implements iResource {
 
     public function getResourceId() {
         return $this->resourceId;
+    }
+
+    public function getHttpStatus() {
+
+        return $this->httpStatus;
     }
 
 }

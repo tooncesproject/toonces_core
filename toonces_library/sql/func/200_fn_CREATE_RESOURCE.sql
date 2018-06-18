@@ -18,9 +18,7 @@ DELIMITER //
 CREATE FUNCTION CREATE_RESOURCE  (
      parent_resource_id BIGINT
     ,pathname VARCHAR(50)
-    ,page_title VARCHAR(50)
-    ,pagebuilder_class VARCHAR(50)
-    ,pageview_class VARCHAR(50)
+    ,resource_class VARCHAR(50)
     ,redirect_on_error BOOL
     ,published BOOL
 
@@ -91,16 +89,12 @@ BEGIN
 
         INSERT INTO resource (
              pathname
-            ,page_title
             ,resource_class
-            ,pageview_class
             ,redirect_on_error
             ,published
         ) VALUES (
-            pathname
-            ,page_title
+             pathname
             ,resource_class
-            ,pageview_class
             ,redirect_on_error
             ,published
         );   

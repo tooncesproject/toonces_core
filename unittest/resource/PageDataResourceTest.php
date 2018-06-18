@@ -22,10 +22,10 @@ class PageDataResourceTest extends SqlDependentTestCase {
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
 
-        // Instantiate a PageDataResource and dependencies
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        // Instantiate a ResourceDataResource and dependencies
+        $pdr = new ResourceDataResource();
+        $pdr->setResourceId(1);
+        $pdr->conn = $conn;
         $pdr->resourceData = array();
 
         // Create a resource and a sub-resource
@@ -92,11 +92,11 @@ class PageDataResourceTest extends SqlDependentTestCase {
      */
     function testGeneratePathName() {
         // ARRANGE
-        // Instantiate a PageDataResource and dependencies
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        $pdr = new ResourceDataResource();
+        $pdr->conn = $conn;
+        $pdr->setResourceId(1);
         $pdr->resourceData = array('pageTitle' => 'Hi! I\'m a resource.');
 
         // ACT
@@ -111,22 +111,22 @@ class PageDataResourceTest extends SqlDependentTestCase {
     }
 
 
-    function testValidatePageBuilderClass() {
+    function testValidateResourceClass() {
 
         // ARRANGE
-        // Instantiate a PageDataResource and dependencies
-        $pageView = new JsonRenderer(1);
-        $pdr = new PageDataResource($pageView);
+        // Instantiate a ResourceDataResource and dependencies
+        $pdr = new ResourceDataResource();
+        $pdr->setResourceId(1);
         $pdr->resourceData = array();
 
         // ACT
-        // bogus pagebuilder class invalidated
-        $pdr->resourceData['pageBuilderClass'] = 'foo';
-        $bogusResult = $pdr->validatePageBuilderClass();
+        // bogus resource class invalidated
+        $pdr->resourceData['resourceClass'] = 'foo';
+        $bogusResult = $pdr->validateResourceClass();
 
-        // legit pagebuilder class validated
-        $pdr->resourceData['pageBuilderClass'] = 'PageBuilder';
-        $goodResult = $pdr->validatePageBuilderClass();
+        // legit resource class validated
+        $pdr->resourceData['resourceClass'] = 'Resource';
+        $goodResult = $pdr->validateResourceClass();
 
         // ASSERT
         $this->assertFalse($bogusResult);
@@ -134,38 +134,17 @@ class PageDataResourceTest extends SqlDependentTestCase {
 
     }
 
-
-    function testValidatePageViewClass() {
-        // ARRANGE
-        // Instantiate a PageDataResource and dependencies
-        $pageView = new JsonRenderer(1);
-        $pdr = new PageDataResource($pageView);
-        $pdr->resourceData = array();
-
-        // ACT
-        // bogus pagebuilder class invalidated
-        $pdr->resourceData['pageViewClass'] = 'foo';
-        $bogusResult = $pdr->validatePageViewClass();
-
-        // legit pagebuilder class validated
-        $pdr->resourceData['pageViewClass'] = 'JsonRenderer';
-        $goodResult = $pdr->validatePageViewClass();
-
-        // ASSERT
-        $this->assertFalse($bogusResult);
-        $this->assertTrue($goodResult);
-    }
 
     /**
      * @depends testValidatePathName
      */
     function testRecursiveCheckWriteAccess() {
         // ARRANGE
-        // Instantiate a PageDataResource and dependencies
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        $pdr = new ResourceDataResource();
+        $pdr->conn = $conn;
+        $pdr->setResourceId(1);
 
         // Create users.
         $nonAdminUserId = $this->createNonAdminUser();
@@ -249,11 +228,11 @@ SQL;
         // get SQL connection
         $conn = $this->getConnection();
 
-        // Instantiate a PageDataResource and dependencies
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        $pdr = new ResourceDataResource();
+        $pdr->setResourceId(1);
+        $pdr->conn = $conn;
 
         // Create an unpublished resource
         $unpublishedResourceId = $this->createPage(false);
@@ -262,13 +241,11 @@ SQL;
         // Invalid post - missing resource title
         $invalidPost = array (
              'ancestorResourceId' => 1
-            ,'pageBuilderClass' => 'Toonces404PageBuilder'
-            ,'pageViewClass' => 'JsonRenderer'
         );
 
-        // Valid post - has resource title
+        // Valid post - has resource class
         $validPost = $invalidPost;
-        $validPost['pageTitle'] = 'Page Title';
+        $validPost['resourceClass'] = 'Resource';
 
         // Valid post but no non-admin access
         $validNoAccessPost = $validPost;
@@ -282,13 +259,9 @@ SQL;
         $badPathnamePost = $validPost;
         $badPathnamePost['pathName'] = 'donkey%#$%';
 
-        // Invalid post - bogus pagebuilder class
-        $badPbPost = $validPost;
-        $badPbPost['pageBuilderClass'] = 'foo';
-
-        // Invalid post - bogus pageview class
-        $badPvPost = $validPost;
-        $badPvPost['pageViewClass'] = 'foo';
+        // Invalid post - bogus Resource class
+        $badResourcePost = $validPost;
+        $badResourcePost['resourceClass'] = 'foo';
 
         // Record how many pages currently reside in the database
         $sql = "SELECT COUNT(*) FROM resource";
@@ -328,15 +301,10 @@ SQL;
         $pdr->postAction();
         $badPathnameStatus = $pdr->httpStatus;
 
-        // POST with invalid pagebuilder class returns 400 error
-        $pdr->resourceData = $badPbPost;
+        // POST with invalid Resource class returns 400 error
+        $pdr->resourceData = $badResourcePost;
         $pdr->postAction();
         $badPbStatus = $pdr->httpStatus;
-
-        // POST with invalid pageview class returns 400 error
-        $pdr->resourceData = $badPvPost;
-        $pdr->postAction();
-        $badPvStatus = $pdr->httpStatus;
 
         // Page not created after unauthenticated or invalid attempts.
         $sql = "SELECT COUNT(*) FROM resource";
@@ -355,10 +323,8 @@ SQL;
         $newResourceId = intval($resourceIdStr);
         $sql = <<<SQL
         SELECT
-             page_title
-            ,pathname
-            ,pagebuilder_class
-            ,pageview_class
+             pathname
+            ,resource_class
             ,redirect_on_error
             ,published
         FROM resource
@@ -367,10 +333,8 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['resourceId' => $newResourceId]);
         $result = $stmt->fetchAll();
-        $insertedPageTitle = $result[0]['page_title'];
         $insertedPathName = $result[0]['pathname'];
-        $insertedPageBuilderClass = $result[0]['pagebuilder_class'];
-        $insertedPageViewClass = $result[0]['pageview_class'];
+        $insertedResourceClass = $result[0]['resource_class'];
         $insertedRedirectOnError = boolval($result[0]['redirect_on_error']);
         $insertedPublished = boolval($result[0]['published']);
 
@@ -391,11 +355,8 @@ SQL;
         // POST with invalid pathName returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPathnameStatus);
 
-        // POST with invalid pagebuilder class returns 400 error
+        // POST with invalid Resource class returns 400 error
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPbStatus);
-
-        // POST with invalid pageview class returns 400 error
-        $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $badPvStatus);
 
         // Page not created after unauthenticated or invalid attempts.
         $this->assertEquals($pageCountBefore, $pageCountAfter);
@@ -405,10 +366,8 @@ SQL;
 
         // POST with valid input created a record in the database.
 
-        $this->assertSame($validResult[$newResourceId]['pageTitle'], $insertedPageTitle);
         $this->assertSame($validResult[$newResourceId]['pathName'], $insertedPathName);
-        $this->assertSame($validResult[$newResourceId]['pageBuilderClass'], $insertedPageBuilderClass);
-        $this->assertSame($validResult[$newResourceId]['pageViewClass'], $insertedPageViewClass);
+        $this->assertSame($validResult[$newResourceId]['resourceClass'], $insertedResourceClass);
         $this->assertSame($validResult[$newResourceId]['redirectOnError'], $insertedRedirectOnError);
         $this->assertSame($validResult[$newResourceId]['published'], $insertedPublished);
 
@@ -420,14 +379,11 @@ SQL;
      */
     function testPutAction() {
         // ARRANGE
-        // get SQL connection
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-
-        // Instantiate a PageDataResource and dependencies
-        $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        $pdr = new ResourceDataResource();
+        $pdr->conn = $conn;
+        $pdr->setResourceId(1);
 
         // Create an unpublished resource
         $unpublishedResourceId = $this->createPage(false);
@@ -435,10 +391,8 @@ SQL;
         // create some input data mockups
         // valid post
         $validPost = array (
-             'pageTitle' => 'New Title'
-            ,'pathName' => 'newpathname'
-            ,'pageViewClass' => 'FileRenderer'
-            ,'pageBuilderClass' => 'DocumentEndpointPageBuilder'
+             'pathName' => 'newpathname'
+            ,'resourceClass' => 'Resource'
             ,'redirectOnError' => true
             ,'published' => true
         );
@@ -454,10 +408,8 @@ SQL;
         // Query database for state before PUT attempts
         $sql = <<<SQL
             SELECT
-                 page_title
-                ,pathname
-                ,pageview_class
-                ,pagebuilder_class
+                 pathname
+                ,resource_class
                 ,redirect_on_error
                 ,published
             FROM resource
@@ -506,10 +458,8 @@ SQL;
         // Query database for state after PUT attempts
         $sql = <<<SQL
             SELECT
-                 page_title
-                ,pathname
-                ,pageview_class
-                ,pagebuilder_class
+                 pathname
+                ,resource_class
                 ,redirect_on_error
                 ,published
             FROM resource
@@ -530,10 +480,8 @@ SQL;
         // Page record is updated in database
         $sql = <<<SQL
             SELECT
-                 page_title
-                ,pathname
-                ,pageview_class
-                ,pagebuilder_class
+                 pathname
+                ,resource_class
                 ,redirect_on_error
                 ,published
             FROM resource
@@ -542,10 +490,8 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['resourceId' => $unpublishedResourceId]);
         $result = $stmt->fetchAll();
-        $insertedPageTitle = $result[0]['page_title'];
         $insertedPathName = $result[0]['pathname'];
-        $insertedPageViewClass = $result[0]['pageview_class'];
-        $insertedPageBuilderClass = $result[0]['pagebuilder_class'];
+        $insertedResourceClass = $result[0]['resource_class'];
         $insertedRedirectOnError = boolval($result[0]['redirect_on_error']);
         $insertedPublished = boolval($result[0]['published']);
 
@@ -573,10 +519,8 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $validPutStatus);
 
         // Page record is updated in database
-        $this->assertSame($validResult[$unpublishedResourceId]['pageTitle'], $insertedPageTitle);
         $this->assertSame($validResult[$unpublishedResourceId]['pathName'], $insertedPathName);
-        $this->assertSame($validResult[$unpublishedResourceId]['pageViewClass'], $insertedPageViewClass);
-        $this->assertSame($validResult[$unpublishedResourceId]['pageBuilderClass'], $insertedPageBuilderClass);
+        $this->assertSame($validResult[$unpublishedResourceId]['resourceClass'], $insertedResourceClass);
         $this->assertSame($validResult[$unpublishedResourceId]['redirectOnError'], $insertedRedirectOnError);
         $this->assertSame($validResult[$unpublishedResourceId]['published'], $insertedPublished);
 
@@ -588,14 +532,11 @@ SQL;
      */
     function testGetAction() {
         // ARRANGE
-        // get SQL connection
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-
-        // Instantiate a PageDataResource and dependencies
-        $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        $pdr = new ResourceDataResource();
+        $pdr->conn = $conn;
+        $pdr->resourceId = 1;
 
         // Create a non-admin user
         $nonAdminUserId = $this->createNonAdminUser();
@@ -623,16 +564,14 @@ SQL;
         // Now that we've created pages, query the database for its current state
         $sql = <<<SQL
         SELECT
-             p.resource_id
-            ,p.page_title
-            ,p.pathname
-            ,p.pagebuilder_class
-            ,p.pageview_class
-            ,p.redirect_on_error
-            ,p.published
+             r.resource_id
+            ,r.pathname
+            ,r.resource_class
+            ,r.redirect_on_error
+            ,r.published
             ,CASE WHEN rua.resource_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
-        FROM resource p
-        LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND rua.user_id = :userId
+        FROM resource r
+        LEFT JOIN resource_user_access rua ON r.resource_id = rua.resource_id AND rua.user_id = :userId
 SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(['userId' => $nonAdminUserId]);
@@ -640,14 +579,12 @@ SQL;
 
         $sql = <<<SQL
         SELECT
-             p.resource_id
-            ,p.page_title
-            ,p.pathname
-            ,p.pagebuilder_class
-            ,p.pageview_class
-            ,p.redirect_on_error
-            ,p.published
-        FROM resource p
+             r.resource_id
+            ,r.pathname
+            ,r.resource_class
+            ,r.redirect_on_error
+            ,r.published
+        FROM resource r
         WHERE resource_id = :resourceId
 SQL;
         $stmt = $conn->prepare($sql);
@@ -681,7 +618,7 @@ SQL;
         $unpublishedResult = $pdr->getAction();
         $unpublishedStatus = $pdr->httpStatus;
 
-        // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
+        // Authenticated non-admin, non-parameterized GET returns all and only pages available to user
         $pdr->resourceData = array();
         $pdr->parameters = array();
         $noParamResult = $pdr->getAction();
@@ -718,10 +655,8 @@ SQL;
 
         // ... with data matching database.
         $this->assertSame(intval($publicPageState[0]['resource_id']), key($singleParamResult));
-        $this->assertSame($publicPageState[0]['page_title'], $singleParamRecord['pageTitle']);
         $this->assertSame($publicPageState[0]['pathname'], $singleParamRecord['pathName']);
-        $this->assertSame($publicPageState[0]['pagebuilder_class'], $singleParamRecord['pageBuilderClass']);
-        $this->assertSame($publicPageState[0]['pageview_class'], $singleParamRecord['pageViewClass']);
+        $this->assertSame($publicPageState[0]['resource_class'], $singleParamRecord['resourceClass']);
         $this->assertSame(boolval($publicPageState[0]['redirect_on_error']), $singleParamRecord['redirectOnError']);
         $this->assertSame(boolval($publicPageState[0]['published']), $singleParamRecord['published']);
 
@@ -729,7 +664,7 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $unpublishedStatus);
         $this->assertEmpty($unpublishedResult);
 
-        // Authenticated non-admin, non-parameterized GET returns all and only pages avaliable to user
+        // Authenticated non-admin, non-parameterized GET returns all and only pages available to user
         $this->assertEquals(Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse'), $noParamStatus);
 
         foreach ($pagesState as $pageRecord) {
@@ -768,11 +703,11 @@ SQL;
      */
     function testDeleteAction() {
         // ARRANGE
-        // Instantiate a PageDataResource and dependencies
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new PageDataResource($pageView);
+        $pdr = new ResourceDataResource();
+        $pdr->conn = $conn;
+        $pdr->setResourceId(1);
 
         // Create users.
         $nonAdminUserId = $this->createNonAdminUser();

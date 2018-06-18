@@ -4,7 +4,7 @@
  * Initial Commit: 5/25/18
  * @author paulanderson
  *
- * Implementation of ApiDataValidator for POST operations in PageDataResource.
+ * Implementation of ApiDataValidator for POST operations in ResourceDataResource.
  */
 
 
@@ -24,17 +24,9 @@ class PagePostApiDataValidator extends ApiDataValidator implements iApiDataValid
         $pathName->maxLength = 50;
         $this->addFieldValidator('pathName', $pathName);
 
-        $pageTitle = new StringFieldValidator(false);
-        $pageTitle->maxLength = 50;
-        $this->addFieldValidator('pageTitle', $pageTitle);
-
-        $pageBuilderClass= new StringFieldValidator(false);
-        $pageBuilderClass->maxLength = 50;
-        $this->addFieldValidator('pageBuilderClass', $pageBuilderClass);
-
-        $pageViewClass = new StringFieldValidator(false);
-        $pageViewClass->maxLength = 50;
-        $this->addFieldValidator('pageViewClass', $pageViewClass);
+        $resourceClass= new StringFieldValidator(false);
+        $resourceClass->maxLength = 50;
+        $this->addFieldValidator('resourceClass', $resourceClass);
 
         $redirectOnError = new BooleanFieldValidator(true);
         $this->addFieldValidator('redirectOnError', $redirectOnError);

@@ -2,20 +2,30 @@
 /**
  * @author paulanderson
  *
- * ApiRenderer.php
+ * Renderer.php
  * Initial commit: Paul Anderson, 4/25/2018
  *
- * Abstract class providing common functionality for API PageView classes.
+ * Abstract class defining the Renderer abstraction.
  *
  */
 
 require_once LIBPATH . 'php/toonces.php';
 
-abstract class Renderer implements iRenderer
-{
-    public function renderResource($paramResource) {
-        // Not implemented in abstract class.
-        // Called by index.php on objects compliant to the iPageView interface.
-        // Subclasses should override this.
+abstract class Renderer implements iRenderer {
+
+    /**
+     * @param iResource $resource
+     * @throws Exception
+     */
+    public function sendHttpStatusHeader($resource) {
+
+        $httpStatus = $resource->getHttpStatus();
+        $statusString = strval($httpStatus);
+        if (!$statusString)
+            throw new Exception('Programming Error: Resource objects must have the httpStatus variable set before rendering.');
+
+        header($statusString, true, $httpStatus);
+
     }
+
 }

@@ -2,16 +2,16 @@
 /**
  *
  * @author paulanderson
- * ExtHtmlPagePutApiDataValidator.php
+ * DomDataResourcePutApiDataValidator.php
  * Initial Commit: 5/25/18
  *
- * ApiDataValidator for ExtHtmlPageDataResource PUT operations.
+ * ApiDataValidator for DomResourceDataResource PUT operations.
  *
  */
 
 include_once LIBPATH.'php/toonces.php';
 
-class ExtHtmlPagePutApiDataValidator extends ExtHtmlPagePostApiDataValidator implements iApiDataValidator {
+class DomDataResourcePutApiDataValidator extends DomDataResourcePostApiDataValidator implements iApiDataValidator {
 
     function buildFields() {
         parent::buildFields();
@@ -19,6 +19,5 @@ class ExtHtmlPagePutApiDataValidator extends ExtHtmlPagePostApiDataValidator imp
         // Make some fields optional.
         $this->fieldValidators['htmlBody']->allowNull = true;
         $this->fieldValidators['ancestorResourceId']->allowNull = true;
-        $this->fieldValidators['pageTitle']->allowNull = true;
     }
 }

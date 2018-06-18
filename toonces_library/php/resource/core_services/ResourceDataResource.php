@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * PageDataResource.php
+ * ResourceDataResource.php
  * Initial commit: Paul Anderson, 5/2/2018
  *
  * DataResource subclass creating an API endpoint for managing pages.
@@ -10,7 +10,7 @@
 
 require_once LIBPATH . 'php/toonces.php';
 
-class PageDataResource extends DataResource implements iResource {
+class ResourceDataResource extends DataResource implements iResource {
 
     /**
      * Validates path name as set in resourceData.
@@ -20,9 +20,11 @@ class PageDataResource extends DataResource implements iResource {
      */
     function validatePathName($ancestorResourceId, $resourceId = null) {
 
+        $this->connectSql();
+
         $pathNameValid = false;
         do {
-            $conn = $this->pageViewReference->getSqlConn();
+
             // Pathname contains disallowed characters?
             if (!ctype_alnum(preg_replace('[_|-]', '', $this->resourceData['pathName']))) {
                 // if the supplied path name contains non-alphanumeric chars other than underscore,
@@ -52,7 +54,7 @@ SQL;
                 ,'pathName' => $this->resourceData['pathName']
                 ,'resourceId' => $resourceId
             );
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute($sqlParams);;
             $result = $stmt->fetchAll();
             if (!empty($result)) {
@@ -67,7 +69,7 @@ SQL;
             FROM resource
             WHERE resource_id = :ancestorResourceId;
 SQL;
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute(array('ancestorResourceId' => $ancestorResourceId));
             $result = $stmt->fetchAll();
             if (empty($result)) {
@@ -83,15 +85,17 @@ SQL;
         return $pathNameValid;
     }
 
+    /**
+     * Generates a path name from the page title specified in resourceData.
+     * @return string a valid pathname.
+     */
     function generatePathName() {
-        /**
-         * Generates a path name from the page title specified in resourceData.
-         * @return string a valid pathname.
-         */
-        $conn = $this->pageViewReference->getSQLConn();
+
+        $this->connectSql();
+
         // If it's not supplied, generate one from the title.
         $sql = "SELECT GENERATE_PATHNAME(:pageTitle)";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute(array('pageTitle' => $this->resourceData['pageTitle']));
         $result = $stmt->fetchall();
         $this->resourceData['pathName'] = $result[0][0];
@@ -99,38 +103,19 @@ SQL;
     }
 
 
-    function validatePageBuilderClass() {
-        /**
-         * Attempts to instantiate the PageBuilder class specified in resourceData.
-         * @var string $pageBuilderClass
-         * @return bool t/f, the named class can be instantiated.
-         */
-        $pageBuilderClass = $this->resourceData['pageBuilderClass'];
-
-        if (!class_exists($pageBuilderClass)) {
-
-            $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-            $this->statusMessage = 'Error: Invalid Page builder class: ' . $pageBuilderClass;
-            return false;
-        } else {
-            return true;
-        }
-
-    }
-
-
     /**
-     * Attempts to instantiate the PageView class specified in resourceData.
-     * @var string $pageViewClass
+     * Attempts to instantiate the PageBuilder class specified in resourceData.
+     * @var string $resourceClass
      * @return bool t/f, the named class can be instantiated.
      */
-    function validatePageViewClass() {
-        // If invalid, update HTTP status and message.
-        $pageViewClass = $this->resourceData['pageViewClass'];
+    function validateResourceClass() {
 
-        if (!class_exists($pageViewClass)) {
+        $resourceClass = $this->resourceData['resourceClass'];
+
+        if (!class_exists($resourceClass)) {
+
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-            $this->statusMessage = 'Error: Invalid PageView class: ' . $pageViewClass;
+            $this->statusMessage = 'Error: Resource class: ' . $resourceClass;
             return false;
         } else {
             return true;
@@ -147,13 +132,14 @@ SQL;
      */
     function recursiveCheckWriteAccess($userId, $resourceId) {
 
-        $conn = $this->pageViewReference->getSqlConn();
+        $this->connectSql();
+
         // Can the user access the current page?
-        $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $resourceId, $conn, true);
+        $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $resourceId, $this->conn, true);
         // If yes, recurse, checking any children of the page.
         if ($userHasAccess) {
             $sql = "SELECT descendant_resource_id FROM resource_hierarchy_bridge WHERE resource_id = :resourceId";
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute(['resourceId' => $resourceId]);
             $result = $stmt->fetchAll();
             // If the page has children, recurse.
@@ -195,7 +181,7 @@ SQL;
      */
     function postAction() {
 
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
 
         $this->instantiatePostValidator();
 
@@ -230,7 +216,7 @@ SQL;
             }
 
             // Is the ancestor page valid, and does the user have write access?
-            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $this->resourceData['ancestorResourceId'], $conn, true);
+            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $this->resourceData['ancestorResourceId'], $this->conn, true);
             if (!$userHasAccess) {
                 // No access or page doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -247,14 +233,8 @@ SQL;
                 break;
             }
 
-            // Validate PageBuilder class
-            if (!$this->validatePageBuilderClass()) {
-                $this->resourceData = array('status' => $this->statusMessage);
-                break;
-            }
-
-            // Validate PageView class
-            if (!$this->validatePageViewClass()) {
+            // Validate Resource class
+            if (!$this->validateResourceClass()) {
                 $this->resourceData = array('status' => $this->statusMessage);
                 break;
             }
@@ -264,9 +244,7 @@ SQL;
             SELECT CREATE_RESOURCE(
                  :parentResourceId
                 ,:pathName
-                ,:pageTitle
-                ,:pageBuilderClass
-                ,:pageViewClass
+                ,:resourceClass
                 ,:redirectOnError
                 ,:published
             )
@@ -274,15 +252,13 @@ SQL;
             $sqlParams = array(
                  'parentResourceId' => $this->resourceData['ancestorResourceId']
                 ,'pathName' => $this->resourceData['pathName']
-                ,'pageTitle' => $this->resourceData['pageTitle']
-                ,'pageBuilderClass' => $this->resourceData['pageBuilderClass']
-                ,'pageViewClass' => $this->resourceData['pageViewClass']
+                ,'resourceClass' => $this->resourceData['resourceClass']
                 ,'redirectOnError' => intval($this->resourceData['redirectOnError'])
                 ,'published' => intval($this->resourceData['published'])
             );
 
             $resourceId = null;
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
 
             try {
                 $stmt->execute($sqlParams);
@@ -298,7 +274,7 @@ SQL;
             // Check to ensure page ID was actually created
             if (!$resourceId) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                $this->statusMessage = 'Page creation failed, possible due to a silent database error. Debug the data supplied to PageDataResource.';
+                $this->statusMessage = 'Page creation failed, possible due to a silent database error. Debug the data supplied to ResourceDataResource.';
                 break;
             }
 
@@ -314,7 +290,7 @@ SQL;
                 WHERE u.user_id = :userId AND u.is_admin = 0
 
 SQL;
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $sqlParams = array('resourceId' => $resourceId, 'userId' => $userId);
             $stmt->execute($sqlParams);
 
@@ -338,8 +314,8 @@ SQL;
 
         $this->instantiatePutValidator();
 
-        // Connect to SQL
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
+
         // The blogID should be set in the URL parameters.
         $resourceId = $this->validateIntParameter('id');
 
@@ -375,7 +351,7 @@ SQL;
             }
 
             // Is the page valid, and does the user have write access?
-            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $resourceId, $conn, true);
+            $userHasAccess = CheckResourceUserAccess::checkUserAccess($userId, $resourceId, $this->conn, true);
             if (!$userHasAccess) {
                 // No access or page doesn't exist? Return a 404 error.
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
@@ -384,7 +360,7 @@ SQL;
 
             // If supplied, is the path name valid?
             if (isset($this->resourceData['pathName'])) {
-                $parentResourceId = GrabParentResourceId::getParentId($resourceId, $conn);
+                $parentResourceId = GrabParentResourceId::getParentId($resourceId, $this->conn);
                 if (!$this->validatePathName($parentResourceId, $resourceId)) {
                     $this->resourceData = array('status' => $this->statusMessage);
                     break;
@@ -400,20 +376,10 @@ SQL;
                 array_push($updateFields, 'pathname = :pathName');
                 $sqlParams['pathName'] = $this->resourceData['pathName'];
             }
-            // page title
-            if (isset($this->resourceData['pageTitle'])) {
-                array_push($updateFields, 'page_title = :pageTitle');
-                $sqlParams['pageTitle'] = $this->resourceData['pageTitle'];
-            }
-            // pagebuilder class
-            if (isset($this->resourceData['pageBuilderClass'])) {
-                array_push($updateFields, 'pagebuilder_class = :pageBuilderClass');
-                $sqlParams['pageBuilderClass'] = $this->resourceData['pageBuilderClass'];
-            }
-            // pageview class
-            if (isset($this->resourceData['pageViewClass'])) {
-                array_push($updateFields, 'pageview_class = :pageViewClass');
-                $sqlParams['pageViewClass'] = $this->resourceData['pageViewClass'];
+            // Resource class
+            if (isset($this->resourceData['resourceClass'])) {
+                array_push($updateFields, 'resource_class = :resourceClass');
+                $sqlParams['pageBuilderClass'] = $this->resourceData['resourceClass'];
             }
             // redirect on error
             if(isset($this->resourceData['redirectOnError'])) {
@@ -443,7 +409,7 @@ SQL;
 
             if (!empty($updateFields)) {
                 try {
-                    $stmt = $conn->prepare($sql);
+                    $stmt = $this->conn->prepare($sql);
                     $stmt->execute($sqlParams);
                 } catch (PDOException $e) {
                     $this->httpStatus = Enumeration::getOrdinal('HTTP_500_INTERNAL_SERVER_ERROR', 'EnumHTTPResponse');
@@ -467,52 +433,50 @@ SQL;
     /**
      * Called by abstract ApiResource::getResource.
      * Performs authentication, validation and execution of a GET request.
-     * @return object (array), $this->resourceData
+     * @return array
      */
     function getAction() {
 
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $resourceId = $this->validateIntParameter('id');
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
 
         // Acquire the user id if this is an authenticated request.
         $userId = $this->authenticateUser() ?? 0;
         // Build the query
         $sql = <<<SQL
             SELECT
-                 p.resource_id
+                 r.resource_id
                 ,rhb.resource_id AS ancestor_resource_id
                 ,pathname
-                ,page_title
-                ,pagebuilder_class
-                ,pageview_class
-                ,p.created_dt
-                ,p.modified_dt
-                ,redirect_on_error
-                ,published
-            FROM resource p
+                ,resource_class
+                ,r.created_dt
+                ,r.modified_dt
+                ,r.redirect_on_error
+                ,r.published
+            FROM resource r
             -- join to PHB is to get the parent page ID
-            LEFT JOIN resource_hierarchy_bridge rhb ON p.resource_id = rhb.descendant_resource_id
-            LEFT JOIN resource_user_access rua ON p.resource_id = rua.resource_id AND (rua.user_id = :userId)
+            LEFT JOIN resource_hierarchy_bridge rhb ON r.resource_id = rhb.descendant_resource_id
+            LEFT JOIN resource_user_access rua ON r.resource_id = rua.resource_id AND (rua.user_id = :userId)
             LEFT JOIN users u ON u.user_id = :userId
             WHERE
-                (p.resource_id = :resourceId OR :resourceId IS NULL)
+                (r.resource_id = :resourceId OR :resourceId IS NULL)
                 AND
                 (
-                    (p.published = 1 AND p.deleted IS NULL)
+                    (r.published = 1 AND r.deleted IS NULL)
                     OR
                     rua.user_id IS NOT NULL
                     OR
                     u.is_admin = TRUE
                 )
-            ORDER BY p.resource_id ASC
+            ORDER BY r.resource_id ASC
 
 SQL;
         // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
         $result = null;
         if ($resourceId !== 0) {
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $sqlParams = array('userId' => $userId, 'resourceId' => $resourceId);
             $stmt->execute($sqlParams);
             $result = $stmt->fetchAll();
@@ -523,12 +487,10 @@ SQL;
             foreach ($result as $row)
                 $this->resourceData[$row[0]] = array(
                      'url' => $this->resourceUrl . '?id=' . strval($row['resource_id'])
-                    ,'pageUri' => GrabResourceURL::getURL($row['resource_id'], $conn)
+                    ,'pageUri' => GrabResourceURL::getURL($row['resource_id'], $this->conn)
                     ,'ancestorResourceId' => intval($row['ancestor_resource_id'])
                     ,'pathName' => $row['pathname']
-                    ,'pageTitle' => $row['page_title']
-                    ,'pageBuilderClass' => $row['pagebuilder_class']
-                    ,'pageViewClass' => $row['pageview_class']
+                    ,'resourceClass' => $row['resource_class']
                     ,'createdDate' => $row['created_dt']
                     ,'modifiedDate' => $row['modified_dt']
                     ,'redirectOnError' => boolval($row['redirect_on_error'])
@@ -556,7 +518,7 @@ SQL;
 
 
         $resourceId = $this->validateIntParameter('id');
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
         $this->resourceData = array();
 
         do {
@@ -592,7 +554,7 @@ SQL;
             // Validation has passed; delete the page.
             // Note: sp_delete_resource is recursive; it also deletes any children the page has.
             $sql = "CALL sp_delete_resource(:resourceId)";
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->execute(array('resourceId' => $resourceId));
             $this->httpStatus = Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse');
 

@@ -12,63 +12,47 @@
 use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
-require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 
-// Concrete class for testing
+// Concrete classes for testing
 class ConcreteRenderer extends Renderer {
-    // No additional functionality.
+    public function renderResource($resource) {
+        parent::renderResource($resource);
+    }
 }
 
-class RendererTest extends SqlDependentTestCase {
+class RendererTestResource extends Resource {
 
-    // We will omit unit tests for simple setter/getter methods.
-    // I'm not THAT pedantic. --Paul
-
-    function testConstruct() {
-        // ARRANGE
-        $resourceId = 1;
-        $version = '2.0';
-        $_SERVER['HTTP_ACCEPT_VERSION'] = $version;
-
-        //ACT
-        $apv = new ConcreteRenderer($resourceId);
-
-        // ASSERT
-        $this->assertEquals($resourceId, $apv->resourceId);
-        $this->assertSame($version, $apv->apiVersion);
+    public function getResource() {
+        return 'foo';
     }
 
+    public function render() {
+        // implementation not required for this test
+    }
+}
+
+
+
+class RendererTest extends TestCase {
 
     /**
      * @expectedException Exception
      */
-    function testGetResource() {
+    public function testSendHttpStatusHeaderThrowsException() {
         // ARRANGE
-        $apv = new ConcreteRenderer(1);
+        $renderer = new ConcreteRenderer();
+        $resource = new RendererTestResource();
 
-        $tooManyDataObjects = array('oneObject' => 'foo', 'oneObjectTooMany' => 'bar');
-        $justOneDataObject = array('oneObject' => 'foo');
 
         // ACT
-        // The object should throw an error if we attempt to give it an array longer than 1.
-        $failed = false;
-        $apv->dataObjects = $tooManyDataObjects;
-        try {
-            $apv->getResource();
-        } finally {
-            $failed = true;
-        }
-
-        // With correct setup, it should just return the same array as set.
-        $apv->dataObjects = $justOneDataObject;
-        $output = $apv->getResource();
+        // Resource will not have http status set;
+        // expectation is this will throw an exception.
+        $renderer->sendHttpStatusHeader($resource);
 
         // ASSERT
-        $this->assertTrue($failed);
-        $this->assertSame($justOneDataObject, $output);
-
-    }
+        // (assertion is exception thrown per PHPDoc @expectedException)
+   }
 
 
 }

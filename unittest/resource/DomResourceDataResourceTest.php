@@ -1,8 +1,8 @@
 <?php
 /**
  * @author paulanderson
- * ExtHtmlPageResourceTest.php
- * Unit tests for the class ExtHtmlPageDataResource
+ * DomResourceDataResourceTest.php.php
+ * Unit tests for the class DomResourceDataResource
  *
  */
 
@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../FileDependentTestCase.php';
 
 
-class ExtHtmlPageResourceTest extends FileDependentTestCase {
+class DomResourceDataResourceTest extends FileDependentTestCase {
 
     function testSetupClient() {
         // ARRANGE
@@ -35,32 +35,31 @@ SQL;
         $stmt = $conn->prepare($sql);
         $stmt->execute(array('resourceId' => $resourceId));
 
-        // Instantiate an ExtHtmlPageDataResource and dependencies
-        $pageView = new JsonRenderer($resourceId);
-        $pageView->setSQLConn($conn);
-        $client = new LocalResourceClient();
-        $ehpr = new ExtHtmlPageDataResource($pageView);
+        // Instantiate an DomResourceDataResource and dependencies
+        $ehpr = new DomResourceDataResource();
+        $ehpr->resourceId = $resourceId;
+        $ehpr->conn = $conn;
 
         // Mock up some data
         $data = array('clientClass' => 'LocalResourceClient');
 
         // ACT
         // Does not instantiate client if already set, returns 0
-        $resourceClient = new ResourceClient($pageView);
+        $resourceClient = new ResourceClient();
         $ehpr->client = $resourceClient;
         $ehpr->resourceData = $data;
-        $ehpr->setupClient(null);
+        $ehpr->setupClients(null);
         $existingClass = get_class($ehpr->client);
 
         // Instantiates client specified in resourceData, returns 0
         unset($ehpr->client);
-        $ehpr->setupClient(null);
+        $ehpr->setupClients(null);
         $resourceDataClass = get_class($ehpr->client);
 
         // Instantiates client from ext_html_page if resourceId parameter set, returns 0
         unset($ehpr->client);
         unset($ehpr->resourceData);
-        $ehpr->setupClient($resourceId);
+        $ehpr->setupClients($resourceId);
         $databaseClass = get_class($ehpr->client);
 
         // ASSERT
@@ -86,11 +85,11 @@ SQL;
         // Instantiate a client
         $client = new LocalResourceClient();
 
-        // Instantiate an ExtHtmlPageDataResource and dependencies.
+        // Instantiate an DomResourceDataResource and dependencies.
         $resourceId = $this->createPage(false);
-        $pageView = new JsonRenderer($resourceId);
-        $pageView->setSQLConn($conn);
-        $epr = new ExtHtmlPageDataResource($pageView);
+        $epr = new DomResourceDataResource();
+        $epr->conn = $conn;
+        $epr->resourceId = $resourceId;
         $epr->client = $client;
 
         $url = $GLOBALS['TEST_FILE_PATH'];
@@ -125,7 +124,7 @@ SQL;
         // Unauthenticated POST doesn't copy any files
         $noFiles = scandir($url);
 
-        // Unauthenticated POST with invalid data per PageDataResource returns 401
+        // Unauthenticated POST with invalid data per ResourceDataResource returns 401
         $this->unsetBasicAuth();
         $epr->resourceData = $pdrBadRequestBody;
         $pdrInvalidResult = $epr->postAction();
@@ -168,7 +167,7 @@ SQL;
         // Unauthenticated POST doesn't copy any files
         $this->assertEquals($countFilesBefore, count($noFiles));
 
-        // Unauthenticated POST with invalid data per PageDataResource returns 401
+        // Unauthenticated POST with invalid data per ResourceDataResource returns 401
         $this->assertEquals(Enumeration::getOrdinal('HTTP_401_UNAUTHORIZED', 'EnumHTTPResponse'), $pdrInvalidStatus);
 
         // Unauthenticated POST wih invalid data doesn't copy any files
@@ -215,12 +214,12 @@ SQL;
         $resourceId = $result[0]['resource_id'];
         $dbHtmlPathBefore = $result[0]['html_path'];
 
-        // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageView = new JsonRenderer($resourceId);
-        $pageView->setSQLConn($conn);
-        $epr = new ExtHtmlPageDataResource($pageView);
+        // Instantiate an DomResourceDataResource and dependencies.
+        $epr = new DomResourceDataResource();
         $client = new LocalResourceClient();
         $epr->client = $client;
+        $epr->conn = $conn;
+        $epr->resourceId = $resourceId;
         $epr->parameters['id'] = strval($resourceId);
 
         $url = $GLOBALS['TEST_FILE_PATH'];
@@ -319,14 +318,11 @@ SQL;
      */
     function testGetAction() {
         // ARRANGE
-        // get SQL connection
+        // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
-
-        // Instantiate a PageDataResource and dependencies
-        $conn = $this->getConnection();
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($conn);
-        $pdr = new ExtHtmlPageDataResource($pageView);
+        $pdr = new DomResourceDataResource();
+        $pdr->setResourceId(1);
+        $pdr->conn = $conn;
 
         // Create a non-admin user
         $nonAdminUserId = $this->createNonAdminUser();
@@ -372,10 +368,7 @@ SQL;
         $sql = <<<SQL
         SELECT
              p.resource_id
-            ,p.page_title
             ,p.pathname
-            ,p.pagebuilder_class
-            ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
             ,CASE WHEN rua.resource_id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_access
@@ -392,10 +385,7 @@ SQL;
         $sql = <<<SQL
         SELECT
              p.resource_id
-            ,p.page_title
             ,p.pathname
-            ,p.pagebuilder_class
-            ,p.pageview_class
             ,p.redirect_on_error
             ,p.published
             ,ehp.html_path
@@ -524,10 +514,10 @@ SQL;
         $resourceId = $result[0]['resource_id'];
         $dbHtmlPath = $result[0]['html_path'];
 
-        // Instantiate an ExtHtmlPageDataResource and dependencies.
-        $pageView = new JsonRenderer($resourceId);
-        $pageView->setSQLConn($conn);
-        $epr = new ExtHtmlPageDataResource($pageView);
+        // Instantiate an DomResourceDataResource and dependencies.
+        $epr = new DomResourceDataResource();
+        $epr->resourceId = $resourceId;
+        $epr->conn = $conn;
         $epr->parameters['id'] = strval($resourceId);
         $client = new LocalResourceClient();
         $epr->client = $client;

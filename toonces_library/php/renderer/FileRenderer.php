@@ -13,41 +13,29 @@ require_once LIBPATH . 'php/toonces.php';
 class FileRenderer extends Renderer implements iRenderer {
 
     /**
-     * @param FileResource $paramResource
+     * @param iFileResource $resource
      * @throws Exception
      * @return string
      */
-    public function renderResource($paramResource) {
-        // Called by index.php - Serves a file download, if applicable.
+    public function renderResource($resource) {
 
-        // Execute the object.
-        $resourcePath = $paramResource->getResource();
+        $resourcePath = $resource->getResource();
 
-        // Once executed, the resource must have an HTTP status.
-        // If it doesn't, throw an exception.
-        $httpStatus = $paramResource->httpStatus;
-        $httpStatusString = null;
-        if (isset($httpStatus))
-            $httpStatusString = Enumeration::getString($httpStatus, 'EnumHTTPResponse');
-        if (!$httpStatusString)
-            throw new Exception('Error: An API resource must have an HTTP status property upon execution.');
+        $this->sendHttpStatusHeader($resource);
 
         // If applicable - Say, this is a GET request - Start the transfer.
         if ($resourcePath) {
-            header($httpStatusString, true, $httpStatus);
             $headerStr = "Content-Type: application/octet-stream";
             header($headerStr);
             // Stop output buffering
-            if (ob_get_level()) {
+            if (ob_get_level())
                 ob_end_flush();
-            }
 
             flush();
             readfile($resourcePath);
-        } else {
-            header($httpStatusString, true, $httpStatus);
 
         }
+
         // For testing purposes, we return the resource path supplied by the resource.
         return $resourcePath;
 

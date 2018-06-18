@@ -144,15 +144,11 @@ SQL;
         // Create main resource if it doesn't already exist.
         $sql = <<<SQL
         INSERT INTO resource (
-         page_title
-        ,pagebuilder_class
-        ,pageview_class
+        ,resource_class
         ,redirect_on_error
         ,published
         ) VALUES (
-         'Sorry, This is Toonces.'
-        ,'ExtHTMLPageBuilder'
-        ,'HTMLPageView'
+        ,'TooncesWelcomeDomDocumentResource'
         ,FALSE
         ,TRUE
         );
@@ -229,9 +225,7 @@ SQL;
         SELECT CREATE_RESOURCE (
              1                              -- parent_resource_id BIGINT
             ,'coreservices'                 -- ,pathname VARCHAR(50)
-            ,'Toonces Core Services'        -- ,page_title VARCHAR(50)
-            ,'CoreServicesAPIPageBuilder'   -- ,pagebuilder_class VARCHAR(50)
-            ,JJsonRenderer                 -- ,pageview_class VARCHAR(50)
+            ,'CoreServicesDataResource'   -- ,resource_class VARCHAR(50)
             ,FALSE                          -- ,redirect_on_error BOOL
             ,FALSE                          -- ,published BOOL
         )
@@ -251,9 +245,7 @@ SQL;
         SELECT CREATE_RESOURCE (
              :csResourceId                          -- parent_resource_id BIGINT
             ,'resources'                            -- ,pathname VARCHAR(50)
-            ,'Toonces Core Services - Pages'    -- ,page_title VARCHAR(50)
-            ,'PageApiPageBuilder'              -- ,pagebuilder_class VARCHAR(50)
-            ,'JsJsonRenderer                     -- ,pageview_class VARCHAR(50)
+            ,'resourceDataResource'              -- ,resource_class VARCHAR(50)
             ,FALSE                              -- ,redirect_on_error BOOL
             ,FALSE                              -- ,published BOOL
         )
@@ -269,14 +261,13 @@ SQL;
         throw $e;
     }
 
+    /*
     // external content resources endpoint
     $sql = <<<SQL
         SELECT CREATE_RESOURCE (
              :resourcesResourceId                               -- parent_resource_id BIGINT
             ,'contentresources'                             -- ,pathname VARCHAR(50)
-            ,'Toonces Core Services - Content Pages'    -- ,page_title VARCHAR(50)
-            ,'ExtPageApiPageBuilder'                    -- ,pagebuilder_class VARCHAR(50)
-            ,'JsJsonRenderer                            -- ,pageview_class VARCHAR(50)
+            ,'DomResourceDataResource'                    -- ,resource_class VARCHAR(50)
             ,FALSE                                      -- ,redirect_on_error BOOL
             ,FALSE                                      -- ,published BOOL
         )
@@ -289,8 +280,9 @@ SQL;
         echo('Failed to create Core Services API (Content resources): ' . $e->getMessage());
         throw $e;
     }
+    */
 
-
+    /*
     // HTML Files endpoint
     $sql = <<<SQL
         SELECT CREATE_RESOURCE (
@@ -312,6 +304,7 @@ SQL;
         echo('Failed to create Core Services API (HTML resources): ' . $e->getMessage());
         throw $e;
     }
+    */
 
     // Write the SQL credentials to toonces_config.xml
     // code tips from: https://stackoverflow.com/questions/2038535/create-new-xml-file-and-write-data-to-it

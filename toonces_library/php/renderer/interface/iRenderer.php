@@ -7,12 +7,20 @@
  * delegate to index.php
  */
 
+require_once LIBPATH . 'php/toonces.php';
 
 interface iRenderer
 {
+
     /**
-     * @param iResource $paramResource
+     * @param iResource $resource
+     * @return int
      */
-    public function renderResource($paramResource);
+    public function sendHttpStatusHeader($resource);
+
+    /**
+     * @param iResource $resource
+     */
+    public function renderResource($resource);
 
 }

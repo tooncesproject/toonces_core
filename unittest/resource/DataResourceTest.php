@@ -40,9 +40,7 @@ class DataResourceTest extends SqlDependentTestCase {
 
     public function testValidateHeaders() {
         // ARRANGE
-        // Instantiate with a PageView object
-        $jsonPageView = new JsonRenderer(1);
-        $dr = new ConcreteDataResource($jsonPageView);
+        $dr = new ConcreteDataResource();
 
         // ACT
         // Go without header
@@ -62,9 +60,7 @@ class DataResourceTest extends SqlDependentTestCase {
         // Test the validateIntParameter function
 
         // ARRANGE
-        // Instantiate with a PageView object
-        $jsonPageView = new JsonRenderer(1);
-        $dr = new ConcreteDataResource($jsonPageView);
+        $dr = new ConcreteDataResource();
 
         $parameterArray = array(
              'valid' => '666'
@@ -112,9 +108,10 @@ SQL;
         $stmt->execute();
         $result = $stmt->fetchAll();
         $resourceId = $result[0][0];
-        $jsonPageView = new JsonRenderer($resourceId);
-        $jsonPageView->setSQLConn($sqlConn);
-        $dr = new ConcreteDataResource($jsonPageView);
+
+        $dr = new ConcreteDataResource();
+        $dr->conn = $sqlConn;
+        $dr->resourceId = $resourceId;
 
         // ACT
         $_SERVER['PHP_AUTH_USER'] = 'badhacker@asshole.com';
@@ -142,8 +139,7 @@ SQL;
     public function testValidateData () {
         // ARRANGE
         // Instantiate base objects
-        $jsonPageView = new JsonRenderer(1);
-        $dr = new ConcreteDataResource($jsonPageView);
+        $dr = new ConcreteDataResource();
 
         // Set up the DataResource object's Data Validator.
         $dr->apiDataValidator = new TestApiDataValidator();
@@ -204,9 +200,8 @@ SQL;
     function testGetResource() {
         // ARRANGE
         // See testGetSubResources for fixture injection
-        $pageView = new JsonRenderer(1);
-        $pageView->setSQLConn($this->getConnection());
-        $dr = new ConcreteDataResource($pageView);
+        $dr = new ConcreteDataResource();
+        $dr->conn = $this->getConnection();
         $dr->httpMethod = 'GET';
         $testData = array('foo' => 'bar');
         $dr->resourceData = $testData;

@@ -8,7 +8,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-abstract class DataResource extends ApiResource implements iResource
+abstract class DataResource extends ApiResource implements iDataResource
 {
     var $resourceData = array();
     var $fields = array();
@@ -73,7 +73,7 @@ abstract class DataResource extends ApiResource implements iResource
         //      true if resources are available. Resources added to DataObjects and $httpStatus set to 200.
         //      false if no resources are available. $httpStatus set to 418 (haha)
 
-        $sqlConn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
 
         // Acquire the user id if this is an authenticated request.
         $userId = $this->authenticateUser() ?? 0;
@@ -100,8 +100,8 @@ abstract class DataResource extends ApiResource implements iResource
                 )
             ORDER BY r.resource_id ASC
 SQL;
-        $stmt = $sqlConn->prepare($sql);
-        $sqlParams = array('userId' => $userId, 'resourceId' => $this->pageViewReference->resourceId);
+        $stmt = $this->conn->prepare($sql);
+        $sqlParams = array('userId' => $userId, 'resourceId' => $this->resourceId);
         $stmt->execute($sqlParams);
         $result = $stmt->fetchAll();
         if ($result) {
@@ -191,6 +191,9 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
             $this->statusMessage = 'Missing required HTTP headers.';
         }
+
+        if ($this->statusMessage)
+            $returnData['status'] = $this->statusMessage;
 
         return $returnData;
     }

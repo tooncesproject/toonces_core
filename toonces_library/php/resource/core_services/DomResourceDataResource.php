@@ -1,16 +1,16 @@
 <?php
 /**
  * @author paulanderson
- * ExtHtmlPageDataResource.php.php
+ * DomResourceDataResource.php
  * Initial commit: 5/5/2018
  *
- * DataResource class (and subclass of PageDataResource) for managing HTML-content pages.
+ * DataResource class (and subclass of ResourceDataResource) for managing HTML-content pages.
  *
  */
 
 require_once LIBPATH . 'php/toonces.php';
 
-class ExtHtmlPageDataResource extends PageDataResource implements iResource {
+class DomResourceDataResource extends ResourceDataResource implements iResource {
 
     /**
      * @var iResourceClient
@@ -26,12 +26,13 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
      * @param int $resourceId
      * @return int
      */
-    function setupClient($resourceId = null) {
+    function setupClients($resourceId = null) {
         // woo!
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
+
         $clientClass = null;
         if (isset($this->resourceData['clientClass']))
-        $clientClass = $this->resourceData['clientClass'];
+            $clientClass = $this->resourceData['clientClass'];
 
         // Only instantiate the client if it hasn't been set externally
         // (Unit tests will set a "dummy" client)
@@ -39,8 +40,8 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
             // Class set in parameters?
             if (!$clientClass && $resourceId) {
                 // If not set in parameters, query the database for the client class
-                $sql = "SELECT client_class FROM ext_html_page WHERE resource_id = :resourceId";
-                $stmt = $conn->prepare($sql);
+                $sql = "SELECT client_class FROM dom_resource WHERE resource_id = :resourceId";
+                $stmt = $this->conn->prepare($sql);
                 $stmt->execute(['resourceId' => $resourceId]);
                 $result = $stmt->fetchAll();
                 $clientClass = $result[0]['client_class'];
@@ -48,7 +49,7 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
 
             // Attempt to instantiate the client
             try {
-                $this->client = new $clientClass($this->pageViewReference);
+                $this->client = new $clientClass;
             } catch (Exception $e) {
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
                 $this->statusMessage = 'Failed to instantiate the ResourceClient object: '. $e->getMessage();
@@ -63,7 +64,7 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
      * Instantiate an APIDataValidator outside PostAction so it isn't inherited.
      */
     function instantiatePostValidator() {
-        $this->apiDataValidator = new ExtHtmlPagePostApiDataValidator();
+        $this->apiDataValidator = new DomDataResourcePostApiDataValidator();
     }
 
 
@@ -74,40 +75,61 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
         $this->apiDataValidator = new PagePutApiDataValidator();
     }
 
+    /**
+     * @return void
+     */
+    private function coalesceResourceAttributes() {
+
+        // Get defaults from toonces-config.xml
+        $xml = new DOMDocument();
+        $xml->load(ROOTPATH.'toonces-config.xml');
+        $defaultClientNode = $xml->getElementsByTagName('default_resource_client')->item(0);
+        $defaultClientClass = $defaultClientNode->nodeValue;
+
+        $htmlResourcePathNode = $xml->getElementsByTagName('html_resource_path')->item(0);
+        $htmlResourcePath = $htmlResourcePathNode->nodeValue;
+        $defaultTemplateNode = $xml->getElementsByTagName('default_page_template')->item(0);
+        $defaultTemplateFileName =  $defaultTemplateNode->nodeValue;
+        $defaultTemplatePath = $htmlResourcePath . $defaultTemplateFileName;
+
+
+        // Set default attributes, if not already set.
+        if (!isset($this->resourceData['resourceClass']))
+            $this->resourceData['resourceClass'] = 'DomDocumentResource';
+        
+        if (!isset($this->resourceData['contentClientClass'])) 
+            $this->resourceData['contentClientClass']  = $defaultClientClass;
+        
+        if (!isset($this->resourceData['templateClientClass']))
+            $this->resourceData['templateClientClass'] = $defaultClientClass;
+
+        if (!isset($this->resourceData['templateHtmlPath']))
+            $this->resourceData['templateHtmlPath'] = $defaultTemplatePath;
+
+    }
+
 
     /**
-     * override PageDataResource->postAction
+     * override ResourceDataResource->postAction
      * @return array
      */
     function postAction() {
 
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
 
         $this->instantiatePostValidator();
 
         // Acquire the POST body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
-        // Set up default values.
-        if (!isset($this->resourceData['pageBuilderClass']))
-            $this->resourceData['pageBuilderClass'] = 'ExtHTMLPageBuilder';
 
-        if (!isset($this->resourceData['pageViewClass']))
-            $this->resourceData['pageViewClass'] = 'HTMLPageView';
-
-        if (!isset($this->resourceData['clientClass'])) {
-            // If not already set, get the default client class from toonces-config.xml
-            $xml = new DOMDocument();
-            $xml->load(ROOTPATH.'toonces-config.xml');
-            $pathNode = $xml->getElementsByTagName('default_resource_client')->item(0);
-            $this->resourceData['clientClass']  = $pathNode->nodeValue;
-        }
+        $this->coalesceResourceAttributes();
 
         $dataValid = $this->validateData($this->resourceData);
         // Go through validation and POST actions.
         do {
             // Attempt to instantiate the client
-            $clientStatus = $this->setupClient(null);
+            $clientStatus = $this->setupClients(null);
             // Break if error.
 
             if ($clientStatus == 1)
@@ -132,7 +154,7 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
 
             // Acquire critical variables body prior to resource creation
             $htmlBody = $this->resourceData['htmlBody'];
-            $clientClass = $this->resourceData['clientClass'];
+            $contentClientClass = $this->resourceData['contentClientClass'];
 
             // Attempt to create the resource
             parent::postAction();
@@ -161,13 +183,13 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
                 $this->urlPath = $pathNode->nodeValue;
             }
 
-            // Generate a file URL
-            $fileUrl = $this->urlPath . strval($resourceId) . '_' . $fileNameDate . '.htm';
+            // Generate
+            $contentHtmlPath = $this->urlPath . strval($resourceId) . '_' . $fileNameDate . '.htm';
 
             // Create the file
             $email = $_SERVER['PHP_AUTH_USER'];
             $pw = $_SERVER['PHP_AUTH_PW'];
-            $clientResponse = $this->client->put($fileUrl, $htmlBody, $email, $pw);
+            $clientResponse = $this->client->put($contentHtmlPath, $htmlBody, $email, $pw);
                 $clientStatus = $this->client->getHttpStatus();
 
             // If file creation was unsuccessful, roll back, break and error.
@@ -181,17 +203,25 @@ class ExtHtmlPageDataResource extends PageDataResource implements iResource {
 
             // Insert a record into ext_html_page
             $sql = <<<SQL
-                INSERT INTO ext_html_page
-                    (resource_id, html_path, client_class)
+                INSERT INTO dom_resource
+                (
+                    resource_id
+                   ,content_html_path
+                   ,content_client_class
+                )
                 VALUES
-                    (:resourceId, :htmlPath, :clientClass)
+                (
+                     :resourceId
+                    ,:htmlPath
+                    ,:contentClientClass
+                )
 SQL;
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
 
             $sqlParams = array(
                  'resourceId' => $resourceId
-                ,'htmlPath' => $fileUrl
-                ,'clientClass' => $clientClass
+                ,'htmlPath' => $contentHtmlPath
+                ,'contentClientClass' => $contentClientClass
             );
             try {
                 $stmt->execute($sqlParams);
@@ -210,7 +240,7 @@ SQL;
             $this->httpStatus = Enumeration::getOrdinal('HTTP_201_CREATED', 'EnumHTTPResponse');
 
             // Append the file URL to the output
-            $this->resourceData['fileUrl'] = $fileUrl;
+            $this->resourceData['contentHtmlPath'] = $contentHtmlPath;
 
         } while (false);
 
@@ -221,7 +251,7 @@ SQL;
      * @return array
      */
     public function putAction() {
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
         // Acquire the PUT body (if not already set)
         if (count($this->resourceData) == 0)
             $this->resourceData = json_decode(file_get_contents("php://input"), true);
@@ -273,14 +303,14 @@ SQL;
             $fileUrl = null;
             if ($htmlBody) {
                 // Attempt to instantiate the client
-                $clientStatus = $this->setupClient($resourceId);
+                $clientStatus = $this->setupClients($resourceId);
                 // Break if error.
                 if ($clientStatus == 1)
                     break;
 
                 // Get current datetime from SQL server as basis for file name.
                 $sql = "SELECT CURRENT_TIMESTAMP()";
-                $stmt = $conn->prepare($sql);
+                $stmt = $this->conn->prepare($sql);
                 $stmt->execute();
                 $result = $stmt->fetchAll();
                 $date = $result[0][0];
@@ -327,7 +357,7 @@ SQL;
                     ,html_path = VALUES(html_path)
                     ,client_class = VALUES(client_class)
 SQL;
-                $stmt = $conn->prepare($sql);
+                $stmt = $this->conn->prepare($sql);
                 $sqlParams = array(
                     'resourceId' => $resourceId
                     ,'htmlPath' => $fileUrl
@@ -365,7 +395,7 @@ SQL;
         // Query the database for the resource, depending upon parameters
         // First - Validate GET parameters
         $resourceId = $this->validateIntParameter('id');
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
 
         do {
             // GET requests require authentication at this endpoint.
@@ -412,7 +442,7 @@ SQL;
             // if the id parameter is 0, it's bogus. Only query if it's null or >= 1.
             $result = null;
             if ($resourceId !== 0) {
-                $stmt = $conn->prepare($sql);
+                $stmt = $this->conn->prepare($sql);
                 $sqlParams = array('userId' => $userId, 'resourceId' => $resourceId);
                 $stmt->execute($sqlParams);
                 $result = $stmt->fetchAll();
@@ -423,7 +453,7 @@ SQL;
                 foreach ($result as $row) {
                     $this->resourceData[$row[0]] = array(
                         'url' => $this->resourceUrl . '?id=' . strval($row['resource_id'])
-                        ,'pageUri' => GrabResourceURL::getURL($row['resource_id'], $conn)
+                        ,'pageUri' => GrabResourceURL::getURL($row['resource_id'], $this->conn)
                         ,'ancestorResourceId' => intval($row['ancestor_resource_id'])
                         ,'pathName' => $row['pathname']
                         ,'pageTitle' => $row['page_title']
@@ -450,7 +480,7 @@ SQL;
      */
     public function deleteAction() {
 
-        $conn = $this->pageViewReference->getSQLConn();
+        $this->connectSql();
 
         // Query the database for the file vector.
         $id = $this->validateIntParameter('id');
@@ -459,7 +489,7 @@ SQL;
                 FROM dom_resource
                 WHERE resource_id = :resourceId
 SQL;
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute(['resourceId' => $id]);
         $result = $stmt->fetchAll();
         $htmlPath = $result[0]['html_path'];
@@ -471,7 +501,7 @@ SQL;
             }
 
             // Set up client.
-            $clientState = $this->setupClient(intval($id));
+            $clientState = $this->setupClients(intval($id));
             // Client setup successfully?
             if ($clientState == 1)
                 break;

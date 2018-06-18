@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS sessions (
      session_id     BIGINT          NOT NULL    AUTO_INCREMENT
     ,user_id        BIGINT          NOT NULL
-    ,ip_address     BIGINT          NOT NULL    -- WHAT'S THE BEST FOR STORING THIS?
+    ,ip_address     BIGINT          NOT NULL
     ,started        TIMESTAMP       NOT NULL
     ,user_agent     VARCHAR(1000)   NULL
 
@@ -99,8 +99,7 @@ CREATE TABLE IF NOT EXISTS meta_http_method (
 
 CREATE TABLE IF NOT EXISTS login_attempt (
      login_attempt_id     BIGINT        NOT NULL    AUTO_INCREMENT
-    ,
-     resource_id          BIGINT        NULL
+    ,resource_id          BIGINT        NULL
     ,meta_http_method_id  BIGINT        NULL
     ,attempt_user_id      BIGINT        NULL
     ,attempt_time         TIMESTAMP     NOT NULL
@@ -128,7 +127,7 @@ CREATE TABLE IF NOT EXISTS dom_resource (
     ,resource_id            BIGINT       NOT NULL
     ,title                  VARCHAR(200) NOT NULL
     ,template_html_path     VARCHAR(200) NOT NULL
-    ,template_client_class  VARCHAR(50) NOT NULL
+    ,template_client_class  VARCHAR(50)  NOT NULL
     ,content_html_path      VARCHAR(200) NOT NULL
     ,content_client_class   VARCHAR(50)  NOT NULL
     ,created_by             VARCHAR(50)  NULL

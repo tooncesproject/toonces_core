@@ -19,15 +19,29 @@ abstract class ApiResource extends Resource implements iResource {
     var $resourceUri;
     var $sessionManager;
 
+    /**
+     * @var PDO
+     */
+    var $conn;
+
+    function connectSql(){
+        if (!isset($this->conn))
+            $this->conn = UniversalConnect::doConnect();
+    }
+
+
+
     function authenticateUser() {
         // Toonces Core Services API uses Basic Auth for authentication, and the same
         // user structure as Toonces Admin.
         // Returns a user ID if login valid, null if not.
         $userId  = NULL;
 
+        $this->connectSql();
+
         // If there is no SessionManager object, instantiate one now.
         if (!$this->sessionManager)
-            $this->sessionManager = new SessionManager(UniversalConnect::doConnect());
+            $this->sessionManager = new SessionManager($this->conn);
 
         if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
             $email = $_SERVER['PHP_AUTH_USER'];
@@ -47,10 +61,11 @@ abstract class ApiResource extends Resource implements iResource {
      */
     public function getResource() {
 
-        $conn = UniversalConnect::doConnect();
+        $this->connectSql();
+
         // Get the resource URI if it hasn't already been set externally
         if (!$this->resourceUri)
-            $this->resourceUri = GrabResourceURL::getURL($this->resourceId, $conn);
+            $this->resourceUri = GrabResourceURL::getURL($this->resourceId, $this->conn);
 
         // Build the full URL path
         $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';

@@ -99,15 +99,13 @@ class FileResourceTest extends FileDependentTestCase {
 
         // Create an unpublished resource
         $resourceId = $this-> createPage(false);
-
-        // Instantiate a PageView object and dependencies
-        $pageView = new FileRenderer($resourceId);
         $conn = $this->getConnection();
-        $pageView->setSQLConn($conn);
 
         // Instantiate a FileResource object
         $filename = 'test.txt';
-        $fr = new FileResource($pageView);
+        $fr = new FileResource();
+        $fr->resourceId = $resourceId;
+        $fr->conn = $conn;
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $fileData = 'Hello, I\'m a text file' . PHP_EOL;
 
@@ -209,13 +207,10 @@ class FileResourceTest extends FileDependentTestCase {
         // Create an unpublished resource
         $resourceId = $this-> createPage(false);
 
-        // Instantiate a PageView object and dependencies
-        $pageView = new FileRenderer($resourceId);
-        $conn = $this->getConnection();
-        $pageView->setSQLConn($conn);
-
         // Instantiate a FileResource object and dependencies
-        $fr = new FileResource($pageView);
+        $fr = new FileResource();
+        $fr->conn = $conn;
+        $fr->resourceId = $resourceId;
         $expectedFileData = 'hello, i\'m a different text file now.' . PHP_EOL;
         $filename = 'test.txt';
         $requestHost = 'http://example.com/';
@@ -302,13 +297,10 @@ class FileResourceTest extends FileDependentTestCase {
         // Create an unpublished resource
         $resourceId = $this-> createPage(false);
 
-        // Instantiate a PageView object and dependencies
-        $pageView = new FileRenderer($resourceId);
-        $conn = $this->getConnection();
-        $pageView->setSQLConn($conn);
-
         // Instantiate a FileResource object and dependencies
-        $fr = new FileResource($pageView);
+        $fr = new FileResource();
+        $fr->conn = $conn;
+        $fr->resourceId = $resourceId;
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $filename = 'test.txt';
         $requestHost = 'http://example.com/';

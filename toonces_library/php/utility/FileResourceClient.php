@@ -13,14 +13,30 @@ include_once LIBPATH.'php/toonces.php';
 
 class FileResourceClient implements iResourceClient {
 
+    /**
+     * @var PDO
+     */
     var $conn;
     var $resourceStatus;
     var $pageViewReference;
 
+    function connectSql() {
+        if (!isset($this->conn))
+            $this->conn = UniversalConnect::doConnect();
+    }
+
+
+    /**
+     * @return int
+     */
     function getHttpStatus() {
         return $this->resourceStatus;
     }
 
+
+    /**
+     * @return string
+     */
     function getResourcePath() {
         // By default, FRC uses the html_resource_path var specified in toonces-config.xml, just like
         // the DocumentEndpointPageBuilder.
@@ -32,8 +48,16 @@ class FileResourceClient implements iResourceClient {
         return $path;
     }
 
-    function get($url) {
-        $fileResource = new FileResource(null);
+    /**
+     * @param string $url
+     * @param null|string $username
+     * @param null|string $password
+     * @param array $paramHeaders
+     * @return string
+     * @throws Exception
+     */
+    function get($url, $username = null, $password = null, $paramHeaders = array()) {
+        $fileResource = new FileResource();
         $fileResource->resourcePath = $this->getResourcePath();
         $fileResource->requireAuthentication = false;
         $fileResource->requestPath = $url;
@@ -43,10 +67,16 @@ class FileResourceClient implements iResourceClient {
     }
 
 
-    function put($url, $data) {
+    /**
+     * @param string $url
+     * @param $data
+     * @param null|string $username
+     * @param null|string $password
+     * @param array $paramHeaders
+     */
+    function put($url, $data, $username = null, $password = null, $paramHeaders = array()) {
 
-        if (!isset($this->conn))
-            $this->conn = $this->pageViewReference-getSQLConn();
+        $this->connectSql();
 
         // Instantiate fileResource and set dependencies.
         $fileResource = new FileResource(null);
@@ -67,12 +97,18 @@ class FileResourceClient implements iResourceClient {
     }
 
 
-    function delete($url) {
-        if (!isset($this->conn))
-            $this->conn = $this->pageViewReference-getSQLConn();
+    /**
+     * @param string $url
+     * @param null|string $username
+     * @param null|string $password
+     * @param array $paramHeaders
+     */
+    function delete($url, $username = null, $password = null, $paramHeaders = array()) {
+
+        $this->connectSql();
 
         // Instantiate fileResource and set dependencies.
-        $fileResource = new FileResource(null);
+        $fileResource = new FileResource();
         $fileResource->conn = $this->conn;
         // Acquire the page ID attributed to the URL so the fileResource
         // object can authenticate user access to the page.
@@ -87,7 +123,5 @@ class FileResourceClient implements iResourceClient {
         return $response;
     }
 
-    function __construct($pageView) {
-        $this->pageViewReference = $pageView;
-    }
+
 }
