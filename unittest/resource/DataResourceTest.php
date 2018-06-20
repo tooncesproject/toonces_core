@@ -140,6 +140,7 @@ SQL;
         // ARRANGE
         // Instantiate base objects
         $dr = new ConcreteDataResource();
+        $dr->conn = $this->getConnection();
 
         // Set up the DataResource object's Data Validator.
         $dr->apiDataValidator = new TestApiDataValidator();

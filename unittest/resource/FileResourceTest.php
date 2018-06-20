@@ -28,6 +28,7 @@ class FileResourceTest extends FileDependentTestCase {
 
         // Proceed
         $fr = new FileResource();
+        $fr->conn = $this->getConnection();
         $testData = 'look here is some data' .PHP_EOL;
         $fr->resourceData = $testData;
         $fr->httpMethod = 'OPTIONS';
@@ -95,13 +96,12 @@ class FileResourceTest extends FileDependentTestCase {
 
         // Create an unpublished resource
         $resourceId = $this-> createPage(false);
-        $conn = $this->getConnection();
 
         // Instantiate a FileResource object
         $filename = 'test.txt';
         $fr = new FileResource();
         $fr->resourceId = $resourceId;
-        $fr->conn = $conn;
+        $fr->conn = $this->getConnection();
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $fileData = 'Hello, I\'m a text file' . PHP_EOL;
 

@@ -95,6 +95,7 @@ class ResourceDataResourceTest extends SqlDependentTestCase {
         $pdr = new ResourceDataResource();
         $pdr->setResourceId(1);
         $pdr->resourceData = array();
+        $pdr->conn = $this->getConnection();
 
         // ACT
         // bogus resource class invalidated
@@ -202,9 +203,6 @@ SQL;
      */
     function testPostAction() {
         // ARRANGE
-        // get SQL connection
-        $conn = $this->getConnection();
-
         // Instantiate a ResourceDataResource and dependencies
         $conn = $this->getConnection();
         $pdr = new ResourceDataResource();

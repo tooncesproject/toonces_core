@@ -77,6 +77,7 @@ class ApiResourceTest extends SqlDependentTestCase {
         $ar = new ConcreteApiResource();
         $testObjectArray = array('testObject' => 'foo');
         $ar->dataObjects = $testObjectArray;
+        $ar->conn = $this->getConnection();
 
         // Inject HTTP host
         $_SERVER['HTTP_HOST'] = 'example.com';
@@ -104,6 +105,7 @@ class ApiResourceTest extends SqlDependentTestCase {
         $ar = new ConcreteApiResource();
         $testObjectArray = array('testObject' => 'foo');
         $ar->resourceData = $testObjectArray;
+        $ar->conn = $this->getConnection();
 
         // Inject HTTP host
         $_SERVER['HTTP_HOST'] = 'example.com';
