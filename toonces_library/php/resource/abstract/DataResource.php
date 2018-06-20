@@ -83,7 +83,6 @@ abstract class DataResource extends ApiResource implements iDataResource
             SELECT
                  r.resource_id
                 ,r.pathname
-                ,r.page_title
             FROM resource_hierarchy_bridge rhb
             JOIN resource r ON rhb.descendant_resource_id = r.resource_id
             LEFT JOIN resource_user_access rua ON r.resource_id = rua.resource_id AND (rua.user_id = :userId)
@@ -92,7 +91,7 @@ abstract class DataResource extends ApiResource implements iDataResource
                 (rhb.resource_id = :resourceId)
                 AND
                 (
-                    (r.published = 1 AND r.deleted IS NULL)
+                    (r.published = 1)
                     OR
                     rua.user_id IS NOT NULL
                     OR
@@ -109,8 +108,7 @@ SQL;
             $subResources = array();
             foreach ($result as $row) {
                 $subResources[$row[0]] = array(
-                     'url' => $this->resourceUrl . $row[1]
-                    ,'title' => $row[2]
+                     'url' => $this->resourceUrl . $row['pathname']
                 );
             }
             $this->resourceData['resources'] = $subResources;

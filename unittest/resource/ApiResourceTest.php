@@ -16,9 +16,12 @@ require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 class ConcreteApiResource extends ApiResource {
     // inherits all functionality
-    public function getResource()
-    {
+    public function getResource() {
         return parent::getResource();
+    }
+
+    public function render() {
+        // Implementation not required for this test
     }
 }
 

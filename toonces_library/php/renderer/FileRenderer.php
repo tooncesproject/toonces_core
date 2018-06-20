@@ -5,7 +5,7 @@
  * Initial commit: Paul Anderson, 4/26/2018
  *
  * Renderer extension for handling transfers of files from a vector.
- *
+ * Suitable for small throughput only; doesn't kill output buffering.
 */
 
 require_once LIBPATH . 'php/toonces.php';
@@ -27,17 +27,11 @@ class FileRenderer extends Renderer implements iRenderer {
         if ($resourcePath) {
             $headerStr = "Content-Type: application/octet-stream";
             header($headerStr);
-            // Stop output buffering
-            if (ob_get_level())
-                ob_end_flush();
 
             flush();
             readfile($resourcePath);
 
         }
-
-        // For testing purposes, we return the resource path supplied by the resource.
-        return $resourcePath;
 
     }
 }

@@ -12,6 +12,14 @@ require_once __DIR__ . '/SqlDependentTestCase.php';
 
 abstract class FileDependentTestCase extends SqlDependentTestCase {
 
+    /**
+     * @throws Exception
+     */
+    function setUp() {
+        parent::setUp();
+        $this->checkFileFixture();
+    }
+
     public function checkFileFixture() {
         // Performs a safety check on the test files directory.
         // If any files exist in the directory or if directory doesn't exist, it halts the test.
@@ -28,12 +36,19 @@ abstract class FileDependentTestCase extends SqlDependentTestCase {
             throw new Exception('Unit test exception: Test file directory for FileDependentTestCase doesn\'t exist or isn\'t empty.');
     }
 
+    /**
+     * @param string $fileName
+     * @param string $fileContents
+     */
+    public function makeTestFile($fileName, $fileContents) {
+        $dir = $GLOBALS['TEST_FILE_PATH'];
+        file_put_contents($dir . $fileName, $fileContents);
+    }
+
+
     public function destroyFileFixture() {
         // Deletes any files in the test directory.
-        // Use with caution. You should run checkFileFixture at the start of
-        // your unit test to ensure you're not deleting anything by accident here -
-        // Then after tests have run, call destroyFileFixture to clear any files
-        // created by your test.
+        // Use with caution.
         $dir = $GLOBALS['TEST_FILE_PATH'];
         $dirData = scandir($dir);
 
@@ -43,5 +58,10 @@ abstract class FileDependentTestCase extends SqlDependentTestCase {
                 unlink($GLOBALS['TEST_FILE_PATH'] . $file);
         }
 
+    }
+
+    function tearDown() {
+        parent::tearDown();
+        $this->destroyFileFixture();
     }
 }

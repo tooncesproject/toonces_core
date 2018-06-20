@@ -11,61 +11,43 @@
 use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
+require_once __DIR__ . '../../FileDependentTestCase.php';
 
 // Setting up some concrete DataResource objects for testing
-class GoodFileResource extends FileResource {
+class TestFileResource extends FileResource {
+
+    var $testData;
+
     function getResource() {
-        $testData = array('example.com/barf');
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPStatus');
-        return $testData;
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+        return $this->testData;
     }
 }
 
-class BadFileResource extends FileResource {
-    function getResource() {
-        $testData = array('example.com/barf');
-        $this->httpStatus = null;
-        return $testData;
-    }
-}
 
-class FileRendererTest extends TestCase {
-
+class FileRendererTest extends FileDependentTestCase {
 
     /**
-     * @expectedException Exception
+     * @throws Exception
+     * @runInSeparateProcess
      */
     function testRenderResource() {
-        // Notes: Without a wrapper, PHPUnit doesn't include a way to test the
-        // readfile() output of this class.
-        // We'll lean on integration testing and/or trust that the PHP-native functions
-        // actually work.
         // ARRANGE
-        $jpv = new FileRenderer(1);
-        $goodFileResource = new GoodFileResource($jpv);
-        $badFileResource = new BadFileResource($jpv);
-        $badOutput = null;
-        $goodOutput = null;
+        $fileRenderer = new FileRenderer();
+        $testFileResource = new TestFileResource();
+        $testFileContents = 'Hello I am a text file.';
+        $testFileName = 'file.txt';
+        $this->makeTestFile($testFileName, $testFileContents);
+        $testFilePath = $GLOBALS['TEST_FILE_PATH'];
+        $testFileResource->testData = $testFilePath . $testFileName;
 
         // ACT
-        // With invalid DataResource
-        $jpv->dataObjects = array(0 => $badFileResource );
-
-        $errorState = false;
-        try {
-            $badOutput = $jpv->renderResource();
-        } finally {
-            $errorState = true;
-        }
-
-        // with valid DataResource
-        $jpv->dataObjects = array(0 => $goodFileResource );
-        $goodOutput = $jpv->renderResource();
+        $fileRenderer->renderResource($testFileResource);
+        $output = ob_get_contents();
 
         // ASSERT
-        $this->assertNull($badOutput);
-        $this->assertTrue($errorState);
-        $this->assertSame('example.com/barf', $goodOutput);
+        $this->assertSame($testFileContents, $output);
+
 
     }
 }

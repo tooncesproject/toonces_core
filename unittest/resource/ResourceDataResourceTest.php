@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * PageDataResourceTest.php
+ * ResourceDataResourceTest.php.php
  * Initial commit: Paul Anderson, 5/2/2018
  *
  * Unit tests for the PageApiResource class.
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
-class PageDataResourceTest extends SqlDependentTestCase {
+class ResourceDataResourceTest extends SqlDependentTestCase {
 
     function testValidatePathName() {
         // ARRANGE
@@ -84,29 +84,6 @@ class PageDataResourceTest extends SqlDependentTestCase {
 
         // Bogus parent resource ID invalidated
         $this->assertFalse($bogusParentResult);
-
-    }
-
-    /**
-     * @depends testValidatePathName
-     */
-    function testGeneratePathName() {
-        // ARRANGE
-        // Instantiate a ResourceDataResource and dependencies
-        $conn = $this->getConnection();
-        $pdr = new ResourceDataResource();
-        $pdr->conn = $conn;
-        $pdr->setResourceId(1);
-        $pdr->resourceData = array('pageTitle' => 'Hi! I\'m a resource.');
-
-        // ACT
-        $newPathName = $pdr->generatePathName();
-
-        // ASSERT
-        // pathName is set
-        $this->assertSame($newPathName, $pdr->resourceData['pathName']);
-        // pathName is valid
-        $this->assertTrue($pdr->validatePathName(1));
 
     }
 
@@ -246,6 +223,7 @@ SQL;
         // Valid post - has resource class
         $validPost = $invalidPost;
         $validPost['resourceClass'] = 'Resource';
+        $validPost['pathName'] = 'pathname';
 
         // Valid post but no non-admin access
         $validNoAccessPost = $validPost;
@@ -595,7 +573,7 @@ SQL;
         // ACT
         // GET with admin login returns all pages and 200
         $this->setAdminAuth();
-        $adminResult = $pdr->getAction();
+            $adminResult = $pdr->getAction();
         $adminStatus = $pdr->httpStatus;
 
         // GET with bogus ID parameter returns 404 and empty result

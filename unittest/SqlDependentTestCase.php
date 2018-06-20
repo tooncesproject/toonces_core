@@ -124,9 +124,7 @@ SQL;
         SELECT CREATE_RESOURCE  (
              :parentResourceId                  -- parent_resource_id BIGINT
             ,:pathName                      -- pathname VARCHAR(50)
-            ,'Unpublished Page'             -- page_title VARCHAR(50)
-            ,'Toonces404PageBuilder'        -- pagebuilder_class VARCHAR(50)
-            ,'HTMLPageView'                 -- pageview_class VARCHAR(50)
+            ,'TooncesWelcomeDomDocumentResource'        -- resource_class VARCHAR(50)
             ,FALSE                          -- redirect_on_error BOOL
             ,:published                     -- published BOOL
 )

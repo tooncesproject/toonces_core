@@ -144,13 +144,13 @@ SQL;
         // Create main resource if it doesn't already exist.
         $sql = <<<SQL
         INSERT INTO resource (
-        ,resource_class
-        ,redirect_on_error
-        ,published
+           resource_class
+          ,redirect_on_error
+          ,published
         ) VALUES (
-        ,'TooncesWelcomeDomDocumentResource'
-        ,FALSE
-        ,TRUE
+          'TooncesWelcomeDomDocumentResource'
+          ,FALSE
+          ,TRUE
         );
 
 SQL;
@@ -163,6 +163,10 @@ SQL;
             throw $e;
         }
 
+        /*
+         *
+         * TODO: REPLACE OR DEPRECATE EXT RESOURCES
+         *
         // Get the resource ID
         $sql = 'SELECT LAST_INSERT_ID()';
         $stmt = $conn->prepare($sql);
@@ -179,6 +183,7 @@ SQL;
             echo('Failed to insert a record into ext_html_page: ' . $e->getMessage());
             throw $e;
         }
+        */
     } else {
         echo '    Detected existing home resource in database; Skipping.' . PHP_EOL;
     }

@@ -214,17 +214,17 @@ SQL;
         $noHeaderResult = $dr->getResource();
         $noHeaderStatus = $dr->httpStatus;
 
-        // Call the method with the default valid heaer set - Expect parent class (ApiResource) operations
+        // Call the method with the default valid header set - Expect parent class (ApiResource) operations
         $_SERVER['CONTENT_TYPE'] = 'application/json';
+        $dr->statusMessage = null;
         $headerResult = $dr->getResource();
         $headerStatus = $dr->httpStatus;
 
         // ASSERT
         // Call the method without the default valid header
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noHeaderStatus);
-        $this->assertNull($noHeaderResult);
 
-        // Call the method with the default valid heaer set - Expect parent class (ApiResource) operations
+        // Call the method with the default valid header set - Expect parent class (ApiResource) operations
         $this->assertSame($testData, $headerResult);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse'), $headerStatus);
 

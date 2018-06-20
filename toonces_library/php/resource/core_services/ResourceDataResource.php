@@ -25,6 +25,13 @@ class ResourceDataResource extends DataResource implements iResource {
         $pathNameValid = false;
         do {
 
+            // Pathname is empty?
+            if (empty($this->resourceData['pathName'])) {
+                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
+                $this->statusMessage = 'pathName must not be empty.';
+                break;
+            }
+
             // Pathname contains disallowed characters?
             if (!ctype_alnum(preg_replace('[_|-]', '', $this->resourceData['pathName']))) {
                 // if the supplied path name contains non-alphanumeric chars other than underscore,
@@ -33,12 +40,7 @@ class ResourceDataResource extends DataResource implements iResource {
                 $this->statusMessage = 'pathName may only contain alphanumeric characters or underscores.';
                 break;
             }
-            // Pathname is empty?
-            if (empty($this->resourceData['pathName'])) {
-                $this->httpStatus = Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse');
-                $this->statusMessage = 'pathName must not be empty.';
-                break;
-            }
+
 
             // Pathname already exists for ancestor resource?
             $sql = <<<SQL
@@ -83,23 +85,6 @@ SQL;
         } while (false);
 
         return $pathNameValid;
-    }
-
-    /**
-     * Generates a path name from the page title specified in resourceData.
-     * @return string a valid pathname.
-     */
-    function generatePathName() {
-
-        $this->connectSql();
-
-        // If it's not supplied, generate one from the title.
-        $sql = "SELECT GENERATE_PATHNAME(:pageTitle)";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(array('pageTitle' => $this->resourceData['pageTitle']));
-        $result = $stmt->fetchall();
-        $this->resourceData['pathName'] = $result[0][0];
-        return $this->resourceData['pathName'];
     }
 
 
@@ -222,10 +207,6 @@ SQL;
                 $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
                 break;
             }
-
-            // Generate the path name if not supplied explicitly
-            if (!isset($this->resourceData['pathName']))
-                $this->generatePathName();
 
             // Now validate the path name
             if (!$this->validatePathName($this->resourceData['ancestorResourceId'])) {
@@ -379,7 +360,7 @@ SQL;
             // Resource class
             if (isset($this->resourceData['resourceClass'])) {
                 array_push($updateFields, 'resource_class = :resourceClass');
-                $sqlParams['pageBuilderClass'] = $this->resourceData['resourceClass'];
+                $sqlParams['resourceClass'] = $this->resourceData['resourceClass'];
             }
             // redirect on error
             if(isset($this->resourceData['redirectOnError'])) {
@@ -464,7 +445,7 @@ SQL;
                 (r.resource_id = :resourceId OR :resourceId IS NULL)
                 AND
                 (
-                    (r.published = 1 AND r.deleted IS NULL)
+                    r.published = 1
                     OR
                     rua.user_id IS NOT NULL
                     OR

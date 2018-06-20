@@ -39,7 +39,7 @@ class RendererTest extends TestCase {
     /**
      * @expectedException Exception
      */
-    public function testSendHttpStatusHeaderThrowsException() {
+    public function testHttpStatusException() {
         // ARRANGE
         $renderer = new ConcreteRenderer();
         $resource = new RendererTestResource();

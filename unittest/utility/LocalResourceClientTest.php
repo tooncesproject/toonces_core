@@ -16,9 +16,6 @@ class LocalResourceClientTest extends FileDependentTestCase {
 
     function testPut() {
         // ARRANGE
-        // Set up file fixture
-        $this->checkFileFixture();
-
         // Set up client
         $client = new LocalResourceClient();
 
@@ -27,7 +24,7 @@ class LocalResourceClientTest extends FileDependentTestCase {
         $url = $path . 'test_local_resource_client.txt';
 
         // ACT
-        $response = $client->put($url, $data);
+        $client->put($url, $data);
 
         // ASSERT
         $this->assertFileExists($url);
@@ -35,17 +32,17 @@ class LocalResourceClientTest extends FileDependentTestCase {
 
     }
 
-    /**
-     * @depends testPut
-     */
+
     function testGet() {
         // ARRANGE
         // Set up client
         $client = new LocalResourceClient();
 
+        $fileName = 'test_local_resource_client.txt';
         $data = "hi i am file data";
+        $this->makeTestFile($fileName, $data);
         $path = $GLOBALS['TEST_FILE_PATH'];
-        $url = $path . 'test_local_resource_client.txt';
+        $url = $path . $fileName;
 
         // ACT
         $response = $client->get($url);
@@ -56,26 +53,25 @@ class LocalResourceClientTest extends FileDependentTestCase {
 
     }
 
-    /**
-     * @depends testGet
-     */
+
     function testDelete() {
         // ARRANGE
         // Set up client
         $client = new LocalResourceClient();
 
+        $fileName = 'test_local_resource_client.txt';
+        $data = "hi i am file data";
+        $this->makeTestFile($fileName, $data);
         $path = $GLOBALS['TEST_FILE_PATH'];
-        $url = $path . 'test_local_resource_client.txt';
+        $url = $path . $fileName;
 
         // ACT
-        $response = $client->delete($url);
+        $client->delete($url);
 
         // ASSERT
         $this->assertFileNotExists($url);
         $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $client->getHttpStatus());
 
-        // Tear down
-        $this->destroyFileFixture();
     }
 
 }

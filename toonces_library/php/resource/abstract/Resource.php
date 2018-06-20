@@ -13,6 +13,7 @@ abstract class Resource implements iResource {
 
     public $resourceId;
     public $httpStatus;
+    public $parameters = array();
 
     public function setResourceId($paramResourceId) {
         $this->resourceId = $paramResourceId;

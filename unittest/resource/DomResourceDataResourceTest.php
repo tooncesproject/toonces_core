@@ -22,7 +22,6 @@ class DomResourceDataResourceTest extends FileDependentTestCase {
         // clear and build fixtures.
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
-        $this->checkFileFixture();
 
         // Create a resource and insert an associated record in ext_html_page
         $resourceId = $this->createPage(true);
@@ -573,7 +572,6 @@ SQL;
         $this->assertEquals(Enumeration::getOrdinal('HTTP_204_NO_CONTENT', 'EnumHTTPResponse'), $deletedStatus);
 
         // Tear down the fixture.
-        $this->destroyFileFixture();
         $this->destroyTestDatabase();
 
     }

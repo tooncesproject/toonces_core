@@ -20,7 +20,7 @@ class PagePostApiDataValidator extends ApiDataValidator implements iApiDataValid
         $ancestorResourceId = new IntegerFieldValidator(false);
         $this->addFieldValidator('ancestorResourceId', $ancestorResourceId);
 
-        $pathName = new StringFieldValidator(true);
+        $pathName = new StringFieldValidator(false);
         $pathName->maxLength = 50;
         $this->addFieldValidator('pathName', $pathName);
 

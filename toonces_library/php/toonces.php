@@ -15,6 +15,7 @@ include_once LIBPATH . 'php/utility/SessionManager.php';
 include_once LIBPATH . 'php/utility/static/GrabParentResourceId.php';
 include_once LIBPATH . 'php/utility/static/CheckResourceUserAccess.php';
 include_once LIBPATH . 'php/resource/abstract/ApiResource.php';
+include_once LIBPATH . 'php/resource/interface/iDataResource.php';
 include_once LIBPATH . 'php/resource/abstract/DataResource.php';
 include_once LIBPATH . 'php/utility/abstract/FieldValidator.php';
 include_once LIBPATH . 'php/utility/interface/iFieldValidator.php';
@@ -30,6 +31,7 @@ include_once LIBPATH . 'php/utility/datavalidator/DomDataResourcePostApiDataVali
 include_once LIBPATH . 'php/utility/datavalidator/DomDataResourcePutApiDataValidator.php';
 include_once LIBPATH . 'php/resource/core_services/CoreServicesDataResource.php';
 include_once LIBPATH . 'php/resource/core_services/ResourceDataResource.php';
+include_once LIBPATH . 'php/resource/interface/iFileResource.php';
 include_once LIBPATH . 'php/resource/core_services/FileResource.php';
 include_once LIBPATH . 'php/resource/core_services/DomResourceDataResource.php';
 include_once LIBPATH . 'php/renderer/abstract/Renderer.php';
@@ -41,6 +43,10 @@ include_once LIBPATH . 'php/utility/static/GrabResourceURL.php';
 include_once LIBPATH . 'php/utility/static/GrabParentResourceURL.php';
 include_once LIBPATH . 'php/utility/UserManager.php';
 
+include_once LIBPATH . 'php/resource/interface/iDomDocumentResource.php';
+include_once LIBPATH . 'php/resource/abstract/DomDocumentResource.php';
+include_once LIBPATH . 'php/resource/abstract/SimpleDomDocumentResource.php';
+include_once LIBPATH . 'php/resource/defaults/TooncesWelcomeDomDocumentResource.php';
 
 // custom
 include_once LIBPATH . 'custom/toonces_custom.php';

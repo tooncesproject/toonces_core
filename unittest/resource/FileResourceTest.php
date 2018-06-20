@@ -21,17 +21,13 @@ class FileResourceTest extends FileDependentTestCase {
      */
     function testGetResourceExcNull() {
         // ARRANGE
-        // Check the file fixture per FileDependentTestCase.
-        $this->checkFileFixture();
 
         // Tear down (if exists) and rebuild the database fixture,.
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
 
         // Proceed
-        $pv = new FileRenderer(1);
-        $pv->setSQLConn($this->getConnection());
-        $fr = new FileResource($pv);
+        $fr = new FileResource();
         $testData = 'look here is some data' .PHP_EOL;
         $fr->resourceData = $testData;
         $fr->httpMethod = 'OPTIONS';
@@ -48,9 +44,9 @@ class FileResourceTest extends FileDependentTestCase {
      */
     function testGetResourceExcBogus() {
         // ARRANGE
-        $pv = new FileRenderer(1);
-        $pv->setSQLConn($this->getConnection());
-        $fr = new FileResource($pv);
+        $fr = new FileResource();
+        $fr->setResourceId(1);
+        $fr->conn = $this->getConnection();
         $testData = 'look here is some data' .PHP_EOL;
         $fr->resourceData = $testData;
         $fr->httpMethod = 'OPTIONS';
@@ -65,12 +61,12 @@ class FileResourceTest extends FileDependentTestCase {
 
     /**
      * @depends testGetResourceExcBogus
+     * @throws Exception
      */
     function testGetResource() {
         // ARRANGE
-        $pv = new FileRenderer(1);
-        $pv->setSQLConn($this->getConnection());
-        $fr = new FileResource($pv);
+        $fr = new FileResource();
+        $fr->conn = $this->getConnection();
         $testData = 'look here is some data' .PHP_EOL;
         $fr->resourceData = $testData;
         $fr->httpMethod = 'OPTIONS';
@@ -142,7 +138,7 @@ class FileResourceTest extends FileDependentTestCase {
         $noDataStatus = $fr->httpStatus;
         $noDataFileExists = file_exists($testFileVector);
 
-        // Attempt a PUT where user does not explicity have access
+        // Attempt a PUT where user does not explicitly have access
         $this->setNonAdminAuth();
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $fr->resourceData = $fileData;
@@ -182,7 +178,7 @@ class FileResourceTest extends FileDependentTestCase {
         $this->assertEquals(Enumeration::getOrdinal('HTTP_400_BAD_REQUEST', 'EnumHTTPResponse'), $noDataStatus);
         $this->assertFalse($noDataFileExists);
 
-        // Attempt a PUT where user does not explicity have access
+        // Attempt a PUT where user does not explicitly have access
         $this->assertEquals(Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse'), $nonAdminStatus);
         $this->assertFalse($nonAdminFileExists);
 
@@ -200,7 +196,7 @@ class FileResourceTest extends FileDependentTestCase {
 
 
     /**
-     * @depends testPutAction
+     * @throws Exception
      */
     function testGetAction() {
         // ARRANGE
@@ -209,10 +205,11 @@ class FileResourceTest extends FileDependentTestCase {
 
         // Instantiate a FileResource object and dependencies
         $fr = new FileResource();
-        $fr->conn = $conn;
+        $fr->conn = $this->getConnection();
         $fr->resourceId = $resourceId;
-        $expectedFileData = 'hello, i\'m a different text file now.' . PHP_EOL;
+        $expectedFileData = 'hello, i\'m yet another text file.' . PHP_EOL;
         $filename = 'test.txt';
+        $this->makeTestFile($filename, $expectedFileData);
         $requestHost = 'http://example.com/';
         $requestPath = $requestHost . $filename;
         $expectedFileVector = $GLOBALS['TEST_FILE_PATH'] . $filename;
@@ -291,6 +288,7 @@ class FileResourceTest extends FileDependentTestCase {
 
     /**
      * @depends testGetAction
+     * @throws Exception
      */
     function testDeleteAction() {
         // ARRANGE
@@ -299,10 +297,12 @@ class FileResourceTest extends FileDependentTestCase {
 
         // Instantiate a FileResource object and dependencies
         $fr = new FileResource();
-        $fr->conn = $conn;
+        $fr->conn = $this->getConnection();
         $fr->resourceId = $resourceId;
         $fr->resourcePath = $GLOBALS['TEST_FILE_PATH'];
         $filename = 'test.txt';
+        $fileContents = 'Hi, I\'m a text file, please delete me.';
+        $this->makeTestFile($filename, $fileContents);
         $requestHost = 'http://example.com/';
         $requestPath = $requestHost . $filename;
         $expectedFileVector = $GLOBALS['TEST_FILE_PATH'] . $filename;
@@ -358,7 +358,6 @@ class FileResourceTest extends FileDependentTestCase {
 
         // Tear Down
         $this->destroyTestDatabase();
-        $this->destroyFileFixture();
 
     }
 }

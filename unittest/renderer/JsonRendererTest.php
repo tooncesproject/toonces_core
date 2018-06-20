@@ -13,56 +13,35 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
 // Setting up some concrete DataResource objects for testing
-class GoodDataResource extends DataResource {
+class TestDataResource extends DataResource {
     function getResource() {
         $testData = array('foo' => 'bar');
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPStatus');
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
         return $testData;
     }
 }
 
-class BadDataResource extends DataResource {
-    function getResource() {
-        $testData = array('foo' => 'bar');
-        $this->httpStatus = null;
-        return $testData;
-    }
-}
 
 class JsonRendererTest extends TestCase {
 
     /**
-     * @expectedException Exception
+     * @runInSeparateProcess
+     * @throws Exception
      */
     function testRenderResource() {
         // ARRANGE
-        $jpv = new JsonRenderer(1);
-        $goodDataResource = new GoodDataResource($jpv);
-        $badDataResource = new BadDataResource($jpv);
-        $badOutput = null;
-        $goodOutput = null;
+        $jpv = new JsonRenderer();
+        $goodDataResource = new TestDataResource();
+        $testData = array('foo' => 'bar');
+        $expectedString = json_encode($testData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         // ACT
-        // With invalid DataResource
-        $jpv->dataObjects = array(0 => $badDataResource );
-
-        $errorState = false;
-        try {
-            $badOutput = $jpv->renderResource();
-        } finally {
-            $errorState = true;
-        }
-
-        // with valid DataResource
-        $jpv->dataObjects = array(0 => $goodDataResource );
-        $goodOutput = $jpv->renderResource();
-        json_decode($goodOutput);
+        $jpv->renderResource($goodDataResource);
 
         // ASSERT
-        $this->assertNull($badOutput);
-        $this->assertTrue($errorState);
-        $this->assertTrue(is_array($goodOutput));
-        $this->assertTrue(json_last_error() == JSON_ERROR_NONE);
+        $this->expectOutputString($expectedString);
+
+
 
     }
 }
