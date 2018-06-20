@@ -9,6 +9,11 @@ interface iDomDocumentResource extends iResource {
     /**
      * @return DOMDocument
      */
+    function composeDomDocument();
+
+    /**
+     * @return DOMDocument
+     */
     public function getResource();
 
 }

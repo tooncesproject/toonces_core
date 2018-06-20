@@ -8,7 +8,7 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-abstract class DataResource extends ApiResource implements iDataResource
+abstract class DataResource extends Resource implements iDataResource
 {
     var $resourceData = array();
     var $fields = array();

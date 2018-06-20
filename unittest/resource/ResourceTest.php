@@ -1,10 +1,9 @@
 <?php
 /**
  * @author paulanderson
- * ApiResourceTest.php
  * Initial commit: Paul Anderson, 4/27/2018
  *
- * Unit tests for the ApiResource abstract class
+ * Unit tests for the Resource abstract class
  *
  * */
 
@@ -14,7 +13,7 @@ require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 require_once __DIR__ . '../../SqlDependentTestCase.php';
 
 
-class ConcreteApiResource extends ApiResource {
+class ConcreteResource extends Resource {
     // inherits all functionality
     public function getResource() {
         return parent::getResource();
@@ -25,11 +24,11 @@ class ConcreteApiResource extends ApiResource {
     }
 }
 
-class ApiResourceTest extends SqlDependentTestCase {
+class ResourceTest extends SqlDependentTestCase {
 
     public function testAuthenticateUser() {
         // ARRANGE
-        $ar = new ConcreteApiResource();
+        $ar = new ConcreteResource();
         // Set up SQL connection
         $sqlConn = $this->getConnection();
         $ar->conn = $sqlConn;
@@ -74,7 +73,7 @@ class ApiResourceTest extends SqlDependentTestCase {
     public function testGetResourceException() {
         // ARRANGE
         // Instantiate base objects
-        $ar = new ConcreteApiResource();
+        $ar = new ConcreteResource();
         $testObjectArray = array('testObject' => 'foo');
         $ar->dataObjects = $testObjectArray;
         $ar->conn = $this->getConnection();
@@ -102,7 +101,7 @@ class ApiResourceTest extends SqlDependentTestCase {
 
         // ARRANGE
         // Instantiate base objects
-        $ar = new ConcreteApiResource();
+        $ar = new ConcreteResource();
         $testObjectArray = array('testObject' => 'foo');
         $ar->resourceData = $testObjectArray;
         $ar->conn = $this->getConnection();

@@ -15,11 +15,13 @@ class TooncesResourceFactory implements iResourceFactory {
     /**
      * @var PDO
      */
-    private $conn;
+    public $conn;
 
 
     public function makeResource($paramResourceUri) {
-        $this->conn = UniversalConnect::doConnect();
+        if (!$this->conn)
+            $this->conn = UniversalConnect::doConnect();
+
         $resourceId = $this->getResourceId($paramResourceUri);
         return $this->getResourceById($resourceId);
 
@@ -66,7 +68,12 @@ SQL;
         $stmt = $this->conn->prepare($sql);
         $stmt->execute(['resourceId' => $paramResourceId]);
         $result = $stmt->fetchAll();
-        $resourceClassName = $result['resource_class'];
+
+        if ($result) {
+            $resourceClassName = $result['resource_class'];
+        } else {
+            $resourceClassName = $this->getDefault404ResourceClassName();
+        }
 
         $resource = $this->dynamicallyInstantiateResource($resourceClassName);
         $resource->setResourceId($paramResourceId);
@@ -81,6 +88,15 @@ SQL;
      */
     private function dynamicallyInstantiateResource($paramResourceClassName) {
         return new $paramResourceClassName;
+    }
+
+    private function getDefault404ResourceClassName() {
+        $configXml = new DOMDocument();
+        $configXml->load(ROOTPATH . 'toonces-config.xml');
+
+        $resourceNameNode = $configXml->getElementsByTagName('resource_404_class')->item(0);
+        $className = $resourceNameNode->nodeValue;
+        return $className;
     }
 
 }

@@ -1,10 +1,10 @@
 <?php
 /**
  * @author paulanderson
- * Initial commit: 6/17/18
+ * Initial commit: 6/20/18
  */
 
-class TooncesWelcomeDomDocumentResource extends NestedDomDocumentResource {
+class Toonces404DomDocumentResource extends NestedDomDocumentResource {
 
     function getInnerDomDocument() {
         $configXml = new DOMDocument();
@@ -13,11 +13,11 @@ class TooncesWelcomeDomDocumentResource extends NestedDomDocumentResource {
         $pathNode = $configXml->getElementsByTagName('html_resource_path')->item(0);
         $path = $pathNode->nodeValue;
 
-        $fileName = 'toonces_welcome.html';
+        $fileName = 'toonces_404.html';
         $innerDomDocument = new DOMDocument();
         $innerDomDocument->load($path . $fileName);
 
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
+        $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
 
         return $innerDomDocument;
     }

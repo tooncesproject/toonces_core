@@ -14,7 +14,7 @@ include_once LIBPATH . 'php/renderer/interface/iRenderer.php';
 include_once LIBPATH . 'php/utility/SessionManager.php';
 include_once LIBPATH . 'php/utility/static/GrabParentResourceId.php';
 include_once LIBPATH . 'php/utility/static/CheckResourceUserAccess.php';
-include_once LIBPATH . 'php/resource/abstract/ApiResource.php';
+include_once LIBPATH . 'php/resource/abstract/Resource.php';
 include_once LIBPATH . 'php/resource/interface/iDataResource.php';
 include_once LIBPATH . 'php/resource/abstract/DataResource.php';
 include_once LIBPATH . 'php/utility/abstract/FieldValidator.php';
@@ -45,8 +45,10 @@ include_once LIBPATH . 'php/utility/UserManager.php';
 
 include_once LIBPATH . 'php/resource/interface/iDomDocumentResource.php';
 include_once LIBPATH . 'php/resource/abstract/DomDocumentResource.php';
-include_once LIBPATH . 'php/resource/abstract/SimpleDomDocumentResource.php';
+include_once LIBPATH . 'php/resource/interface/iNestedDomDocumentResource.php';
+include_once LIBPATH . 'php/resource/abstract/NestedDomDocumentResource.php';
 include_once LIBPATH . 'php/resource/defaults/TooncesWelcomeDomDocumentResource.php';
+include_once LIBPATH . 'php/resource/defaults/Toonces404DomDocumentResource.php';
 
 // custom
 include_once LIBPATH . 'custom/toonces_custom.php';

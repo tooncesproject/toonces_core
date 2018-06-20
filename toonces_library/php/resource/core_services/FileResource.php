@@ -11,7 +11,7 @@
 
 include_once LIBPATH . 'php/toonces.php';
 
-class FileResource extends ApiResource implements iFileResource {
+class FileResource extends Resource implements iFileResource {
 
     var $resourcePath;
     var $requestPath;

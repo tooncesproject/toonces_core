@@ -26,6 +26,8 @@ abstract class SqlDependentTestCase extends TestCase
         $_SERVER['QUERY_STRING'] = '';
         $_SERVER['HTTP_USER_AGENT'] = '';
         $_SERVER['REMOTE_ADDR'] = null;
+        $_SERVER['HTTP_HOST'] = 'example.com';
+
     }
 
     final public function getConnection() {
@@ -171,4 +173,6 @@ SQL;
         $_SERVER['PHP_AUTH_USER'] = $GLOBALS['NON_ADMIN_USERNAME'];
         $_SERVER['PHP_AUTH_PW'] = $GLOBALS['NON_ADMIN_PASSWORD'];
     }
+
+
 }

@@ -18,9 +18,9 @@ class CheckResourceUserAccessTest extends SqlDependentTestCase {
     public function testCheckUserAccess() {
         // ARRANGE
         // This requires a database fixture with an admin and non-admin user.
-        $conn = $this->getConnection();
         $this->destroyTestDatabase();
         $this->buildTestDatabase();
+        $conn = $this->getConnection();
         $nonAdminUserId = $this->createNonAdminUser();
 
         $sql = "SELECT user_id FROM users WHERE email = :email";
@@ -117,5 +117,6 @@ SQL;
         // Non-admin write access to unpublished resource without permissions
         $this->assertFalse($noPermissionWriteResult);
 
+        $this->destroyTestDatabase();
     }
 }

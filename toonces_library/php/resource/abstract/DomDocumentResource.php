@@ -13,6 +13,12 @@ require_once LIBPATH . 'php/toonces.php';
 
 abstract class DomDocumentResource extends Resource implements iDomDocumentResource {
 
+    public function getAction() {
+
+        $this->resourceData = $this->composeDomDocument();
+        return $this->resourceData;
+    }
+
     /**
      * @throws Exception
      */
