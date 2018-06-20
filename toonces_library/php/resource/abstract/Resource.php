@@ -50,13 +50,14 @@ abstract class Resource implements iResource {
         return $this->httpStatus;
     }
 
-
     function connectSql(){
         if (!isset($this->conn))
             $this->conn = UniversalConnect::doConnect();
     }
 
-
+    public function setResourceUri($uri) {
+        $this->resourceUri = $uri;
+    }
 
     function authenticateUser() {
         // Toonces Core Services API uses Basic Auth for authentication, and the same
@@ -88,11 +89,9 @@ abstract class Resource implements iResource {
      */
     public function getResource() {
 
-        $this->connectSql();
-
-        // Get the resource URI if it hasn't already been set externally
+        // Set the resource URI to empty if it hasn't already been set externally.
         if (!$this->resourceUri)
-            $this->resourceUri = GrabResourceURL::getURL($this->resourceId, $this->conn);
+            $this->resourceUri = '';
 
         // Build the full URL path
         $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';

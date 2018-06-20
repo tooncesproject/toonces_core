@@ -7,15 +7,10 @@
 class TooncesWelcomeDomDocumentResource extends NestedDomDocumentResource {
 
     function getInnerDomDocument() {
-        $configXml = new DOMDocument();
-        $configXml->load(ROOTPATH . 'toonces-config.xml');
 
-        $pathNode = $configXml->getElementsByTagName('html_resource_path')->item(0);
-        $path = $pathNode->nodeValue;
-
-        $fileName = 'toonces_welcome.html';
+        $fileName = LIBPATH . 'html/toonces_welcome.html';
         $innerDomDocument = new DOMDocument();
-        $innerDomDocument->load($path . $fileName);
+        $innerDomDocument->load($fileName);
 
         $this->httpStatus = Enumeration::getOrdinal('HTTP_200_OK', 'EnumHTTPResponse');
 

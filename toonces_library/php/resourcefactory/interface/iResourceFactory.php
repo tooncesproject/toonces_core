@@ -13,8 +13,8 @@ require_once LIBPATH . '/php/toonces.php';
 
 interface iResourceFactory {
     /**
-     * @param $paramResourceUri
+     * @param $resourceUri
      * @return iResource
      */
-    public function makeResource($paramResourceUri);
+    public function makeResource($resourceUri);
 }

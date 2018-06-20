@@ -7,15 +7,10 @@
 class Toonces404DomDocumentResource extends NestedDomDocumentResource {
 
     function getInnerDomDocument() {
-        $configXml = new DOMDocument();
-        $configXml->load(ROOTPATH . 'toonces-config.xml');
 
-        $pathNode = $configXml->getElementsByTagName('html_resource_path')->item(0);
-        $path = $pathNode->nodeValue;
-
-        $fileName = 'toonces_404.html';
+        $fileName = LIBPATH . 'html/toonces_404.html';
         $innerDomDocument = new DOMDocument();
-        $innerDomDocument->load($path . $fileName);
+        $innerDomDocument->load($fileName);
 
         $this->httpStatus = Enumeration::getOrdinal('HTTP_404_NOT_FOUND', 'EnumHTTPResponse');
 

@@ -8,6 +8,12 @@ abstract class NestedDomDocumentResource extends DomDocumentResource implements 
 {
 
     /**
+     * @var string
+     * tryna make this testable
+     */
+    public $htmlResourcePath;
+
+    /**
      * @return DOMDocument
      *
      * Default behavior is to use the template specified in toonces-config.xml.
@@ -19,12 +25,15 @@ abstract class NestedDomDocumentResource extends DomDocumentResource implements 
         $configXml = new DOMDocument();
         $configXml->load(ROOTPATH . 'toonces-config.xml');
 
-        $pathNode = $configXml->getElementsByTagName('html_resource_path')->item(0);
-        $path = $pathNode->nodeValue;
+        if (!$this->htmlResourcePath) {
+            $pathNode = $configXml->getElementsByTagName('html_resource_path')->item(0);
+            $this->htmlResourcePath = $pathNode->nodeValue;
+        }
+
         $fileNameNode = $configXml->getElementsByTagName('default_page_template')->item(0);
         $fileName = $fileNameNode->nodeValue;
 
-        $templateFilePath = $path . $fileName;
+        $templateFilePath = $this->htmlResourcePath . $fileName;
 
         $templateDomDocument = new DOMDocument();
         $templateDomDocument->load($templateFilePath);

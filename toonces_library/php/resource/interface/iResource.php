@@ -28,4 +28,10 @@ interface iResource
     public function getHttpStatus();
 
     public function render();
+
+    /**
+     * @param string $uri
+     */
+    public function setResourceUri($uri);
+
 }

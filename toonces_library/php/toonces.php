@@ -43,6 +43,7 @@ include_once LIBPATH . 'php/utility/static/GrabResourceURL.php';
 include_once LIBPATH . 'php/utility/static/GrabParentResourceURL.php';
 include_once LIBPATH . 'php/utility/UserManager.php';
 
+include_once LIBPATH . 'php/renderer/DomDocumentRenderer.php';
 include_once LIBPATH . 'php/resource/interface/iDomDocumentResource.php';
 include_once LIBPATH . 'php/resource/abstract/DomDocumentResource.php';
 include_once LIBPATH . 'php/resource/interface/iNestedDomDocumentResource.php';

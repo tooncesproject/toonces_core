@@ -18,30 +18,32 @@ class TooncesResourceFactory implements iResourceFactory {
     public $conn;
 
 
-    public function makeResource($paramResourceUri) {
+    public function makeResource($resourceUri) {
         if (!$this->conn)
             $this->conn = UniversalConnect::doConnect();
 
-        $resourceId = $this->getResourceId($paramResourceUri);
-        return $this->getResourceById($resourceId);
+        $resourceId = $this->getResourceId($resourceUri);
+        $resource = $this->getResourceById($resourceId);
+        $resource->setResourceUri($resourceUri);
+        return $resource;
 
     }
 
 
     /**
-     * @param string $paramPathString
+     * @param string $pathString
      * @return int
      */
-    private function getResourceId($paramPathString) {
+    private function getResourceId($pathString) {
 
         $defaultPage = 1;
         $depthCount = 0;
 
         // return home resource if no path string
-        if (trim($paramPathString) == '') {
+        if (trim($pathString) == '') {
             return $defaultPage;
         } else {
-            $pathArray = explode('/', $paramPathString);
+            $pathArray = explode('/', $pathString);
 
             // recursively query pages tables until end is reached
             $resourceId = SearchPathString::grabResourceId($pathArray, $defaultPage, $depthCount, $this->conn);
@@ -52,10 +54,10 @@ class TooncesResourceFactory implements iResourceFactory {
 
 
     /**
-     * @param $paramResourceId
+     * @param $resourceId
      * @return iResource
      */
-    private function getResourceById($paramResourceId) {
+    private function getResourceById($resourceId) {
         $sql = <<<SQL
         SELECT
             resource_class
@@ -66,7 +68,7 @@ class TooncesResourceFactory implements iResourceFactory {
 SQL;
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['resourceId' => $paramResourceId]);
+        $stmt->execute(['resourceId' => $resourceId]);
         $result = $stmt->fetchAll();
 
         if ($result) {
@@ -76,18 +78,18 @@ SQL;
         }
 
         $resource = $this->dynamicallyInstantiateResource($resourceClassName);
-        $resource->setResourceId($paramResourceId);
+        $resource->setResourceId($resourceId);
 
         return $resource;
 
     }
 
     /**
-     * @param string $paramResourceClassName
+     * @param string $resourceClassName
      * @return iResource
      */
-    private function dynamicallyInstantiateResource($paramResourceClassName) {
-        return new $paramResourceClassName;
+    private function dynamicallyInstantiateResource($resourceClassName) {
+        return new $resourceClassName;
     }
 
     private function getDefault404ResourceClassName() {
