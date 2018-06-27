@@ -43,11 +43,12 @@ include_once LIBPATH . 'php/utility/static/GrabResourceURL.php';
 include_once LIBPATH . 'php/utility/static/GrabParentResourceURL.php';
 include_once LIBPATH . 'php/utility/UserManager.php';
 
+include_once LIBPATH . 'php/utility/dom_document_composer/interface/iDomDocumentComposer.php';
+include_once LIBPATH . 'php/utility/dom_document_composer/NestedDomDocumentComposer.php';
+
 include_once LIBPATH . 'php/renderer/DomDocumentRenderer.php';
 include_once LIBPATH . 'php/resource/interface/iDomDocumentResource.php';
 include_once LIBPATH . 'php/resource/abstract/DomDocumentResource.php';
-include_once LIBPATH . 'php/resource/interface/iNestedDomDocumentResource.php';
-include_once LIBPATH . 'php/resource/abstract/NestedDomDocumentResource.php';
 include_once LIBPATH . 'php/resource/defaults/TooncesWelcomeDomDocumentResource.php';
 include_once LIBPATH . 'php/resource/defaults/Toonces404DomDocumentResource.php';
 
