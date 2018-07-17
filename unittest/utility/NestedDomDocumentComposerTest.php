@@ -18,6 +18,8 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
         $ddc = new NestedDomDocumentComposer();
         $ddc->resourceClient = new LocalResourceClient();
         $outerDomDocument = new DOMDocument();
+        $implementation = new DOMImplementation();
+        $outerDomDocument->appendChild($implementation->createDocumentType('html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"'));
         $outerNode = $outerDomDocument->createElement('div');
         $outerDomDocument->appendChild($outerNode);
 
@@ -25,16 +27,21 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
         $outerContentElement->setAttribute('id', 'toonces-content');
         $outerNode->appendChild($outerContentElement);
         $outerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'outer.html';
+        $outerDomDocument->saveXML();
+
         $outerDomDocument->save($outerDomDocumentPath);
 
 
         $innerDomDocument = new DOMDocument();
+        $innerDomDocument->appendChild($implementation->createDocumentType('html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"'));
         $innerContentElement = $innerDomDocument->createElement('div');
         $contentValue = 'this is the text content of the document';
         $innerContentElement->nodeValue = $contentValue;
         $innerContentElement->setAttribute('id', 'toonces-content');
         $innerDomDocument->appendChild($innerContentElement);
         $innerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'inner.html';
+        $innerDomDocument->saveXML();
+        //$innerDomDocument->saveXML($innerContentElement);
         $innerDomDocument->save($innerDomDocumentPath);
 
         $ddc->outerDomDocumentUrl = $outerDomDocumentPath;
@@ -42,9 +49,9 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
 
         // ACT
         $composedDocument = $ddc->composeDomDocument();
-        $composedDocument->validate();
-        $composedContentElement = $composedDocument->getElementById('toonces-content');
-        //die($composedDocument->saveHTML());
+        //$composedDocument->validate();
+        //die($composedDocument->saveHTML());$composedContentElement = $composedDocument->getElementById('toonces-content');
+        die($composedDocument->saveXML());
         $composedContentValue = $composedContentElement->nodeValue;
         $composedOuterNodeList = $composedDocument->getElementsByTagName('outer_node');
 
@@ -53,6 +60,9 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
         $this->assertEquals(1, $composedOuterNodeList->count());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testOuterDomDocumentOnly() {
         // ARRANGE
         $ddc = new NestedDomDocumentComposer();
@@ -75,8 +85,8 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
     public function testNoContentElementException() {
         // ARRANGE
         $ddc = new NestedDomDocumentComposer();
-        $outerDomDocument = new DOMDocument();
-        $innerDomDocument = new DOMDocument();
+        //$outerDomDocument = new DOMDocument();
+        //$innerDomDocument = new DOMDocument();
 
         // ACT
         $ddc->composeDomDocument();
