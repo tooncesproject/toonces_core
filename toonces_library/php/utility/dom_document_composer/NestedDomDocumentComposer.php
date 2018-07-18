@@ -113,9 +113,13 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
         $domString = $this->resourceClient->get($fileUrl, $this->clientUsername, $this->clientPassword, $this->clientHeaders);
         $domDocument = new DOMDocument();
 
-        //$domDocument->loadHTML($domString);
-        $domDocument->loadXML($domString);
-        $domDocument->saveXML();
+        // Will this help?
+        $domDocument->validateOnParse = true;
+
+        $domDocument->loadHTML($domString);
+        //$domDocument->loadXML($domString);
+        //$domDocument->saveXML();
+        $domDocument->saveHTML();
         return $domDocument;
     }
 
