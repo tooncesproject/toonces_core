@@ -38,28 +38,15 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
     public function composeDomDocument() {
 
         $this->outerDomDocument = $this->loadDomDocumentFromFile($this->outerDomDocumentUrl);
-        //echo $this->outerDomDocument->saveHTML();
-
-        // TODO remove this
-        $this->outerDomDocument->save($this->outerDomDocumentUrl);
 
 
         if ($this->innerDomDocumentUrl)
             $this->innerDomDocument = $this->loadDomDocumentFromFile($this->innerDomDocumentUrl);
 
-        // TODO remove this
-        $this->outerDomDocument->save($this->outerDomDocumentUrl);
-
 
         //$this->checkContentElementIds();
-        // TODO remove this
-        $this->outerDomDocument->save($this->outerDomDocumentUrl);
-
 
         $this->validateDomDocuments();
-
-        // TODO remove this
-        $this->outerDomDocument->save($this->outerDomDocumentUrl);
 
 
 
@@ -67,34 +54,19 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
             $innerContentElement = $this->innerDomDocument->getElementById('toonces-content');
             //die(var_dump($innerContentElement->textContent));
 
-            // TODO remove this
-            $this->outerDomDocument->save($this->outerDomDocumentUrl);
-
-
 
             $outerContentElement = $this->outerDomDocument->getElementById('toonces-content');
-
-            // TODO remove this
-            $this->outerDomDocument->save($this->outerDomDocumentUrl);
 
 
 
             $outerParentElement = $outerContentElement->parentNode;
 
-            // TODO remove this
-            $this->outerDomDocument->save($this->outerDomDocumentUrl);
 
 
             $importedElement = $this->outerDomDocument->importNode($innerContentElement, true);
 
-            // TODO remove this
-            $this->outerDomDocument->save($this->outerDomDocumentUrl);
-
             $outerParentElement->replaceChild($importedElement,$outerContentElement);
         }
-
-        // TODO remove this
-        $this->outerDomDocument->save($this->outerDomDocumentUrl);
 
         return $this->outerDomDocument;
 
@@ -114,12 +86,17 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
         $domDocument = new DOMDocument();
 
         // Will this help?
-        $domDocument->validateOnParse = true;
+        //$domDocument->validateOnParse = true;
 
         $domDocument->loadHTML($domString);
         //$domDocument->loadXML($domString);
         //$domDocument->saveXML();
-        $domDocument->saveHTML();
+
+        //$domDocument->saveHTML();
+
+        $dank = $domDocument->saveHTML();
+
+
         return $domDocument;
     }
 

@@ -5,6 +5,8 @@
  */
 
 use PHPUnit\Framework\TestCase;
+
+require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
 class DomDocumentRendererTest extends TestCase {
@@ -15,7 +17,7 @@ class DomDocumentRendererTest extends TestCase {
      */
     public function testRenderResource() {
         // ARRANGE
-
+        $_SERVER['HTTP_HOST'] = 'example.com';
         $resource = new TooncesWelcomeDomDocumentResource();
         $resource->httpMethod = 'GET';
         $resource->htmlResourcePath = LIBPATH . 'html/';
