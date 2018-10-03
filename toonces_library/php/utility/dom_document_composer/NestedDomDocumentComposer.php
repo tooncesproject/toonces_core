@@ -43,7 +43,7 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
         if ($this->innerDomDocumentUrl)
             $this->innerDomDocument = $this->loadDomDocumentFromFile($this->innerDomDocumentUrl);
 
-
+        // TODO uncomment and test
         //$this->checkContentElementIds();
 
         $this->validateDomDocuments();
@@ -57,11 +57,7 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
 
             $outerContentElement = $this->outerDomDocument->getElementById('toonces-content');
 
-
-
             $outerParentElement = $outerContentElement->parentNode;
-
-
 
             $importedElement = $this->outerDomDocument->importNode($innerContentElement, true);
 
@@ -85,16 +81,10 @@ class NestedDomDocumentComposer implements iDomDocumentComposer {
         $domString = $this->resourceClient->get($fileUrl, $this->clientUsername, $this->clientPassword, $this->clientHeaders);
         $domDocument = new DOMDocument();
 
-        // Will this help?
-        //$domDocument->validateOnParse = true;
-
         $domDocument->loadHTML($domString);
-        //$domDocument->loadXML($domString);
-        //$domDocument->saveXML();
 
-        //$domDocument->saveHTML();
-
-        $dank = $domDocument->saveHTML();
+        // Delete??
+        $domDocument->saveHTML();
 
 
         return $domDocument;

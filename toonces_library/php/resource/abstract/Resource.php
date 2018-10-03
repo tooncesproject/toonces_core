@@ -9,21 +9,41 @@
 
 include_once LIBPATH.'php/toonces.php';
 
-abstract class Resource implements iResource {
+abstract class Resource
+{
 
+    /** @var int */
     public $resourceId;
-    public $httpStatus;
-    public $parameters = array();
-    var $resourceData;
-    var $httpMethod;
-    var $resourceUrl;
-    var $resourceUri;
-    var $sessionManager;
 
-    /**
-     * @var PDO
-     */
-    var $conn;
+    /** @var iAuthenticator */
+    public $authenticator;
+
+    /** @var Responder */
+    public $getResponder;
+
+    /** @var Responder */
+    public $postResponder;
+
+    /** @var Responder */
+    public $headResponder;
+
+    /** @var Responder */
+    public $putResponder;
+
+    /** @var Responder */
+    public $deleteResponder;
+
+    /** @var Responder */
+    public $connectResponder;
+
+    /** @var Responder */
+    public $optionsResponder;
+
+    /** @var Responder */
+    public $traceResponder;
+
+    /** @var Responder */
+    public $patchResponder;
 
 
     /**
@@ -33,136 +53,194 @@ abstract class Resource implements iResource {
         $this->resourceId = $paramResourceId;
     }
 
-
     /**
      * @return int
      */
-    public function getResourceId() {
+    public function getResourceId()
+    {
         return $this->resourceId;
     }
 
-
     /**
-     * @return int
+     * @param Request $paramRequest
+     * @return Response
      */
-    public function getHttpStatus() {
+    public function processRequest($paramRequest)
+    {
 
-        return $this->httpStatus;
-    }
+        if (!$this->authenticator)
+            $this->authenticator = new DefaultAuthenticator();
 
-    function connectSql(){
-        if (!isset($this->conn))
-            $this->conn = UniversalConnect::doConnect();
-    }
+        $paramRequest->userId = $this->authenticator->authenticate($paramRequest);
 
-    public function setResourceUri($uri) {
-        $this->resourceUri = $uri;
-    }
+        $httpMethod = $paramRequest->httpMethod;
 
-    function authenticateUser() {
-        // Toonces Core Services API uses Basic Auth for authentication, and the same
-        // user structure as Toonces Admin.
-        // Returns a user ID if login valid, null if not.
-        $userId  = NULL;
+        switch ($httpMethod) {
+            case HttpMethod::GET:
+                return $this->get($paramRequest);
+                break;
 
-        $this->connectSql();
+            case HttpMethod::POST:
+                return $this->post($paramRequest);
+                break;
 
-        // If there is no SessionManager object, instantiate one now.
-        if (!$this->sessionManager)
-            $this->sessionManager = new SessionManager($this->conn);
+            case HttpMethod::HEAD:
+                return $this->head($paramRequest);
+                break;
 
-        if (array_key_exists('PHP_AUTH_USER', $_SERVER) && array_key_exists('PHP_AUTH_PW', $_SERVER) ) {
-            $email = $_SERVER['PHP_AUTH_USER'];
-            $pw = $_SERVER['PHP_AUTH_PW'];
-            $loginSuccess = $this->sessionManager->login($email, $pw, $this->resourceId);
-            if ($loginSuccess)
-                $userId = $this->sessionManager->userId;
+            case HttpMethod::PUT:
+                return $this->put($paramRequest);
+                break;
+
+            case HttpMethod::DELETE:
+                return $this->delete($paramRequest);
+                break;
+
+            case HttpMethod::CONNECT:
+                return $this->connect($paramRequest);
+                break;
+
+            case HttpMethod::OPTIONS:
+                return $this->options($paramRequest);
+                break;
+
+            case HttpMethod::TRACE:
+                return $this->trace($paramRequest);
+                break;
+
+            case HttpMethod::PATCH:
+                return $this->patch($paramRequest);
+                break;
         }
 
-        return $userId;
     }
 
 
     /**
-     * @return mixed
+     * @param Request $paramRequest
+     * @return Response
      * @throws Exception
      */
-    public function getResource() {
+    public function get($paramRequest)
+    {
+        if (!$this->getResponder)
+            $this->getResponder = new DefaultResponder($this);
 
-        // Set the resource URI to empty if it hasn't already been set externally.
-        if (!$this->resourceUri)
-            $this->resourceUri = '';
-
-        // Build the full URL path
-        $scheme = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https://' : 'http://';
-        $this->resourceUrl = $scheme . $_SERVER['HTTP_HOST'] . '/' . $this->resourceUri;
-
-        // Acquire the HTTP verb from the server if not set externally.
-        if (!$this->httpMethod)
-            $this->httpMethod = $_SERVER['REQUEST_METHOD'];
-
-        // Act depending on the HTTP verb.
-        // Note: Not using a switch statement here to preserve object state.
-        if ($this->httpMethod == 'GET')
-            $this->getAction();
-            elseif ($this->httpMethod == 'POST')
-                $this->postAction();
-            elseif ($this->httpMethod == 'HEAD')
-                $this->headAction();
-            elseif ($this->httpMethod == 'PUT')
-                $this->putAction();
-            elseif ($this->httpMethod == 'OPTIONS')
-                $this->optionsAction();
-            elseif ($this->httpMethod == 'DELETE')
-                $this->deleteAction();
-            elseif ($this->httpMethod == 'CONNECT')
-                $this->connectAction();
-            else
-                throw new Exception('Error: DataResource object getResource() was called without a valid HTTP verb ($httpMethod). Supported methods are GET, POST, HEAD, PUT, OPTIONS, DELETE, CONNECT.');
-
-        return $this->resourceData;
+        $response = $this->getResponder->respond($paramRequest);
+        $response->render();
+        return $response;
     }
 
-    public function getAction() {
-        // Override to define the resource's response to a GET request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function post($paramRequest)
+    {
+        if (!$this->postResponder)
+            $this->postResponder = new DefaultResponder($this);
+
+        $response = $this->postResponder->respond($paramRequest);
+        return $response;
     }
 
-    public function postAction() {
-        // Override to define the resource's response to a POST request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function head($paramRequest)
+    {
+        if (!$this->headResponder)
+            $this->headResponder = new DefaultResponder($this);
+
+        $response = $this->headResponder->respond($paramRequest);
+        return $response;// Override to define the resource's response to a HEAD request.
     }
 
-    public function headAction() {
-        // Override to define the resource's response to a HEAD request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function put($paramRequest)
+    {
+        if (!$this->putResponder)
+            $this->putResponder = new DefaultResponder($this);
+
+        $response = $this->putResponder->respond($paramRequest);
+        return $response;
     }
 
-    public function putAction() {
-        // Override to define the resource's response to a PUT request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function delete($paramRequest)
+    {
+        if (!$this->deleteResponder)
+            $this->deleteResponder = new DefaultResponder($this);
+
+        $response = $this->deleteResponder->respond($paramRequest);
+        return $response;
     }
 
-    public function deleteAction() {
-        // Override to define the resource's response to a DELETE request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function connect($paramRequest)
+    {
+        if (!$this->connectResponder)
+            $this->connectResponder = new DefaultResponder($this);
+
+        $response = $this->connectResponder->respond($paramRequest);
+        return $response;
     }
 
-    public function connectAction() {
-        // Override to define the resource's response to a CONNECT request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function options($paramRequest)
+    {
+        if (!$this->optionsResponder)
+            $this->optionsResponder = new DefaultResponder($this);
+
+        $response = $this->optionsResponder->respond($paramRequest);
+        return $response;
     }
 
-    public function optionsAction() {
-        // Override to define the resource's response to a OPTIONS request.
-        // Default behavior is a 'method not allowed' error (if it isn't implemented).
-        $this->httpStatus = Enumeration::getOrdinal('HTTP_405_METHOD_NOT_ALLOWED', 'EnumHTTPResponse');
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function trace($paramRequest)
+    {
+        if (!$this->traceResponder)
+            $this->traceResponder = new DefaultResponder($this);
+
+        $response = $this->traceResponder->respond($paramRequest);
+        return $response;
+    }
+
+
+    /**
+     * @param Request $paramRequest
+     * @return Response
+     */
+    public function patch($paramRequest)
+    {
+        if (!$this->patchResponder)
+            $this->patchResponder = new DefaultResponder($this);
+
+        $response = $this->patchResponder->respond($paramRequest);
+        return $response;
     }
 
 }

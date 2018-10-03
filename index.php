@@ -38,4 +38,11 @@ $resourceFactory = makeResourceFactory();
 
 $resource = $resourceFactory->makeResource($path);
 
-$resource->render();
+// Acquire client request
+$request = StaticRequestFactory::getActiveRequest();
+
+// get Response
+$response = $resource->processRequest($request);
+
+// Render response
+$response->render();

@@ -18,38 +18,6 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
         $ddc = new NestedDomDocumentComposer();
         $ddc->resourceClient = new LocalResourceClient();
 
-
-        /* Nope
-        $outerDomDocument = new DOMDocument();
-        $implementation = new DOMImplementation();
-        $outerDomDocument->appendChild($implementation->createDocumentType('html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"'));
-        $outerNode = $outerDomDocument->createElement('div');
-        $outerDomDocument->appendChild($outerNode);
-
-        $outerContentElement = $outerDomDocument->createElement('div');
-        $outerContentElement->setAttribute('id', 'toonces-content');
-        $outerNode->appendChild($outerContentElement);
-        $outerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'outer.html';
-        $outerDomDocument->saveXML();
-
-        $outerDomDocument->save($outerDomDocumentPath);
-
-
-        $innerDomDocument = new DOMDocument();
-        $innerDomDocument->appendChild($implementation->createDocumentType('html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"'));
-        $innerContentElement = $innerDomDocument->createElement('div');
-        $contentValue = 'this is the text content of the document';
-        $innerContentElement->nodeValue = $contentValue;
-        $innerContentElement->setAttribute('id', 'toonces-content');
-        $innerDomDocument->appendChild($innerContentElement);
-        $innerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'inner.html';
-        $innerDomDocument->saveXML();
-        //$innerDomDocument->saveXML($innerContentElement);
-        $innerDomDocument->save($innerDomDocumentPath);
-        */
-
-
-
         $outerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'outer.html';
         $innerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'inner.html';
 
@@ -59,13 +27,6 @@ class NestedDomDocumentComposerTest extends FileDependentTestCase {
         <html><body><div><div id="toonces-content"></div></div>
         </body></html>
 HTML;
-        /*
-        $outerDocumentString = <<<HTML
-        <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
-        <html><body><div><div id="toonces-content"></div></div>
-        </body></html>
-HTML;
-        */
 
         $innerDocumentString = <<<HTML
         <div id="toonces-content">this is the text content of the document</div>
@@ -83,15 +44,6 @@ HTML;
         // ACT
         $composedDocument = $ddc->composeDomDocument();
 
-        //die($composedDocument->saveHTML());
-        //$composedDocument->saveXML();
-        //$composedDocument->validate();
-        //$composedDocument->saveHTML();
-        //$composedContentElement = $composedDocument->getElementById('toonces-content');
-        //die($composedDocument->saveXML());
-        //die($composedDocument->saveHTML());
-
-
         // get it with xpath
         $xpath = new DOMXPath($composedDocument);
         $xpathQuery = "//div[@id='toonces-content']";
@@ -99,11 +51,9 @@ HTML;
         $composedContentElement = $domNodeList->item(0);
 
         $composedContentValue = $composedContentElement->nodeValue;
-        //$composedOuterNodeList = $composedDocument->getElementsByTagName('outer_node');
 
         // ASSERT
         $this->assertSame($contentValue, $composedContentValue);
-        //$this->assertEquals(1, $composedOuterNodeList->count());
     }
 
     /**
@@ -114,24 +64,7 @@ HTML;
         $ddc = new NestedDomDocumentComposer();
         $ddc->resourceClient = new LocalResourceClient();
 
-        /*
-         * $outerDomDocument = new DOMDocument();
-        $outerNode = new DOMNode();
-        //$outerNode->nodeName = 'outer_node';
-        $outerDomDocument->appendChild($outerNode);
-        */
 
-        /*
-        $outerDomDocument = new DOMDocument();
-        $implementation = new DOMImplementation();
-        $outerDomDocument->appendChild($implementation->createDocumentType('html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"'));
-        $outerNode = $outerDomDocument->createElement('div');
-        $outerDomDocument->appendChild($outerNode);
-
-        $outerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'outer.html';
-        $htmlBefore = $outerDomDocument->saveHTML();
-        $outerDomDocument->save($outerDomDocumentPath);
-        */
 
         $outerDomDocumentPath = $GLOBALS['TEST_FILE_PATH'] . 'outer.html';
         $outerDocumentString = <<<HTML
@@ -169,6 +102,7 @@ HTML;
         // ARRANGE
         $ddc = new NestedDomDocumentComposer();
 
+        // TODO test with document URIs
         //$outerDomDocument = new DOMDocument();
         //$innerDomDocument = new DOMDocument();
 

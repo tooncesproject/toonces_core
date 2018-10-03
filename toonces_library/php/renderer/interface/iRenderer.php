@@ -13,14 +13,8 @@ interface iRenderer
 {
 
     /**
-     * @param iResource $resource
-     * @return int
+     * @param Resource $resource
      */
-    public function sendHttpStatusHeader($resource);
-
-    /**
-     * @param iResource $resource
-     */
-    public function renderResource($resource);
+    public function render($resource);
 
 }

@@ -11,21 +11,29 @@
 
 require_once LIBPATH . 'php/toonces.php';
 
-abstract class Renderer implements iRenderer {
+abstract class Renderer implements iRenderer
+{
 
     /**
-     * @param iResource $resource
-     * @throws Exception
+     * @param Response $response
      */
-    public function sendHttpStatusHeader($resource) {
+    public function render($response)
+    {
+        http_response_code($response->responseCode);
 
-        $httpStatus = $resource->getHttpStatus();
-        $statusString = strval($httpStatus);
-        if (!$statusString)
-            throw new Exception('Programming Error: Resource objects must have the httpStatus variable set before rendering.');
+        foreach ($response->responseHeaders as $key => $value)
+        {
+            header($key . ':' . $value);
+        }
 
-        header($statusString, true, $httpStatus);
+        $this->transmitBody($response->responseData);
 
+    }
+
+
+    public function transmitBody($body)
+    {
+        echo $body;
     }
 
 }
