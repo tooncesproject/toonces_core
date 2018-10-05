@@ -14,6 +14,7 @@ include_once LIBPATH . 'php/Response.php';
 include_once LIBPATH . 'php/Responder.php';
 
 include_once LIBPATH . 'php/DefaultResponse.php';
+include_once LIBPATH . 'php/iResponder.php';
 include_once LIBPATH . 'php/DefaultResponder.php';
 include_once LIBPATH . 'php/HelloWorldResponder.php';
 
