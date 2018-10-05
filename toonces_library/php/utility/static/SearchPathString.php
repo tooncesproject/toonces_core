@@ -17,6 +17,7 @@ class SearchPathString {
         $pageFound = false;
         $descendantResourceId = null;
 
+        // Get pathnames of descendant pages
         $sql = <<<SQL
         SELECT
 	       rhb.descendant_resource_id,

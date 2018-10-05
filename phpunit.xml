@@ -18,26 +18,5 @@ Initial Commit: Paul Anderson, 12/11/2017
 		<testsuite name="installers">
 			<file>unittest/install/SetupDatabaseTest.php</file>
 		</testsuite>
-		<testsuite name="renderers">
-			<file>unittest/resource/RendererTest.php</file>
-			<file>unittest/resource/JsonRendererTest.php</file>
-			<file>unittest/resource/FileRendererTest.php</file>
-		</testsuite>
-		<testsuite name="resources">
-			<file>unittest/resource/ApiResourceTest.php</file>
-			<file>unittest/resource/DataResourceTest.php</file>
-			<file>unittest/resource/HtmlResourceTest.php</file>
-			<file>unittest/resource/HtmlViewResourceTest.php</file>
-			<file>unittest/resource/FileResourceTest.php</file>
-			<file>unittest/resource/PageDataResourceTest.php</file>
-			<file>unittest/resource/ExtHtmlPageDataResourceTest.php</file>
-		</testsuite>
-		<testsuite name="utility_classes">
-			<file>unittest/utility/CheckPageUserAccessTest.php</file>
-			<file>unittest/utility/GrabParentResourceIdTest.php</file>
-			<file>unittest/utility/LocalResourceClientTest.php</file>
-			<file>unittest/utility/HtmlFieldValidatorTest.php</file>
-			<file>unittest/utility/ApiDataValidatorTest.php</file>
-		</testsuite>
 	</testsuites>
 </phpunit>

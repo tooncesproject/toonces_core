@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <toonces_settings>
-	<resource_factory_class>TooncesResourceFactory</resource_factory_class>
+	<resource_factory_class>XmlResourceFactory</resource_factory_class>
 	<resource_404_class>Toonces404DomDocumentResource</resource_404_class>
 	<sql_host>127.0.0.1</sql_host>
 	<sql_port>3306</sql_port>
