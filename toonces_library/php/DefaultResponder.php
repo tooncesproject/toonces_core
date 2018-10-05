@@ -9,7 +9,7 @@ class DefaultResponder extends Responder
 {
     public function respond($paramRequest) {
         return new DefaultResponse(
-            new HttpResponseCode(HttpResponseCode::HTTP_405_METHOD_NOT_ALLOWED),
+            405,
             null,
             null
         );

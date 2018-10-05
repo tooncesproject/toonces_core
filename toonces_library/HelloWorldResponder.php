@@ -19,7 +19,7 @@ class HelloWorldResponder extends Responder
 
 HTML;
 
-        $response = new DefaultResponse(HttpResponseCode(HttpResponseCode::HTTP_200_OK), null, $html);
+        $response = new DefaultResponse(200, null, $html);
         return $response;
     }
 }

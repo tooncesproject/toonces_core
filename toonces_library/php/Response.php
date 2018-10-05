@@ -14,7 +14,7 @@ abstract class Response
 
     /**
      * Response constructor.
-     * @param HttpResponseCode $paramResponseCode
+     * @param int $paramResponseCode
      * @param array $paramResponseHeaders
      * @param $paramResponseData
      */
