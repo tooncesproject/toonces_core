@@ -75,7 +75,7 @@ class XmlResourceFactory implements iResourceFactory
         foreach ($startingElement->childNodes as $childNode) {
             if (get_class($childNode) == 'DOMElement') {
                 if ($childNode->getAttribute('pathname') == $pathArray[$depthCount]) {
-                    $descendantResourceId = $childNode->getAttribute('id');
+                    $descendantResourceId = $childNode->getAttribute('xml:id');
                     $pageFound = true;
                     break;
                 }
