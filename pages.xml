@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pages>
-    <page title="Hello World!" pathname="" xml:id="0" resource_class="HelloWorldResource"/>
+    <page title="Hello World!" pathname="" xml:id="0" resource_class="HelloWorldResource">
         <page title="Another Page" pathname="another_page" xml:id="1" resource_class="HelloWorldResource" />
         <page title="Yet Another Page" pathname="yet_another_page" xml:id="2" resource_class="HelloWorldResource" />
+    </page>
 </pages>
