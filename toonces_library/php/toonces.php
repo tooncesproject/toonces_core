@@ -1,6 +1,6 @@
 <?php
 
-include_once LIBPATH . 'php/enum/HttpMethod.php';
+//include_once LIBPATH . 'php/enum/HttpMethod.php';
 //include_once LIBPATH . 'php/enum/HttpResponseCode.php';
 include_once LIBPATH . 'php/Request.php';
 include_once LIBPATH . 'php/utility/static/SearchPathString.php';

@@ -23,7 +23,7 @@ class Request
     /**
      * Request constructor.
      * @param array $paramHeaders
-     * @param HttpMethod $paramHttpMethod
+     * @param string $paramHttpMethod
      * @param string $paramUri
      * @param array $paramParameters
      * @param string $paramBody

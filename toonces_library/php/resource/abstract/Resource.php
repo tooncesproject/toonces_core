@@ -76,39 +76,40 @@ abstract class Resource
         $httpMethod = $paramRequest->httpMethod;
 
         switch ($httpMethod) {
-            case HttpMethod::GET:
+
+            case 'GET':
                 return $this->get($paramRequest);
                 break;
 
-            case HttpMethod::POST:
+            case 'POST':
                 return $this->post($paramRequest);
                 break;
 
-            case HttpMethod::HEAD:
+            case 'HEAD':
                 return $this->head($paramRequest);
                 break;
 
-            case HttpMethod::PUT:
+            case 'PUT':
                 return $this->put($paramRequest);
                 break;
 
-            case HttpMethod::DELETE:
+            case 'DELETE':
                 return $this->delete($paramRequest);
                 break;
 
-            case HttpMethod::CONNECT:
+            case 'CONNECT':
                 return $this->connect($paramRequest);
                 break;
 
-            case HttpMethod::OPTIONS:
+            case 'OPTIONS':
                 return $this->options($paramRequest);
                 break;
 
-            case HttpMethod::TRACE:
+            case 'TRACE':
                 return $this->trace($paramRequest);
                 break;
 
-            case HttpMethod::PATCH:
+            case 'PATCH':
                 return $this->patch($paramRequest);
                 break;
         }
