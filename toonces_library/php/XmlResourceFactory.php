@@ -14,9 +14,12 @@ class XmlResourceFactory implements iResourceFactory
     {
         $xml = new DOMDocument();
         $xml->load(ROOTPATH.'pages.xml');
+        $xml->validate();
         $resourceId = $this->getResourceId($resourceUri);
-        if ($resourceId) {
-            $resourceClass = $xml->getElementById($resourceId);
+        if (!is_null($resourceId)) {
+            $resourceElement = $xml->getElementById($resourceId);
+            $resourceClass = $resourceElement->getAttribute('resource_class');
+
         } else {
             $resourceClass = $this->getDefault404ResourceClassName();
         }

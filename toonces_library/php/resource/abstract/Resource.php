@@ -128,7 +128,6 @@ abstract class Resource
             $this->getResponder = new DefaultResponder($this);
 
         $response = $this->getResponder->respond($paramRequest);
-        $response->render();
         return $response;
     }
 
