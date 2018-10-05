@@ -73,10 +73,12 @@ class XmlResourceFactory implements iResourceFactory
 
         // Get pathnames of descendant pages
         foreach ($startingElement->childNodes as $childNode) {
-            if ($childNode->getAttribute('pathname') == $pathArray[$depthCount]) {
-                $descendantResourceId = $childNode->getAttribute('id');
-                $pageFound = true;
-                break;
+            if (get_class($childNode) == 'DOMElement') {
+                if ($childNode->getAttribute('pathname') == $pathArray[$depthCount]) {
+                    $descendantResourceId = $childNode->getAttribute('id');
+                    $pageFound = true;
+                    break;
+                }
             }
         }
 
