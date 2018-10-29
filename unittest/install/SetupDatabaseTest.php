@@ -15,9 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../setupTooncesDatabase.php';
-require_once __DIR__ . '../../SqlDependentTestCase.php';
-
-class SetupTooncesDatabaseTest extends SqlDependentTestCase {
+require_once __DIR__ . '../../TooncesTestCase.phplass SetupTooncesDatabaseTest extends TooncesTestCase {
     
     public function testSetupDatabase() {
         

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author paulanderson
- * SqlDependentTestCase
+ * TooncesTestCase
  * Initial commit: Paul Anderson, 4/20/2018
  *
  * Provides a static PDO object factory for unit testing.
@@ -11,16 +11,15 @@
  */
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\DbUnit\TestCaseTrait;
-require_once __DIR__ . '/../setupTooncesDatabase.php';
 
-abstract class SqlDependentTestCase extends TestCase
+abstract class TooncesTestCase extends TestCase
 {
     // only instantiate pdo once for test clean-up/fixture load
     static private $pdo = null;
     private $conn;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         // Set server variables so xdebug doesn't break the unit tests
         $_SERVER['REQUEST_METHOD'] = null;
         $_SERVER['QUERY_STRING'] = '';
@@ -29,6 +28,8 @@ abstract class SqlDependentTestCase extends TestCase
         $_SERVER['HTTP_HOST'] = 'example.com';
 
     }
+
+    /*
 
     final public function getConnection() {
         if ($this->conn === null) {
@@ -173,6 +174,6 @@ SQL;
         $_SERVER['PHP_AUTH_USER'] = $GLOBALS['NON_ADMIN_USERNAME'];
         $_SERVER['PHP_AUTH_PW'] = $GLOBALS['NON_ADMIN_PASSWORD'];
     }
-
+    */
 
 }

@@ -12,17 +12,34 @@ include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
 
 /**
- * @return iResourceFactory
+ * @param string $tagName
+ * @return string
+ */
+function getConfigNodeValue($tagName) {
+    $xml = new DOMDocument();
+    $xml->load(ROOTPATH.'settings/toonces-config.xml');
+    $resourceFactoryNode = $xml->getElementsByTagName($tagName)->item(0);
+    return $resourceFactoryNode->nodeValue;
+}
+
+/**
+ * @return iEndpointSystem
  */
 function makeResourceFactory() {
-    $xml = new DOMDocument();
-    $xml->load(ROOTPATH.'toonces-config.xml');
-    $resourceFactoryNode = $xml->getElementsByTagName('resource_factory_class')->item(0);
-    $resourceFactoryClass = $resourceFactoryNode->nodeValue;
 
+    $resourceFactoryClass = getConfigNodeValue('resource_factory_class');
     return new $resourceFactoryClass;
 
 }
+
+/**
+ * @return iEndpointSystemFactory
+ */
+function makeEndpointSystemFactory() {
+    $endpointSystemFactoryClass = getConfigNodeValue('endpoint_system_factory_class');
+    return new $endpointSystemFactoryClass;
+}
+
 
 /*************** BEHOLD THE MAGIC OF TOONCES ***************/
 

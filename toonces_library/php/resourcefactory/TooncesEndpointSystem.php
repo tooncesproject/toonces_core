@@ -10,7 +10,7 @@
 
 require_once LIBPATH . '/php/toonces.php';
 
-class TooncesResourceFactory implements iResourceFactory {
+class TooncesEndpointSystem implements iEndpointSystem {
 
     /**
      * @var PDO
@@ -18,13 +18,13 @@ class TooncesResourceFactory implements iResourceFactory {
     public $conn;
 
 
-    public function makeResource($resourceUri) {
+    public function makeResource($endpointUri) {
         if (!$this->conn)
             $this->conn = UniversalConnect::doConnect();
 
-        $resourceId = $this->getResourceId($resourceUri);
+        $resourceId = $this->getResourceId($endpointUri);
         $resource = $this->getResourceById($resourceId);
-        $resource->setResourceUri($resourceUri);
+        $resource->setResourceUri($endpointUri);
         return $resource;
 
     }

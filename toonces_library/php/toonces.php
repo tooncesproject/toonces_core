@@ -1,15 +1,18 @@
 <?php
 
-//include_once LIBPATH . 'php/enum/HttpMethod.php';
-//include_once LIBPATH . 'php/enum/HttpResponseCode.php';
+
+include_once LIBPATH . 'php/exception/TooncesException.php';
+include_once LIBPATH . 'php/exception/EndpointNotFoundException.php';
+include_once LIBPATH . 'php/exception/XmlCreateEndpointException.php';
+include_once LIBPATH . 'php/exception/XmlReadWriteException.php';
 
 include_once LIBPATH . 'php/utility/static/StaticRequestFactory.php';
 include_once LIBPATH . 'php/Request.php';
 include_once LIBPATH . 'php/utility/static/SearchPathString.php';
 
-include_once LIBPATH . 'php/resourcefactory/interface/iResourceFactory.php';
-// include_once LIBPATH . 'php/resourcefactory/TooncesResourceFactory.php';
-include_once LIBPATH . 'php/XmlResourceFactory.php';
+include_once LIBPATH . 'php/Endpoint.php';
+include_once LIBPATH . 'php/resourcefactory/interface/iEndpointSystem.php';
+include_once LIBPATH . 'php/XmlEndpointSystem.php';
 
 include_once LIBPATH . 'php/Response.php';
 include_once LIBPATH . 'php/iResponder.php';

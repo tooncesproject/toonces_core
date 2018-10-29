@@ -6,9 +6,9 @@
 
 use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
-require_once __DIR__ . '../../SqlDependentTestCase.php';
+require_once __DIR__ . '../../TooncesTestCase.php;
 
-class TooncesResourceFactoryTest extends SqlDependentTestCase
+class TooncesResourceFactoryTest extends TooncesTestCase
 {
 
     public function testMakeResource() {
@@ -17,7 +17,7 @@ class TooncesResourceFactoryTest extends SqlDependentTestCase
         $this->buildTestDatabase();
 
         $conn = $this->getConnection();
-        $resourceFactory = new TooncesResourceFactory();
+        $resourceFactory = new TooncesEndpointSystem();
         $resourceFactory->conn = $conn;
         $resourcePathname = 'test_resource';
         $resourceId = $this->createPage(true, 1, $resourcePathname);
@@ -40,7 +40,7 @@ class TooncesResourceFactoryTest extends SqlDependentTestCase
 
 
         $conn = $this->getConnection();
-        $resourceFactory = new TooncesResourceFactory();
+        $resourceFactory = new TooncesEndpointSystem();
         $resourceFactory->conn = $conn;
         $resourceUri = 'bogus_resource_uri';
 

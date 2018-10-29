@@ -31,6 +31,8 @@ toonces_dash_mockup.html
 ckeditor
 go-pear.phar
 phpunit-6.5.8.phar
+vendor/*
+composer.lock
 
 # EB stuff
 .elasticbeanstalk
