@@ -3,20 +3,11 @@ Initial Commit: Paul Anderson, 12/11/2017
  -->
 <phpunit>
 	<php>
-		<var name="DB_HOST" value="localhost" />
-		<var name="DB_PORT" value="22" />
-		<var name="DB_DBNAME" value="toonces" />
-		<var name="DB_USERNAME" value="unittest" />
-		<var name="DB_PASSWORD" value="kittycat" />
-		<var name="TOONCES_USERNAME" value="email@example.com" />
-		<var name="TOONCES_PASSWORD" value="correcthorsebatterystaple" />
-		<var name="NON_ADMIN_USERNAME" value="user@example.com" />
-		<var name="NON_ADMIN_PASSWORD" value="reallySecurePassword" />
-		<var name="TEST_FILE_PATH" value="~/temp" />
+		<var name="TEST_FILE_PATH" value="~/temp/" />
 	</php>
 	<testsuites>
-		<testsuite name="installers">
-			<file>unittest/install/SetupDatabaseTest.php</file>
+		<testsuite name="endpointoperator">
+			<file>unittest/endpointoperator/XmlEndpointOperatorTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

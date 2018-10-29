@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../FileDependentTestCase.php';
 require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
-class XmlEndpointSystemTest extends FileDependentTestCase
+class XmlEndpointOperatorTest extends FileDependentTestCase
 {
 
     public function setUp()
@@ -68,7 +68,7 @@ XML;
     public function testCreateEndpoint()
     {
         // ARRANGE
-        $xmlEndpointSystem = new XmlEndpointSystem($this->filesystem);
+        $xmlEndpointSystem = new XmlEndpointOperator($this->filesystem);
         $parentEndpointId = 0;
         $title = 'test';
         $pathname = 'test_path';
@@ -90,7 +90,7 @@ XML;
     public function testReadEndpointByUri()
     {
         // ARRANGE
-        $xmlEndpointSystem = new XmlEndpointSystem($this->filesystem);
+        $xmlEndpointSystem = new XmlEndpointOperator($this->filesystem);
 
         $uri = '/p_d_1/p_d_2/p_d_3/';
 
@@ -108,7 +108,7 @@ XML;
     public function testReadEndpointById()
     {
         // ARRANGE
-        $xmlEndpointSystem = new XmlEndpointSystem($this->filesystem);
+        $xmlEndpointSystem = new XmlEndpointOperator($this->filesystem);
 
         // ACT
         $endpoint = $xmlEndpointSystem->readEndpointById(3);
@@ -124,7 +124,7 @@ XML;
     public function testUpdateEndpoint()
     {
         // ARRANGE
-        $xmlEndpointSystem = new XmlEndpointSystem($this->filesystem);
+        $xmlEndpointSystem = new XmlEndpointOperator($this->filesystem);
 
         $updateEndpoint = new Endpoint();
         $updateEndpoint->endpointId = 3;
@@ -146,7 +146,7 @@ XML;
     public function testDeleteEndpoint()
     {
         // ARRANGE
-        $xmlEndpointSystem = new XmlEndpointSystem($this->filesystem);
+        $xmlEndpointSystem = new XmlEndpointOperator($this->filesystem);
 
         // ACT
         $deletedEndpoint = $xmlEndpointSystem->deleteEndpoint(3);

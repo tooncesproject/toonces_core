@@ -8,11 +8,11 @@
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 
-class LocalXmlEndpointSystemBuilder implements iEndpointSystemFactory
+class LocalXmlEndpointOperatorBuilder implements iEndpointOperatorBuilder
 {
     public function makeEndpointSystem()
     {
-        $settings = parse_ini_file(__DIR__ . '/settings/XmlEndpointSystem.ini');
+        $settings = parse_ini_file(__DIR__ . '/settings/XmlEndpointOperator.ini');
         $endpointSystemRootPath = $settings['endpointSystemRootPath'];
 
         if (empty($endpointSystemRootPath))
@@ -22,8 +22,7 @@ class LocalXmlEndpointSystemBuilder implements iEndpointSystemFactory
         $filesystemAdapter = new Local($endpointSystemRootPath);
         $filesystem = new Filesystem($filesystemAdapter);
 
-        $endpointSystem = new XmlEndpointSystem();
-        $endpointSystem->filesystem = $filesystem;
+        $endpointSystem = new XmlEndpointOperator($filesystem);
 
         $endpointSystem->endpointXmlFilePath = $settings['endpointXmlFilePath'];
 

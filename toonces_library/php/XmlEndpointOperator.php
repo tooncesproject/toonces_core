@@ -9,7 +9,7 @@ require_once LIBPATH . '/php/toonces.php';
 use League\Flysystem\FileNotFoundException;
 
 
-class XmlEndpointSystem implements iEndpointSystem
+class XmlEndpointOperator implements iEndpointOperator
 {
 
     /** @var DOMDocument */
@@ -22,7 +22,7 @@ class XmlEndpointSystem implements iEndpointSystem
     public $endpointXmlFilePath;
 
     /**
-     * XmlEndpointSystem constructor.
+     * XmlEndpointOperator constructor.
      * @param \League\Flysystem\Filesystem $filesystem
      * @throws XmlReadWriteException
      */
@@ -169,7 +169,7 @@ class XmlEndpointSystem implements iEndpointSystem
      */
     private function loadXml()
     {
-        $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointSystem.ini');
+        $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointOperator.ini');
         $endpointXmlFilePath = $settings['endpointXmlFilePath'];
         $this->domDocument = new DOMDocument();
         try {
@@ -187,7 +187,7 @@ class XmlEndpointSystem implements iEndpointSystem
      */
     private function writeXml()
     {
-        $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointSystem.ini');
+        $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointOperator.ini');
         $endpointXmlFilePath = $settings['endpointXmlFilePath'];
         try {
             $this->filesystem->put($endpointXmlFilePath, $this->domDocument->saveXML());

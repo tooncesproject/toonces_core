@@ -23,7 +23,7 @@ function getConfigNodeValue($tagName) {
 }
 
 /**
- * @return iEndpointSystem
+ * @return iEndpointOperator
  */
 function makeResourceFactory() {
 
@@ -33,7 +33,7 @@ function makeResourceFactory() {
 }
 
 /**
- * @return iEndpointSystemFactory
+ * @return iEndpointOperatorBuilder
  */
 function makeEndpointSystemFactory() {
     $endpointSystemFactoryClass = getConfigNodeValue('endpoint_system_factory_class');

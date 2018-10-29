@@ -4,13 +4,13 @@
  * initial commit: 6/12/18
  * Time: 9:10 PM
  *
- * Interface defining requirements for resourcefactory objects.
+ * Interface defining requirements for endpointoperator objects.
  *
  */
 
 require_once LIBPATH . '/php/toonces.php';
 
-interface iEndpointSystem
+interface iEndpointOperator
 {
 
 

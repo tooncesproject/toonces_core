@@ -8,11 +8,10 @@ include_once LIBPATH . 'php/exception/XmlReadWriteException.php';
 
 include_once LIBPATH . 'php/utility/static/StaticRequestFactory.php';
 include_once LIBPATH . 'php/Request.php';
-include_once LIBPATH . 'php/utility/static/SearchPathString.php';
 
 include_once LIBPATH . 'php/Endpoint.php';
-include_once LIBPATH . 'php/resourcefactory/interface/iEndpointSystem.php';
-include_once LIBPATH . 'php/XmlEndpointSystem.php';
+include_once LIBPATH . 'php/endpointoperator/interface/iEndpointOperator.php';
+include_once LIBPATH . 'php/XmlEndpointOperator.php';
 
 include_once LIBPATH . 'php/Response.php';
 include_once LIBPATH . 'php/iResponder.php';
@@ -29,9 +28,4 @@ include_once LIBPATH . 'php/DefaultAuthenticator.php';
 include_once LIBPATH . 'php/resource/abstract/Resource.php';
 include_once LIBPATH . 'php/HelloWorldResource.php';
 include_once LIBPATH . 'php/FourOhFourResource.php';
-
-include_once LIBPATH . 'php/utility/static/UniversalConnect.php';
-
-// custom
-include_once LIBPATH . 'custom/toonces_custom.php';
 

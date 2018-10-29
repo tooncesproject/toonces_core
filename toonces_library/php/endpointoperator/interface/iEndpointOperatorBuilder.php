@@ -5,8 +5,8 @@
  * Time: 5:22 PM
  */
 
-interface iEndpointSystemFactory
+interface iEndpointOperatorBuilder
 {
-    /** @return iEndpointSystem */
+    /** @return iEndpointOperator */
     public function makeEndpointSystem();
 }
