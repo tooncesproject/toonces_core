@@ -12,11 +12,11 @@ class LocalXmlEndpointOperatorBuilder implements iEndpointOperatorBuilder
 {
     public function makeEndpointSystem()
     {
-        $settings = parse_ini_file(__DIR__ . '/settings/XmlEndpointOperator.ini');
+        $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointOperator.ini');
         $endpointSystemRootPath = $settings['endpointSystemRootPath'];
 
         if (empty($endpointSystemRootPath))
-            $endpointSystemRootPath = __DIR__;
+            $endpointSystemRootPath = LIBPATH . 'xml/';
 
         // TODO try/except block here ?
         $filesystemAdapter = new Local($endpointSystemRootPath);

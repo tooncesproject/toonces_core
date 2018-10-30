@@ -1,6 +1,6 @@
 <?php
 
-
+require ROOTPATH . 'vendor/autoload.php';
 include_once LIBPATH . 'php/exception/TooncesException.php';
 include_once LIBPATH . 'php/exception/EndpointNotFoundException.php';
 include_once LIBPATH . 'php/exception/XmlCreateEndpointException.php';

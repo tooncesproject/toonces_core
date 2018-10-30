@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pages>
-    <page title="Hello World!" pathname="" xml:id="0" resource_class="HelloWorldResource">
-        <page title="Another Page" pathname="another_page" xml:id="1" resource_class="HelloWorldResource">
-            <page title="Still Another Page" pathname="a_page" xml:id="3" resource_class="HelloWorldResource">
-                <page title="Woo Another Page" pathname="another_page" xml:id="4" resource_class="HelloWorldResource">
-                </page>
-            </page>
-        </page>
-        <page title="Yet Another Page" pathname="yet_another_page" xml:id="2" resource_class="HelloWorldResource" />
-    </page>
-</pages>
+<endpoints>
+    <endpoint title="Root endpoint" pathname="" xml:id="id_0" resource_class="HelloWorldResource">
+        <endpoint title="endpoint at depth 1" pathname="p_d_1" xml:id="id_1" resource_class="HelloWorldResource">
+            <endpoint title="endpoint at depth 2" pathname="p_d_2" xml:id="id_3" resource_class="HelloWorldResource">
+                <endpoint title="endpoint at depth 3" pathname="p_d_3" xml:id="id_4" resource_class="HelloWorldResource">
+                </endpoint>
+            </endpoint>
+        </endpoint>
+    </endpoint>
+    <endpoint title="Second endpoint at depth 1" pathname="2_p_d_1" xml:id="id_2" resource_class="HelloWorldResource" />
+</endpoints>
