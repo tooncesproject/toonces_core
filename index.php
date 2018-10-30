@@ -50,7 +50,7 @@ $request = StaticRequestFactory::getActiveRequest();
 // get an Endpoint
 try {
     $endpoint = $endpointOperator->readEndpointByUri($request->uri);
-} catch (EndpointNotFoundException) {
+} catch (EndpointNotFoundException $e) {
     $endpoint = new Endpoint();
     $endpoint->resourceClassName = $parameters['resource404Class'];
 }
