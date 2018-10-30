@@ -289,9 +289,10 @@ class XmlEndpointOperator implements iEndpointOperator
         $targetPathname = array_pop($pathArray);
         foreach ($endpointElement->childNodes as $childNode) {
             if (get_class($childNode) == 'DOMElement') {
-                if ($childNode->getAttribute('pathname') == $targetPathname)
+                if ($childNode->getAttribute('pathname') == $targetPathname) {
                     $childNodeId = intval(str_replace('id_', '', $childNode->getAttribute('xml:id')));
                     return $this->recursivelyFindEndpoint($pathArray, $childNodeId);
+                }
             }
         }
 
