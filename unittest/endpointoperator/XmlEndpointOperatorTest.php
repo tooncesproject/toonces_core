@@ -18,10 +18,10 @@ class XmlEndpointOperatorTest extends FileDependentTestCase
 
         $xmlFixture = <<<XML
         <endpoints>
-            <endpoint title="Root endpoint" pathname="" xml:id="id_0" resource_class="SomeResourceClass1">
-                    <endpoint title="endpoint at depth 1" pathname="p_d_1" xml:id="id_1" resource_class="SomeResourceClass2">
-                        <endpoint title="endpoint at depth 2" pathname="p_d_2" xml:id="id_3" resource_class="SomeResourceClass3">
-                            <endpoint title="endpoint at depth 3" pathname="p_d_3" xml:id="id_4" resource_class="SomeResourceClass4">
+            <endpoint title="Root endpoint" pathname="" xml:id="id_0" resourceClass="SomeResourceClass1">
+                    <endpoint title="endpoint at depth 1" pathname="p_d_1" xml:id="id_1" resourceClass="SomeResourceClass2">
+                        <endpoint title="endpoint at depth 2" pathname="p_d_2" xml:id="id_3" resourceClass="SomeResourceClass3">
+                            <endpoint title="endpoint at depth 3" pathname="p_d_3" xml:id="id_4" resourceClass="SomeResourceClass4">
                         </endpoint>
                     </endpoint>
                </endpoint>

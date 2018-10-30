@@ -25,6 +25,7 @@ interface iEndpointOperator
 
     /**
      * @param string $endpointUri;
+     * @throws EndpointNotFoundException
      * @return Endpoint
      */
     public function readEndpointByUri($endpointUri);

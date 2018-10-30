@@ -48,7 +48,12 @@ $endpointOperator = $endpointOperatorBuilder->makeEndpointSystem();
 $request = StaticRequestFactory::getActiveRequest();
 
 // get an Endpoint
-$endpoint = $endpointOperator->readEndpointByUri($request->uri);
+try {
+    $endpoint = $endpointOperator->readEndpointByUri($request->uri);
+} catch (EndpointNotFoundException) {
+    $endpoint = new Endpoint();
+    $endpoint->resourceClassName = $parameters['resource404Class'];
+}
 
 // get a Resource
 $resource = StaticResourceFactory::makeResource($endpoint);
