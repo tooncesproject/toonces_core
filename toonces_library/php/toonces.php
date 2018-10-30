@@ -13,6 +13,8 @@ include_once LIBPATH . 'php/record/Request.php';
 include_once LIBPATH . 'php/record/Endpoint.php';
 include_once LIBPATH . 'php/abstract/iEndpointOperator.php';
 include_once LIBPATH . 'php/XmlEndpointOperator.php';
+include_once LIBPATH . 'php/abstract/iEndpointOperatorBuilder.php';
+include_once LIBPATH . 'php/LocalXmlEndpointOperatorBuilder.php';
 
 include_once LIBPATH . 'php/abstract/Response.php';
 include_once LIBPATH . 'php/abstract/Responder.php';

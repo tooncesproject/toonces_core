@@ -36,7 +36,7 @@ $path = parse_url($url,PHP_URL_PATH);
 $path = substr($path,1,strlen($path)-1);
 
 // Get config parameters
-$parameters = parse_ini_file(ROOTPATH . 'settings/toonces.ini');
+$parameters = parse_ini_file(LIBPATH . 'settings/toonces.ini');
 
 // Instantiate an EndpointOperatorBuilder
 $endpointOperatorBuilder = makeEndpointOperatorBuilder($parameters['endpointOperatorBuilderClass']);
