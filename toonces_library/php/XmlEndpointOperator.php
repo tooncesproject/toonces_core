@@ -91,7 +91,7 @@ class XmlEndpointOperator implements iEndpointOperator
         $endpointUri = rtrim(ltrim($endpointUri, '/'), '/');
         $pathArray = array_reverse(explode('/', $endpointUri));
         $endpointId = $this->recursivelyFindEndpoint($pathArray, 0);
-        if (sizeof($pathArray) != 0 && $endpointId == 0)
+        if (!empty($pathArray[0]) && $endpointId == 0)
             throw new EndpointNotFoundException('Endpoint not found at URI ' . $endpointUri);
 
         return $this->readEndpointById($endpointId);
