@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <endpoints>
-    <endpoint title="Root endpoint" pathname="" xml:id="id_0" resource_class="HelloWorldResource">
-        <endpoint title="endpoint at depth 1" pathname="p_d_1" xml:id="id_1" resource_class="HelloWorldResource">
-            <endpoint title="endpoint at depth 2" pathname="p_d_2" xml:id="id_3" resource_class="HelloWorldResource">
-                <endpoint title="endpoint at depth 3" pathname="p_d_3" xml:id="id_4" resource_class="HelloWorldResource">
+    <endpoint title="Root endpoint" pathname="" xml:id="id_0" resourceClassName="HelloWorldResource">
+        <endpoint title="endpoint at depth 1" pathname="p_d_1" xml:id="id_1" resourceClassName="HelloWorldResource">
+            <endpoint title="endpoint at depth 2" pathname="p_d_2" xml:id="id_3" resourceClassName="HelloWorldResource">
+                <endpoint title="endpoint at depth 3" pathname="p_d_3" xml:id="id_4" resourceClassName="HelloWorldResource">
                 </endpoint>
             </endpoint>
         </endpoint>
     </endpoint>
-    <endpoint title="Second endpoint at depth 1" pathname="2_p_d_1" xml:id="id_2" resource_class="HelloWorldResource" />
+    <endpoint title="Second endpoint at depth 1" pathname="2_p_d_1" xml:id="id_2" resourceClassName="HelloWorldResource" />
 </endpoints>
