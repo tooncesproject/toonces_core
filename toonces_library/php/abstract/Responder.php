@@ -5,7 +5,7 @@
  * Time: 9:40 PM
  */
 
-abstract class Responder implements iResponder {
+abstract class Responder {
 
     var $resource;
 
@@ -16,6 +16,14 @@ abstract class Responder implements iResponder {
     public function __construct($paramResource)
     {
         $this->resource = $paramResource;
+    }
+
+    /**
+     * @return Response
+     */
+    public function respond($paramRequest)
+    {
+        throw new BadMethodCallException('Responder subclasses must implement respond($paramRequest');
     }
 
 }

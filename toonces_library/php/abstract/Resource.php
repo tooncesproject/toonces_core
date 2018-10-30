@@ -7,13 +7,13 @@
  *
  */
 
-include_once LIBPATH.'php/toonces.php';
+include_once LIBPATH . 'php/toonces.php';
 
 abstract class Resource
 {
 
     /** @var int */
-    public $resourceId;
+    public $endpointId;
 
     /** @var iAuthenticator */
     public $authenticator;
@@ -49,16 +49,16 @@ abstract class Resource
     /**
      * @param int $paramResourceId
      */
-    public function setResourceId($paramResourceId) {
-        $this->resourceId = $paramResourceId;
+    public function setEndpointId($paramResourceId) {
+        $this->endpointId = $paramResourceId;
     }
 
     /**
      * @return int
      */
-    public function getResourceId()
+    public function getEndpointId()
     {
-        return $this->resourceId;
+        return $this->endpointId;
     }
 
     /**

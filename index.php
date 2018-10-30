@@ -12,32 +12,17 @@ include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
 
 /**
- * @param string $tagName
- * @return string
- */
-function getConfigNodeValue($tagName) {
-    $xml = new DOMDocument();
-    $xml->load(ROOTPATH.'settings/toonces-config.xml');
-    $resourceFactoryNode = $xml->getElementsByTagName($tagName)->item(0);
-    return $resourceFactoryNode->nodeValue;
-}
-
-/**
+ * @param string $endpointOperatorClass
  * @return iEndpointOperator
  */
-function makeResourceFactory() {
 
-    $resourceFactoryClass = getConfigNodeValue('resource_factory_class');
-    return new $resourceFactoryClass;
-
-}
 
 /**
+ * @param string $endpointOperatorBuilderClass
  * @return iEndpointOperatorBuilder
  */
-function makeEndpointSystemFactory() {
-    $endpointSystemFactoryClass = getConfigNodeValue('endpoint_system_factory_class');
-    return new $endpointSystemFactoryClass;
+function makeEndpointOperatorBuilder($endpointOperatorBuilderClass) {
+    return new $endpointOperatorBuilderClass;
 }
 
 
@@ -50,13 +35,23 @@ $path = parse_url($url,PHP_URL_PATH);
 // trim last slash from path
 $path = substr($path,1,strlen($path)-1);
 
-// Instantiate ResourceFactory
-$resourceFactory = makeResourceFactory();
+// Get config parameters
+$parameters = parse_ini_file(ROOTPATH . 'settings/toonces.ini');
 
-$resource = $resourceFactory->makeResource($path);
+// Instantiate an EndpointOperatorBuilder
+$endpointOperatorBuilder = makeEndpointOperatorBuilder($parameters['endpointOperatorBuilderClass']);
+
+// Instantiate an EndpointOperator
+$endpointOperator = $endpointOperatorBuilder->makeEndpointSystem();
 
 // Acquire client request
 $request = StaticRequestFactory::getActiveRequest();
+
+// get an Endpoint
+$endpoint = $endpointOperator->readEndpointByUri($request->uri);
+
+// get a Resource
+$resource = StaticResourceFactory::makeResource($endpoint);
 
 // get Response
 $response = $resource->processRequest($request);
