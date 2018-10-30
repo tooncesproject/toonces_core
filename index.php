@@ -12,12 +12,6 @@ include_once 'config.php';
 require_once LIBPATH.'/php/toonces.php';
 
 /**
- * @param string $endpointOperatorClass
- * @return iEndpointOperator
- */
-
-
-/**
  * @param string $endpointOperatorBuilderClass
  * @return iEndpointOperatorBuilder
  */

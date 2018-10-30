@@ -87,6 +87,8 @@ class XmlEndpointOperator implements iEndpointOperator
      * @throws XmlReadWriteException
      */
     public function readEndpointByUri($endpointUri) {
+
+        $endpointUri = rtrim(ltrim($endpointUri, '/'), '/');
         $pathArray = array_reverse(explode('/', $endpointUri));
         $endpointId = $this->recursivelyFindEndpoint($pathArray, 0);
         if (sizeof($pathArray) != 0 && $endpointId == 0)
@@ -288,7 +290,8 @@ class XmlEndpointOperator implements iEndpointOperator
         foreach ($endpointElement->childNodes as $childNode) {
             if (get_class($childNode) == 'DOMElement') {
                 if ($childNode->getAttribute('pathname') == $targetPathname)
-                    return $this->recursivelyFindEndpoint($pathArray, $childNode->getAttribue('xml:id'));
+                    $childNodeId = intval(str_replace('id_', '', $childNode->getAttribute('xml:id')));
+                    return $this->recursivelyFindEndpoint($pathArray, $childNodeId);
             }
         }
 
