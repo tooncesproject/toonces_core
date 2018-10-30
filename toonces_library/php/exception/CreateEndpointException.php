@@ -6,7 +6,7 @@
  * Time: 3:22 PM
  */
 
-class XmlCreateEndpointException extends TooncesException
+class CreateEndpointException extends TooncesException
 {
     public function __construct($message, $code = 1, Exception $previous = null)
     {

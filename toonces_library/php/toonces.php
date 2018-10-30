@@ -3,8 +3,8 @@
 require ROOTPATH . 'vendor/autoload.php';
 include_once LIBPATH . 'php/exception/TooncesException.php';
 include_once LIBPATH . 'php/exception/EndpointNotFoundException.php';
-include_once LIBPATH . 'php/exception/XmlCreateEndpointException.php';
-include_once LIBPATH . 'php/exception/XmlReadWriteException.php';
+include_once LIBPATH . 'php/exception/CreateEndpointException.php';
+include_once LIBPATH . 'php/exception/EndpointReadWriteException.php';
 
 include_once LIBPATH . 'php/utility/static/StaticRequestFactory.php';
 include_once LIBPATH . 'php/utility/static/StaticResourceFactory.php';

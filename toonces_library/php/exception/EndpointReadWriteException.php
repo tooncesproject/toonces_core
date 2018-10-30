@@ -5,7 +5,7 @@
  * Time: 5:58 PM
  */
 
-class XmlReadWriteException extends TooncesException
+class EndpointReadWriteException extends TooncesException
 {
     public function __construct($message, $code = 0, Exception $previous = null)
     {

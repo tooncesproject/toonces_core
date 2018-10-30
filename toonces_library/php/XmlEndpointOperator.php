@@ -24,7 +24,7 @@ class XmlEndpointOperator implements iEndpointOperator
     /**
      * XmlEndpointOperator constructor.
      * @param \League\Flysystem\Filesystem $filesystem
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     public function __construct($filesystem)
     {
@@ -40,8 +40,8 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param string $pathName
      * @param string $resourceClassName
      * @return Endpoint
-     * @throws XmlReadWriteException
-     * @throws XmlCreateEndpointException
+     * @throws EndpointReadWriteException
+     * @throws CreateEndpointException
      */
     public function createEndpoint($parentEndpointId, $title, $pathName, $resourceClassName)
     {
@@ -66,7 +66,7 @@ class XmlEndpointOperator implements iEndpointOperator
 
         } while (false);
         if (!empty($errorMessage)) {
-            throw new XmlCreateEndpointException($errorMessage);
+            throw new CreateEndpointException($errorMessage);
         }
 
         $endpoint = new Endpoint();
@@ -84,7 +84,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param string $endpointUri
      * @return Endpoint
      * @throws EndpointNotFoundException
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     public function readEndpointByUri($endpointUri) {
 
@@ -102,7 +102,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param int $endpointId
      * @param bool $recursive
      * @return Endpoint
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     public function readEndpointById($endpointId, $recursive = false)
     {
@@ -134,7 +134,7 @@ class XmlEndpointOperator implements iEndpointOperator
     /**
      * @param Endpoint $endpoint
      * @return Endpoint
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     public function updateEndpoint($endpoint)
     {
@@ -149,7 +149,7 @@ class XmlEndpointOperator implements iEndpointOperator
 
     /**
      * @param int $endpointId
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      * @return Endpoint
      */
     public function deleteEndpoint($endpointId)
@@ -167,7 +167,7 @@ class XmlEndpointOperator implements iEndpointOperator
     }
 
     /**
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     private function loadXml()
     {
@@ -177,7 +177,7 @@ class XmlEndpointOperator implements iEndpointOperator
         try {
             $xml = $this->filesystem->read($endpointXmlFilePath);
         } catch (FileNotFoundException $e) {
-            throw new XmlReadWriteException('Failed to read endpoints XML file: ' . $e->getMessage());
+            throw new EndpointReadWriteException('Failed to read endpoints XML file: ' . $e->getMessage());
         }
 
         $this->domDocument->loadXML($xml);
@@ -185,7 +185,7 @@ class XmlEndpointOperator implements iEndpointOperator
     }
 
     /**
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     private function writeXml()
     {
@@ -194,7 +194,7 @@ class XmlEndpointOperator implements iEndpointOperator
         try {
             $this->filesystem->put($endpointXmlFilePath, $this->domDocument->saveXML());
         } catch (Exception $e) {
-            throw new XmlReadWriteException('Failed to write endpoints XML file: ' . $e->getMessage());
+            throw new EndpointReadWriteException('Failed to write endpoints XML file: ' . $e->getMessage());
         }
     }
 
@@ -217,7 +217,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param $pathname
      * @param $parentEndpointId
      * @return bool
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     private function checkPathnameExists($pathname, $parentEndpointId)
     {
@@ -236,7 +236,7 @@ class XmlEndpointOperator implements iEndpointOperator
     /**
      * @param int $parentEndpointId
      * @param Endpoint $endpoint
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     private function insertEndpoint($parentEndpointId, $endpoint)
     {
@@ -256,7 +256,7 @@ class XmlEndpointOperator implements iEndpointOperator
 
 
     /**
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      * @return int
      */
     private function getMaxEndpointId($startingId = 0)
@@ -280,7 +280,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param $pathArray
      * @param $startingEndpointId
      * @return mixed
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      */
     private function recursivelyFindEndpoint($pathArray, $startingEndpointId)
     {

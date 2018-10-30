@@ -61,8 +61,8 @@ XML;
 
 
     /**
-     * @throws XmlCreateEndpointException
-     * @throws XmlReadWriteException]
+     * @throws CreateEndpointException
+     * @throws EndpointReadWriteException]
      * @throws \League\Flysystem\FileNotFoundException
      */
     public function testCreateEndpoint()
@@ -84,7 +84,7 @@ XML;
 
     /**
      * @throws EndpointNotFoundException
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      * @throws \League\Flysystem\FileNotFoundException
      */
     public function testReadEndpointByUri()
@@ -102,7 +102,7 @@ XML;
     }
 
     /**
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      * @throws \League\Flysystem\FileNotFoundException
      */
     public function testReadEndpointById()
@@ -118,7 +118,7 @@ XML;
     }
 
     /**
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      * @throws \League\Flysystem\FileNotFoundException
      */
     public function testUpdateEndpoint()
@@ -140,7 +140,7 @@ XML;
     }
 
     /**
-     * @throws XmlReadWriteException
+     * @throws EndpointReadWriteException
      * @throws \League\Flysystem\FileNotFoundException
      */
     public function testDeleteEndpoint()
