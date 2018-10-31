@@ -1,7 +1,7 @@
 <?php
-/*
+/**
 *	index.php
-*	Copyright (c) 2015 by Paul Anderson, All Rigths Reserved
+*	Copyright (c) 2018 by Paul Anderson, All Rights Reserved
 *
 *	This script is the root script for any given application in the site.
 *	It instantiates an iPageView-compliant object which provides the base rendering for a resource
@@ -9,6 +9,7 @@
 */
 
 include_once 'config.php';
+require __DIR__ . '/vendor/autoload.php';
 
 /**
  * @param string $endpointOperatorBuilderClass

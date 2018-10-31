@@ -22,7 +22,6 @@ abstract class FileDependentTestCase extends TooncesTestCase {
         parent::setUp();
         $fileSystemRootPath = $GLOBALS['TEST_FILE_PATH'];
 
-        # TODO: does Local throw an exception when initialized with a bad path?
         $fileSystemAdapter = new Local($fileSystemRootPath);
         $this->filesystem = new Filesystem($fileSystemAdapter);
 
