@@ -4,11 +4,11 @@
   },
   "autoload": {
     "classmap": [
-
       "toonces_library/php/exception/TooncesException.php",
       "toonces_library/php/exception/EndpointNotFoundException.php",
       "toonces_library/php/exception/CreateEndpointException.php",
       "toonces_library/php/exception/EndpointReadWriteException.php",
+      "toonces_library/php/StaticEndpointOperatorFactory.php",
       "toonces_library/php/utility/static/StaticRequestFactory.php",
       "toonces_library/php/utility/static/StaticResourceFactory.php",
       "toonces_library/php/record/Request.php",

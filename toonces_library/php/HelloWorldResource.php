@@ -11,7 +11,7 @@ class HelloWorldResource extends Resource
 
     public function __construct()
     {
-        $this->getResponder = new HelloWorldResponder();
+        $this->getResponder = new HelloWorldResponder($this);
     }
 
 }

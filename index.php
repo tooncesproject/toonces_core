@@ -11,15 +11,6 @@
 include_once 'config.php';
 require __DIR__ . '/vendor/autoload.php';
 
-/**
- * @param string $endpointOperatorBuilderClass
- * @return iEndpointOperatorBuilder
- */
-function makeEndpointOperatorBuilder($endpointOperatorBuilderClass) {
-    return new $endpointOperatorBuilderClass;
-}
-
-
 /*************** BEHOLD THE MAGIC OF TOONCES ***************/
 
 // Acquire URI from request
@@ -32,11 +23,8 @@ $path = substr($path,1,strlen($path)-1);
 // Get config parameters
 $parameters = parse_ini_file(LIBPATH . 'settings/toonces.ini');
 
-// Instantiate an EndpointOperatorBuilder
-$endpointOperatorBuilder = makeEndpointOperatorBuilder($parameters['endpointOperatorBuilderClass']);
-
 // Instantiate an EndpointOperator
-$endpointOperator = $endpointOperatorBuilder->makeEndpointSystem();
+$endpointOperator = StaticEndpointOperatorFactory::makeEndpointOperator();
 
 // Acquire client request
 $request = StaticRequestFactory::getActiveRequest();
@@ -45,8 +33,12 @@ $request = StaticRequestFactory::getActiveRequest();
 try {
     $endpoint = $endpointOperator->readEndpointByUri($request->uri);
 } catch (EndpointNotFoundException $e) {
-    $endpoint = new Endpoint();
-    $endpoint->resourceClassName = $parameters['resource404Class'];
+    $endpoint = new Endpoint(
+        0,
+        '',
+        $parameters['resource404Class']
+    );
+
 }
 
 // get a Resource

@@ -42,7 +42,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @throws EndpointReadWriteException
      * @throws CreateEndpointException
      */
-    public function createEndpoint($parentEndpointId, $title, $pathName, $resourceClassName)
+    public function createEndpoint($parentEndpointId, $pathName, $resourceClassName)
     {
         $errorMessage = '';
         do {
@@ -68,11 +68,13 @@ class XmlEndpointOperator implements iEndpointOperator
             throw new CreateEndpointException($errorMessage);
         }
 
-        $endpoint = new Endpoint();
-        $endpoint->endpointId = $this->getMaxEndpointId() + 1;
-        $endpoint->title = $title;
-        $endpoint->pathname = $pathName;
-        $endpoint->resourceClassName = $resourceClassName;
+        $endpoint = new Endpoint(
+            $this->getMaxEndpointId() + 1,
+            $pathName,
+            $resourceClassName,
+            null
+        );
+
         $this->insertEndpoint($parentEndpointId, $endpoint);
         $this->writeXml();
         return $endpoint;
@@ -108,11 +110,12 @@ class XmlEndpointOperator implements iEndpointOperator
 
         $endpointIdStr = 'id_' . strval($endpointId);
         $endpointElement = $this->domDocument->getElementById($endpointIdStr);
-        $endpoint = new Endpoint();
-        $endpoint->endpointId = $endpointId;
-        $endpoint->title = $endpointElement->getAttribute('title');
-        $endpoint->pathname = $endpointElement->getAttribute('pathname');
-        $endpoint->resourceClassName = $endpointElement->getAttribute('resourceClassName');
+        $endpoint = new Endpoint(
+            $endpointId,
+            $endpointElement->getAttribute('pathname'),
+            $endpointElement->getAttribute('resourceClassName'),
+            null
+        );
 
         if ($recursive) {
             foreach ($endpointElement->childNodes as $childNode) {
@@ -139,7 +142,6 @@ class XmlEndpointOperator implements iEndpointOperator
     {
         $endpointIdStr = 'id_' . strval($endpoint->endpointId);
         $endpointElement = $this->domDocument->getElementById($endpointIdStr);
-        $endpointElement->setAttribute('title', $endpoint->title);
         $endpointElement->setAttribute('pathname', $endpoint->pathname);
         $endpointElement->setAttribute('resourceClassName', $endpoint->resourceClassName);
         $this->writeXml();
@@ -168,7 +170,7 @@ class XmlEndpointOperator implements iEndpointOperator
     /**
      * @throws EndpointReadWriteException
      */
-    private function loadXml()
+    protected function loadXml()
     {
         $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointOperator.ini');
         $endpointXmlFilePath = $settings['endpointXmlFilePath'];
@@ -186,7 +188,7 @@ class XmlEndpointOperator implements iEndpointOperator
     /**
      * @throws EndpointReadWriteException
      */
-    private function writeXml()
+    protected function writeXml()
     {
         $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointOperator.ini');
         $endpointXmlFilePath = $settings['endpointXmlFilePath'];
@@ -201,7 +203,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param string $pathName
      * @return bool
      */
-    private function validatePathName($pathName)
+    protected function validatePathName($pathName)
     {
         // Pathname contains disallowed characters, or is empty?
         if (!ctype_alnum(preg_replace('[_|-]', '', $pathName)) | empty($pathName)) {
@@ -218,7 +220,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @return bool
      * @throws EndpointReadWriteException
      */
-    private function checkPathnameExists($pathname, $parentEndpointId)
+    protected function checkPathnameExists($pathname, $parentEndpointId)
     {
         $pathnameExists = false;
         $parentEndpoint = $this->readEndpointById($parentEndpointId, true);
@@ -237,19 +239,17 @@ class XmlEndpointOperator implements iEndpointOperator
      * @param Endpoint $endpoint
      * @throws EndpointReadWriteException
      */
-    private function insertEndpoint($parentEndpointId, $endpoint)
+    protected function insertEndpoint($parentEndpointId, $endpoint)
     {
         // $endpointElement = new DOMElement('page');
         $endpointElement = $this->domDocument->createElement('endpoint');
         $endpointElement->setAttribute('xml:id', 'id_' . strval($endpoint->endpointId));
-        $endpointElement->setAttribute('title', $endpoint->title);
         $endpointElement->setAttribute('pathname', $endpoint->pathname);
         $endpointElement->setAttribute('resourceClassName', $endpoint->resourceClassName);
 
         $endpointIdStr = 'id_' . strval($parentEndpointId);
         $parentElement = $this->domDocument->getElementById($endpointIdStr);
         $parentElement->appendChild($endpointElement);
-        //$this->domDocument->validate();
 
     }
 
@@ -258,7 +258,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @throws EndpointReadWriteException
      * @return int
      */
-    private function getMaxEndpointId($startingId = 0)
+    protected function getMaxEndpointId($startingId = 0)
     {
 
         $endpointIdStr = 'id_' . strval($startingId);
@@ -281,7 +281,7 @@ class XmlEndpointOperator implements iEndpointOperator
      * @return mixed
      * @throws EndpointReadWriteException
      */
-    private function recursivelyFindEndpoint($pathArray, $startingEndpointId)
+    protected function recursivelyFindEndpoint($pathArray, $startingEndpointId)
     {
         $endpointIdStr = 'id_' . strval($startingEndpointId);
         $endpointElement = $this->domDocument->getElementById($endpointIdStr);

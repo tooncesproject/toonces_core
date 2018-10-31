@@ -10,7 +10,11 @@ use League\Flysystem\Adapter\Local;
 
 class LocalXmlEndpointOperatorBuilder implements iEndpointOperatorBuilder
 {
-    public function makeEndpointSystem()
+    /**
+     * @return iEndpointOperator|XmlEndpointOperator
+     * @throws EndpointReadWriteException
+     */
+    public function makeEndpointOperator()
     {
         $settings = parse_ini_file(LIBPATH . 'settings/XmlEndpointOperator.ini');
         $endpointSystemRootPath = $settings['endpointSystemRootPath'];

@@ -48,7 +48,7 @@ abstract class Response
 
     }
 
-    private function transmitResponseData()
+    protected function transmitResponseData()
     {
         echo $this->responseData;
     }

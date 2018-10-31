@@ -48,8 +48,6 @@ XML;
         $endpointElement = $domDocument->getElementById($endpointIdStr);
 
         $endpointMatchesFixture =
-            ($endpointElement->getAttribute('title') == $endpoint->title)
-            &&
             ($endpointElement->getAttribute('pathname') == $endpoint->pathname)
             &&
             ($endpointElement->getAttribute('resourceClassName') == $endpoint->resourceClassName)
@@ -125,11 +123,11 @@ XML;
         // ARRANGE
         $xmlEndpointSystem = new XmlEndpointOperator($this->filesystem);
 
-        $updateEndpoint = new Endpoint();
-        $updateEndpoint->endpointId = 3;
-        $updateEndpoint->title = 'Updated Endpoint';
-        $updateEndpoint->pathname = 'updated_endpoint';
-        $updateEndpoint->resourceClassName = "UpdatedResourceClassName";
+        $updateEndpoint = new Endpoint(
+            3,
+            'updated_endpoint',
+            'updatedResourceClassName'
+        );
 
         // ACT
         $xmlEndpointSystem->updateEndpoint($updateEndpoint);

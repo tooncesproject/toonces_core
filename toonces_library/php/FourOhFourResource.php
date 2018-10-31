@@ -10,6 +10,6 @@ class FourOhFourResource extends Resource {
 
     public function __construct()
     {
-        $this->getResponder = new FourOhFourResponder();
+        $this->getResponder = new FourOhFourResponder($this);
     }
 }

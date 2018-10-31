@@ -7,11 +7,28 @@
 
 class Endpoint {
 
+    /**
+     * Endpoint constructor.
+     * @param integer $endpointId
+     * @param string $pathname
+     * @param string $resourceClassName
+     * @param array|null $children
+     */
+    public function __construct(
+        $endpointId,
+        $pathname,
+        $resourceClassName,
+        $children = null
+    )
+    {
+        $this->endpointId = $endpointId;
+        $this->pathname = $pathname;
+        $this->resourceClassName = $resourceClassName;
+        $this->children = $children;
+    }
+
     /** @var integer */
     var $endpointId;
-
-    /** @var string */
-    var $title;
 
     /** @var string */
     var $pathname;

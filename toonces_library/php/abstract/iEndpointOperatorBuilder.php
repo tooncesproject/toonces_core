@@ -8,5 +8,5 @@
 interface iEndpointOperatorBuilder
 {
     /** @return iEndpointOperator */
-    public function makeEndpointSystem();
+    public function makeEndpointOperator();
 }

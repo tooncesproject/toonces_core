@@ -15,12 +15,11 @@ interface iEndpointOperator
 
     /**
      * @param integer $parentEndpointId
-     * @param string $title
      * @param string $pathName
      * @param string $resourceClassName
      * @return Endpoint
      */
-    public function createEndpoint($parentEndpointId, $title, $pathName, $resourceClassName);
+    public function createEndpoint($parentEndpointId, $pathName, $resourceClassName);
 
     /**
      * @param string $endpointUri;
