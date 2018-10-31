@@ -7,8 +7,6 @@
  *
  */
 
-include_once LIBPATH . 'php/toonces.php';
-
 abstract class Resource
 {
 

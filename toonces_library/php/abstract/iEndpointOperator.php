@@ -8,7 +8,6 @@
  *
  */
 
-require_once LIBPATH . '/php/toonces.php';
 
 interface iEndpointOperator
 {

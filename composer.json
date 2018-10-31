@@ -1,5 +1,33 @@
 {
   "require": {
     "league/flysystem": "1.0.*"
+  },
+  "autoload": {
+    "classmap": [
+
+      "toonces_library/php/exception/TooncesException.php",
+      "toonces_library/php/exception/EndpointNotFoundException.php",
+      "toonces_library/php/exception/CreateEndpointException.php",
+      "toonces_library/php/exception/EndpointReadWriteException.php",
+      "toonces_library/php/utility/static/StaticRequestFactory.php",
+      "toonces_library/php/utility/static/StaticResourceFactory.php",
+      "toonces_library/php/record/Request.php",
+      "toonces_library/php/record/Endpoint.php",
+      "toonces_library/php/abstract/iEndpointOperator.php",
+      "toonces_library/php/XmlEndpointOperator.php",
+      "toonces_library/php/abstract/iEndpointOperatorBuilder.php",
+      "toonces_library/php/LocalXmlEndpointOperatorBuilder.php",
+      "toonces_library/php/abstract/Response.php",
+      "toonces_library/php/abstract/Responder.php",
+      "toonces_library/php/DefaultResponse.php",
+      "toonces_library/php/DefaultResponder.php",
+      "toonces_library/php/HelloWorldResponder.php",
+      "toonces_library/php/FourOhFourResponder.php",
+      "toonces_library/php/abstract/iAuthenticator.php",
+      "toonces_library/php/DefaultAuthenticator.php",
+      "toonces_library/php/abstract/Resource.php",
+      "toonces_library/php/HelloWorldResource.php",
+      "toonces_library/php/FourOhFourResource.php"
+    ]
   }
 }

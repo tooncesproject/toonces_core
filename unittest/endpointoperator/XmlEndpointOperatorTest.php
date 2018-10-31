@@ -7,7 +7,6 @@
 
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../FileDependentTestCase.php';
-require_once __DIR__ . '/../../toonces_library/php/toonces.php';
 
 class XmlEndpointOperatorTest extends FileDependentTestCase
 {
